@@ -1,0 +1,27 @@
+task_optimization:
+
+  paths:
+    input_dir: "../input"
+    output_dir: "../output"
+
+  prediction:
+    - algorithm: "RandomForest"
+      parameters:
+        param1: 0.1
+        param2: 0.2
+
+    - algorithm: "SVM"
+      parameters:
+        param1: 0.1
+        param2: 0.2
+
+  downstream_task:
+    - algorithm: "downstream_task_algorithm"
+      parameters:
+        param1: 0.1
+        param2: 0.2
+
+    - algorithm: "downstream_task_algorithm"
+      parameters:
+        param1: 0.1
+        param2: 0.2
