@@ -1,0 +1,33 @@
+2024-11-03 19:13:29,339 - m2_clustering.run - INFO - Starting Clustering Component
+2024-11-03 19:13:29,346 - root - INFO - Copied global_network.csv to C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\input
+2024-11-03 19:13:29,346 - m2_clustering.run - ERROR - Error in Clustering: 'm2_clustering'
+2024-11-03 19:24:43,444 - m2_clustering.run - INFO - Starting Clustering Component
+2024-11-03 19:24:43,444 - m2_clustering.run - ERROR - Error in Clustering: 'm2_clustering'
+2024-11-03 19:30:02,510 - m2_clustering.run - INFO - Starting Clustering Component
+2024-11-03 19:30:02,510 - m2_clustering.run - INFO - Selected Clustering Algorithm: hierarchical
+2024-11-03 19:30:07,858 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 19:30:07,858 - m2_clustering.run - ERROR - Error in Clustering Component: module 'hierarchical' has no attribute 'run_hierarchical_clustering'
+2024-11-03 19:30:37,725 - m2_clustering.run - INFO - Starting Clustering Component
+2024-11-03 19:30:37,725 - m2_clustering.run - INFO - Selected Clustering Algorithm: hierarchical
+2024-11-03 19:30:38,376 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 19:30:38,376 - hierarchical - INFO - Running Hierarchical Clustering
+2024-11-03 19:30:38,778 - hierarchical - ERROR - Error in Hierarchical Clustering: AgglomerativeClustering.__init__() got an unexpected keyword argument 'affinity'
+2024-11-03 19:30:38,778 - m2_clustering.run - ERROR - Error in Clustering Component: AgglomerativeClustering.__init__() got an unexpected keyword argument 'affinity'
+2024-11-03 19:33:34,477 - m2_clustering.run - INFO - Starting Clustering Component
+2024-11-03 19:33:34,478 - m2_clustering.run - INFO - Selected Clustering Algorithm: hierarchical
+2024-11-03 19:33:35,152 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 19:33:35,152 - hierarchical - INFO - Running Hierarchical Clustering
+2024-11-03 19:33:38,751 - hierarchical - INFO - Cluster labels saved to C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\output\cluster_labels.csv
+2024-11-03 19:33:38,751 - hierarchical - ERROR - Error in Hierarchical Clustering: name 'n_clusters' is not defined
+2024-11-03 19:33:38,751 - m2_clustering.run - ERROR - Error in Clustering Component: name 'n_clusters' is not defined
+2024-11-03 19:37:19,236 - m2_clustering.run - INFO - Starting Clustering Component
+2024-11-03 19:37:19,236 - m2_clustering.run - INFO - Selected Clustering Algorithm: hierarchical
+2024-11-03 19:37:19,902 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 19:37:19,902 - hierarchical - INFO - Running Hierarchical Clustering
+2024-11-03 19:37:24,016 - hierarchical - INFO - Cluster labels saved to C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\output\cluster_labels.csv
+2024-11-03 19:37:24,192 - hierarchical - INFO - Cluster 1 data saved to C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\output\cluster_1.csv
+2024-11-03 19:37:25,356 - hierarchical - INFO - Cluster 2 data saved to C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\output\cluster_2.csv
+2024-11-03 19:37:25,378 - hierarchical - INFO - Cluster 3 data saved to C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\output\cluster_3.csv
+2024-11-03 19:37:25,389 - m2_clustering.run - INFO - Hierarchical Clustering completed successfully.
+2024-11-03 19:37:25,389 - __main__ - INFO - Component 2 completed. Outputs saved to C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\output
+2024-11-03 19:37:25,389 - __main__ - INFO - Pipeline execution completed successfully.

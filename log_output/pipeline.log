@@ -1,0 +1,70 @@
+2024-11-03 19:13:29,326 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-03 19:13:29,326 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-03 19:13:29,326 - __main__ - INFO - Pipeline run_all: False
+2024-11-03 19:13:29,326 - __main__ - INFO - Pipeline execution range: 2 to 2
+2024-11-03 19:13:29,326 - __main__ - INFO - Running component 2: clustering
+2024-11-03 19:13:29,333 - root - DEBUG - Current working directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet
+2024-11-03 19:13:29,333 - root - DEBUG - Component config path: m2_clustering\config\config.yml
+2024-11-03 19:13:29,333 - root - DEBUG - Component config directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\config
+2024-11-03 19:13:29,337 - root - DEBUG - Resolved input directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\input
+2024-11-03 19:13:29,337 - root - DEBUG - Resolved output directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\output
+2024-11-03 19:24:43,441 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-03 19:24:43,441 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-03 19:24:43,441 - __main__ - INFO - Pipeline run_all: False
+2024-11-03 19:24:43,441 - __main__ - INFO - Pipeline execution range: 2 to 2
+2024-11-03 19:24:43,441 - __main__ - INFO - Running component 2: clustering
+2024-11-03 19:24:43,442 - root - DEBUG - Current working directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet
+2024-11-03 19:24:43,442 - root - DEBUG - Component config path: m2_clustering\config\config.yml
+2024-11-03 19:24:43,442 - root - DEBUG - Component config directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\config
+2024-11-03 19:24:43,442 - root - DEBUG - Resolved input directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\input
+2024-11-03 19:24:43,442 - root - DEBUG - Resolved output directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\output
+2024-11-03 19:30:02,506 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-03 19:30:02,507 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-03 19:30:02,507 - __main__ - INFO - Pipeline run_all: False
+2024-11-03 19:30:02,507 - __main__ - INFO - Pipeline execution range: 2 to 2
+2024-11-03 19:30:02,507 - __main__ - INFO - Running component 2: clustering
+2024-11-03 19:30:02,509 - root - DEBUG - Current working directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet
+2024-11-03 19:30:02,509 - root - DEBUG - Component config path: m2_clustering\config\config.yml
+2024-11-03 19:30:02,509 - root - DEBUG - Component config directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\config
+2024-11-03 19:30:02,509 - root - DEBUG - Resolved input directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\input
+2024-11-03 19:30:02,509 - root - DEBUG - Resolved output directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\output
+2024-11-03 19:30:37,722 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-03 19:30:37,722 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-03 19:30:37,722 - __main__ - INFO - Pipeline run_all: False
+2024-11-03 19:30:37,722 - __main__ - INFO - Pipeline execution range: 2 to 2
+2024-11-03 19:30:37,722 - __main__ - INFO - Running component 2: clustering
+2024-11-03 19:30:37,724 - root - DEBUG - Current working directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet
+2024-11-03 19:30:37,724 - root - DEBUG - Component config path: m2_clustering\config\config.yml
+2024-11-03 19:30:37,724 - root - DEBUG - Component config directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\config
+2024-11-03 19:30:37,724 - root - DEBUG - Resolved input directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\input
+2024-11-03 19:30:37,724 - root - DEBUG - Resolved output directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\output
+2024-11-03 19:33:34,475 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-03 19:33:34,475 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-03 19:33:34,475 - __main__ - INFO - Pipeline run_all: False
+2024-11-03 19:33:34,475 - __main__ - INFO - Pipeline execution range: 2 to 2
+2024-11-03 19:33:34,475 - __main__ - INFO - Running component 2: clustering
+2024-11-03 19:33:34,476 - root - DEBUG - Current working directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet
+2024-11-03 19:33:34,477 - root - DEBUG - Component config path: m2_clustering\config\config.yml
+2024-11-03 19:33:34,477 - root - DEBUG - Component config directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\config
+2024-11-03 19:33:34,477 - root - DEBUG - Resolved input directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\input
+2024-11-03 19:33:34,477 - root - DEBUG - Resolved output directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\output
+2024-11-03 19:37:19,234 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-03 19:37:19,234 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-03 19:37:19,234 - __main__ - INFO - Pipeline run_all: False
+2024-11-03 19:37:19,234 - __main__ - INFO - Pipeline execution range: 2 to 2
+2024-11-03 19:37:19,234 - __main__ - INFO - Running component 2: clustering
+2024-11-03 19:37:19,235 - root - DEBUG - Current working directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet
+2024-11-03 19:37:19,235 - root - DEBUG - Component config path: m2_clustering\config\config.yml
+2024-11-03 19:37:19,235 - root - DEBUG - Component config directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\config
+2024-11-03 19:37:19,235 - root - DEBUG - Resolved input directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\input
+2024-11-03 19:37:19,235 - root - DEBUG - Resolved output directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m2_clustering\output
+2024-11-03 19:54:04,910 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-03 19:54:04,910 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-03 19:54:04,910 - __main__ - INFO - Pipeline run_all: False
+2024-11-03 19:54:04,911 - __main__ - INFO - Pipeline execution range: 3 to 3
+2024-11-03 19:54:04,911 - __main__ - INFO - Running component 3: network_embedding
+2024-11-03 19:54:04,913 - root - DEBUG - Current working directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet
+2024-11-03 19:54:04,913 - root - DEBUG - Component config path: m3_network_embedding\config\config.yml
+2024-11-03 19:54:04,913 - root - DEBUG - Component config directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m3_network_embedding\config
+2024-11-03 19:54:04,913 - root - DEBUG - Resolved input directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m3_network_embedding\input
+2024-11-03 19:54:04,913 - root - DEBUG - Resolved output directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m3_network_embedding\output
