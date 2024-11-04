@@ -1,0 +1,1556 @@
+2024-11-03 16:36:34,572 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 16:36:34,572 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccNet
+2024-11-03 16:36:34,573 - root - ERROR - Algorithm module not found: 1_graph_generation\config\smccnet.py
+2024-11-03 16:36:34,573 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: Algorithm module not found: 1_graph_generation\config\smccnet.py
+2024-11-03 16:37:06,335 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 16:37:06,335 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccNet
+2024-11-03 16:37:06,339 - root - ERROR - Algorithm module not found: 1_graph_generation\config\smccnet.py
+2024-11-03 16:37:06,339 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: Algorithm module not found: 1_graph_generation\config\smccnet.py
+2024-11-03 16:39:01,987 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 16:39:01,987 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccNet
+2024-11-03 16:39:01,988 - root - ERROR - Algorithm module not found: 1_graph_generation\config\smccnet.py
+2024-11-03 16:39:01,988 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: Algorithm module not found: 1_graph_generation\config\smccnet.py
+2024-11-03 16:39:32,429 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 16:39:32,429 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccNet
+2024-11-03 16:39:32,429 - root - ERROR - Algorithm module not found: 1_graph_generation\config\smccnet.py
+2024-11-03 16:39:32,429 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: Algorithm module not found: 1_graph_generation\config\smccnet.py
+2024-11-03 16:51:16,012 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 16:51:16,012 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: SmCCNet
+2024-11-03 16:51:16,012 - root - ERROR - Algorithm module not found: 1_graph_generation\config\smccnet.py
+2024-11-03 16:51:16,012 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: Algorithm module not found: 1_graph_generation\config\smccnet.py
+2024-11-03 16:53:39,460 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 16:53:39,460 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccnet
+2024-11-03 16:53:39,460 - root - ERROR - Algorithm module not found: 1_graph_generation\config\smccnet.py
+2024-11-03 16:53:39,460 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: Algorithm module not found: 1_graph_generation\config\smccnet.py
+2024-11-03 16:55:14,265 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 16:55:14,265 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccnet
+2024-11-03 16:55:14,265 - root - ERROR - Algorithm module not found: m1_graph_generation\config\smccnet.py
+2024-11-03 16:55:14,265 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: Algorithm module not found: m1_graph_generation\config\smccnet.py
+2024-11-03 16:55:58,803 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 16:55:58,803 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccnet
+2024-11-03 16:55:58,803 - root - ERROR - Algorithm module not found: m1_graph_generation\config\smccnet.py
+2024-11-03 16:55:58,803 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: Algorithm module not found: m1_graph_generation\config\smccnet.py
+2024-11-03 16:57:17,207 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 16:57:17,207 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccnet
+2024-11-03 16:57:17,207 - root - ERROR - Algorithm module not found: m1_graph_generation\config\smccnet.py
+2024-11-03 16:57:17,207 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: Algorithm module not found: m1_graph_generation\config\smccnet.py
+2024-11-03 17:00:08,905 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 17:00:08,905 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccnet
+2024-11-03 17:00:08,923 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:00:08,923 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: run_smccnet() takes 3 positional arguments but 4 were given
+2024-11-03 17:00:53,057 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 17:00:53,057 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccnet
+2024-11-03 17:00:53,059 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:00:53,059 - smccnet - INFO - Running SmCCNet Algorithm
+2024-11-03 17:00:53,059 - smccnet - ERROR - Error in SmCCNet Algorithm: 'smccnet_path'
+2024-11-03 17:00:53,060 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: 'smccnet_path'
+2024-11-03 17:04:19,675 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 17:04:19,675 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccnet
+2024-11-03 17:04:19,689 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:04:19,689 - smccnet - INFO - Running SmCCNet Algorithm
+2024-11-03 17:04:19,689 - smccnet - ERROR - Error in SmCCNet Algorithm: 'smccnet_dir'
+2024-11-03 17:04:19,689 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: 'smccnet_dir'
+2024-11-03 17:05:01,774 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 17:05:01,775 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccnet
+2024-11-03 17:05:01,775 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:05:01,775 - smccnet - INFO - Running SmCCNet Algorithm
+2024-11-03 17:05:01,775 - utils.load_data - ERROR - Path 'C:\Users\ramosv\Desktop\BDLab\Github\config' does not exist.
+2024-11-03 17:05:01,775 - smccnet - ERROR - Error in SmCCNet Algorithm: Path 'C:\Users\ramosv\Desktop\BDLab\Github\config' does not exist.
+2024-11-03 17:05:01,775 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: Path 'C:\Users\ramosv\Desktop\BDLab\Github\config' does not exist.
+2024-11-03 17:08:55,954 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 17:08:55,954 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccnet
+2024-11-03 17:08:55,965 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:08:55,965 - smccnet - INFO - Running SmCCNet Algorithm
+2024-11-03 17:08:55,966 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:08:55,966 - smccnet - ERROR - R script not found: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\SmCCNet.R
+2024-11-03 17:08:55,966 - smccnet - ERROR - Error in SmCCNet Algorithm: R script not found: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\SmCCNet.R
+2024-11-03 17:08:55,966 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: R script not found: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\SmCCNet.R
+2024-11-03 17:10:06,504 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 17:10:06,505 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccnet
+2024-11-03 17:10:06,508 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:10:06,508 - smccnet - INFO - Running SmCCNet Algorithm
+2024-11-03 17:10:06,508 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:10:06,509 - smccnet - ERROR - R script not found: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet/m1_graph_generation/SmCCNet.R
+2024-11-03 17:10:06,509 - smccnet - ERROR - Error in SmCCNet Algorithm: R script not found: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet/m1_graph_generation/SmCCNet.R
+2024-11-03 17:10:06,509 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: R script not found: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet/m1_graph_generation/SmCCNet.R
+2024-11-03 17:11:37,368 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 17:11:37,368 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccnet
+2024-11-03 17:11:37,378 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:11:37,378 - smccnet - INFO - Running SmCCNet Algorithm
+2024-11-03 17:11:37,378 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:11:37,379 - smccnet - DEBUG - Executing command: Rscript C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\config\SmCCNet.R C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\Y_finalgold_coarse.csv C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\metabolites_blood_count_adjusted_2019-08-26.csv,C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\proteins_blood_count_adjusted_protein_names.csv Metabolite,Protein 5 PCA 732 C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\output
+2024-11-03 17:11:37,995 - smccnet - ERROR - SmCCNet R script failed with error: 
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+Error in file(file, "rt") : cannot open the connection
+Calls: as.matrix -> read.csv -> read.table -> file
+In addition: Warning message:
+In file(file, "rt") :
+  cannot open file 'C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input/C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\metabolites_blood_count_adjusted_2019-08-26.csv': Invalid argument
+Execution halted
+
+2024-11-03 17:11:37,995 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: Command '['Rscript', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\config\\SmCCNet.R', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\Y_finalgold_coarse.csv', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\metabolites_blood_count_adjusted_2019-08-26.csv,C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\proteins_blood_count_adjusted_protein_names.csv', 'Metabolite,Protein', '5', 'PCA', '732', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\output']' returned non-zero exit status 1.
+2024-11-03 17:14:26,282 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 17:14:26,282 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccnet
+2024-11-03 17:14:26,283 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:14:26,283 - smccnet - INFO - Running SmCCNet Algorithm
+2024-11-03 17:14:26,283 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:14:26,284 - smccnet - DEBUG - Executing command: Rscript C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\config\SmCCNet.R C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\Y_finalgold_coarse.csv C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\metabolites_blood_count_adjusted_2019-08-26.csv,C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\proteins_blood_count_adjusted_protein_names.csv Metabolite,Protein 5 PCA 732 C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\output
+2024-11-03 17:14:40,333 - smccnet - ERROR - SmCCNet R script failed with error: 
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+Error in colMeans(x, na.rm = TRUE) : 'x' must be numeric
+Calls: fastAutoSmCCNet ... myMultiCCA -> lapply -> FUN -> scale.default -> colMeans
+Execution halted
+
+2024-11-03 17:14:40,334 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: Command '['Rscript', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\config\\SmCCNet.R', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\Y_finalgold_coarse.csv', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\metabolites_blood_count_adjusted_2019-08-26.csv,C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\proteins_blood_count_adjusted_protein_names.csv', 'Metabolite,Protein', '5', 'PCA', '732', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\output']' returned non-zero exit status 1.
+2024-11-03 17:16:35,993 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 17:16:35,994 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccnet
+2024-11-03 17:16:36,005 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:16:36,006 - smccnet - INFO - Running SmCCNet Algorithm
+2024-11-03 17:16:36,006 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:16:36,006 - smccnet - DEBUG - Executing command: Rscript C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\config\SmCCNet.R C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\Y_finalgold_coarse.csv C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\metabolites_blood_count_adjusted_2019-08-26.csv,C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\proteins_blood_count_adjusted_protein_names.csv Metabolite,Protein 5 PCA 732 C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\output
+2024-11-03 17:16:48,769 - smccnet - ERROR - SmCCNet R script failed with error: 
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+Error in colMeans(x, na.rm = TRUE) : 'x' must be numeric
+Calls: fastAutoSmCCNet ... myMultiCCA -> lapply -> FUN -> scale.default -> colMeans
+Execution halted
+
+2024-11-03 17:16:48,769 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: Command '['Rscript', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\config\\SmCCNet.R', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\Y_finalgold_coarse.csv', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\metabolites_blood_count_adjusted_2019-08-26.csv,C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\proteins_blood_count_adjusted_protein_names.csv', 'Metabolite,Protein', '5', 'PCA', '732', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\output']' returned non-zero exit status 1.
+2024-11-03 17:19:00,542 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 17:19:00,542 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccnet
+2024-11-03 17:19:00,543 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:19:00,543 - smccnet - INFO - Running SmCCNet Algorithm
+2024-11-03 17:19:00,543 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:19:00,544 - smccnet - DEBUG - Executing command: Rscript C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\config\SmCCNet.R C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\Y_finalgold_coarse.csv C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\metabolites_blood_count_adjusted_2019-08-26.csv,C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\proteins_blood_count_adjusted_protein_names.csv Metabolite,Protein 5 PCA 732 C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\output
+2024-11-03 17:19:07,365 - smccnet - ERROR - SmCCNet R script failed with error: 
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+Warning messages:
+1: In lapply(X = X, FUN = FUN, ...) : NAs introduced by coercion
+2: In lapply(X = X, FUN = FUN, ...) : NAs introduced by coercion
+Error in svd(xlist[[i]]) : infinite or missing values in 'x'
+Calls: fastAutoSmCCNet -> getCanWeightsMulti -> myMultiCCA -> matrix -> svd
+Execution halted
+
+2024-11-03 17:19:07,366 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: Command '['Rscript', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\config\\SmCCNet.R', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\Y_finalgold_coarse.csv', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\metabolites_blood_count_adjusted_2019-08-26.csv,C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\proteins_blood_count_adjusted_protein_names.csv', 'Metabolite,Protein', '5', 'PCA', '732', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\output']' returned non-zero exit status 1.
+2024-11-03 17:24:04,044 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 17:24:04,044 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccnet
+2024-11-03 17:24:04,045 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:24:04,045 - smccnet - INFO - Running SmCCNet Algorithm
+2024-11-03 17:24:04,046 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:24:04,046 - smccnet - DEBUG - Executing command: Rscript C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\config\SmCCNet.R C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\Y_finalgold_coarse.csv C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\metabolites_blood_count_adjusted_2019-08-26.csv,C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\proteins_blood_count_adjusted_protein_names.csv Metabolite,Protein 5 PCA 732 C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\output
+2024-11-03 17:24:10,171 - smccnet - ERROR - SmCCNet R script failed with error: 
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+Error: Number of samples in phenotype data does not match the omics data.
+Execution halted
+
+2024-11-03 17:24:10,171 - m1_graph_generation.run - ERROR - Error in Graph Generation Component: Command '['Rscript', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\config\\SmCCNet.R', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\Y_finalgold_coarse.csv', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\metabolites_blood_count_adjusted_2019-08-26.csv,C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\proteins_blood_count_adjusted_protein_names.csv', 'Metabolite,Protein', '5', 'PCA', '732', 'C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\output']' returned non-zero exit status 1.
+2024-11-03 17:28:22,584 - m1_graph_generation.run - INFO - Starting Graph Generation Component
+2024-11-03 17:28:22,584 - m1_graph_generation.run - INFO - Selected Graph Generation Algorithm: smccnet
+2024-11-03 17:28:22,585 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:28:22,586 - smccnet - INFO - Running SmCCNet Algorithm
+2024-11-03 17:28:22,586 - utils.load_data - INFO - All paths validated successfully.
+2024-11-03 17:28:22,586 - smccnet - DEBUG - Executing command: Rscript C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\config\SmCCNet.R C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\Y_finalgold_coarse.csv C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\metabolites_blood_count_adjusted_2019-08-26.csv,C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input\proteins_blood_count_adjusted_protein_names.csv Metabolite,Protein 5 PCA 732 C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\output
+2024-11-03 17:55:21,813 - smccnet - INFO - SmCCNet R script executed successfully.
+2024-11-03 17:55:21,813 - smccnet - INFO - SmCCNet Output:
+[1] "Phenotype file: C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\Y_finalgold_coarse.csv"
+[1] "Omics files: C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\metabolites_blood_count_adjusted_2019-08-26.csv, C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\proteins_blood_count_adjusted_protein_names.csv"
+[1] "Data types: Metabolite, Protein"
+[1] "Kfold: 5"
+[1] "Summarization method: PCA"
+[1] "Seed: 732"
+[1] "Saving directory: C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\output"
+[1] "Loading phenotype file: C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\Y_finalgold_coarse.csv"
+[1] "Phenotype data length: 898"
+[1] "Phenotype factor levels: 0" "Phenotype factor levels: 1"
+[1] "Loading omics file: C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\metabolites_blood_count_adjusted_2019-08-26.csv"
+[1] "Omics data dimensions: 898 samples x 995 features"
+[1] "Loading omics file: C:\\Users\\ramosv\\Desktop\\BDLab\\Github\\BioNeuralNet\\m1_graph_generation\\input\\proteins_blood_count_adjusted_protein_names.csv"
+[1] "Omics data dimensions: 898 samples x 1317 features"
+[1] "Number of samples after alignment: 898"
+
+**********************************
+* Welcome to Automated SmCCNet! *
+**********************************
+
+This project uses multiomics PLS 
+
+--------------------------------------------------
+>> Now determining the scaling factor for multi-omics analysis...
+--------------------------------------------------
+
+The between-omics and omics-phenotype importance ratio is:  0.3398457 : 1 
+
+The scaling factor selection is:  
+
+Metabolite-Protein: 0.339845703179062 
+
+--------------------------------------------------
+>> Determining the best penalty selection through cross-validation...
+--------------------------------------------------
+
+
+The best penalty term for Metabolite after 5-fold cross-validation is: 0.6 
+The best penalty term for Protein after 5-fold cross-validation is: 0.5 
+and the best penalty term on classifier is: 0.7
+with testing accuracy score = 0.687 
+Now running multi-omics PLS with best penalty term on the complete dataset. 
+
+--------------------------------------------------
+>> Now starting network clustering...
+--------------------------------------------------
+
+Clustering completed...
+
+--------------------------------------------------
+>> Now starting network pruning and summarization score extraction...
+--------------------------------------------------
+
+There are 3 network modules before pruning
+ Now extracting subnetwork for network module  1 
+Network module 1 Result:The final network size is: 86 with maximum PC correlation w.r.t. phenotype to be: -0.378
+ Now extracting subnetwork for network module  2 
+Network module 2 Result:The final network size is: 55 with maximum PC correlation w.r.t. phenotype to be: 0.253
+ Now extracting subnetwork for network module  3 
+Network module 3 Result:The final network size is: 41 with maximum PC correlation w.r.t. phenotype to be: 0.126
+
+************************************
+*   Execution Finished!            *
+*   Automated SmCCNet Completed!   *
+************************************
+
+There are 4 files stored in the local directory: 
+1. CVResult.csv: cross-validation result. 
+2. CVFold.Rdata: omics and phenotype data splited into different folds. 
+3. globalNetwork.Rdata: global network adjacency matrix, omics data, phenotype. 
+4. size_a_net_b.Rdata: subnetworks result file after clustering and network pruning. 
+SUBNETWORK RESULT FILE CONTAINS:
+1. correlation_sub: correlation matrix for the subnetwork.
+2. M: adjacency matrix for the subnetwork.
+3. omics_corelation_data: individual molecular feature correlation with phenotype.
+4. pc_correlation: first 3 PCs correlation with phenotype.
+5. pc_loading: principal component loadings.
+6. pca_x1_score: principal component score and phenotype data.
+7. mod_size: number of molecular features in the subnetwork.
+8. sub_type: type of feature for each molecular features.
+
+NOTE:
+1. The results are saved in the user-specified directory.
+   If not specified, use 'getwd()' to find the current working directory.
+
+2. The results are in 'size_a_net_b.Rdata', where:
+   'a' = network size, 'b' = module number.
+
+3. To prevent overwriting result files across projects, rename the result file after each run.
+
+4. Subnetwork visualization can be done through shinyApp or cytoscape. Please refer to the network visualization section in the multi-omics or single-omics vignette for more detail. For the Shiny app, visit: https://smccnet.shinyapps.io/smccnetnetwork/
+
+************************************
+
+2024-11-03 17:55:21,814 - smccnet - WARNING - SmCCNet Warnings/Errors:
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%
+ Progress: ──────────────────────────────────────────────────────────────── 100%Warning message:
+In split.default(1:nrow(X[[1]]), sample(1:nrow(X[[1]]), Kfold)) :
+  data length is not a multiple of split variable
+
+2024-11-03 17:55:21,824 - m1_graph_generation.run - INFO - smccnet Algorithm executed successfully.
+2024-11-03 17:55:21,825 - __main__ - INFO - Component 1 completed. Outputs saved to C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\output
+2024-11-03 17:55:21,825 - __main__ - INFO - Pipeline execution completed successfully.

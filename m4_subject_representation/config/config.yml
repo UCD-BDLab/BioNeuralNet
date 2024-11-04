@@ -1,0 +1,15 @@
+subject_representation:
+  paths:
+    input_dir: "../input"
+    output_dir: "../output"
+
+  integrate_embeddings_into_omics_data:
+    files:
+      embeddings: "embeddings.csv"
+      omics_data: "omics_data.csv"
+
+  scalar-representation:
+    files:
+      embeddings: "embeddings.csv"
+      omics_data: "omics_data.csv"
+      scalar_representation: "scalar_representation.csv"
