@@ -1,0 +1,7 @@
+# Python package dependencies for the BioNetwork Pipeline
+PyYAML>=5.4
+pandas>=1.0
+numpy>=1.18
+scikit-learn>=0.24
+node2vec>=0.4.1
+
