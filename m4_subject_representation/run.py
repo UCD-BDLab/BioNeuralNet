@@ -65,3 +65,7 @@ def load_method_module(component_number, algorithm):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+# avg emeeddings for each node, then use that value to weight the feature that we have in our dataset
+# Take that vali and multiple by all the values in the columns that correstpon to this node.
+# another example is take the max rahter than avg.
