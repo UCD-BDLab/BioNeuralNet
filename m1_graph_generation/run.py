@@ -23,10 +23,20 @@ def run_graph_generation(config):
         input_dir = os.path.abspath(config['graph_generation']['paths']['input_dir'])
         output_dir = os.path.abspath(config['graph_generation']['paths']['output_dir'])
 
-        # Ensure input directory exists
         if not os.path.isdir(input_dir):
             logger.error(f"Input directory does not exist: {input_dir}")
             sys.exit(1)
+
+        # Check if input directory is empty
+        if not os.listdir(input_dir):
+            logger.error(f"Input directory is empty: {input_dir}")
+            print(f"The input directory '{input_dir}' is empty. Please add omics-data files.")
+            sys.exit(1)
+
+        # # Ensure input directory exists
+        # if not os.path.isdir(input_dir):
+        #     logger.error(f"Input directory does not exist: {input_dir}")
+        #     sys.exit(1)
 
         # Since 'algorithm' key is not present, directly set to 'smccnet'
         algorithm = "smccnet"
