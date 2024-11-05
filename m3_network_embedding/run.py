@@ -28,8 +28,8 @@ def run_network_embedding(config):
         os.makedirs(output_dir, exist_ok=True)
 
         # Check if input directory is empty and copy files if necessary
-        source_dir = os.path.abspath(os.path.join('m2_clustering', 'output'))
-        copy_files_if_input_empty(input_dir, source_dir)
+        #source_dir = os.path.abspath(os.path.join('m2_clustering', 'output'))
+        copy_files_if_input_empty(input_dir)
 
         # Since 'algorithm' key is not present in the component config, set it directly
         algorithm = "node2vec"
@@ -39,17 +39,17 @@ def run_network_embedding(config):
         algorithm_module = load_algorithm_module(component_number=3, algorithm=algorithm)
 
         # Dynamic discovery of cluster files
-        cluster_files = find_files(input_dir, "cluster_*.csv")
-        if not cluster_files:
-            logger.error(f"No cluster CSV files found in {input_dir}")
+        input_files = find_files(input_dir, "*.csv")
+        if not input_files:
+            logger.error(f"No CSV files found in {input_dir}")
             sys.exit(1)
 
-        # Validate cluster files
-        validate_paths(*cluster_files)
+        # Exclude 'cluster_labels.csv' if present
+        input_files = [f for f in input_files if not f.endswith('cluster_labels.csv')]
 
-        # Run embedding for each cluster
-        for cluster_file in cluster_files:
-            algorithm_module.run_node2vec(cluster_file, config, output_dir)
+        # Run embedding for each input file
+        for input_file in input_files:
+            algorithm_module.run_node2vec(input_file, config, output_dir)
 
         logger.info(f"{algorithm} Embedding completed successfully.")
 
@@ -78,26 +78,56 @@ def load_algorithm_module(component_number, algorithm):
     spec.loader.exec_module(module)
     return module
 
-def copy_files_if_input_empty(input_dir, source_dir):
+def copy_files_if_input_empty(input_dir):
     """
-    Copy cluster files from source_dir to input_dir if input_dir is empty, excluding cluster_labels.csv.
+    Copy files from the appropriate source directory to input_dir if input_dir is empty,
+    with user prompts.
     """
     if not os.path.exists(input_dir):
         os.makedirs(input_dir)
     if not os.listdir(input_dir):
         # Input directory is empty
-        cluster_files = [
-            f for f in os.listdir(source_dir)
-            if f.startswith('cluster_') and f.endswith('.csv') and f != 'cluster_labels.csv'
-        ]
-        if not cluster_files:
-            logging.error(f"No cluster CSV files found in source directory {source_dir}")
+        print(f"The input directory '{input_dir}' is empty.")
+        print("Select the source of input files:")
+        print("1. Use output from Component 2 (Clustering)")
+        print("2. Use output from Component 1 (Graph Generation)")
+        print("3. Provide input files manually")
+        choice = input("Enter your choice (1/2/3): ").strip()
+        if choice == '1':
+            source_dir = os.path.abspath(os.path.join('m2_clustering', 'output'))
+            cluster_files = [
+                f for f in os.listdir(source_dir)
+                if f.startswith('cluster_') and f.endswith('.csv') and f != 'cluster_labels.csv'
+            ]
+            if cluster_files:
+                for file in cluster_files:
+                    src_file = os.path.join(source_dir, file)
+                    dst_file = os.path.join(input_dir, file)
+                    shutil.copy(src_file, dst_file)
+                    logging.info(f"Copied {file} to {input_dir}")
+                    print(f"Copied {file} from Component 2 to '{input_dir}'.")
+            else:
+                print(f"No cluster files found in {source_dir}. Please run Component 2 first or provide the necessary input files.")
+                sys.exit(1)
+        elif choice == '2':
+            source_dir = os.path.abspath(os.path.join('m1_graph_generation', 'output'))
+            network_file = 'global_network.csv'
+            src_file = os.path.join(source_dir, network_file)
+            dst_file = os.path.join(input_dir, network_file)
+            if os.path.exists(src_file):
+                shutil.copy(src_file, dst_file)
+                logging.info(f"Copied {network_file} to {input_dir}")
+                print(f"Copied {network_file} from Component 1 to '{input_dir}'.")
+            else:
+                print(f"Error: {network_file} not found in {source_dir}. Please run Component 1 first or provide the necessary input files.")
+                sys.exit(1)
+        elif choice == '3':
+            print("Please provide the required input files in the input directory.")
             sys.exit(1)
-        for file in cluster_files:
-            src_file = os.path.join(source_dir, file)
-            dst_file = os.path.join(input_dir, file)
-            shutil.copy(src_file, dst_file)
-            logging.info(f"Copied {file} to {input_dir}")
+        else:
+            print("Invalid choice. Exiting.")
+            sys.exit(1)
+
 
 
 def find_files(directory, pattern):

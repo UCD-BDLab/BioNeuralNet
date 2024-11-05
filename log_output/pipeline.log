@@ -68,3 +68,18 @@
 2024-11-03 19:54:04,913 - root - DEBUG - Component config directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m3_network_embedding\config
 2024-11-03 19:54:04,913 - root - DEBUG - Resolved input directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m3_network_embedding\input
 2024-11-03 19:54:04,913 - root - DEBUG - Resolved output directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m3_network_embedding\output
+2024-11-04 12:00:41,721 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-04 12:31:24,764 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-04 12:31:24,764 - __main__ - INFO - Running component 3: network_embedding
+2024-11-04 12:31:24,772 - root - DEBUG - Current working directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet
+2024-11-04 12:31:24,772 - root - DEBUG - Component config path: m3_network_embedding\config\config.yml
+2024-11-04 12:31:24,772 - root - DEBUG - Component config directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m3_network_embedding\config
+2024-11-04 12:31:24,772 - root - DEBUG - Resolved input directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m3_network_embedding\input
+2024-11-04 12:31:24,772 - root - DEBUG - Resolved output directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m3_network_embedding\output
+2024-11-04 12:33:38,061 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-04 12:33:38,061 - __main__ - INFO - Running component 1: graph_generation
+2024-11-04 12:33:38,070 - root - DEBUG - Current working directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet
+2024-11-04 12:33:38,070 - root - DEBUG - Component config path: m1_graph_generation\config\config.yml
+2024-11-04 12:33:38,070 - root - DEBUG - Component config directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\config
+2024-11-04 12:33:38,070 - root - DEBUG - Resolved input directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input
+2024-11-04 12:33:38,070 - root - DEBUG - Resolved output directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\output

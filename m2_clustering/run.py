@@ -53,23 +53,37 @@ def run_clustering(config):
         logger.error(f"Error in Clustering Component: {e}")
         sys.exit(1)
 
-def copy_files_if_input_empty(input_dir, source_dir):
+def copy_files_if_input_empty(input_dir):
     """
-    Copy files from source_dir to input_dir if input_dir is empty.
+    Copy files from source_dir to input_dir if input_dir is empty,
+    with user prompts.
     """
     if not os.path.exists(input_dir):
-        os.makedirs(input_dir)
+        logging.error(f"Input directory does not exist: {input_dir}")
+        sys.exit(1)
+
     if not os.listdir(input_dir):
         # Input directory is empty
-        csv_files = [f for f in os.listdir(source_dir) if f.endswith('.csv')]
-        if not csv_files:
-            logging.error(f"No CSV files found in source directory {source_dir}")
+        logging.error(f"Input directory is empty: {input_dir}")
+        print(f"The input directory '{input_dir}' is empty.")
+        use_component1 = input("Do you want to use the output from Component 1 (Graph Generation)? (y/n): ").strip().lower()
+        if use_component1 == 'y':
+            source_dir = os.path.abspath(os.path.join('m1_graph_generation', 'output'))
+            network_file = 'global_network.csv'
+            src_file = os.path.join(source_dir, network_file)
+            dst_file = os.path.join(input_dir, network_file)
+            if os.path.exists(src_file):
+                shutil.copy(src_file, dst_file)
+                logging.info(f"Copied {network_file} to {input_dir}")
+                print(f"Copied {network_file} from Component 1 to '{input_dir}'.")
+            else:
+                print(f"Error: {network_file} not found in {source_dir}. Please run Component 1 first or provide the necessary input files.")
+                sys.exit(1)
+        else:
+            print("Please provide the required input files in the input directory.")
             sys.exit(1)
-        for file in csv_files:
-            src_file = os.path.join(source_dir, file)
-            dst_file = os.path.join(input_dir, file)
-            shutil.copy(src_file, dst_file)
-            logging.info(f"Copied {file} to {input_dir}")
+
+
 
 def load_algorithm_module(component_number, algorithm):
     """
