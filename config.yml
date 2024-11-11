@@ -4,23 +4,23 @@ pipeline:
   output_dir: "log_output"
   log_file: "pipeline.log"
 
-# Graph Generation Settings
+# Graph Generation
 m1_graph_generation:
   algorithm: "smccnet"
 
-# Clustering Settings
+# Clustering
 m2_clustering:
   algorithm: "Hierarchical"
 
-# Network Embedding Settings
+# Network Embedding
 m3_network_embedding:
   algorithm: "node2vec"
 
-# Subject Representation Settings
+# Subject Representation
 m4_subject_representation:
   integration_method: "scalar-representation"
 
-# Task Optimization Settings
-m5_task_optimization:
-  task_type: "prediction"
-  algorithm: "random_forest"
+# Task Optimization
+m5_integrated_task:
+  # Prediction with network information using DPMON.
+  task: "prediction"

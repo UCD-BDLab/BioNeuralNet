@@ -1,6 +1,6 @@
 # BioNeuralNet
 
-BioNeuralNet is a **modular**, **flexible**, and **extensible** bioinformatics pipeline designed to streamline the analysis of multi-omics data. It facilitates a seamless workflow encompassing graph generation, clustering, network embedding, subject representation, and task optimization. Tailored for scientists and researchers, BioNeuralNet simplifies complex computational tasks, enabling efficient data processing and insightful biological discoveries.
+BioNeuralNet is a **modular**, **flexible**, and **extensible** bioinformatics pipeline designed to streamline the analysis of multi-omics data. It facilitates a seamless workflow encompassing graph generation, clustering, network embedding, subject representation, and Integrated Tasks. Tailored for scientists and researchers, BioNeuralNet simplifies complex computational tasks, enabling efficient data processing and insightful biological discoveries.
 
 ## Table of Contents
 
@@ -12,7 +12,7 @@ BioNeuralNet is a **modular**, **flexible**, and **extensible** bioinformatics p
   - [2. Clustering](#2-clustering)
   - [3. Network Embedding](#3-network-embedding)
   - [4. Subject Representation](#4-subject-representation)
-  - [5. Task Optimization](#5-task-optimization)
+  - [5. Integrated Tasks](#5-integrated-tasks)
 - [Configuration](#configuration)
   - [Root Configuration](#root-configuration)
   - [Component Configuration](#component-configuration)
@@ -20,6 +20,7 @@ BioNeuralNet is a **modular**, **flexible**, and **extensible** bioinformatics p
 - [Usage](#usage)
   - [Running the Entire Pipeline](#running-the-entire-pipeline)
   - [Running Individual Components](#running-individual-components)
+  - [Running Task Optmization](#running-task-optimization)
 - [Workflow Overview](#workflow-overview)
   - [Data Flow and Dependencies](#data-flow-and-dependencies)
 - [Logging](#logging)
@@ -45,12 +46,14 @@ BioNeuralNet is a **modular** and **flexible** network embedding framework tailo
 
 - **Modular Architecture:** Each analysis step—network generation, embedding, clustering, and optimization—is encapsulated within its own module, allowing for independent development and testing.
 - **Dynamic Algorithm Integration:** Effortlessly switch between different algorithms or introduce new ones by updating configuration files, without altering the core pipeline scripts.
+- **Optimized Integrated Tasks:** Utilizes **DPMON** for efficient and effective predictive modeling tasks.
 - **Comprehensive Logging System:** Maintain detailed logs for both the overall pipeline (`pipeline.log`) and individual components (`component.log`), aiding in monitoring and debugging.
 - **Reusable Helper Functions:** Streamlined file operations and data handling through centralized helper utilities, promoting code reuse and consistency.
 - **Consistent Naming Conventions:** Standardized output file naming ensures clarity and prevents overwriting of results.
 - **Robust Error Handling:** Implemented validation checks and exception handling mechanisms ensure the pipeline fails gracefully, providing informative error messages.
 - **User-Friendly Configuration:** Centralized and component-specific YAML configuration files simplify the setup process, making the pipeline accessible to users with varying levels of technical expertise.
 - **Scalability and Performance:** Optimized to handle large-scale multi-omics datasets efficiently, making it suitable for extensive bioinformatics research.
+
 
 ## Pipeline Architecture
 
@@ -64,49 +67,86 @@ BioNeuralNet's architecture is meticulously designed to promote clarity and effi
 2. **Clustering:** Segments the global graph into meaningful clusters.
 3. **Network Embedding:** Generates embeddings for each sub-network using specified embedding techniques.
 4. **Subject Representation:** Integrates network embeddings with omics data to create comprehensive subject profiles.
-5. **Task Optimization:** Performs predictive modeling based on subject representations to optimize downstream tasks.
+5. **Integrated Tasks:** Performs predictive modeling based on subject representations to optimize downstream tasks.
 
 ## Pipeline Components
 
-### 1. Graph Generation (`m1_graph_generation`)
+- ### 1. Graph Generation (`m1_graph_generation`)
 
-**Purpose:** Constructs a global graph from multi-omics and phenotype data using specified algorithms.
+  **Purpose:** Constructs a global graph from multi-omics and phenotype data using specified algorithms.
 
-- **Input:** Multi-Omics Data Files, Phenotype File.
-- **Output:** `global_network.csv` saved in `m1_graph_generation/output/`.
-- **Algorithms:** Implemented in `config/smccnet.py` and can be extended with additional algorithms.
+  - **Input:** Multi-Omics Data Files, Phenotype File.
+  - **Output:** `global_network.csv` saved in `m1_graph_generation/output/`.
+  - **Algorithms:** Implemented in `config/smccnet.py` and can be extended with additional algorithms.
 
-### 2. Clustering (`m2_clustering`)
+- ### 2. Clustering (`m2_clustering`)
 
-**Purpose:** Segments the global graph into sub-networks using clustering methods.
+  **Purpose:** Segments the global graph into sub-networks using clustering methods.
 
-- **Input:** `global_network.csv` from `m1_graph_generation/output/`.
-- **Output:** `cluster_1.csv`, `cluster_2.csv`, etc., saved in `m2_clustering/output/`.
-- **Algorithms:** Hierarchical Clustering (`config/hierarchical.py`), PageRank Clustering (`config/pagerank.py`).
+  - **Input:** `global_network.csv` from `m1_graph_generation/output/`.
+  - **Output:** `cluster_1.csv`, `cluster_2.csv`, etc., saved in `m2_clustering/output/`.
+  - **Algorithms:** Hierarchical Clustering (`config/hierarchical.py`), PageRank Clustering (`config/pagerank.py`).
 
-### 3. Network Embedding (`m3_network_embedding`)
+- ### 3. Network Embedding (`m3_network_embedding`)
 
-**Purpose:** Generates embeddings for each sub-network using network embedding techniques.
+  **Purpose:** Generates embeddings for each sub-network using network embedding techniques.
 
-- **Input:** `cluster_1.csv`, `cluster_2.csv`, etc., from `m2_clustering/output/`.
-- **Output:** `cluster_1_embeddings.csv`, `cluster_2_embeddings.csv`, etc., saved in `m3_network_embedding/output/`.
-- **Algorithms:** Node2Vec (`config/node2vec.py`).
+  - **Input:** `cluster_1.csv`, `cluster_2.csv`, etc., from `m2_clustering/output/`.
+  - **Output:** `cluster_1_embeddings.csv`, `cluster_2_embeddings.csv`, etc., saved in `m3_network_embedding/output/`.
+  - **Algorithms:** Node2Vec (`config/node2vec.py`).
 
-### 4. Subject Representation (`m4_subject_representation`)
+- ### 4. Subject Representation (`m4_subject_representation`)
 
-**Purpose:** Integrates network embeddings with omics data to create comprehensive subject representations.
+  **Purpose:** Integrates network embeddings with omics data to create comprehensive subject representations.
 
-- **Input:** Embeddings from `m3_network_embedding/output/`, Raw Multi-Omics Data.
-- **Output:** `integrated_data.csv` saved in `m4_subject_representation/output/`.
-- **Methods:** Concatenation (`config/concatenate.py`), Scalar Representation (`config/scalar_representation.py`).
+  - **Input:** Embeddings from `m3_network_embedding/output/`, Raw Multi-Omics Data.
+  - **Output:** `integrated_data.csv` saved in `m4_subject_representation/output/`.
+  - **Methods:** Concatenation (`config/concatenate.py`), Scalar Representation (`config/scalar_representation.py`).
 
-### 5. Task Optimization (`m5_task_optimization`)
+- ### 5. Integrated Task Processing (`m5_integrated_tasks`)
 
-**Purpose:** Performs predictive modeling based on subject representations to optimize downstream tasks.
+  **Purpose:** Performs disease prediction and additional downstream analyses using integrated multi-omics data and network information.
 
-- **Input:** `integrated_data.csv` from `m4_subject_representation/output/`.
-- **Output:** `predictions_<timestamp>.csv` saved in `m5_task_optimization/output/`.
-- **Algorithms:** Random Forest, SVM, Logistic Regression (`config/prediction.py`).
+  - **Input:**
+      - **Mandatory:**
+          - `network_file`: An omics network file (`network.csv`) from `m1_graph_generation/output/`, `m2_clustering/output/`, or a user-provided adjacency matrix.
+          - `omics_files`: List of omics data files (e.g., `metabolites.csv`, `proteins.csv`).
+          - `phenotype_file`: `phenotype.csv`.
+      - **Optional but Recommended:**
+          - `features_file`: Clinical data for nodes (e.g., `features.csv`).
+  - **Output:** `predictions.csv` saved in `m5_integrated_tasks/output/`.
+  - **Description:** Utilizes DPMON for disease prediction based on integrated multi-omics data and network information. Can incorporate additional downstream tasks for comprehensive analysis.
+
+  ```yaml
+integrated_tasks:
+  task: "prediction"
+
+  paths:
+    input_dir: "./input"
+    output_dir: "./output"
+
+  # Prediction Task Configuration
+  prediction:
+    network_file: "global_network.csv"
+    omics_files:
+      - "metabolites_blood_count_adjusted_2019-08-26.csv"
+      - "proteins_blood_count_adjusted_protein_names.csv"
+    phenotype_file: "Y_finalgold_coarse.csv"
+    features_file: ""
+    model: "GCN"
+    gpu: false
+    cuda: 0
+    tune: false
+    gnn_layer_num: 3
+    gnn_hidden_dim: 128
+    lr: 0.01
+    weight_decay: 1e-4
+    nn_hidden_dim1: 128
+    nn_hidden_dim2: 16
+    num_epochs: 50
+    repeat_num: 10
+
+  ```
 
 ## Configuration
 
@@ -139,10 +179,9 @@ m3_network_embedding:
 m4_subject_representation:
   integration_method: "scalar-representation"
 
-# Task Optimization Settings
-m5_task_optimization:
+# Integrated Tasks Settings
+m5_integrated_task:
   task_type: "prediction"
-  algorithm: "RandomForest"
 ```
 ### Component Configuration
 
@@ -204,29 +243,51 @@ pip install -r requirements.txt
 
 BioNeuralNet is designed with user-friendliness and flexibility in mind. Whether you're looking to execute the entire pipeline or focus on specific analysis steps, BioNeuralNet accommodates your research needs seamlessly.
 
-### Running the Entire Pipeline
+- ### Running the Entire Pipeline
 
-Execute all components sequentially to process your multi-omics data from network generation to task optimization.
+  Execute all components sequentially to process your multi-omics data from network generation to Integrated Tasks.
 
-```bash
-python main.py --start 1 --end 5
-```
-**Description:**
+  ```bash
+  python main.py --start 1 --end 5
+  ```
+  **Description:**
 
-- `--start 1`: Begins execution from Component 1 (Graph Generation).
-- `--end 5`: Ends execution at Component 5 (Task Optimization).
+  - `--start 1`: Begins execution from Component 1 (Graph Generation).
+  - `--end 5`: Ends execution at Component 5 (Integrated Tasks).
 
-### Running Individual Components
+  - ### Running Individual Components
 
-Focus on specific components without executing the entire pipeline. Useful for testing or when certain stages are already completed.
+  Focus on specific components without executing the entire pipeline. Useful for testing or when certain stages are already completed.
 
-**Example**: Run only Component 3 (Network Embedding).
+  **Example**: Run only Component 3 (Network Embedding).
 
-```bash
-python main.py --start 3 --end 3
-```
+  ```bash
+  python main.py --start 3 --end 3
+  ```
 
-Note: Ensure that the `input_dir` of the component contains the necessary input files.
+  Note: Ensure that the `input_dir` of the component contains the necessary input files.
+
+- ### Running Integrated Tasks
+
+  Execute only the Integrated Tasks component using **DPMON**.
+
+  ```bash
+  python main.py --start 5 --end 5
+  ```
+
+  **Description**:
+
+    - **Configuration**:
+    Ensure that task_type: "prediction" is set in the global config.yml and that `m5_integrated_task/config.yml` is properly configured with **DPMON** parameters.
+
+    - **Input**:
+    Place input files in the `m5_integrated_task/input/` directory or ensure they are correctly copied from previous components.
+
+    - **Output**:
+    The predictions will be saved as `predictions.csv` in `m5_integrated_task/output/`.
+
+    - **Reference**:
+    For more details on [DPMON](https://github.com/UCD-BDLab/DPMON).
 
 ## Workflow Overview
 ### Data Flow and Dependencies
@@ -247,9 +308,16 @@ Note: Ensure that the `input_dir` of the component contains the necessary input 
     - **Input**: `node_embeddings_cluster1.csv`, `node_embeddings_cluster2.csv`, etc., `from m3_network_embedding/output/`, Raw Multi-Omics Data.
     - **Output**: integrated_data.csv saved in `m4_subject_representation/output/`.
 
-5. **Task Optimization** (`m5_task_optimization`):
-    - **Input**: integrated_data.csv from `m4_subject_representation/output/`.
-    - **Output**: predictions_<timestamp>.csv saved in `m5_task_optimization/output/`.
+5. **Integrated Task Processing** (`m5_integrated_tasks`):
+    - **Input**:
+        - **Mandatory:**
+            - `network_file`: An omics network file (`network.csv`). Can be from `m1_graph_generation/output/`, `m2_clustering/output/`, or a user-provided `network.csv` as an adjacency matrix.
+            - `omics_files`: List of omics data files (e.g., `metabolites.csv`, `proteins.csv`).
+            - `phenotype_file`: `phenotype.csv`.
+        - **Optional but Recommended:**
+            - `features_file`: Clinical data for nodes (e.g., `features.csv`).
+    - **Output**: `predictions.csv` saved in `m5_integrated_tasks/output/`.
+    - **Description**: Utilizes DPMON for disease prediction based on integrated multi-omics data and network information. Can incorporate additional downstream tasks for comprehensive analysis.
 
 ## Logging
 
