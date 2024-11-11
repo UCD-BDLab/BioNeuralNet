@@ -1,5 +1,3 @@
-# /m3_network_embedding/config/config.yml
-
 network_embedding:
   paths:
     input_dir: "../input"

@@ -4,7 +4,7 @@ import sys
 import importlib.util
 import shutil
 from utils import setup_logging
-from utils import validate_paths, find_files
+from utils import find_files
 
 def run_network_embedding(config):
     """
@@ -28,10 +28,10 @@ def run_network_embedding(config):
         os.makedirs(output_dir, exist_ok=True)
 
         # Check if input directory is empty and copy files if necessary
-        #source_dir = os.path.abspath(os.path.join('m2_clustering', 'output'))
+        # source_dir = os.path.abspath(os.path.join('m2_clustering', 'output'))
         copy_files_if_input_empty(input_dir)
 
-        # Since 'algorithm' key is not present in the component config, set it directly
+        # Since algorithm key is not present in the component config, set it directly
         algorithm = "node2vec"
         logger.info(f"Selected Network Embedding Algorithm: {algorithm}")
 
