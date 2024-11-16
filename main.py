@@ -1,5 +1,3 @@
-# main.py
-
 import os
 import sys
 import yaml
@@ -20,7 +18,7 @@ component_run_functions[1] = graph_generation.run_graph_generation
 component_run_functions[2] = clustering.run_clustering
 component_run_functions[3] = network_embedding.run_network_embedding
 component_run_functions[4] = subject_representation.run_subject_representation
-component_run_functions[5] = integrated_tasks.run_integrated_tasks
+component_run_functions[5] = integrated_tasks.run_prediction_dpmon
 
 def load_root_config(config_path='config.yml'):
     with open(config_path, 'r') as file:
@@ -212,7 +210,7 @@ def run_selected_components(selected_components, root_config, logger):
         component_name = component_mapping[component_number]
         logger.info(f"Running component {component_number}: {component_name}")
 
-        if component_number > 3:
+        if component_number > 5:
             print(f"Component {component_number} ({component_name}) is under construction.")
             continue
 

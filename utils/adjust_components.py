@@ -8,7 +8,7 @@ component_mapping = {
     2: "clustering",
     3: "network_embedding",
     4: "subject_representation",
-    5: "integrated_task"
+    5: "integrated_tasks"
 }
 
 # second mapping from each component number to its run function
