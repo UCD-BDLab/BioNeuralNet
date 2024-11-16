@@ -45,6 +45,12 @@ class NeuralNetwork(nn.Module):
         logger.info("Initialized DownstreamTaskNN.")
 
     def forward(self, omics_dataset, omics_network_tg):
+        #logger.debug(f"Omics Dataset shape: {omics_dataset.shape}")
+        #logger.debug(f"Omics Dataset shape: {omics_network_tg.shape}")
+
+        logger.debug(f"Omics Dataset: {omics_dataset}")
+        logger.debug(f"Omics Network: {omics_network_tg}")
+
         logger.debug("Starting forward pass.")
         omics_network_nodes_embedding = self.gnn(omics_network_tg)
         omics_network_nodes_embedding_ae = self.autoencoder(omics_network_nodes_embedding)

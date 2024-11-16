@@ -12,7 +12,7 @@ def run_prediction_dpmon(config):
     Execute prediction with network information using DPMON.
     """
     # Set up component-specific logging
-    component_output_dir = os.path.abspath(config['integrated_task']['paths']['output_dir'])
+    component_output_dir = os.path.abspath(config['integrated_tasks']['paths']['output_dir'])
     os.makedirs(component_output_dir, exist_ok=True)
     component_log_file = os.path.join(component_output_dir, 'component.log')
     setup_logging(component_log_file)
@@ -22,8 +22,8 @@ def run_prediction_dpmon(config):
 
     try:
         # Extract paths from component config
-        input_dir = os.path.abspath(config['integrated_task']['paths']['input_dir'])
-        output_dir = os.path.abspath(config['integrated_task']['paths']['output_dir'])
+        input_dir = os.path.abspath(config['integrated_tasks']['paths']['input_dir'])
+        output_dir = os.path.abspath(config['integrated_tasks']['paths']['output_dir'])
 
         # Ensure input directory exists
         if not os.path.isdir(input_dir):
@@ -34,7 +34,7 @@ def run_prediction_dpmon(config):
         copy_files_if_input_empty(input_dir)
 
         # Extract DPMON parameters from component config
-        prediction_config = config['integrated_task']['prediction']
+        prediction_config = config['integrated_tasks']['prediction']
         model = prediction_config.get('model', 'GCN')
         gpu = prediction_config.get('gpu', False)
         cuda = prediction_config.get('cuda', 0)
@@ -61,7 +61,7 @@ def run_prediction_dpmon(config):
             sys.exit(1)
 
         # Check if input directory is empty and prompt user if necessary
-        copy_files_if_input_empty(input_dir, config)
+        copy_files_if_input_empty(input_dir)
 
         # Verify that all required files exist in the input directory
         missing_files = []
@@ -91,7 +91,7 @@ def run_prediction_dpmon(config):
             'nn_hidden_dim2': nn_hidden_dim2,
             'epoch_num': epoch_num,
             'repeat_num': repeat_num,
-            'network_file': network_file,
+            'network_file': os.path.join(input_dir, network_file),
             'features_file': features_file,
             'phenotype_file': os.path.join(input_dir, phenotype_file),
             'omics_files': [os.path.join(input_dir, omics_file) for omics_file in omics_files],

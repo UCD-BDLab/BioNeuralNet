@@ -83,3 +83,580 @@
 2024-11-04 12:33:38,070 - root - DEBUG - Component config directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\config
 2024-11-04 12:33:38,070 - root - DEBUG - Resolved input directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\input
 2024-11-04 12:33:38,070 - root - DEBUG - Resolved output directory: C:\Users\ramosv\Desktop\BDLab\Github\BioNeuralNet\m1_graph_generation\output
+2024-11-14 10:29:04,093 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 10:29:04,094 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 10:30:22,509 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 10:30:22,510 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 10:30:22,510 - root - ERROR - Component config file not found: m5_integrated_task/config/config.yml
+2024-11-14 10:30:22,510 - __main__ - ERROR - An error occurred: Component config file not found: m5_integrated_task/config/config.yml
+2024-11-14 10:31:28,570 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 10:31:28,571 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 10:31:28,571 - root - ERROR - Component config file not found: m5_integrated_task/config/config.yml
+2024-11-14 10:31:28,571 - __main__ - ERROR - An error occurred: Component config file not found: m5_integrated_task/config/config.yml
+2024-11-14 10:31:48,747 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 10:31:48,747 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 10:31:48,747 - root - ERROR - Component config file not found: m5_integrated_task/config/config.yml
+2024-11-14 10:31:48,747 - __main__ - ERROR - An error occurred: Component config file not found: m5_integrated_task/config/config.yml
+2024-11-14 10:37:48,354 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 10:37:48,354 - __main__ - INFO - Running component 5: integrated_task
+2024-11-14 10:37:48,354 - root - ERROR - Component config file not found: m5_integrated_task/config/config.yml
+2024-11-14 10:37:48,355 - __main__ - ERROR - An error occurred: Component config file not found: m5_integrated_task/config/config.yml
+2024-11-14 10:38:11,639 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 10:38:11,640 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 10:38:11,640 - root - ERROR - Component config file not found: m5_integrated_tasks/config/config.yml
+2024-11-14 10:38:11,640 - __main__ - ERROR - An error occurred: Component config file not found: m5_integrated_tasks/config/config.yml
+2024-11-14 10:38:24,674 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 10:38:24,674 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 10:38:24,678 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 10:38:24,678 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 10:38:24,679 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 10:38:24,679 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config/input
+2024-11-14 10:38:24,679 - root - ERROR - Input directory does not exist: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config/input
+2024-11-14 10:38:24,679 - __main__ - ERROR - An error occurred: Input directory does not exist: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config/input
+2024-11-14 10:42:00,449 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 10:42:00,449 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 10:42:00,454 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 10:42:00,454 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 10:42:00,454 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 10:42:00,454 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 10:42:00,454 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 10:43:10,322 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 10:43:10,322 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 10:43:10,327 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 10:43:10,327 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 10:43:10,327 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 10:43:10,327 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 10:43:10,327 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 10:54:58,632 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 10:54:58,633 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 10:54:58,638 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 10:54:58,638 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 10:54:58,638 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 10:54:58,638 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config/input
+2024-11-14 10:54:58,638 - root - ERROR - Input directory does not exist: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config/input
+2024-11-14 10:54:58,638 - __main__ - ERROR - An error occurred: Input directory does not exist: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config/input
+2024-11-14 10:55:23,537 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 10:55:23,537 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 10:55:23,544 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 10:55:23,544 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 10:55:23,544 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 10:55:23,544 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 10:55:23,545 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 11:02:30,987 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 11:02:30,987 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 11:02:30,994 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 11:02:30,994 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 11:02:30,995 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 11:02:30,995 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 11:02:30,995 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 11:08:22,676 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 11:08:22,676 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 11:08:22,681 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 11:08:22,681 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 11:08:22,682 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 11:08:22,682 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 11:08:22,682 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 11:10:44,171 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 11:10:44,171 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 11:10:44,176 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 11:10:44,176 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 11:10:44,176 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 11:10:44,177 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 11:10:44,177 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 11:27:27,508 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 11:27:27,509 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 11:27:27,513 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 11:27:27,513 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 11:27:27,514 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 11:27:27,514 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 11:27:27,514 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 11:30:12,608 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 11:30:12,609 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 11:30:12,613 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 11:30:12,614 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 11:30:12,614 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 11:30:12,614 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 11:30:12,614 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 11:34:10,828 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 11:34:10,828 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 11:34:10,832 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 11:34:10,832 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 11:34:10,832 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 11:34:10,832 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 11:34:10,832 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 11:39:59,685 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 11:39:59,686 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 11:39:59,692 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 11:39:59,692 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 11:39:59,692 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 11:39:59,692 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 11:39:59,692 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 11:49:56,888 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 11:49:56,888 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 11:49:56,894 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 11:49:56,894 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 11:49:56,894 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 11:49:56,894 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 11:49:56,895 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 11:51:51,160 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 11:51:51,160 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 11:51:51,165 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 11:51:51,165 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 11:51:51,165 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 11:51:51,165 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 11:51:51,165 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 11:57:58,437 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 11:57:58,438 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 11:57:58,443 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 11:57:58,443 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 11:57:58,443 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 11:57:58,443 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 11:57:58,443 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 12:00:32,829 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 12:00:32,830 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 12:00:32,835 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 12:00:32,835 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 12:00:32,835 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 12:00:32,835 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 12:00:32,836 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 12:00:50,005 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 12:00:50,006 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 12:00:50,011 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 12:00:50,011 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 12:00:50,012 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 12:00:50,012 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 12:00:50,012 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 12:01:36,710 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 12:01:36,710 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 12:01:36,713 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 12:01:36,713 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 12:01:36,713 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 12:01:36,713 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 12:01:36,714 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 12:06:35,829 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 12:06:35,830 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 12:06:35,834 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 12:06:35,834 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 12:06:35,834 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 12:06:35,834 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 12:06:35,834 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 12:09:34,410 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 12:09:34,410 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 12:09:34,414 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 12:09:34,414 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 12:09:34,414 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 12:09:34,414 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 12:09:34,414 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 12:10:20,667 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 12:10:20,668 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 12:10:20,672 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 12:10:20,672 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 12:10:20,673 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 12:10:20,673 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 12:10:20,673 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 12:10:35,604 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 12:10:35,604 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 12:10:35,609 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 12:10:35,609 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 12:10:35,609 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 12:10:35,609 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 12:10:35,609 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 13:36:08,759 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 13:36:08,759 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 13:36:08,764 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 13:36:08,764 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 13:36:08,765 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 13:36:08,765 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 13:36:08,765 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 13:40:43,670 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 13:40:43,670 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 13:40:43,676 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 13:40:43,676 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 13:40:43,676 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 13:40:43,676 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 13:40:43,676 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-14 13:44:11,389 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-14 13:44:11,389 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-14 13:44:11,394 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-14 13:44:11,394 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-14 13:44:11,395 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-14 13:44:11,395 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-14 13:44:11,395 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 09:58:19,058 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 09:58:19,058 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 09:58:19,064 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 09:58:19,064 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 09:58:19,064 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 09:58:19,064 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 09:58:19,064 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 10:15:24,245 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 10:15:24,246 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 10:15:24,251 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 10:15:24,252 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 10:15:24,252 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 10:15:24,252 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 10:15:24,252 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 10:17:28,098 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 10:17:28,099 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 10:17:28,105 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 10:17:28,105 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 10:17:28,105 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 10:17:28,105 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 10:17:28,105 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 10:28:33,567 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 10:28:33,567 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 10:28:33,574 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 10:28:33,574 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 10:28:33,574 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 10:28:33,574 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 10:28:33,574 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 10:29:26,101 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 10:29:26,102 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 10:29:26,107 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 10:29:26,107 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 10:29:26,108 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 10:29:26,108 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 10:29:26,108 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 10:37:13,858 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 10:37:13,860 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 10:37:13,865 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 10:37:13,865 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 10:37:13,865 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 10:37:13,865 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 10:37:13,866 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 10:40:28,460 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 10:40:28,461 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 10:40:28,467 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 10:40:28,467 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 10:40:28,467 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 10:40:28,467 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 10:40:28,467 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 10:41:46,012 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 10:41:46,013 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 10:41:46,018 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 10:41:46,018 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 10:41:46,019 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 10:41:46,019 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 10:41:46,019 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 10:42:10,303 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 10:42:10,305 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 10:42:10,310 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 10:42:10,310 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 10:42:10,311 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 10:42:10,311 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 10:42:10,311 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 10:43:34,408 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 10:43:34,409 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 10:43:34,415 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 10:43:34,415 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 10:43:34,415 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 10:43:34,415 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 10:43:34,415 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 10:55:56,167 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 10:55:56,168 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 10:55:56,182 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 10:55:56,182 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 10:55:56,183 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 10:55:56,183 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 10:55:56,183 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 11:24:18,302 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 11:24:18,303 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 11:24:18,307 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 11:24:18,307 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 11:24:18,308 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 11:24:18,308 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 11:24:18,308 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 11:37:34,489 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 11:37:34,490 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 11:37:34,493 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 11:37:34,493 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 11:37:34,494 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 11:37:34,494 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 11:37:34,494 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 11:38:58,930 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 11:38:58,931 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 11:38:58,934 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 11:38:58,935 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 11:38:58,935 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 11:38:58,935 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 11:38:58,935 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 12:01:21,775 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 12:01:21,777 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 12:01:21,781 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 12:01:21,781 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 12:01:21,782 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 12:01:21,782 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 12:01:21,782 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 12:03:17,823 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 12:03:17,823 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 12:03:17,828 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 12:03:17,828 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 12:03:17,828 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 12:03:17,828 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 12:03:17,828 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 12:05:31,784 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 12:05:31,784 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 12:05:31,789 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 12:05:31,789 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 12:05:31,789 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 12:05:31,789 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 12:05:31,789 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 12:08:11,046 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 12:08:11,047 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 12:08:11,050 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 12:08:11,050 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 12:08:11,051 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 12:08:11,051 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 12:08:11,051 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 12:08:55,254 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 12:08:55,254 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 12:08:55,259 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 12:08:55,259 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 12:08:55,259 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 12:08:55,259 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 12:08:55,259 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 12:09:56,631 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 12:09:56,631 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 12:09:56,635 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 12:09:56,635 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 12:09:56,635 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 12:09:56,635 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 12:09:56,635 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 12:24:25,229 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 12:24:25,230 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 12:24:25,234 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 12:24:25,234 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 12:24:25,234 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 12:24:25,234 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 12:24:25,234 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 12:25:01,122 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 12:25:01,123 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 12:25:01,126 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 12:25:01,126 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 12:25:01,126 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 12:25:01,126 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 12:25:01,127 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 12:25:15,906 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 12:25:15,906 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 12:25:15,910 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 12:25:15,910 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 12:25:15,910 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 12:25:15,910 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 12:25:15,910 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 12:32:46,927 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 12:32:46,927 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 12:32:46,931 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 12:32:46,931 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 12:32:46,932 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 12:32:46,932 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 12:32:46,932 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 12:34:19,726 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 12:34:19,726 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 12:34:19,730 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 12:34:19,730 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 12:34:19,730 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 12:34:19,730 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 12:34:19,730 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 12:48:10,321 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 12:48:10,321 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 12:48:10,325 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 12:48:10,325 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 12:48:10,325 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 12:48:10,325 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 12:48:10,325 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 12:48:53,695 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 12:48:53,695 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 12:48:53,699 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 12:48:53,699 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 12:48:53,699 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 12:48:53,699 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 12:48:53,699 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 12:56:45,549 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 12:56:45,550 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 12:56:45,554 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 12:56:45,554 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 12:56:45,554 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 12:56:45,555 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 12:56:45,555 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 13:09:51,347 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 13:09:51,347 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 13:09:51,351 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 13:09:51,351 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 13:09:51,351 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 13:09:51,351 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 13:09:51,351 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 13:12:18,684 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 13:12:18,684 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 13:12:18,688 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 13:12:18,688 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 13:12:18,688 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 13:12:18,688 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 13:12:18,688 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 13:16:50,263 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 13:16:50,263 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 13:16:50,267 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 13:16:50,267 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 13:16:50,267 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 13:16:50,267 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 13:16:50,267 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 13:19:06,105 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 13:19:06,105 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 13:19:06,108 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 13:19:06,108 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 13:19:06,108 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 13:19:06,108 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 13:19:06,108 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 13:23:27,272 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 13:23:27,273 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 13:23:27,276 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 13:23:27,276 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 13:23:27,276 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 13:23:27,277 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 13:23:27,277 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 13:29:58,011 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 13:29:58,012 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 13:29:58,016 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 13:29:58,016 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 13:29:58,016 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 13:29:58,016 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 13:29:58,016 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 13:30:32,140 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 13:30:32,141 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 13:30:32,145 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 13:30:32,145 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 13:30:32,145 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 13:30:32,145 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 13:30:32,145 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 13:53:38,539 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 13:53:38,540 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 13:53:38,544 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 13:53:38,544 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 13:53:38,544 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 13:53:38,545 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 13:53:38,545 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 15:30:45,726 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 15:30:45,727 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 15:30:45,730 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 15:30:45,731 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 15:30:45,731 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 15:30:45,731 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 15:30:45,731 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 15:33:14,255 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 15:33:14,256 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 15:33:14,259 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 15:33:14,259 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 15:33:14,259 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 15:33:14,259 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 15:33:14,260 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 15:40:05,355 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 15:40:05,356 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 15:40:05,359 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 15:40:05,359 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 15:40:05,359 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 15:40:05,359 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 15:40:05,360 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 15:41:22,228 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 15:41:22,228 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 15:41:22,231 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 15:41:22,231 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 15:41:22,231 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 15:41:22,232 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 15:41:22,232 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 15:45:16,609 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 15:45:16,609 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 15:45:16,613 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 15:45:16,613 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 15:45:16,613 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 15:45:16,613 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 15:45:16,613 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 15:47:31,954 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 15:47:31,955 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 15:47:31,958 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 15:47:31,958 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 15:47:31,958 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 15:47:31,958 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 15:47:31,958 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 15:50:06,373 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 15:50:06,373 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 15:50:06,377 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 15:50:06,377 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 15:50:06,377 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 15:50:06,377 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 15:50:06,377 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 15:54:43,748 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 15:54:43,748 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 15:54:43,752 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 15:54:43,752 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 15:54:43,752 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 15:54:43,752 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 15:54:43,752 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 16:15:50,650 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 16:15:50,651 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 16:15:50,655 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 16:15:50,655 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 16:15:50,655 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 16:15:50,655 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 16:15:50,655 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 16:17:16,076 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 16:17:16,077 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 16:17:16,080 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 16:17:16,080 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 16:17:16,081 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 16:17:16,081 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 16:17:16,081 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 16:20:58,736 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 16:20:58,737 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 16:20:58,740 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 16:20:58,740 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 16:20:58,740 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 16:20:58,740 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 16:20:58,741 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 16:23:42,990 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 16:23:42,990 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 16:23:42,994 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 16:23:42,995 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 16:23:42,995 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 16:23:42,995 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 16:23:42,995 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 16:36:22,038 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 16:36:22,039 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 16:36:22,042 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 16:36:22,042 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 16:36:22,042 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 16:36:22,042 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 16:36:22,042 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 16:48:11,290 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 16:48:11,290 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 16:48:11,294 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 16:48:11,294 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 16:48:11,295 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 16:48:11,295 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 16:48:11,295 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 16:53:45,757 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 16:53:45,757 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 16:53:45,762 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 16:53:45,762 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 16:53:45,762 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 16:53:45,762 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 16:53:45,763 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 17:23:03,151 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 17:23:03,152 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 17:23:03,156 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 17:23:03,156 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 17:23:03,156 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 17:23:03,157 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 17:23:03,157 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 17:27:58,213 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 17:27:58,214 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 17:27:58,218 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 17:27:58,219 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 17:27:58,219 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 17:27:58,219 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 17:27:58,219 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
+2024-11-15 17:30:29,971 - __main__ - INFO - Pipeline configuration loaded from config.yml
+2024-11-15 17:30:29,971 - __main__ - INFO - Running component 5: integrated_tasks
+2024-11-15 17:30:29,975 - root - DEBUG - Current working directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet
+2024-11-15 17:30:29,975 - root - DEBUG - Component config path: m5_integrated_tasks/config/config.yml
+2024-11-15 17:30:29,975 - root - DEBUG - Component config directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/config
+2024-11-15 17:30:29,976 - root - DEBUG - Resolved input directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/input
+2024-11-15 17:30:29,976 - root - DEBUG - Resolved output directory: /Users/ramosv/Desktop/GitHub/BioNeuralNet/m5_integrated_tasks/output
