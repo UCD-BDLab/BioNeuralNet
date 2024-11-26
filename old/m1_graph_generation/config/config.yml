@@ -1,0 +1,22 @@
+# /m1_graph_generation/config/config.yml
+
+graph_generation:
+
+  paths:
+    input_dir: "../input"
+    output_dir: "../output"
+
+  smccnet:
+    omics_files:
+      - "metabolites_blood_count_adjusted_2019-08-26.csv"
+      - "proteins_blood_count_adjusted_protein_names.csv"
+
+    # Data types correspond to the omics files above
+    data_type:
+      - "Metabolite"
+      - "Protein"
+
+    phenotype_file: "Y_finalgold_coarse.csv"
+    kfold: 5
+    summarization: "PCA"
+    seed: 732

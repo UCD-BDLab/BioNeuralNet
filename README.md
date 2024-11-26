@@ -1,459 +1,415 @@
 # BioNeuralNet
 
-BioNeuralNet is a **modular**, **flexible**, and **extensible** bioinformatics pipeline designed to streamline the analysis of multi-omics data. It facilitates a seamless workflow encompassing graph generation, clustering, network embedding, subject representation, and Integrated Tasks. Tailored for scientists and researchers, BioNeuralNet simplifies complex computational tasks, enabling efficient data processing and insightful biological discoveries.
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![PyPI](https://img.shields.io/pypi/v/bioneuralnet)
+![Python Versions](https://img.shields.io/pypi/pyversions/bioneuralnet)
+
+**BioNeuralNet** is designed to integrate omics data with neural network embeddings, facilitating advanced data analysis in bioinformatics. Leveraging Python, BioNeuralNet constructs and analyzes complex biological networks, ensuring comprehensive and scalable data processing.
+
+---
 
 ## Table of Contents
 
-- [Introduction](#introduction)
-- [Features](#features)
-- [Pipeline Architecture](#pipeline-architecture)
-- [Pipeline Components](#pipeline-components)
-  - [1. Graph Generation](#1-graph-generation)
-  - [2. Clustering](#2-clustering)
-  - [3. Network Embedding](#3-network-embedding)
-  - [4. Subject Representation](#4-subject-representation)
-  - [5. Integrated Tasks](#5-integrated-tasks)
-- [Configuration](#configuration)
-  - [Root Configuration](#root-configuration)
-  - [Component Configuration](#component-configuration)
-- [Installation](#installation)
-- [Usage](#usage)
-  - [Running the Entire Pipeline](#running-the-entire-pipeline)
-  - [Running Individual Components](#running-individual-components)
-  - [Running Task Optmization](#running-task-optimization)
-- [Workflow Overview](#workflow-overview)
-  - [Data Flow and Dependencies](#data-flow-and-dependencies)
-- [Logging](#logging)
-- [Extending the Pipeline](#extending-the-pipeline)
-  - [Adding New Algorithms](#adding-new-algorithms)
-- [Best Practices](#best-practices)
-- [License](#license)
-- [Contact](#contact)
+1. [Overview](#overview)
+2. [Features](#features)
+3. [Installation](#installation)
+    - [For Users: Python Package Installation](#for-users-python-package-installation)
+    - [For Users: R Dependencies](#for-users-r-dependencies)
+    - [For Developers: Development Environment Setup](#for-developers-development-environment-setup)
+4. [Quick Start Guide](#quick-start-guide)
+5. [Pipeline Components](#pipeline-components)
+6. [Acknowledgements](#acknowledgements)
+7. [Documentation](#documentation)
+8. [Testing](#testing)
+9. [Contributing](#contributing)
+10. [License](#license)
+11. [Contact](#contact)
 
-## Introduction
+---
 
-BioNeuralNet is a **modular** and **flexible** network embedding framework tailored for bioinformatics applications. Designed as a comprehensive toolkit, BioNeuralNet streamlines the processes of network generation, embedding, clustering, and analysis, enabling scientists to extract meaningful insights from complex multi-omics data. By allowing users to run individual components or the entire pipeline sequentially, BioNeuralNet offers unparalleled adaptability to meet diverse research needs.
+## Overview
 
-### Key Benefits:
+BioNeuralNet empowers researchers to seamlessly integrate various omics datasets using advanced neural network embeddings. By combining the strengths of Python for data manipulation and analysis, BioNeuralNet provides a comprehensive toolkit for bioinformatics applications.
 
-- **Modularity:** Each component operates independently, facilitating easy updates and maintenance.
-- **Flexibility:** Users can customize the pipeline by selecting specific components or running the full workflow.
-- **Extensibility:** Seamlessly integrate new algorithms and methods without disrupting existing functionalities.
-- **Usability:** User-friendly configuration through YAML files simplifies setup and execution.
-- **Scalability:** Efficiently handles large datasets, making it suitable for extensive bioinformatics analyses.
+
+![BioNeuralNet Workflow](/assets/BioNeuralNet.png)
+
+
+---
 
 ## Features
 
-- **Modular Architecture:** Each analysis step—network generation, embedding, clustering, and optimization—is encapsulated within its own module, allowing for independent development and testing.
-- **Dynamic Algorithm Integration:** Effortlessly switch between different algorithms or introduce new ones by updating configuration files, without altering the core pipeline scripts.
-- **Optimized Integrated Tasks:** Utilizes **DPMON** for efficient and effective predictive modeling tasks.
-- **Comprehensive Logging System:** Maintain detailed logs for both the overall pipeline (`pipeline.log`) and individual components (`component.log`), aiding in monitoring and debugging.
-- **Reusable Helper Functions:** Streamlined file operations and data handling through centralized helper utilities, promoting code reuse and consistency.
-- **Consistent Naming Conventions:** Standardized output file naming ensures clarity and prevents overwriting of results.
-- **Robust Error Handling:** Implemented validation checks and exception handling mechanisms ensure the pipeline fails gracefully, providing informative error messages.
-- **User-Friendly Configuration:** Centralized and component-specific YAML configuration files simplify the setup process, making the pipeline accessible to users with varying levels of technical expertise.
-- **Scalability and Performance:** Optimized to handle large-scale multi-omics datasets efficiently, making it suitable for extensive bioinformatics research.
+- **Graph Construction**: Utilize SmCCNet and WGCNA algorithms to build complex biological networks.
+- **Clustering**: Perform clustering using methods like PageRank and Hierarchical Clustering.
+- **Network Embedding**: Generate high-dimensional embeddings using Graph Neural Networks (GNNs) and Node2Vec.
+- **Subject Representation**: Enhance omics data representations for downstream analyses.
+- **Comprehensive Testing**: Ensure reliability with a robust testing suite and continuous integration.
+- **Developer-Friendly**: Streamlined setup for contributors with pre-commit hooks and development tools.
 
+---
 
-## Pipeline Architecture
+## Installation
 
-![BioNeuralNet Diagram](assets/BioNeuralNet-wb.png)
+### For Users: Python Package Installation
 
-BioNeuralNet's architecture is meticulously designed to promote clarity and efficiency. Each component is encapsulated within its own directory, containing all necessary scripts, configurations, and dependencies. The pipeline orchestrates these components in a sequential manner, ensuring data flows seamlessly from one analysis stage to the next.
+Most users can install **BioNeuralNet** directly via `pip`, which includes all necessary Python dependencies.
 
-### Architecture Overview
+1. **Ensure Python 3.7 or Higher is Installed**
 
-1. **Graph Generation:** Constructs a global network from multi-omics and phenotype data.
-2. **Clustering:** Segments the global graph into meaningful clusters.
-3. **Network Embedding:** Generates embeddings for each sub-network using specified embedding techniques.
-4. **Subject Representation:** Integrates network embeddings with omics data to create comprehensive subject profiles.
-5. **Integrated Tasks:** Performs predictive modeling based on subject representations to optimize downstream tasks.
+   Verify your Python version:
+
+   ```bash
+   python3 --version
+   ```
+
+2. **Install BioNeuralNet via Pip**
+
+   ```bash
+   pip install bioneuralnet
+   ```
+
+   *This command installs the latest stable release from PyPI, including all base dependencies.*
+
+   **Note:** If you require CUDA-enabled functionalities (for GPU acceleration), ensure that you have the appropriate CUDA version installed on your system.
+
+### For Users: R Dependencies
+
+**BioNeuralNet** integrates R scripts for graph construction using SmCCNet and WGCNA. While Python users can install the package via `pip`, R dependencies need separate installation. Most users do not require R functionalities unless they intend to utilize these specific graph construction methods.
+
+#### 1. Manual R Installation
+
+If you prefer manual installation or are on an unsupported operating system, follow these steps:
+
+**a. Install R**
+
+- **Download R:**
+
+   Visit the [CRAN R Project](https://cran.r-project.org/) and download the appropriate installer for your operating system.
+
+- **Install R:**
+
+  Follow the installation instructions provided on the CRAN website for your specific OS.
+
+**b. Install Required R Packages**
+
+Open R or RStudio and execute the following commands to install necessary packages:
+
+```R
+install.packages(c("dplyr", "SmCCNet", "WGCNA"))
+```
+
+**Notes:**
+
+- **System Dependencies:** Some R packages might require additional system dependencies. Ensure you have the necessary build tools installed (e.g., `gcc`, `make`).
+
+- **Permissions:** You may need administrative privileges to install certain packages or dependencies.
+
+### For Developers: Development Environment Setup
+
+Researchers and developers intending to contribute to **BioNeuralNet** should set up a development environment. This involves creating a virtual environment, installing dependencies, and setting up pre-commit hooks to maintain code quality.
+
+1. **Clone the Repository**
+
+   ```bash
+   git clone https://github.com/UCD-BDLab/BioNeuralNet.git
+   cd BioNeuralNet
+   ```
+
+2. **Run the Setup Script**
+
+   The `setup.sh` script automates the setup process for developers.
+
+   ```bash
+   ./setup.sh
+   ```
+
+   **What `setup.sh` Does:**
+
+   - **Creates and Activates a Virtual Environment:** Ensures that dependencies are isolated.
+   - **Installs Base and Development Dependencies:** Sets up the environment with necessary packages.
+   - **Installs Pre-Commit Hooks:** Automates code quality checks before commits.
+   - **Initializes the Project:** Sets up directories and configuration files.
+
+   **Note:** Ensure you have execution permissions for `setup.sh`. If not, make it executable:
+
+   ```bash
+   chmod +x setup.sh
+   ```
+
+3. **Verify Pre-Commit Hooks**
+
+   After running `setup.sh`, pre-commit hooks should be installed automatically. To confirm, you can run:
+
+   ```bash
+   pre-commit run --all-files
+   ```
+
+   *This will execute all configured pre-commit hooks on the entire codebase.*
+
+4. **Install R Dependencies (If Needed)**
+
+   If your development work involves R scripts, ensure that R and its required packages are installed as per the [R Dependencies](#for-users-r-dependencies) section.
+
+---
+
+## Quick Start Guide
+
+Begin using **BioNeuralNet** by following these streamlined steps:
+
+1. **Prepare Input Data**
+
+   - **Omics Data:** Place your omics CSV files (e.g., `proteomics_data.csv`, `metabolomics_data.csv`) in the `input/` directory.
+   - **Phenotype Data:** Place `phenotype_data.csv` in the `input/` directory.
+   - **Clinical Data:** Place `clinical_data.csv` in the `input/` directory.
+
+2. **Combine Omics Data**
+
+   If you have multiple omics datasets, combine them using the `combine_omics_data` utility.
+
+   ```python
+   from bioneuralnet.utils.data_utils import combine_omics_data
+
+   omics_file_paths = [
+       './input/proteomics_data.csv',
+       './input/metabolomics_data.csv'
+   ]
+
+   combined_omics_file = './input/omics_data.csv'
+
+   combine_omics_data(omics_file_paths, combined_omics_file)
+   ```
+
+3. **Run the Example Usage Script**
+
+   Execute the example usage script or create your own pipeline script to perform data integration and analysis.
+
+   ```bash
+   python examples/usage_examples.py
+   ```
+
+   *This script demonstrates how to use various components of BioNeuralNet with direct parameter passing.*
+
+---
 
 ## Pipeline Components
 
-- ### 1. Graph Generation (`m1_graph_generation`)
+BioNeuralNet's pipeline consists of several interconnected components:
 
-  **Purpose:** Constructs a global graph from multi-omics and phenotype data using specified algorithms.
+1. **Graph Construction**
 
-  - **Input:** Multi-Omics Data Files, Phenotype File.
-  - **Output:** `global_network.csv` saved in `m1_graph_generation/output/`.
-  - **Algorithms:** Implemented in `config/smccnet.py` and can be extended with additional algorithms.
+   - **SmCCNet**: Builds graphs based on higher-order correlations.
+   - **WGCNA**: Constructs weighted correlation networks and detects modules.
 
-- ### 2. Clustering (`m2_clustering`)
+2. **Clustering**
 
-  **Purpose:** Segments the global graph into sub-networks using clustering methods.
+   - **PageRankClustering**: Clusters nodes based on personalized PageRank.
+   - **HierarchicalClustering**: Performs agglomerative hierarchical clustering.
 
-  - **Input:** `global_network.csv` from `m1_graph_generation/output/`.
-  - **Output:** `cluster_1.csv`, `cluster_2.csv`, etc., saved in `m2_clustering/output/`.
-  - **Algorithms:** Hierarchical Clustering (`config/hierarchical.py`), PageRank Clustering (`config/pagerank.py`).
+3. **Network Embedding Generation**
 
-- ### 3. Network Embedding (`m3_network_embedding`)
+   - **GNNEmbedding**: Generates embeddings using Graph Neural Networks.
+   - **Node2VecEmbedding**: Generates embeddings using the Node2Vec algorithm.
 
-  **Purpose:** Generates embeddings for each sub-network using network embedding techniques.
+4. **Subject Representation**
 
-  - **Input:** `cluster_1.csv`, `cluster_2.csv`, etc., from `m2_clustering/output/`.
-  - **Output:** `cluster_1_embeddings.csv`, `cluster_2_embeddings.csv`, etc., saved in `m3_network_embedding/output/`.
-  - **Algorithms:** Node2Vec (`config/node2vec.py`).
+   - **SubjectRepresentationEmbedding**: Integrates node embeddings into omics data to enhance subject representations.
 
-- ### 4. Subject Representation (`m4_subject_representation`)
+   ![Subject Representation Workflow](/assets/Subject.png)
 
-  **Purpose:** Integrates network embeddings with omics data to create comprehensive subject representations.
+5. **Integrated Tasks**
 
-  - **Input:** Embeddings from `m3_network_embedding/output/`, Raw Multi-Omics Data.
-  - **Output:** `integrated_data.csv` saved in `m4_subject_representation/output/`.
-  - **Methods:** Concatenation (`config/concatenate.py`), Scalar Representation (`config/scalar_representation.py`).
+   - **Disease Prediction using Multi-Omics Networks**: Leverages the power of Graph Neural Networks (GNNs) to capture intricate relationships between biological entities and extract valuable knowledge from this network structure.
 
-- ### 5. Integrated Task Processing (`m5_integrated_tasks`)
+   ![DPMON](/assets/DPMON.png)
 
-  **Purpose:** Performs disease prediction and additional downstream analyses using integrated multi-omics data and network information.
+6. **Utility Functions**
 
-  - **Input:**
-      - **Mandatory:**
-          - `network_file`: An omics network file (`network.csv`) from `m1_graph_generation/output/`, `m2_clustering/output/`, or a user-provided adjacency matrix.
-          - `omics_files`: List of omics data files (e.g., `metabolites.csv`, `proteins.csv`).
-          - `phenotype_file`: `phenotype.csv`.
-      - **Optional but Recommended:**
-          - `features_file`: Clinical data for nodes (e.g., `features.csv`).
-  - **Output:** `predictions.csv` saved in `m5_integrated_tasks/output/`.
-  - **Description:** Utilizes DPMON for disease prediction based on integrated multi-omics data and network information. Can incorporate additional downstream tasks for comprehensive analysis.
+   - Includes tools for data manipulation, path validation, and more.
 
-  ```yaml
-integrated_tasks:
-  task: "prediction"
+---
 
-  paths:
-    input_dir: "./input"
-    output_dir: "./output"
+## Acknowledgements
 
-  # Prediction Task Configuration
-  prediction:
-    network_file: "global_network.csv"
-    omics_files:
-      - "metabolites_blood_count_adjusted_2019-08-26.csv"
-      - "proteins_blood_count_adjusted_protein_names.csv"
-    phenotype_file: "Y_finalgold_coarse.csv"
-    features_file: ""
-    model: "GCN"
-    gpu: false
-    cuda: 0
-    tune: false
-    gnn_layer_num: 3
-    gnn_hidden_dim: 128
-    lr: 0.01
-    weight_decay: 1e-4
-    nn_hidden_dim1: 128
-    nn_hidden_dim2: 16
-    num_epochs: 50
-    repeat_num: 10
+BioNeuralNet utilizes several external packages and libraries that are integral to its functionality. We extend our gratitude to the developers and contributors of these projects:
 
-  ```
+- **SmCCNet**
+  - *Description*: An R package for Sparse Multiple Canonical Correlation Network.
+  - *Repository*: [SmCCNet on CRAN](https://cran.r-project.org/package=SmCCNet)
 
-## Configuration
+- **WGCNA**
+  - *Description*: Weighted Correlation Network Analysis for R.
+  - *Repository*: [WGCNA on CRAN](https://cran.r-project.org/package=WGCNA)
 
-### Root Configuration
+- **Node2Vec**
+  - *Description*: Scalable Feature Learning for Networks.
+  - *Repository*: [Node2Vec GitHub](https://github.com/aditya-grover/node2vec)
 
-The root `config.yml` centralizes the configuration settings for the entire pipeline. It specifies which algorithms to use for each component and general pipeline settings.
+- **Other Libraries**
+  - **dplyr**: A grammar of data manipulation for R. [dplyr on CRAN](https://cran.r-project.org/package=dplyr)
+  - **PyTorch**: An open source machine learning library based on the Torch library. [PyTorch Official Site](https://pytorch.org/)
+  - **PyTorch Geometric**: Extension library for PyTorch to handle geometric data. [PyTorch Geometric GitHub](https://github.com/pyg-team/pytorch_geometric)
+  - **Pytest**: A framework that makes building simple and scalable tests easy. [Pytest Official Site](https://pytest.org/)
+  - **Pre-commit**: A framework for managing and maintaining multi-language pre-commit hooks. [Pre-commit GitHub](https://github.com/pre-commit/pre-commit)
+  - **Other Dependencies**: Refer to `requirements.txt` for a complete list of Python dependencies.
 
-**Example `config.yml`:**
+*Thank you to all the open-source communities that make projects like BioNeuralNet possible.*
 
-```yaml
-# General pipeline settings
-pipeline:
-  run_all: true
-  output_dir: "log_output"
-  log_file: "pipeline.log"
+---
 
-# Graph Generation Settings
-m1_graph_generation:
-  algorithm: "smccnet"
+## Documentation
 
-# Clustering Settings
-m2_clustering:
-  algorithm: "Hierarchical"
+Comprehensive documentation is available to help you navigate and utilize all features of **BioNeuralNet**.
 
-# Network Embedding Settings
-m3_network_embedding:
-  algorithm: "node2vec"
+- **Main Documentation:** Located in the [`docs/`](docs/) directory, providing detailed guides and usage instructions.
+- **API Reference:** Detailed API documentation is available [here](https://yourdocumentationurl.com/api). *(Replace with your actual documentation URL)*
+- **Testing Documentation:** Refer to [`tests/README.md`](tests/README.md) for information on running and writing tests.
+- **Additional Guides:** Explore other `README.md` files within subdirectories for specific component details.
 
-# Subject Representation Settings
-m4_subject_representation:
-  integration_method: "scalar-representation"
+*Note:* The **README.md** provides an overview and essential instructions, while the **API Reference** offers in-depth technical details about the package's classes, functions, and methods.
 
-# Integrated Tasks Settings
-m5_integrated_task:
-  task_type: "prediction"
-```
-### Component Configuration
+---
 
-Each component has its own `config.yml` file located in its respective `config/` directory. These files contain algorithm-specific parameters.
+## Testing
 
-**Example for Clustering (`m2_clustering/config/config.yml`):**
+Ensuring the reliability of **BioNeuralNet** is paramount. Automated tests run on every commit and pull request via GitHub Actions, and pre-commit hooks enforce local testing before code is committed.
 
-```yaml
-clustering:
-  paths:
-    input_dir: "../input"
-    output_dir: "../output"
+### Overview
 
-  Hierarchical:
-    n_clusters: 5
-    linkage: "ward"
-    affinity: "euclidean"
+- **Testing Framework:** Utilizes `pytest` for writing and running tests.
+- **Continuous Integration:** GitHub Actions runs tests on multiple Python versions, checks code quality, and reports coverage.
+- **Local Enforcement:** Pre-commit hooks automate tests and code quality checks before commits.
 
-  PageRank:
-    damping_factor: 0.85
-    max_iter: 100
-    tol: 1e-6
-```
-**Example for Network Embedding (`m3_network_embedding/config/config.yml`):**
+### Running Tests Locally
 
-```yaml
-network_embedding:
-  paths:
-    input_dir: "../input"
-    output_dir: "../output"
+Detailed instructions are available in [`tests/README.md`](tests/README.md), but here's a quick overview:
 
-  node2vec:
-    embedding_dim: 128
-    walk_length: 80
-    num_walks: 10
-    window_size: 10
-```
-## Installation
+1. **Ensure Development Dependencies are Installed**
 
-**Clone the Repository:**
+   ```bash
+   pip install -r requirements-dev.txt
+   ```
+
+2. **Run All Tests**
+
+   ```bash
+   pytest
+   ```
+
+3. **View Coverage Reports**
+
+   ```bash
+   pytest --cov=bioneuralnet --cov-report=html tests/
+   ```
+
+   *Open `htmlcov/index.html` in your browser to view the coverage details.*
+
+### Continuous Integration
+
+Every commit and pull request triggers GitHub Actions workflows that:
+
+- Install dependencies.
+- Lint and format code.
+- Run the test suite.
+- Upload coverage reports to Codecov.
+
+Ensure that all tests pass in the CI pipeline before merging changes.
+
+---
+
+## Contributing
+
+Contributions are welcome! To ensure a smooth collaboration process, please adhere to the following guidelines:
+
+1. **Fork the Repository**
+
+   ```bash
+   git clone https://github.com/UCD-BDLab/BioNeuralNet.git
+   cd BioNeuralNet
+   ```
+
+2. **Create a Feature Branch**
+
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+3. **Install Development Dependencies**
+
+   ```bash
+   ./setup.sh
+   ```
+
+4. **Make Your Changes**
+
+   - Write clean, readable code following PEP 8 standards.
+   - Add or update tests as necessary.
+   - Update documentation if your changes affect usage or functionality.
+
+5. **Run Tests Locally**
+
+   ```bash
+   pytest
+   ```
+
+6. **Commit Your Changes**
+
+   ```bash
+   git add .
+   git commit -m "Add feature XYZ"
+   ```
+
+   *Pre-commit hooks will run automatically, ensuring code quality and passing tests before the commit is finalized.*
+
+7. **Push to Your Fork**
+
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+8. **Open a Pull Request**
+
+   Navigate to the original repository and open a pull request detailing your changes.
+
+### Pre-Commit Hooks
+
+To maintain code quality, pre-commit hooks are enforced. After setting up your development environment, ensure that pre-commit hooks are installed:
 
 ```bash
-git clone https://github.com/bdlab-ucd/BioNeuralNet.git
-cd BioNeuralNet
-```
-**Set Up a Virtual Environment:**
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-**Install Required Packages:**
-
-```bash
-pip install -r requirements.txt
+pre-commit install
 ```
 
-## Usage
+*These hooks will automatically run tests, format code, and perform linting before each commit.*
 
-BioNeuralNet is designed with user-friendliness and flexibility in mind. Whether you're looking to execute the entire pipeline or focus on specific analysis steps, BioNeuralNet accommodates your research needs seamlessly.
+### Guidelines for Writing Tests
 
-- ### Running the Entire Pipeline
+Refer to [`tests/README.md`](tests/README.md) for comprehensive guidelines on writing effective and consistent tests.
 
-  Execute all components sequentially to process your multi-omics data from network generation to Integrated Tasks.
-
-  ```bash
-  python main.py --start 1 --end 5
-  ```
-  **Description:**
-
-  - `--start 1`: Begins execution from Component 1 (Graph Generation).
-  - `--end 5`: Ends execution at Component 5 (Integrated Tasks).
-
-  - ### Running Individual Components
-
-  Focus on specific components without executing the entire pipeline. Useful for testing or when certain stages are already completed.
-
-  **Example**: Run only Component 3 (Network Embedding).
-
-  ```bash
-  python main.py --start 3 --end 3
-  ```
-
-  Note: Ensure that the `input_dir` of the component contains the necessary input files.
-
-- ### Running Integrated Tasks
-
-  Execute only the Integrated Tasks component using **DPMON**.
-
-  ```bash
-  python main.py --start 5 --end 5
-  ```
-
-  **Description**:
-
-    - **Configuration**:
-    Ensure that task_type: "prediction" is set in the global config.yml and that `m5_integrated_task/config.yml` is properly configured with **DPMON** parameters.
-
-    - **Input**:
-    Place input files in the `m5_integrated_task/input/` directory or ensure they are correctly copied from previous components.
-
-    - **Output**:
-    The predictions will be saved as `predictions.csv` in `m5_integrated_task/output/`.
-
-    - **Reference**:
-    For more details on [DPMON](https://github.com/UCD-BDLab/DPMON).
-
-## Workflow Overview
-### Data Flow and Dependencies
-
-1. **Graph Generation**(`m1_graph_generation`):
-    - **Input**: Multi-Omics Data Files, Phenotype File.
-    - **Output**: `global_graph.csv` saved in `m1_graph_generation/output/`.
-
-2. **Clustering** (`m2_clustering`):
-    - **Input**: `global_graph.csv` from `m1_graph_generation/output/`.
-    - **Output**: `cluster1.csv`, `cluster2.csv`, etc., saved in `m2_clustering/output/`.
-
-3. **Network Embedding** (`m3_network_embedding`):
-    - **Input**: `cluster1.csv`, `cluster2.cs`v, etc., from `m2_clustering/output/`.
-    - **Output**: `node_embeddings_cluster1.csv`, `node_embeddings_cluster2.csv`, etc., saved in `m3_network_embedding/output`/.
-
-4. **Subject Representation** (`m4_subject_representation`):
-    - **Input**: `node_embeddings_cluster1.csv`, `node_embeddings_cluster2.csv`, etc., `from m3_network_embedding/output/`, Raw Multi-Omics Data.
-    - **Output**: integrated_data.csv saved in `m4_subject_representation/output/`.
-
-5. **Integrated Task Processing** (`m5_integrated_tasks`):
-    - **Input**:
-        - **Mandatory:**
-            - `network_file`: An omics network file (`network.csv`). Can be from `m1_graph_generation/output/`, `m2_clustering/output/`, or a user-provided `network.csv` as an adjacency matrix.
-            - `omics_files`: List of omics data files (e.g., `metabolites.csv`, `proteins.csv`).
-            - `phenotype_file`: `phenotype.csv`.
-        - **Optional but Recommended:**
-            - `features_file`: Clinical data for nodes (e.g., `features.csv`).
-    - **Output**: `predictions.csv` saved in `m5_integrated_tasks/output/`.
-    - **Description**: Utilizes DPMON for disease prediction based on integrated multi-omics data and network information. Can incorporate additional downstream tasks for comprehensive analysis.
-
-## Logging
-
-BioNeuralNet implements comprehensive logging to facilitate monitoring and debugging.
-
-- **Root Log** (`pipeline.log`): Located in the global `output_dir`, records high-level pipeline execution details.
-- **Component Logs** (`component.log`): Located within each component's `output/` directory, contain detailed logs specific to that component's execution.
-
-**Example Locations:**
-
-- `global_output/pipeline.log`
-- `m2_clustering/output/component.log`
-
-## Extending the Pipeline
-
-BioNeuralNet's **modular** and **extensible** design allows researchers to incorporate new algorithms and methods effortlessly. This flexibility ensures that the pipeline can evolve alongside advancements in bioinformatics and network analysis.
-
-### Adding New Algorithms
-
-Integrate new algorithms into BioNeuralNet by following these streamlined steps:
-
-1. **Create the Algorithm Script:**
-   - Navigate to the target component's `config/` directory.
-   - Add a new Python script named after the algorithm (e.g., `new_algorithm.py`).
-
-2. **Implement the Algorithm:**
-   - Define a `run_method` function (or appropriately named) that encapsulates the algorithm's logic.
-   - Ensure the function accepts necessary parameters such as `config`, `input_dir`, and `output_dir`.
-
-**Example: `m2_clustering/config/new_algorithm.py`**
-
-```python
-import logging
-import pandas as pd
-from sklearn.cluster import KMeans
-
-def run_method(network_file, config, output_dir):
-    """
-    Perform K-Means Clustering on the network data.
-    """
-    logger = logging.getLogger(__name__)
-    logger.info("Running K-Means Clustering")
-
-    try:
-        # Load network data
-        network_df = pd.read_csv(network_file, index_col=0)
-        feature_matrix = network_df.values
-
-        # Initialize the clustering model
-        model = KMeans(
-            n_clusters=config['clustering']['KMeans']['n_clusters'],
-            random_state=config['clustering']['KMeans']['random_state']
-        )
-
-        # Fit the model
-        labels = model.fit_predict(feature_matrix)
-
-        # Save cluster labels
-        cluster_labels_file = os.path.join(output_dir, "cluster_labels_kmeans.csv")
-        cluster_labels_df = pd.DataFrame({
-            'node': network_df.index,
-            'cluster': labels
-        })
-        cluster_labels_df.to_csv(cluster_labels_file, index=False)
-        logger.info(f"K-Means cluster labels saved to {cluster_labels_file}")
-
-    except Exception as e:
-        logger.error(f"Error in K-Means Clustering: {e}")
-        raise
-```
-**3. Update Component Configuration:**
-
-- Modify the component's `config.yml` to include the new algorithm and its specific parameters.
-
-**Example: `m2_clustering/config/config.yml`**
-
-```yaml
-clustering:
-  paths:
-    input_dir: "../input"
-    output_dir: "../output"
-
-  Hierarchical:
-    n_clusters: 5
-    linkage: "ward"
-    affinity: "euclidean"
-
-  PageRank:
-    damping_factor: 0.85
-    max_iter: 100
-    tol: 1e-6
-
-  KMeans:
-    n_clusters: 5
-    random_state: 42
-```
-**4. Update Root Configuration:**
-
-- Specify the new algorithm in the root `config.yml` for the respective component. In the example below we specify the new clustering algorithm.
-
-**Example:**
-```yaml
-# Clustering Settings
-m2_clustering:
-  algorithm: "KMeans"
-```
-
-**5. Run the Pipeline:**
-
-- Execute the pipeline or the specific component to utilize the new algorithm.
-
-```bash
-python main.py --start 2 --end 2
-```
-
-### Best Practices for Extending code base:
-
-*   **Consistent Naming:** Follow standardized naming conventions for new scripts and modules to ensure seamless integration.
-
-*   **Documentation:** Update relevant sections of the `README.md` and any in-code documentation to reflect the addition of new algorithms.
-
-*   **Testing:** After adding a new algorithm, perform both unit tests and integration tests to verify functionality and compatibility.
-
-*   **Version Control:** Commit changes systematically using Git, documenting the integration steps for future reference.
+---
 
 ## License
 
-[MIT License](/LICENSE)
+This project is licensed under the [MIT License](LICENSE).
+
+---
 
 ## Contact
 
-For questions or support, please contact:
+For questions, support, or contributions, please open an issue on [GitHub](https://github.com/UCD-BDLab/BioNeuralNet/issues) or contact the maintainers directly.
 
-- Vicente Ramos
-  - Email: vicente.ramos@ucdenver.edu
+---
 
-- Big Data Management and Mining Laboratory
-  - Email: bdlab@ucdenver.edu
+## Final Notes
 
+- **Primary Installation Method:** Most users can seamlessly install **BioNeuralNet** using `pip install bioneuralnet`, which handles all necessary Python dependencies.
+
+- **R Dependencies:** R scripts required for SmCCNet and WGCNA are not installable via `pip`. Users needing these functionalities should follow the R installation instructions provided [above](#for-users-r-dependencies).
+
+- **Usage with Direct Parameter Passing:** All components in BioNeuralNet can be used by directly passing parameters to the classes, without the need for configuration files. Refer to the example usage scripts in the [`examples/`](examples/) directory.
+
+- **Developer Setup:** Developers contributing to the project should use the `setup.sh` script to establish their development environment, ensuring consistency and adherence to project standards.
+
+- **Documentation and Testing:** Comprehensive documentation and a robust testing suite ensure that both users and contributors have the resources needed to effectively utilize and enhance **BioNeuralNet**.
+
+By maintaining a clear and organized `README.md`, we aim to facilitate ease of use for end-users and streamline the development process for contributors. This structured approach enhances the overall quality and maintainability of the **BioNeuralNet** project.
+
+---

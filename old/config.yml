@@ -1,0 +1,26 @@
+# General pipeline settings
+pipeline:
+  run_all: false
+  output_dir: "log_output"
+  log_file: "pipeline.log"
+
+# Graph Generation
+m1_graph_generation:
+  algorithm: "smccnet"
+
+# Clustering
+m2_clustering:
+  algorithm: "Hierarchical"
+
+# Network Embedding
+m3_network_embedding:
+  algorithm: "node2vec"
+
+# Subject Representation
+m4_subject_representation:
+  integration_method: "scalar-representation"
+
+# Task Optimization
+m5_integrated_task:
+  # Prediction with network information using DPMON.
+  task: "prediction"
