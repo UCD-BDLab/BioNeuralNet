@@ -1,0 +1,5 @@
+# CUDA-specific dependencies for BioNeuralNet
+
+# PyTorch Geometric dependencies for CUDA (e.g. here CUDA 11.7)
+torch_scatter @ https://data.pyg.org/whl/torch-2.0.0+cu117.html
+torch_sparse @ https://data.pyg.org/whl/torch-2.0.0+cu117.html

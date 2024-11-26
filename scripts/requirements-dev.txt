@@ -1,0 +1,24 @@
+# Development dependencies for BioNeuralNet
+
+# Testing
+pytest>=6.0
+pytest-cov
+pytest-mock
+
+# Documentation
+sphinx
+sphinx_rtd_theme
+
+# Code Quality and Formatting
+flake8
+black
+mypy
+
+# Additional Development Tools
+pre-commit
+tox
+
+# Build dependencies for BioNeuralNet
+setuptools>=42
+wheel
+twine

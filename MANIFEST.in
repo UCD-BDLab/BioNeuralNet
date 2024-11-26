@@ -1,0 +1,23 @@
+# Include essential files
+include README.md
+include LICENSE
+
+# Include all .yml files in the utils directory
+recursive-include bioneuralnet/utils *.yml
+
+# Include shell scripts in the scripts directory
+recursive-include bioneuralnet/scripts *.sh
+
+# Include all requirements files
+include requirements.txt
+include requirements-cpu.txt
+include requirements-cuda.txt
+include requirements-dev.txt
+
+# Include documentation source files
+recursive-include docs/source *.rst
+recursive-include docs *.md
+
+# Include examples
+recursive-include examples *
+

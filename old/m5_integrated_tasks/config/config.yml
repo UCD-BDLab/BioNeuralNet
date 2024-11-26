@@ -1,0 +1,32 @@
+integrated_tasks:
+  paths:
+    input_dir: "../input"
+    output_dir: "../output"
+
+  prediction:
+    network_file: "global_network.csv"
+    omics_files:
+      - "metabolites_blood_count_adjusted_2019-08-26.csv"
+      - "proteins_blood_count_adjusted_protein_names.csv"
+
+    phenotype_file: "Y_finalgold_coarse.csv"
+
+    # Features file with clinical data for nodes
+    # Set to null if not used
+    features_file: null 
+
+    # Parameters for the model
+    model: "GCN"                
+    gpu: false                  
+    cuda: 0                     
+    tune: false                 
+
+    # Other parameters for dpmon
+    gnn_layer_num: 3            
+    gnn_hidden_dim: 16          
+    lr: 0.01                    
+    weight_decay: 0.001         
+    nn_hidden_dim1: 16          
+    nn_hidden_dim2: 16          
+    num_epochs: 5               
+    repeat_num: 1               

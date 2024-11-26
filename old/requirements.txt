@@ -1,0 +1,30 @@
+# Global dependencies
+torch==2.0.0
+torch_geometric
+PyYAML>=5.4
+pandas>=1.0
+numpy>=1.18
+scikit-learn>=0.24
+node2vec>=0.4.1
+
+# DPMON dependencies
+matplotlib
+ray[tune]
+tensorboardX
+networkx
+
+
+# Installing torch with your own system configuration.
+# https://pytorch-geometric.readthedocs.io/en/2.5.2/notes/installation.html
+
+# If an error occurs installing the following packages, run them directly from terminal
+# pip install torch_scatter
+# pip install torch_sparse
+torch_scatter -f https://data.pyg.org/whl/torch-2.0.0+cpu.html
+torch_sparse -f https://data.pyg.org/whl/torch-2.0.0+cpu.html
+
+## Ex in Linux OS using CUDA
+# torch==2.0.0
+# torch_geometric
+# torch_scatter -f https://data.pyg.org/whl/torch-2.0.0+cu117.html
+# torch_sparse -f https://data.pyg.org/whl/torch-2.0.0+cu117.html

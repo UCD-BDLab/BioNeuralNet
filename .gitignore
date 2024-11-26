@@ -1,3 +1,52 @@
+# Python
+*.pyc
 __pycache__/
+*.pyo
+*.pyd
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Sphinx documentation build
+docs/build/
+
+# Virtual environment
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
 .venv/
-.DS_Store/
+
+# IDE and editor directories
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Test reports
+test_report/
+
+# Other
+*.bak
+*.tmp
