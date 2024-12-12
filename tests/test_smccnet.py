@@ -58,6 +58,7 @@ class TestSmCCNet(unittest.TestCase):
         smccnet = SmCCNet(
             phenotype_file='input/phenotype_data.csv',
             omics_list=['input/proteins.csv', 'input/metabolites.csv'],
+            data_types=['protein', 'metabolite']
         )
 
         with self.assertRaises(subprocess.CalledProcessError):
@@ -71,6 +72,10 @@ class TestSmCCNet(unittest.TestCase):
     @patch('bioneuralnet.graph_generation.smccnet.pd.read_csv')
     @patch('bioneuralnet.graph_generation.smccnet.os.path.isfile')
     def test_load_global_network_success(self, mock_isfile, mock_read_csv):
+        """
+        Test that SmCCNet.run() successfully returns a DataFrame if the R script executes without errors.
+        """
+        
         # Setup the mocks
         mock_isfile.return_value = True
         mock_read_csv.return_value = pd.DataFrame({'Gene1': [1, 0], 'Gene2': [0, 1]}, index=['Gene1', 'Gene2'])
@@ -78,6 +83,7 @@ class TestSmCCNet(unittest.TestCase):
         smccnet = SmCCNet(
             phenotype_file='input/phenotype_data.csv',
             omics_list=['input/proteins.csv', 'input/metabolites.csv'],
+            data_types=['protein', 'metabolite']
         )
 
         result = smccnet.load_global_network('smccnet_output_1')
@@ -97,6 +103,7 @@ class TestSmCCNet(unittest.TestCase):
         smccnet = SmCCNet(
             phenotype_file='input/phenotype_data.csv',
             omics_list=['input/proteins.csv', 'input/metabolites.csv'],
+            data_types=['protein', 'metabolite']
         )
 
         with self.assertRaises(FileNotFoundError):
@@ -116,6 +123,7 @@ class TestSmCCNet(unittest.TestCase):
         smccnet = SmCCNet(
             phenotype_file='input/phenotype_data.csv',
             omics_list=['input/proteins.csv', 'input/metabolites.csv'],
+            data_types=['protein', 'metabolite']
         )
 
         with self.assertRaises(pd.errors.EmptyDataError):

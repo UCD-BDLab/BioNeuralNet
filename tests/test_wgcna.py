@@ -28,7 +28,6 @@ class TestWGCNA(unittest.TestCase):
             soft_power=6,
             min_module_size=30,
             merge_cut_height=0.25,
-            output_dir='wgcna_output_1'
         )
 
         result = wgcna.run()
@@ -37,7 +36,8 @@ class TestWGCNA(unittest.TestCase):
         mock_create_output_dir.assert_called_once()
         mock_preprocess.assert_called_once()
         mock_subprocess.assert_called_once()
-        mock_load_global.assert_called_once_with()
+        mock_load_global.assert_called_once_with('wgcna_output_1')
+
         self.assertTrue(isinstance(result, pd.DataFrame))
         self.assertEqual(result.shape, (2, 2))
         self.assertListEqual(list(result.columns), ['Gene1', 'Gene2'])
@@ -63,7 +63,6 @@ class TestWGCNA(unittest.TestCase):
             soft_power=6,
             min_module_size=30,
             merge_cut_height=0.25,
-            output_dir='wgcna_output_2'
         )
 
         with self.assertRaises(subprocess.CalledProcessError):
@@ -88,14 +87,13 @@ class TestWGCNA(unittest.TestCase):
             soft_power=6,
             min_module_size=30,
             merge_cut_height=0.25,
-            output_dir='wgcna_output_1'
         )
 
-        result = wgcna.load_global_network()
-
-        # Assertions
+        result = wgcna.load_global_network('wgcna_output_1')
+        
         mock_isfile.assert_called_once_with('wgcna_output_1/global_network.csv')
         mock_read_csv.assert_called_once_with('wgcna_output_1/global_network.csv', index_col=0)
+        
         self.assertTrue(isinstance(result, pd.DataFrame))
         self.assertEqual(result.shape, (2, 2))
 
@@ -112,11 +110,10 @@ class TestWGCNA(unittest.TestCase):
             soft_power=6,
             min_module_size=30,
             merge_cut_height=0.25,
-            output_dir='wgcna_output_1'
         )
 
         with self.assertRaises(FileNotFoundError):
-            wgcna.load_global_network()
+            wgcna.load_global_network('wgcna_output_1')
 
         # Assertions
         mock_isfile.assert_called_once_with('wgcna_output_1/global_network.csv')
@@ -136,11 +133,10 @@ class TestWGCNA(unittest.TestCase):
             soft_power=6,
             min_module_size=30,
             merge_cut_height=0.25,
-            output_dir='wgcna_output_1'
         )
 
         with self.assertRaises(pd.errors.EmptyDataError):
-            wgcna.load_global_network()
+            wgcna.load_global_network('wgcna_output_1')
 
         # Assertions
         mock_isfile.assert_called_once_with('wgcna_output_1/global_network.csv')

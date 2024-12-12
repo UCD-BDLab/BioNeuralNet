@@ -49,7 +49,6 @@ __version__: str = '0.1.0'
 from .network_embedding.gnns import GNNEmbedding
 from .network_embedding.node2vec import Node2VecEmbedding
 from .subject_representation.subject_representation import SubjectRepresentationEmbedding
-from .utils.quick_start import quick_start
 from .utils.data_utils import combine_omics_data
 
 # Define the public API of the package
