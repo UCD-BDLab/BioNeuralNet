@@ -20,5 +20,4 @@ tox
 
 # Build dependencies for BioNeuralNet
 setuptools>=42
-wheel
 twine

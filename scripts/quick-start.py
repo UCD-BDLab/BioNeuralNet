@@ -41,7 +41,14 @@ def main():
         print("Unsupported OS. Please install R dependencies manually.")
         exit(1)
 
-    print("Quick-start completed successfully!")
+    print("------------------------------------------------")
+    print("BioNeuralNet quick-start completed successfully!")
+    print("------------------------------------------------\n")
+    print("To activate the virtual environment, run:")
+    print("source .venv/bin/activate\n")
+    print("To deactivate the virtual environment, run:")
+    print("deactivate\n")
+    
 
 if __name__ == "__main__":
     main()

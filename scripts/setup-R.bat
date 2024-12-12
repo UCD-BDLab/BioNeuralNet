@@ -11,9 +11,12 @@ if %ERRORLEVEL% NEQ 0 (
     echo R is already installed.
 )
 
-:: Install R packages
-echo Installing R packages: dplyr, SmCCNet, WGCNA...
-Rscript -e "install.packages(c('dplyr', 'SmCCNet', 'WGCNA'), repos='http://cran.r-project.org')"
+:: Install CRAN and Bioconductor packages
+echo Installing R packages: dplyr, SmCCNet, WGCNA, and dependencies...
+Rscript -e "options(repos = c(CRAN = 'https://cran.r-project.org')); install.packages(c('dplyr', 'SmCCNet'))"
+Rscript -e "options(repos = c(CRAN = 'https://cran.r-project.org')); if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager')"
+Rscript -e "options(repos = c(CRAN = 'https://cran.r-project.org')); BiocManager::install(c('impute', 'preprocessCore', 'GO.db', 'AnnotationDbi'))"
+Rscript -e "options(repos = c(CRAN = 'https://cran.r-project.org')); install.packages('WGCNA')"
 
 echo R dependencies setup completed!
 pause

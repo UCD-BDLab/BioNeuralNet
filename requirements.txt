@@ -3,6 +3,7 @@
 # PyTorch and related libraries
 torch==2.0.0
 torch_geometric
+wheel
 
 # Data handling and processing
 PyYAML>=5.4

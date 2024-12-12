@@ -35,7 +35,6 @@ The API Reference provides detailed documentation for each module, class, and fu
     bioneuralnet.subject_representation.SubjectRepresentationEmbedding
     bioneuralnet.utils.file_helpers.find_files
     bioneuralnet.utils.path_utils.validate_paths
-    bioneuralnet.utils.quick_start.quick_start
 ```
 
 **Explanation:**
