@@ -2,7 +2,6 @@ import pytest
 from bioneuralnet.utils.file_helpers import find_files
 from bioneuralnet.utils.path_utils import validate_paths
 
-
 def test_find_files(tmp_path):
     # Setting temporary directory and files
     temp_dir = tmp_path / "sub"

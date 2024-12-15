@@ -25,7 +25,6 @@
 10. [License](#license)
 11. [Contact](#contact)
 
----
 
 ## Overview
 
@@ -34,8 +33,6 @@ BioNeuralNet empowers researchers to seamlessly integrate various omics datasets
 
 ![BioNeuralNet Workflow](/assets/BioNeuralNet.png)
 
-
----
 
 ## Features
 
@@ -46,11 +43,10 @@ BioNeuralNet empowers researchers to seamlessly integrate various omics datasets
 - **Comprehensive Testing**: Ensure reliability with a robust testing suite and continuous integration.
 - **Developer-Friendly**: Streamlined setup for contributors with pre-commit hooks and development tools.
 
----
 
 ## Installation
 
-### For Users: Python Package Installation
+### Python Package Installation
 
 Most users can install **BioNeuralNet** directly via `pip`, which includes all necessary Python dependencies.
 
@@ -72,9 +68,9 @@ Most users can install **BioNeuralNet** directly via `pip`, which includes all n
 
    **Note:** If you require CUDA-enabled functionalities (for GPU acceleration), ensure that you have the appropriate CUDA version installed on your system.
 
-### For Users: R Dependencies
+### R Dependencies
 
-**BioNeuralNet** integrates R scripts for graph construction using SmCCNet and WGCNA. While Python users can install the package via `pip`, R dependencies need separate installation. Most users do not require R functionalities unless they intend to utilize these specific graph construction methods.
+**BioNeuralNet** integrates R scripts for graph construction using SmCCNet and WGCNA. While Python users can install the package via `pip`, R dependencies need separate installation.
 
 #### 1. Manual R Installation
 
@@ -104,9 +100,9 @@ install.packages(c("dplyr", "SmCCNet", "WGCNA"))
 
 - **Permissions:** You may need administrative privileges to install certain packages or dependencies.
 
-### For Developers: Development Environment Setup
+### Fast Install: Auto install R and development dependencies
 
-Researchers and developers intending to contribute to **BioNeuralNet** should set up a development environment. This involves creating a virtual environment, installing dependencies, and setting up pre-commit hooks to maintain code quality.
+Fastes way to get everything up an running is using the script `fast-install.py`. This involves creating a virtual environment, installing dependencies (including R), and setting up pre-commit hooks to maintain code quality.
 
 1. **Clone the Repository**
 
@@ -117,28 +113,30 @@ Researchers and developers intending to contribute to **BioNeuralNet** should se
 
 2. **Run the Setup Script**
 
-   The `setup.sh` script automates the setup process for developers.
+   The `fast-install.py` script automates the setup process.
 
    ```bash
-   ./setup.sh
+   cd scripts
+   python3 fast-install.py
    ```
 
-   **What `setup.sh` Does:**
+   **What `fast-install.py` Does:**
 
    - **Creates and Activates a Virtual Environment:** Ensures that dependencies are isolated.
    - **Installs Base and Development Dependencies:** Sets up the environment with necessary packages.
    - **Installs Pre-Commit Hooks:** Automates code quality checks before commits.
-   - **Initializes the Project:** Sets up directories and configuration files.
 
-   **Note:** Ensure you have execution permissions for `setup.sh`. If not, make it executable:
+   **Note:** Ensure you have execution permissions for `setup-env.sh` and `setup-R.sh`. If not, make it executable:
 
    ```bash
-   chmod +x setup.sh
+   chmod +x setup-env.sh
+   chmod +x setup-R.sh
    ```
+**Note**: Steps 3 and 4 are only necessary if you plan to contribute to the codebase.
 
 3. **Verify Pre-Commit Hooks**
 
-   After running `setup.sh`, pre-commit hooks should be installed automatically. To confirm, you can run:
+   After running `fast-install.py`, pre-commit hooks should be installed automatically. To confirm, you can run:
 
    ```bash
    pre-commit run --all-files
@@ -150,7 +148,7 @@ Researchers and developers intending to contribute to **BioNeuralNet** should se
 
    If your development work involves R scripts, ensure that R and its required packages are installed as per the [R Dependencies](#for-users-r-dependencies) section.
 
----
+
 
 ## Quick Start Guide
 
@@ -158,11 +156,12 @@ Begin using **BioNeuralNet** by following these streamlined steps:
 
 1. **Prepare Input Data**
 
+   - **Input Directory:** Create an `input/` directory at the root of your project.
    - **Omics Data:** Place your omics CSV files (e.g., `proteomics_data.csv`, `metabolomics_data.csv`) in the `input/` directory.
    - **Phenotype Data:** Place `phenotype_data.csv` in the `input/` directory.
    - **Clinical Data:** Place `clinical_data.csv` in the `input/` directory.
 
-2. **Combine Omics Data**
+2. **Combine Omics Data**, if needed.
 
    If you have multiple omics datasets, combine them using the `combine_omics_data` utility.
 
@@ -179,17 +178,508 @@ Begin using **BioNeuralNet** by following these streamlined steps:
    combine_omics_data(omics_file_paths, combined_omics_file)
    ```
 
-3. **Run the Example Usage Script**
+3. **Examples**
 
-   Execute the example usage script or create your own pipeline script to perform data integration and analysis.
+   Execute of BioNeuralNet components
 
-   ```bash
-   python examples/usage_examples.py
+   3.1. **SmCCnet**
+   ```Python
+   from bioneuralnet.graph_generation.smccnet import SmCCNet
+
+   def main():
+      smccnet = SmCCNet(
+         phenotype_file='input/phenotype_data.csv',
+         omics_list=[
+               'input/proteins.csv',
+               'input/metabolites.csv'
+         ],
+         data_types=['protein', 'metabolite'],  
+         kfold=5,                              
+         summarization='PCA',                  
+         seed=732,                              
+      )
+
+      adjacency_matrix = smccnet.run()
+      adjacency_matrix.to_csv('smccnet_output_1/global_network.csv')
+
+      print("Adjacency Matrix saved to 'smccnet_output_1/global_network.csv'.")
+    ```
+   3.2. **WGCNA**
+   ```Python
+   from bioneuralnet.graph_generation.wgcna import WGCNA
+
+   def main():
+      wgcna = WGCNA(
+         phenotype_file='input/phenotype_data.csv',
+         omics_list=[
+               'input/genes.csv',
+               'input/miRNA.csv'
+         ],
+         # Default values for WGCNA parameters
+         data_types=['gene', 'miRNA'],        
+         soft_power=6,                        
+         min_module_size=30,                  
+         merge_cut_height=0.25,                
+         output_dir='wgcna_output_1'           
+      )
+
+      # Run WGCNA to generate adjacency matrix
+      adjacency_matrix = wgcna.run()
+
+      # Save the adjacency matrix to a CSV file
+      adjacency_matrix.to_csv('wgcna_output_1/global_network.csv')
+
+      print("Adjacency Matrix saved to 'wgcna_output_1/global_network.csv'.")
+
+   if __name__ == "__main__":
+      main()
+    ```
+
+   3.3. **Generate Embeddings using GNNs**
+   ```Python
+   import pandas as pd
+   from bioneuralnet.network_embedding.gnns import GNNEmbedding
+
+   def main():
+      # Paths to input files
+      omics_files = ['input/proteins.csv', 'input/metabolites.csv']
+      phenotype_file = 'input/phenotype_data.csv'
+      clinical_data_file = 'input/clinical_data.csv' 
+      adjacency_matrix_file = 'input/adjacency_matrix.csv'
+
+      # Load adjacency matrix
+      adjacency_matrix = pd.read_csv(adjacency_matrix_file, index_col=0)
+
+      # Initialize GNNEmbedding
+      gnn_embedding = GNNEmbedding(
+         omics_list=omics_files,
+         phenotype_file=phenotype_file,
+         clinical_data_file=clinical_data_file,
+         adjacency_matrix=adjacency_matrix,
+         model_type='GCN', 
+         gnn_hidden_dim=64,
+         gnn_layer_num=2,
+         dropout=True
+      )
+
+      # Run GNN embedding to generate embeddings
+      embeddings_dict = gnn_embedding.run()
+
+      # Access embeddings
+      embeddings_tensor = embeddings_dict['graph']
+      embeddings_df = pd.DataFrame(
+         embeddings_tensor.numpy(),
+         index=adjacency_matrix.index,
+         columns=[f"dim_{i}" for i in range(embeddings_tensor.shape[1])]
+      )
+
+      print("Embeddings generated successfully.")
+      print("Sample embeddings:")
+      print(embeddings_df.head())
+
+   if __name__ == "__main__":
+      main()
+    ```
+
+   3.4. **Generate Embeddings using Node2Vec**
+   ```Python
+   from bioneuralnet.network_embedding.node2vec import Node2VecEmbedding
+
+   def main():
+      # Initialize Node2VecEmbedding parameters
+      node2vec_embedding = Node2VecEmbedding(
+         input_dir='input/graphs/',    
+         embedding_dim=128,            
+         walk_length=80,              
+         num_walks=10,                 
+         window_size=10,              
+         workers=4,                   
+         seed=42,                      
+         output_dir=None               
+      )
+
+      # Run Node2Vec to generate embeddings
+      embeddings = node2vec_embedding.run()
+
+      # embeddings for a specific graph
+      graph_name = 'global_network' 
+      if graph_name in embeddings:
+         embeddings_df = embeddings[graph_name]
+         print(f"Embeddings for '{graph_name}' generated successfully.")
+      else:
+         print(f"No embeddings found for '{graph_name}'.")
+
+   if __name__ == "__main__":
+      main()
+    ```
+   3.5. **Subject Representation**
+   ```Python
+   import pandas as pd
+   from bioneuralnet.subject_representation.subject_representation import SubjectRepresentationEmbedding
+
+   def main():
+      # Paths to input files
+      omics_files = ['input/proteins.csv', 'input/metabolites.csv']
+      phenotype_file = 'input/phenotype_data.csv'
+      clinical_data_file = 'input/clinical_data.csv'
+      adjacency_matrix_file = 'input/adjacency_matrix.csv'
+
+      # Load adjacency matrix
+      adjacency_matrix = pd.read_csv(adjacency_matrix_file, index_col=0)
+
+      # Initialize SubjectRepresentationEmbedding
+      subject_rep_embedding = SubjectRepresentationEmbedding(
+         adjacency_matrix=adjacency_matrix,
+         omics_list=omics_files,
+         phenotype_file=phenotype_file,
+         clinical_data_file=clinical_data_file,
+         embedding_method='GNNs'
+      )
+
+      # Run the subject representation process
+      enhanced_omics_data = subject_rep_embedding.run()
+
+      # The enhanced omics data is saved to the output directory specified in the class
+      print("Subject representation workflow completed successfully.")
+
+
+   if __name__ == "__main__":
+      main()
+
+    ```
+   3.6. **Hierarchical Clustering**
+   ```Python
+   from bioneuralnet.clustering.hierarchical import HierarchicalClustering
+
+   def main():
+      # Initialize HierarchicalClustering parameters
+      hierarchical_cluster = HierarchicalClustering(
+         adjacency_matrix_file='input/global_network.csv',
+         n_clusters=3,            
+         linkage='ward',         
+         affinity='euclidean',   
+      )
+
+      # Run the hierarchical clustering
+      results = hierarchical_cluster.run()
+
+      # Access results
+      cluster_labels_df = results['cluster_labels']
+      print("Cluster labels:")
+      print(cluster_labels_df.head())
+
+      silhouette_score = results['silhouette_score']
+      print(f"Silhouette Score: {silhouette_score}")
+
+   if __name__ == "__main__":
+      main()
+
+   ```
+   3.7. **PageRank Clustering**
+   ```Python
+   from bioneuralnet.clustering.pagerank import PageRankClustering
+
+   def main():
+      # Initialize PageRankClustering parameters
+      pagerank_cluster = PageRankClustering(
+         graph_file='input/GFEV1ac110.edgelist',
+         omics_data_file='input/X.xlsx',
+         phenotype_data_file='input/Y.xlsx',
+         alpha=0.9,
+         max_iter=100,
+         tol=1e-6,
+         k=0.9,
+      )
+
+      # Define seed nodes 
+      seed_nodes = [94] 
+
+      # Run PageRank clustering
+      results = pagerank_cluster.run(seed_nodes=seed_nodes)
+
+      # Access results
+      cluster_nodes = results['cluster_nodes']
+      print(f"Identified cluster with {len(cluster_nodes)} nodes.")
+
+   if __name__ == "__main__":
+      main()
    ```
 
-   *This script demonstrates how to use various components of BioNeuralNet with direct parameter passing.*
+4. **Hybrid Examples**
 
----
+   The example aboves are uses of individual BioNeuralNet components. Here are 2 additional examples using multiple components.
+
+   4.1. **Enhanced Subject Representation using SmCCNet and GNN embeddings.**
+   ```python
+   import os
+   import pandas as pd
+
+   from bioneuralnet.graph_generation.smccnet import SmCCNet
+   from bioneuralnet.network_embedding.gnns import GNNEmbedding
+   from bioneuralnet.subject_representation.subject_representation import SubjectRepresentationEmbedding
+
+
+   def run_smccnet_workflow():
+      """
+      Executes the SmCCNet-based workflow for generating enhanced omics data.
+
+      This function performs the following steps:
+         1. Instantiates the SmCCNet, GNNEmbedding, and SubjectRepresentationEmbedding components.
+         2. Loads omics, phenotype, and clinical data.
+         3. Generates an adjacency matrix using SmCCNet.
+         4. Computes node features based on correlations.
+         5. Generates embeddings using GNNEmbedding.
+         6. Reduces embeddings using PCA.
+         7. Integrates embeddings into omics data to produce enhanced omics data.
+         8. Saves the enhanced omics data to the output directory.
+      """
+      try:
+         # Step 1: Instantiate SmCCNet parameters
+         smccnet_instance = SmCCNet(
+               phenotype_file='input/phenotype_data.csv',
+               omics_list=[
+                  'input/proteins.csv',
+                  'input/metabolites.csv'
+               ],
+               data_types=['protein', 'metabolite'],
+               kfold=5,
+               summarization='PCA',
+               seed=732,
+         )
+
+         # Step 2: Load omics, phenotype, and clinical data
+         omics_data = pd.read_csv('input/omics_data.csv', index_col=0)
+         phenotype_data = pd.read_csv('input/phenotype_data.csv', index_col=0).squeeze()
+         clinical_data = pd.read_csv('input/clinical_data.csv', index_col=0)
+
+         # Step 3: Generate adjacency matrix using SmCCNet
+         adjacency_matrix = smccnet_instance.run()
+
+         # Save adjacency matrix
+         # Output dir is automatically generated by SmCCNet
+         adjacency_output_path = os.path.join(smccnet_instance.output_dir, 'adjacency_matrix.csv')
+         adjacency_matrix.to_csv(adjacency_output_path)
+         print(f"Adjacency matrix saved to {adjacency_output_path}")
+
+         # Step 4: Compute node features based on correlations
+         subject_rep = SubjectRepresentationEmbedding()
+         node_phenotype_corr = subject_rep.compute_node_phenotype_correlation(omics_data, phenotype_data)
+         node_clinical_corr = subject_rep.compute_node_clinical_correlation(omics_data, clinical_data)
+         node_features = pd.concat([node_clinical_corr, node_phenotype_corr.rename('phenotype_corr')], axis=1)
+
+         # Step 5: Generate embeddings using GNNEmbedding
+         gnn_embedding = GNNEmbedding(
+               input_dir='', 
+               model_type='GCN',
+               gnn_input_dim=node_features.shape[1],
+               gnn_hidden_dim=64,
+               gnn_layer_num=2,
+               dropout=True,
+         )
+         embeddings_dict = gnn_embedding.run(graphs={'graph': adjacency_matrix}, node_features=node_features)
+         embeddings_tensor = embeddings_dict['graph']
+         embeddings_df = pd.DataFrame(embeddings_tensor.numpy(), index=node_features.index)
+
+         # Step 6: Reduce embeddings using PCA
+         node_embedding_values = subject_rep.reduce_embeddings(embeddings_df)
+
+         # Step 7: Integrate embeddings into omics data
+         enhanced_omics_data = subject_rep.run(
+               adjacency_matrix=adjacency_matrix,
+               omics_data=omics_data,
+               phenotype_data=phenotype_data,
+               clinical_data=clinical_data,
+               embeddings=node_embedding_values
+         )
+
+         # Step 8: Save the enhanced omics data
+         enhanced_omics_output_path = os.path.join(subject_rep.output_dir, 'enhanced_omics_data.csv')
+         enhanced_omics_data.to_csv(enhanced_omics_output_path)
+         print(f"Enhanced omics data saved to {enhanced_omics_output_path}")
+
+      except FileNotFoundError as fnf_error:
+         print(f"File not found error: {fnf_error}")
+         raise fnf_error
+      except Exception as e:
+         print(f"An error occurred during the SmCCNet workflow: {e}")
+         raise e
+
+   if __name__ == "__main__":
+    try:
+        print("Starting SmCCNet and GNNs Workflow...")
+        run_smccnet_workflow()
+        print("SmCCNet Workflow completed successfully.\n")
+
+    except Exception as e:
+        print(f"An error occurred during the execution: {e}")
+        raise e
+
+   ```
+
+   4.2. **Enhanced Subject Representation using WGCNA and GNN embeddings**
+   ```python
+   import os
+   import pandas as pd
+
+   from bioneuralnet.graph_generation.wgcna import WGCNA
+   from bioneuralnet.network_embedding.gnns import GNNEmbedding
+   from bioneuralnet.network_embedding.node2vec import Node2VecEmbedding
+   from bioneuralnet.subject_representation.subject_representation import SubjectRepresentationEmbedding
+
+
+   def run_wgcna_workflow():
+      """
+      Executes the WGCNA-based workflow for generating enhanced omics data.
+
+      This function performs the following steps:
+         1. Instantiates the WGCNA, GNNEmbedding, and SubjectRepresentationEmbedding components.
+         2. Loads omics, phenotype, and clinical data.
+         3. Generates an adjacency matrix using WGCNA.
+         4. Computes node features based on correlations.
+         5. Generates embeddings using GNNEmbedding.
+         6. Reduces embeddings using PCA.
+         7. Integrates embeddings into omics data to produce enhanced omics data.
+         8. Saves the enhanced omics data to the output directory.
+      """
+      try:
+         # Step 1: Instantiate WGCNA with direct parameters
+         wgcna_instance = WGCNA(
+               phenotype_file='input/phenotype_data.csv',
+               omics_list=['input/omics_data.csv'],
+               data_types=['gene'],  # Adjust based on your data
+               soft_power=6,
+               min_module_size=30,
+               merge_cut_height=0.25,
+         )
+
+         # Step 2: Load omics, phenotype, and clinical data
+         omics_data = pd.read_csv('input/omics_data.csv', index_col=0)
+         phenotype_data = pd.read_csv('input/phenotype_data.csv', index_col=0).squeeze()
+         clinical_data = pd.read_csv('input/clinical_data.csv', index_col=0)
+
+         # Step 3: Generate adjacency matrix using WGCNA
+         adjacency_matrix = wgcna_instance.run()
+
+         # Save adjacency matrix
+         adjacency_output_path = os.path.join(wgcna_instance.output_dir, 'adjacency_matrix.csv')
+         adjacency_matrix.to_csv(adjacency_output_path)
+         print(f"Adjacency matrix saved to {adjacency_output_path}")
+
+         # Step 4: Compute node features based on correlations
+         subject_rep = SubjectRepresentationEmbedding()
+         node_phenotype_corr = subject_rep.compute_node_phenotype_correlation(omics_data, phenotype_data)
+         node_clinical_corr = subject_rep.compute_node_clinical_correlation(omics_data, clinical_data)
+         node_features = pd.concat([node_clinical_corr, node_phenotype_corr.rename('phenotype_corr')], axis=1)
+
+         # Step 5: Generate embeddings using GNNEmbedding
+         gnn_embedding = GNNEmbedding(
+               input_dir='',  # Not used because we pass graphs directly
+               model_type='GCN',
+               gnn_input_dim=node_features.shape[1],
+               gnn_hidden_dim=64,
+               gnn_layer_num=2,
+               dropout=True,
+         )
+         embeddings_dict = gnn_embedding.run(graphs={'graph': adjacency_matrix}, node_features=node_features)
+         embeddings_tensor = embeddings_dict['graph']
+         embeddings_df = pd.DataFrame(embeddings_tensor.numpy(), index=node_features.index)
+
+         # Step 6: Reduce embeddings using PCA
+         node_embedding_values = subject_rep.reduce_embeddings(embeddings_df)
+
+         # Step 7: Integrate embeddings into omics data
+         enhanced_omics_data = subject_rep.run(
+               adjacency_matrix=adjacency_matrix,
+               omics_data=omics_data,
+               phenotype_data=phenotype_data,
+               clinical_data=clinical_data,
+               embeddings=node_embedding_values
+         )
+
+         # Step 8: Save the enhanced omics data
+         enhanced_omics_output_path = os.path.join(subject_rep.output_dir, 'enhanced_omics_data.csv')
+         enhanced_omics_data.to_csv(enhanced_omics_output_path)
+         print(f"Enhanced omics data saved to {enhanced_omics_output_path}")
+
+      except FileNotFoundError as fnf_error:
+         print(f"File not found error: {fnf_error}")
+         raise fnf_error
+      except Exception as e:
+         print(f"An error occurred during the WGCNA workflow: {e}")
+         raise e
+
+   if __name__ == "__main__":
+      try:
+         print("Starting WGCNA and GNNs Workflow...")
+         run_wgcna_workflow()
+         print("WGCNA Workflow completed successfully.\n")
+         
+      except Exception as e:
+         print(f"An error occurred during the execution: {e}")
+         raise e
+   ```
+
+5. **Feature Selector**
+
+   Identifies and prioritizes the most relevant multi-omics features associated with a specific phenotype. Leveraging embeddings generated by Graph Neural Networks (GNNs), this component ensures that selected genetic features capture complex interactions and are highly predictive of the outcomes of interest.
+
+   #### **Purpose**
+
+   Selecting key genetic features is crucial for enhancing model performance, reducing computational complexity, and improving interpretability. By utilizing network embeddings, Feature Selector captures intricate relationships within the data, leading to more meaningful feature selection.
+
+   #### **Supported Feature Selection Methods**
+
+   - **Correlation-Based (`'correlation'`):** Utilizes ANOVA (`f_classif`) to select genetic features that show significant association with the phenotype.
+   - **LASSO-Based (`'lasso'`):** Employs LASSO regression (`LassoCV`) to identify genetic features with non-zero coefficients, indicating their importance.
+   - **Random Forest-Based (`'random_forest'`):** Uses feature importances derived from a Random Forest classifier to select the top contributing genetic features.
+
+   #### **Usage Example**
+
+   ```python
+   import pandas as pd
+   from analysis.feature_selector import FeatureSelector
+   from analysis.subject_representation_embedding import SubjectRepresentationEmbedding
+
+   def main():
+      # Paths to input files
+      omics_files = ['input/genetic_data.csv', 'input/protein_data.csv', 'input/metabolite_data.csv']  # Replace with your omics data files
+      phenotype_file = 'input/phenotype_data.csv'  # Columns: 'Asthma'
+      clinical_data_file = 'input/clinical_data.csv'  # Additional clinical information
+      adjacency_matrix_file = 'input/adjacency_matrix.csv'  # Feature interaction network
+
+      # Load adjacency matrix
+      adjacency_matrix = pd.read_csv(adjacency_matrix_file, index_col=0)
+
+      # Initialize and run SubjectRepresentationEmbedding
+      subject_rep = SubjectRepresentationEmbedding(
+         adjacency_matrix=adjacency_matrix,
+         omics_list=omics_files,
+         phenotype_file=phenotype_file,
+         clinical_data_file=clinical_data_file,
+         embedding_method='GNNs',  # Options: 'GNNs', 'Node2Vec'
+      )
+      enhanced_omics_data = subject_rep.run()
+
+      # Load phenotype data
+      phenotype_data = pd.read_csv(phenotype_file, index_col=0).iloc[:, 0]
+
+      # Initialize and run FeatureSelector
+      feature_selector = FeatureSelector(
+         enhanced_omics_data=enhanced_omics_data,
+         phenotype_data=phenotype_data,
+         num_features=20,  # Number of top features to select
+         selection_method='lasso',  # Options: 'correlation', 'lasso', 'random_forest'
+      )
+      selected_genetic_features = feature_selector.run_feature_selection()
+
+      # Display selected features
+      print("Selected Multi-Omics Features:")
+      print(selected_genetic_features.head())
+
+   if __name__ == "__main__":
+      main()
+
+   ```
 
 ## Pipeline Components
 
@@ -226,7 +716,6 @@ BioNeuralNet's pipeline consists of several interconnected components:
 
    - Includes tools for data manipulation, path validation, and more.
 
----
 
 ## Acknowledgements
 
@@ -254,7 +743,6 @@ BioNeuralNet utilizes several external packages and libraries that are integral 
 
 *Thank you to all the open-source communities that make projects like BioNeuralNet possible.*
 
----
 
 ## Documentation
 
@@ -267,7 +755,6 @@ Comprehensive documentation is available to help you navigate and utilize all fe
 
 *Note:* The **README.md** provides an overview and essential instructions, while the **API Reference** offers in-depth technical details about the package's classes, functions, and methods.
 
----
 
 ## Testing
 
@@ -370,7 +857,9 @@ Contributions are welcome! To ensure a smooth collaboration process, please adhe
 
    Navigate to the original repository and open a pull request detailing your changes.
 
-### Pre-Commit Hooks
+
+
+## Pre-Commit Hooks
 
 To maintain code quality, pre-commit hooks are enforced. After setting up your development environment, ensure that pre-commit hooks are installed:
 
@@ -380,36 +869,17 @@ pre-commit install
 
 *These hooks will automatically run tests, format code, and perform linting before each commit.*
 
-### Guidelines for Writing Tests
+## Guidelines for Writing Tests
 
 Refer to [`tests/README.md`](tests/README.md) for comprehensive guidelines on writing effective and consistent tests.
-
----
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
 
----
 
 ## Contact
 
 For questions, support, or contributions, please open an issue on [GitHub](https://github.com/UCD-BDLab/BioNeuralNet/issues) or contact the maintainers directly.
-
----
-
-## Final Notes
-
-- **Primary Installation Method:** Most users can seamlessly install **BioNeuralNet** using `pip install bioneuralnet`, which handles all necessary Python dependencies.
-
-- **R Dependencies:** R scripts required for SmCCNet and WGCNA are not installable via `pip`. Users needing these functionalities should follow the R installation instructions provided [above](#for-users-r-dependencies).
-
-- **Usage with Direct Parameter Passing:** All components in BioNeuralNet can be used by directly passing parameters to the classes, without the need for configuration files. Refer to the example usage scripts in the [`examples/`](examples/) directory.
-
-- **Developer Setup:** Developers contributing to the project should use the `setup.sh` script to establish their development environment, ensuring consistency and adherence to project standards.
-
-- **Documentation and Testing:** Comprehensive documentation and a robust testing suite ensure that both users and contributors have the resources needed to effectively utilize and enhance **BioNeuralNet**.
-
-By maintaining a clear and organized `README.md`, we aim to facilitate ease of use for end-users and streamline the development process for contributors. This structured approach enhances the overall quality and maintainability of the **BioNeuralNet** project.
 
 ---

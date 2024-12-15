@@ -70,7 +70,7 @@ class SmCCNet:
             str: Path to the created output directory.
         """
         base_dir = "smccnet_output"
-        counter = datetime.now().strftime("%Y%m%d%H%M%S")
+        counter = datetime.now().strftime("%Y-%m-%d %H.%M.%S")
         while True:
             output_dir = f"{base_dir}_{counter}"
             if not os.path.exists(output_dir):

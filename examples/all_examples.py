@@ -13,7 +13,6 @@ from bioneuralnet.graph_generation.smccnet import SmCCNet
 from bioneuralnet.graph_generation.wgcna import WGCNA
 from bioneuralnet.network_embedding.gnns import GNNEmbedding
 from bioneuralnet.network_embedding.node2vec import Node2VecEmbedding
-from bioneuralnet.clustering.pagerank import PageRankClustering
 from bioneuralnet.subject_representation.subject_representation import SubjectRepresentationEmbedding
 
 
