@@ -14,6 +14,9 @@ scikit-learn>=0.24
 # Graph and network analysis
 node2vec>=0.4.1
 networkx
+matplotlib
+pyvis
+
 
 # Visualization and monitoring
 matplotlib

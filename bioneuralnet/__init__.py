@@ -16,6 +16,7 @@ Key Features:
 Modules:
     - `network_embedding`: Tools for generating network embeddings using GNNs and Node2Vec.
     - `subject_representation`: Methods for integrating embeddings into omics data.
+    - `analysis`: Feature selection and visualization tools.
     - `utils`: Utility functions for configuration, logging, file handling, and more.
 
 Example Usage:
@@ -49,6 +50,9 @@ __version__: str = '0.1.0'
 from .network_embedding.gnns import GNNEmbedding
 from .network_embedding.node2vec import Node2VecEmbedding
 from .subject_representation.subject_representation import SubjectRepresentationEmbedding
+from .analysis.feature_selector import FeatureSelector
+from .analysis.static_visualization import StaticVisualizer
+from .analysis.dynamic_visualization import DynamicVisualizer
 from .utils.data_utils import combine_omics_data
 
 # Define the public API of the package
@@ -61,4 +65,7 @@ __all__: list = [
     'Node2VecEmbedding',
     'SubjectRepresentationEmbedding',
     'combine_omics_data',
+    'FeatureSelector',
+    'StaticVisualizer',
+    'DynamicVisualizer'
 ]

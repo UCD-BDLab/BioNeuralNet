@@ -7,7 +7,7 @@ from bioneuralnet.subject_representation.subject_representation import SubjectRe
 class TestSubjectRepresentationEmbedding(unittest.TestCase):
 
     def setUp(self):
-        # Create sample data
+        # sample data
         self.adjacency_matrix = pd.DataFrame([[0,1,0],[1,0,1],[0,1,0]], index=['gene1','gene2','gene3'], columns=['gene1','gene2','gene3'])
         self.omics_data = pd.DataFrame({
             'gene1': [1, 2, 3],

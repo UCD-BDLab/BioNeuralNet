@@ -67,7 +67,7 @@ class SubjectRepresentationEmbedding:
             str: Path to the created output directory.
         """
         base_dir = "subject_representation_output"
-        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        timestamp = datetime.now().strftime("%Y-%m-%d %H.%M.%S")
         output_dir = f"{base_dir}_{timestamp}"
         os.makedirs(output_dir, exist_ok=True)
         self.logger.info(f"Created output directory: {output_dir}")

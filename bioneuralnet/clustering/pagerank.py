@@ -85,7 +85,7 @@ class PageRankClustering:
             str: Path to the created output directory.
         """
         base_dir = "pagerank_output"
-        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        timestamp = datetime.now().strftime("%Y-%m-%d %H.%M.%S")
         output_dir = f"{base_dir}_{timestamp}"
         os.makedirs(output_dir, exist_ok=True)
         self.logger.info(f"Created output directory: {output_dir}")
@@ -301,7 +301,7 @@ class PageRankClustering:
             results (Dict[str, Any]): Clustering results dictionary.
         """
         try:
-            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+            timestamp = datetime.now().strftime("%Y-%m-%d %H.%M.%S")
             filename = os.path.join(self.output_dir, f"pagerank_results_{timestamp}.csv")
 
             df = pd.DataFrame({
