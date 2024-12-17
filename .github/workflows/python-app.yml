@@ -25,21 +25,26 @@ jobs:
         python-version: ${{ matrix.python-version }}
         check-latest: true
 
-    - name: Print working directory
-      run: pwd
+    - name: Install R
+      uses: r-lib/actions/setup-r@v2
 
     - name: List scripts directory contents
       run: ls -la scripts/
 
+    - name: Install R and its dependencies
+      run: |
+        chmod +x scripts/setup-R.sh
+        ./scripts/setup-R.sh
+
     - name: Run setup-env.sh (Non-Interactive)
       env:
-        INSTALL_TYPE: 1 #use cpu
-        INSTALL_DEV: y  #install dev dependencies
+        INSTALL_TYPE: 1   #use cpu
+        INSTALL_DEV: y    #install dev dependencies
       run: |
         chmod +x scripts/setup-env.sh
         ./scripts/setup-env.sh
 
-    - name: Verify R installation
+    - name: Verify R installation and WGCNA
       shell: bash
       run: |
         R --version
