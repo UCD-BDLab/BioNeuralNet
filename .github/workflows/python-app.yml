@@ -25,6 +25,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
         check-latest: true
 
+    - name: List scripts directory contents
+      run: ls -la scripts/
+
     - name: Install dependencies with fast-install.py
       shell: bash
       run: |
