@@ -53,5 +53,11 @@ else
     echo "Using INSTALL_DEV from environment: $dev_choice"
 fi
 
+if [[ "$dev_choice" =~ ^[Yy]$ ]]; then
+    echo "Installing development dependencies..."
+    pip install -r scripts/requirements-dev.txt
+fi
+
+
 
 echo "BioNeuralNet enviroment setup complete."
