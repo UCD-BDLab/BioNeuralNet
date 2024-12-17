@@ -56,10 +56,18 @@ class StaticVisualizer:
         
         Returns:
             nx.Graph: NetworkX graph constructed from the adjacency matrix.
+        
+        Raises:
+            nx.NetworkXError: If the generated graph is empty.
         """
         self.logger.info("Generating NetworkX graph from adjacency matrix.")
         G = nx.from_pandas_adjacency(self.adjacency_matrix)
         self.logger.info(f"Graph generated with {G.number_of_nodes()} nodes and {G.number_of_edges()} edges.")
+        
+        if G.number_of_nodes() == 0:
+            self.logger.error("Generated graph is empty.")
+            raise nx.NetworkXError("Generated graph is empty.")
+        
         return G
 
     def visualize(self, G: nx.Graph):

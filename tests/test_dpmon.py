@@ -1,7 +1,8 @@
 import unittest
 from unittest.mock import patch
 import pandas as pd
-from bioneuralnet.integrated_tasks import DPMON
+import torch
+from bioneuralnet.integrated_tasks.dpmon import DPMON  # Ensure correct import path
 
 class TestDPMON(unittest.TestCase):
 
@@ -32,14 +33,8 @@ class TestDPMON(unittest.TestCase):
             'bmi': [22.5,28.0]
         }, index=['sample1', 'sample2'])
 
-    @patch('bioneuralnet.integrated_tasks.DPMON.run_standard_training')
-    @patch('bioneuralnet.integrated_tasks.DPMON.GnnEmbedding')
-    def test_run_without_tune(self, mock_gnn, mock_standard):
-        # Mock GnnEmbedding.run to return embeddings
-        mock_gnn_instance = mock_gnn.return_value
-        mock_gnn_instance.run.return_value = {'graph': pd.DataFrame([[0.1, 0.2], [0.3, 0.4], [0.5, 0.6]], 
-                                                                    index=['gene1', 'gene2', 'gene3'])}
-
+    @patch('bioneuralnet.integrated_tasks.dpmon.run_standard_training')
+    def test_run_without_tune(self, mock_standard):
         # Mock run_standard_training to return predictions
         mock_standard.return_value = pd.DataFrame({
             'Actual': [2, 3],
@@ -49,8 +44,8 @@ class TestDPMON(unittest.TestCase):
         dpmon = DPMON(
             adjacency_matrix=self.adjacency_matrix,
             omics_list=[self.omics_data1, self.omics_data2],
-            phenotype_file=self.phenotype_data,
-            features_file=self.features_data,
+            phenotype_data=self.phenotype_data,
+            clinical_data=self.features_data,  
             model='GCN',
             tune=False,
             gpu=False,
@@ -58,19 +53,18 @@ class TestDPMON(unittest.TestCase):
         )
 
         predictions = dpmon.run()
-        mock_gnn_instance.run.assert_called_once()
         mock_standard.assert_called_once()
         self.assertIn('Actual', predictions.columns)
         self.assertIn('Predicted', predictions.columns)
         self.assertEqual(predictions.shape, (2,2))
 
-    @patch('bioneuralnet.integrated_tasks.DPMON.run_hyperparameter_tuning')
+    @patch('bioneuralnet.integrated_tasks.dpmon.run_hyperparameter_tuning')
     def test_run_with_tune(self, mock_tune):
         dpmon = DPMON(
             adjacency_matrix=self.adjacency_matrix,
             omics_list=[self.omics_data1, self.omics_data2],
-            phenotype_file=self.phenotype_data,
-            features_file=self.features_data,
+            phenotype_data=self.phenotype_data,
+            clinical_data=self.features_data,
             model='GAT',
             tune=True,
             gpu=False
@@ -85,10 +79,11 @@ class TestDPMON(unittest.TestCase):
             DPMON(
                 adjacency_matrix=self.adjacency_matrix,
                 omics_list=[self.omics_data1, self.omics_data2],
-                phenotype_file=self.phenotype_data,
-                features_file=None,  
+                phenotype_data=self.phenotype_data,
+                clinical_data=None,  # Set to None to simulate missing clinical data
                 model='SAGE',
-                tune=False
+                tune=False,
+                gpu=False
             )
 
 if __name__ == '__main__':

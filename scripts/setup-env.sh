@@ -44,7 +44,6 @@ else
     echo "Using INSTALL_TYPE from environment: $choice"
 fi
 
-
 # Step 7: Installing development dependencies
 if [ -z "$INSTALL_DEV" ]; then
     echo "Do you want to install development dependencies? [y/N]"

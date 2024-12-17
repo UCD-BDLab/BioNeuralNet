@@ -9,6 +9,7 @@ These tutorials demonstrate integrated workflows that combine multiple BioNeural
    hybrid_example_1
    hybrid_example_2
    hybrid_example_3
+   hybrid_example_4
 
 **Hybrid Example 1 (SmCCNet + GNN Embeddings + Subject Representation):**  
 Shows how to construct a network using SmCCNet, generate embeddings with a GNN, and 
@@ -19,6 +20,10 @@ Illustrates using WGCNA-based networks, followed by GNN embedding and subject re
 
 **Hybrid Example 3 (SmCCNet + DPMON)**  
 Demonstrates how to generate a network with SmCCNet and then use DPMON for disease prediction.
+
+**Hybrid Example 4 (SmCCNet + PageRank Clustering + Visualization):**  
+Showcases how to construct a network using SmCCNet, identify meaningful clusters via PageRank-based clustering, 
+and visualize the resulting sub-networks.
 
 By following these tutorials, you can gain insight into how BioNeuralNet’s modules interoperate 
 to produce meaningful multi-omics analyses and ready-to-use data for downstream tasks such as disease 

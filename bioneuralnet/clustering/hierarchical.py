@@ -47,7 +47,7 @@ class HierarchicalClustering:
         self.n_clusters = n_clusters
         self.linkage = linkage
         self.affinity = affinity
-        self.output_dir = output_dir if output_dir else self._create_output_dir()
+        self.output_dir = output_dir #if output_dir else self._create_output_dir()
 
         self.logger = get_logger(__name__)
         self.logger.info("Initialized HierarchicalClustering with the following parameters:")

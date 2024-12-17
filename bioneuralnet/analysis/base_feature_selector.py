@@ -35,7 +35,7 @@ class BaseFeatureSelector:
         """
         self.num_features = num_features
         self.selection_method = selection_method
-        self.output_dir = output_dir if output_dir else self._create_output_dir()
+        self.output_dir = output_dir #if output_dir else self._create_output_dir()
         self.logger = get_logger(__name__)
         self.logger.info("Initialized BaseFeatureSelector.")
 

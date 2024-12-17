@@ -1,4 +1,4 @@
 from .hierarchical import HierarchicalClustering
-from .pagerank import PageRankClustering
+from .pagerank import PageRank
 
-__all__ = ['HierarchicalClustering', 'PageRankClustering']
+__all__ = ['HierarchicalClustering', 'PageRank']
