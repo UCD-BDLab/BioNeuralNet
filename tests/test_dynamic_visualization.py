@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 import networkx as nx
-from bioneuralnet.analysis.dynamic_visualization import DynamicVisualizer
+from bioneuralnet.analysis import DynamicVisualizer
 from unittest import mock
 
 @pytest.fixture
@@ -51,7 +51,9 @@ def test_visualize_creates_file(sample_adjacency_matrix, temp_output_dir):
         output_filename="test_dynamic_network.html"
     )
     
-    with mock.patch('analytics.dynamic_visualization.DynamicVisualizer.logger') as mock_logger:
+    with mock.patch('bioneuralnet.analysis.dynamic_visualization.get_logger') as mock_get_logger:
+        mock_logger = mock.Mock()
+        mock_get_logger.return_value = mock_logger
         G = visualizer.generate_graph()
         visualizer.visualize(G)
     
@@ -72,7 +74,9 @@ def test_visualize_with_different_layouts(sample_adjacency_matrix, temp_output_d
             output_filename=f"dynamic_network_{layout}.html"
         )
         
-        with mock.patch('analytics.dynamic_visualization.DynamicVisualizer.logger') as mock_logger:
+        with mock.patch('bioneuralnet.analysis.dynamic_visualization.get_logger') as mock_get_logger:
+            mock_logger = mock.Mock()
+            mock_get_logger.return_value = mock_logger
             G = visualizer.generate_graph()
             visualizer.visualize(G)
         
@@ -91,17 +95,20 @@ def test_visualize_with_invalid_layout(sample_adjacency_matrix, temp_output_dir)
         output_dir=temp_output_dir,
         output_filename="dynamic_network_invalid.html"
     )
-    
-    with mock.patch('analytics.dynamic_visualization.DynamicVisualizer.logger') as mock_logger:
+
+    with mock.patch.object(visualizer.logger, 'warning') as mock_warning:
         G = visualizer.generate_graph()
         visualizer.visualize(G)
     
-    output_file = temp_output_dir / "dynamic_network_invalid.html"
-    assert output_file.exists()
-    assert output_file.is_file()
+        output_file = temp_output_dir / "dynamic_network_invalid.html"
+        assert output_file.exists()
+        assert output_file.is_file()
     
-    # Ensure a warning was logged for the invalid layout
-    mock_logger.warning.assert_called_with(f"Layout '{invalid_layout}' not recognized. Using default layout.")
+        # Ensure a warning was logged for the invalid layout
+        mock_warning.assert_called_with(
+            f"Layout '{invalid_layout}' not recognized. Falling back to spring layout."
+        )
+
 
 def test_visualize_with_empty_adjacency_matrix(tmp_path):
     """
@@ -129,7 +136,9 @@ def test_visualize_output_directory_creation(sample_adjacency_matrix, tmp_path):
         output_filename="dynamic_network_new_dir.html"
     )
     
-    with mock.patch('analytics.dynamic_visualization.DynamicVisualizer.logger') as mock_logger:
+    with mock.patch('bioneuralnet.analysis.dynamic_visualization.get_logger') as mock_get_logger:
+        mock_logger = mock.Mock()
+        mock_get_logger.return_value = mock_logger
         G = visualizer.generate_graph()
         visualizer.visualize(G)
     
@@ -152,7 +161,9 @@ def test_visualize_with_custom_visualization_params(sample_adjacency_matrix, tem
         height="600px"
     )
     
-    with mock.patch('analytics.dynamic_visualization.DynamicVisualizer.logger') as mock_logger:
+    with mock.patch('bioneuralnet.analysis.dynamic_visualization.get_logger') as mock_get_logger:
+        mock_logger = mock.Mock()
+        mock_get_logger.return_value = mock_logger
         G = visualizer.generate_graph()
         visualizer.visualize(G)
     

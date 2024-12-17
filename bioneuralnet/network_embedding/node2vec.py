@@ -64,7 +64,7 @@ class Node2VecEmbedding:
         self.window_size = window_size
         self.workers = workers
         self.seed = seed
-        self.output_dir = output_dir if output_dir else self._create_output_dir()
+        self.output_dir = output_dir #if output_dir else self._create_output_dir()
 
         # Initialize logger
         self.logger = get_logger(__name__)

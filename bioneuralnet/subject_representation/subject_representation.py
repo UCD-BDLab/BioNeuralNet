@@ -88,7 +88,7 @@ class GraphEmbedding:
             reduction strategy if needed.
         """
         self.logger.info("Running Subject Representation workflow.")
-        output_dir = self._create_output_dir()
+        #output_dir = self._create_output_dir()
 
         try:
             embeddings_df = self.generate_embeddings()
@@ -96,9 +96,9 @@ class GraphEmbedding:
             enhanced_omics_data = self.integrate_embeddings(node_embedding_values)
 
             # Save the enhanced omics data
-            output_file = os.path.join(output_dir, "enhanced_omics_data.csv")
-            enhanced_omics_data.to_csv(output_file)
-            self.logger.info(f"Enhanced omics data saved to {output_file}")
+            #output_file = os.path.join(output_dir, "enhanced_omics_data.csv")
+            #enhanced_omics_data.to_csv(output_file)
+            #self.logger.info(f"Enhanced omics data saved to {output_file}")
 
             return enhanced_omics_data
 

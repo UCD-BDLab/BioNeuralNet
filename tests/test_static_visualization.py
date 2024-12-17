@@ -1,6 +1,7 @@
 import pytest
 import pandas as pd
 import networkx as nx
+
 from bioneuralnet.analysis.static_visualization import StaticVisualizer
 from unittest import mock
 
@@ -16,6 +17,14 @@ def sample_adjacency_matrix(tmp_path):
     }
     adjacency_matrix = pd.DataFrame(data, index=['gene1', 'gene2', 'gene3'])
     return adjacency_matrix
+
+@pytest.fixture
+def mock_logger():
+    with mock.patch('bioneuralnet.utils.logger.get_logger') as mock_get_logger:
+        mock_logger = mock.Mock()
+        mock_get_logger.return_value = mock_logger
+        yield mock_logger
+
 
 @pytest.fixture
 def temp_output_dir(tmp_path):
@@ -51,7 +60,9 @@ def test_visualize_creates_file(sample_adjacency_matrix, temp_output_dir):
         output_filename="test_static_network.png"
     )
     
-    with mock.patch('analytics.static_visualization.StaticVisualizer.logger') as mock_logger:
+    with mock.patch('bioneuralnet.utils.logger.get_logger') as mock_get_logger:
+        mock_logger = mock.Mock()
+        mock_get_logger.return_value = mock_logger
         G = visualizer.generate_graph()
         visualizer.visualize(G)
     
@@ -65,14 +76,17 @@ def test_visualize_with_different_layouts(sample_adjacency_matrix, temp_output_d
     """
     layouts = ['spring', 'kamada_kawai', 'circular', 'random', 'shell']
     for layout in layouts:
-        visualizer = StaticVisualizer(
-            adjacency_matrix=sample_adjacency_matrix,
-            layout=layout,
-            output_dir=temp_output_dir,
-            output_filename=f"static_network_{layout}.png"
-        )
-        
-        with mock.patch('analytics.static_visualization.StaticVisualizer.logger') as mock_logger:
+        with mock.patch('bioneuralnet.utils.logger.get_logger') as mock_get_logger:
+            mock_logger = mock.Mock()
+            mock_get_logger.return_value = mock_logger
+            
+            visualizer = StaticVisualizer(
+                adjacency_matrix=sample_adjacency_matrix,
+                layout=layout,
+                output_dir=temp_output_dir,
+                output_filename=f"static_network_{layout}.png"
+            )
+            
             G = visualizer.generate_graph()
             visualizer.visualize(G)
         
@@ -85,22 +99,31 @@ def test_visualize_with_invalid_layout(sample_adjacency_matrix, temp_output_dir)
     Test that the visualize method handles invalid layout options gracefully.
     """
     invalid_layout = 'invalid_layout'
-    visualizer = StaticVisualizer(
-        adjacency_matrix=sample_adjacency_matrix,
-        layout=invalid_layout,
-        output_dir=temp_output_dir,
-        output_filename="static_network_invalid.png"
-    )
-    
-    with mock.patch('analytics.static_visualization.StaticVisualizer.logger') as mock_logger:
+
+    # Patch get_logger in the static_visualization module, not in utils.logger
+    with mock.patch('bioneuralnet.analysis.static_visualization.get_logger') as mock_get_logger:
+        mock_logger = mock.Mock()
+        mock_get_logger.return_value = mock_logger
+
+        visualizer = StaticVisualizer(
+            adjacency_matrix=sample_adjacency_matrix,
+            layout=invalid_layout,
+            output_dir=temp_output_dir,
+            output_filename="static_network_invalid.png"
+        )
+
         G = visualizer.generate_graph()
         visualizer.visualize(G)
-    
+
     output_file = temp_output_dir / "static_network_invalid.png"
     assert output_file.exists()
     assert output_file.is_file()
-    
-    mock_logger.warning.assert_called_with(f"Layout '{invalid_layout}' not recognized. Falling back to spring layout.")
+
+    mock_logger.warning.assert_called_with(
+        f"Layout '{invalid_layout}' not recognized. Falling back to spring layout."
+    )
+
+
 
 def test_visualize_with_empty_adjacency_matrix(tmp_path):
     """
@@ -113,22 +136,29 @@ def test_visualize_with_empty_adjacency_matrix(tmp_path):
         output_filename="static_network_empty.png"
     )
     
-    with pytest.raises(nx.NetworkXError):
-        G = visualizer.generate_graph()
-        visualizer.visualize(G)
+    with mock.patch('bioneuralnet.utils.logger.get_logger') as mock_get_logger:
+        mock_logger = mock.Mock()
+        mock_get_logger.return_value = mock_logger
+        with pytest.raises(nx.NetworkXError):
+            G = visualizer.generate_graph()
+            visualizer.visualize(G)
 
 def test_visualize_output_directory_creation(sample_adjacency_matrix, tmp_path):
     """
     Test that the visualize method creates the output directory if it does not exist.
     """
     non_existent_dir = tmp_path / "non_existent_output"
-    visualizer = StaticVisualizer(
-        adjacency_matrix=sample_adjacency_matrix,
-        output_dir=non_existent_dir,
-        output_filename="static_network_new_dir.png"
-    )
     
-    with mock.patch('analytics.static_visualization.StaticVisualizer.logger') as mock_logger:
+    with mock.patch('bioneuralnet.utils.logger.get_logger') as mock_get_logger:
+        mock_logger = mock.Mock()
+        mock_get_logger.return_value = mock_logger
+        
+        visualizer = StaticVisualizer(
+            adjacency_matrix=sample_adjacency_matrix,
+            output_dir=non_existent_dir,
+            output_filename="static_network_new_dir.png"
+        )
+        
         G = visualizer.generate_graph()
         visualizer.visualize(G)
     
@@ -152,7 +182,9 @@ def test_visualize_with_custom_visualization_params(sample_adjacency_matrix, tem
         output_filename="static_network_custom.png"
     )
     
-    with mock.patch('analytics.static_visualization.StaticVisualizer.logger') as mock_logger:
+    with mock.patch('bioneuralnet.utils.logger.get_logger') as mock_get_logger:
+        mock_logger = mock.Mock()
+        mock_get_logger.return_value = mock_logger
         G = visualizer.generate_graph()
         visualizer.visualize(G)
     

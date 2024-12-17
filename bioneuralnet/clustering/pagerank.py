@@ -1,8 +1,9 @@
 import os
-import pandas as pd
-import networkx as nx
 from typing import List, Tuple, Dict, Any, Optional
 from datetime import datetime
+
+import pandas as pd
+import networkx as nx
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from scipy.stats import pearsonr
@@ -10,11 +11,11 @@ from scipy.stats import pearsonr
 from ..utils.logger import get_logger
 
 
-class PageRankClustering:
+class PageRank:
     """
-    PageRankClustering Class for Clustering Nodes Based on Personalized PageRank.
+    PageRank Class for Clustering Nodes Based on Personalized PageRank.
 
-    This class handles the loading of graph data, execution of the Personalized PageRank algorithm,
+    This class handles the execution of the Personalized PageRank algorithm
     and identification of clusters based on sweep cuts.
 
     Attributes:
@@ -28,9 +29,9 @@ class PageRankClustering:
 
     def __init__(
         self,
-        graph_file: str,
-        omics_data_file: str,
-        phenotype_data_file: str,
+        graph: nx.Graph,
+        omics_data: pd.DataFrame,
+        phenotype_data: pd.Series,
         alpha: float = 0.9,
         max_iter: int = 100,
         tol: float = 1e-6,
@@ -38,12 +39,12 @@ class PageRankClustering:
         output_dir: Optional[str] = None,
     ):
         """
-        Initializes the PageRankClustering instance with direct parameters.
+        Initializes the PageRank instance with direct data structures.
 
         Args:
-            graph_file (str): Path to the graph edge list file.
-            omics_data_file (str): Path to the omics data file (e.g., 'X.xlsx').
-            phenotype_data_file (str): Path to the phenotype data file (e.g., 'Y.xlsx').
+            graph (nx.Graph): NetworkX graph object representing the network.
+            omics_data (pd.DataFrame): Omics data DataFrame.
+            phenotype_data (pd.Series): Phenotype data Series.
             alpha (float, optional): Damping factor for PageRank. Defaults to 0.9.
             max_iter (int, optional): Maximum iterations for PageRank. Defaults to 100.
             tol (float, optional): Tolerance for convergence. Defaults to 1e-6.
@@ -51,83 +52,92 @@ class PageRankClustering:
             output_dir (str, optional): Directory to save outputs. If None, creates a unique directory.
         """
         # Assign parameters
-        self.graph_file = graph_file
-        self.omics_data_file = omics_data_file
-        self.phenotype_data_file = phenotype_data_file
+        self.G = graph
+        self.B = omics_data
+        self.Y = phenotype_data
         self.alpha = alpha
         self.max_iter = max_iter
         self.tol = tol
         self.k = k
-        self.output_dir = output_dir if output_dir else self._create_output_dir()
+        self.output_dir = output_dir #if output_dir else self._create_output_dir()
 
         # Initialize logger
         self.logger = get_logger(__name__)
-        self.logger.info("Initialized PageRankClustering with the following parameters:")
-        self.logger.info(f"Graph File: {self.graph_file}")
-        self.logger.info(f"Omics Data File: {self.omics_data_file}")
-        self.logger.info(f"Phenotype Data File: {self.phenotype_data_file}")
+        self.logger.info("Initialized PageRank with the following parameters:")
+        self.logger.info(f"Graph: NetworkX Graph with {self.G.number_of_nodes()} nodes and {self.G.number_of_edges()} edges.")
+        self.logger.info(f"Omics Data: DataFrame with shape {self.B.shape}.")
+        self.logger.info(f"Phenotype Data: Series with {len(self.Y)} samples.")
         self.logger.info(f"Alpha: {self.alpha}")
         self.logger.info(f"Max Iterations: {self.max_iter}")
         self.logger.info(f"Tolerance: {self.tol}")
         self.logger.info(f"K (Composite Score Weight): {self.k}")
         self.logger.info(f"Output Directory: {self.output_dir}")
 
-        # Initialize data holders
-        self.G = None  # NetworkX graph
-        self.B = None  # Omics data DataFrame
-        self.Y = None  # Phenotype data Series
+        # Validate input data
+        self._validate_inputs()
+
+    def _validate_inputs(self):
+        """
+        Validates the consistency of input data structures.
+        """
+        try:
+            if not isinstance(self.G, nx.Graph):
+                raise TypeError("graph must be a networkx.Graph instance.")
+
+            if not isinstance(self.B, pd.DataFrame):
+                raise TypeError("omics_data must be a pandas DataFrame.")
+
+            if not isinstance(self.Y, pd.Series):
+                raise TypeError("phenotype_data must be a pandas Series.")
+
+            # Ensure that all graph nodes are present in omics and phenotype data
+            graph_nodes = set(self.G.nodes())
+            omics_nodes = set(self.B.index)
+            phenotype_nodes = set(self.Y.index)
+
+            if not graph_nodes.issubset(omics_nodes):
+                missing = graph_nodes - omics_nodes
+                raise ValueError(f"Omics data is missing nodes: {missing}")
+
+            if not graph_nodes.issubset(phenotype_nodes):
+                missing = graph_nodes - phenotype_nodes
+                raise ValueError(f"Phenotype data is missing nodes: {missing}")
+
+        except Exception as e:
+            self.logger.error(f"Input validation error: {e}")
+            raise
 
     def _create_output_dir(self) -> str:
         """
-        Creates a unique output directory for the current PageRankClustering run.
+        Creates a unique output directory for the current PageRank run.
 
         Returns:
             str: Path to the created output directory.
         """
         base_dir = "pagerank_output"
-        timestamp = datetime.now().strftime("%Y-%m-%d %H.%M.%S")
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
         output_dir = f"{base_dir}_{timestamp}"
         os.makedirs(output_dir, exist_ok=True)
         self.logger.info(f"Created output directory: {output_dir}")
         return output_dir
 
-    def load_data(self) -> None:
-        """
-        Loads the graph, omics data, and phenotype data from the provided files.
-        """
-        try:
-            # Load the graph
-            self.G = nx.read_edgelist(self.graph_file, data=(('weight', float),))
-            self.logger.info(f"Loaded graph with {self.G.number_of_nodes()} nodes and {self.G.number_of_edges()} edges.")
-
-            # Load omics data
-            self.B = pd.read_excel(self.omics_data_file)
-            self.B.drop(self.B.columns[0], axis=1, inplace=True)
-            self.logger.info(f"Loaded omics data with shape {self.B.shape}.")
-
-            # Load phenotype data
-            Y_df = pd.read_excel(self.phenotype_data_file)
-            Y_df.drop(Y_df.columns[0], axis=1, inplace=True)
-            self.Y = Y_df.iloc[:, 0]
-            self.logger.info(f"Loaded phenotype data with {len(self.Y)} samples.")
-
-        except Exception as e:
-            self.logger.error(f"Error loading data: {e}")
-            raise
-
-    def phen_omics_corr(self, nodes: List[int]) -> Tuple[float, str]:
+    def phen_omics_corr(self, nodes: List[Any]) -> Tuple[float, str]:
         """
         Calculates the Pearson correlation between the PCA of omics data and phenotype.
 
         Args:
-            nodes (List[int]): List of node indices to include in the calculation.
+            nodes (List[Any]): List of node identifiers to include in the calculation.
 
         Returns:
             Tuple[float, str]: Correlation coefficient and formatted correlation with p-value.
         """
         try:
+            if len(nodes) < 2:
+                self.logger.warning(f"Not enough nodes ({len(nodes)}) for correlation. Returning 0 correlation.")
+                return 0.0, "0 (1.0)"  # Default correlation and p-value
+
             # Subsetting the omics data
-            B_sub = self.B.iloc[:, nodes]
+            B_sub = self.B.loc[nodes]
 
             # Scaling the subset data
             scaler = StandardScaler()
@@ -138,7 +148,7 @@ class PageRankClustering:
             g1 = pca.fit_transform(scaled).flatten()
 
             # Phenotype data
-            g2 = self.Y.values
+            g2 = self.Y.loc[nodes].values
 
             # Calculating Pearson correlation
             corr, pvalue = pearsonr(g1, g2)
@@ -151,16 +161,16 @@ class PageRankClustering:
             self.logger.error(f"Error in phen_omics_corr: {e}")
             raise
 
-    def sweep_cut(self, p: Dict[str, float]) -> Tuple[List[str], int, float, float, float, str]:
+    def sweep_cut(self, p: Dict[Any, float]) -> Tuple[List[Any], int, float, float, float, str]:
         """
         Performs sweep cut based on the PageRank scores.
 
         Args:
-            p (Dict[str, float]): Dictionary of PageRank scores.
+            p (Dict[Any, float]): Dictionary of PageRank scores.
 
         Returns:
             Tuple containing:
-                - List of node names in the cluster.
+                - List of node identifiers in the cluster.
                 - Cluster size.
                 - Conductance.
                 - Correlation.
@@ -175,9 +185,12 @@ class PageRankClustering:
             min_cut, min_cond_corr = len(p), float('inf')
             len_clus, cond, corr, cor_pval = 0, 1, 0, ''
 
-            # Normalizing PageRank scores
+            # Normalizing PageRank scores by node degrees
             degrees = dict(self.G.degree(weight='weight'))
-            vec = sorted([(p[node] / degrees[node], node) for node in p.keys()], reverse=True)
+            vec = sorted(
+                [(p[node] / degrees[node] if degrees[node] > 0 else 0, node) for node in p.keys()],
+                reverse=True
+            )
 
             for i, (val, node) in enumerate(vec):
                 if val == 0:
@@ -191,7 +204,7 @@ class PageRankClustering:
                     cond_res.append(round(cluster_cond, 3))
 
                     # Calculating correlation
-                    Nodes = [int(k) for k in cluster]
+                    Nodes = list(cluster)
                     cluster_corr, corr_pvalue = self.phen_omics_corr(Nodes)
                     corr_res.append(round(cluster_corr, 3))
                     cluster_corr_neg = -abs(round(cluster_corr, 3))
@@ -204,40 +217,50 @@ class PageRankClustering:
                         min_cond_corr, min_cut = cond_corr, i
                         len_clus = len(cluster)
                         cond = cluster_cond
-                        corr = -cluster_corr_neg
+                        corr = cluster_corr  # Retain positive correlation
                         cor_pval = corr_pvalue
 
-            nodes_in_cluster = [vec[i][1] for i in range(min_cut + 1)]
-            return nodes_in_cluster, len_clus, cond, corr, round(min_cond_corr, 3), cor_pval
+            if min_cut < len(vec):
+                nodes_in_cluster = [vec[i][1] for i in range(min_cut + 1)]
+                return nodes_in_cluster, len_clus, cond, corr, round(min_cond_corr, 3), cor_pval
+            else:
+                self.logger.warning("No valid sweep cut found. Returning empty cluster.")
+                return [], 0, 0.0, 0.0, 0.0, "0 (1.0)"
 
         except Exception as e:
             self.logger.error(f"Error in sweep_cut: {e}")
             raise
 
-    def generate_weighted_personalization(self, nodes: List[int]) -> Dict[str, float]:
+    def generate_weighted_personalization(self, nodes: List[Any]) -> Dict[Any, float]:
         """
         Generates a weighted personalization vector for PageRank.
 
         Args:
-            nodes (List[int]): List of node indices to consider.
+            nodes (List[Any]): List of node identifiers to consider.
 
         Returns:
-            Dict[str, float]: Personalization vector with weights for each node.
+            Dict[Any, float]: Personalization vector with weights for each node.
         """
         try:
-            total_corr = self.phen_omics_corr(nodes)[0]
+            total_corr, _ = self.phen_omics_corr(nodes)
             corr_contribution = []
 
             for i in range(len(nodes)):
                 nodes_excl = nodes[:i] + nodes[i + 1:]
-                corr_excl = self.phen_omics_corr(nodes_excl)[0]
-                contribution = abs(corr_excl) - abs(total_corr)
+                if not nodes_excl:
+                    contribution = 0
+                else:
+                    corr_excl, _ = self.phen_omics_corr(nodes_excl)
+                    contribution = abs(corr_excl) - abs(total_corr)
                 corr_contribution.append(contribution)
 
-            max_contribution = max(corr_contribution, key=abs)
+            max_contribution = max(corr_contribution, key=lambda x: abs(x)) if corr_contribution else 1
+            if max_contribution == 0:
+                max_contribution = 1  # Prevent division by zero
+
             weighted_personalization = {
-                str(nodes[i]): self.alpha * corr_contribution[i] / max_contribution
-                for i in range(len(nodes))
+                node: self.alpha * (corr_contribution[i] / max_contribution)
+                for i, node in enumerate(nodes)
             }
             return weighted_personalization
 
@@ -245,16 +268,26 @@ class PageRankClustering:
             self.logger.error(f"Error in generate_weighted_personalization: {e}")
             raise
 
-    def run_pagerank_clustering(self, seed_nodes: List[int]) -> Dict[str, Any]:
+    def run_pagerank_clustering(self, seed_nodes: List[Any]) -> Dict[str, Any]:
         """
         Executes the PageRank clustering algorithm.
 
         Args:
-            seed_nodes (List[int]): List of seed node indices for personalization.
+            seed_nodes (List[Any]): List of seed node identifiers for personalization.
 
         Returns:
             Dict[str, Any]: Dictionary containing clustering results.
         """
+        # Specific Error Handling
+        if not seed_nodes:
+            self.logger.error("No seed nodes provided for PageRank clustering.")
+            raise ValueError("Seed nodes list cannot be empty.")
+
+        if not set(seed_nodes).issubset(set(self.G.nodes())):
+            missing = set(seed_nodes) - set(self.G.nodes())
+            self.logger.error(f"Seed nodes not in graph: {missing}")
+            raise ValueError(f"Seed nodes not in graph: {missing}")
+
         try:
             # Generate personalization vector
             personalization = self.generate_weighted_personalization(seed_nodes)
@@ -273,7 +306,10 @@ class PageRankClustering:
 
             # Perform sweep cut
             nodes, n, cond, corr, min_corr, pval = self.sweep_cut(p)
-            self.logger.info(f"Sweep cut resulted in cluster of size {n} with conductance {cond} and correlation {corr}.")
+            if not nodes:
+                self.logger.warning("Sweep cut did not identify any cluster.")
+            else:
+                self.logger.info(f"Sweep cut resulted in cluster of size {n} with conductance {cond} and correlation {corr}.")
 
             # Save results
             results = {
@@ -290,6 +326,12 @@ class PageRankClustering:
             return results
 
         except Exception as e:
+            # Generic Error Handling
+            self.logger.error(f"Error in run_pagerank_clustering: {e}")
+            raise
+
+
+        except Exception as e:
             self.logger.error(f"Error in run_pagerank_clustering: {e}")
             raise
 
@@ -301,7 +343,7 @@ class PageRankClustering:
             results (Dict[str, Any]): Clustering results dictionary.
         """
         try:
-            timestamp = datetime.now().strftime("%Y-%m-%d %H.%M.%S")
+            timestamp = datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
             filename = os.path.join(self.output_dir, f"pagerank_results_{timestamp}.csv")
 
             df = pd.DataFrame({
@@ -320,18 +362,17 @@ class PageRankClustering:
             self.logger.error(f"Error in save_results: {e}")
             raise
 
-    def run(self, seed_nodes: List[int]) -> Dict[str, Any]:
+    def run(self, seed_nodes: List[Any]) -> Dict[str, Any]:
         """
         Main method to run the PageRank clustering pipeline.
 
         Args:
-            seed_nodes (List[int]): List of seed node indices for personalization.
+            seed_nodes (List[Any]): List of seed node identifiers for personalization.
 
         Returns:
             Dict[str, Any]: Clustering results.
         """
         try:
-            self.load_data()
             results = self.run_pagerank_clustering(seed_nodes)
             self.logger.info("PageRank clustering completed successfully.")
             return results

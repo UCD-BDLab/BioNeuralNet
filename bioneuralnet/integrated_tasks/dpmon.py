@@ -83,6 +83,7 @@ class DPMON:
         os.makedirs(self.output_dir, exist_ok=True)
         logger.info("Initialized DPMON with the provided parameters.")
 
+
     def run(self) -> pd.DataFrame:
         """
         Execute the DPMON pipeline for disease prediction.
@@ -107,7 +108,7 @@ class DPMON:
             - DPMON relies on internally-generated embeddings (via GNNs), node correlations, and a downstream neural network.
             - Ensure that the adjacency_matrix and omics data are properly aligned and that clinical/phenotype data match the sample indices.
         """
-        self.logger.info("Starting DPMON run.")
+        logger.info("Starting DPMON run.")
 
         dpmon_params = {
             'model': self.model,
@@ -131,7 +132,7 @@ class DPMON:
             combined_omics = combined_omics.merge(self.phenotype_data[['finalgold_visit']], left_index=True, right_index=True)
 
         if self.tune:
-            self.logger.info("Running hyperparameter tuning for DPMON.")
+            logger.info("Running hyperparameter tuning for DPMON.")
             run_hyperparameter_tuning(
                 dpmon_params,
                 self.adjacency_matrix,
@@ -141,7 +142,7 @@ class DPMON:
             return pd.DataFrame()
 
         # Otherwise, run standard training and return predictions
-        self.logger.info("Running standard training for DPMON.")
+        logger.info("Running standard training for DPMON.")
         predictions = run_standard_training(
             dpmon_params,
             self.adjacency_matrix,
@@ -150,7 +151,7 @@ class DPMON:
             output_dir=self.output_dir
         )
 
-        self.logger.info("DPMON run completed.")
+        logger.info("DPMON run completed.")
         return predictions
 
 

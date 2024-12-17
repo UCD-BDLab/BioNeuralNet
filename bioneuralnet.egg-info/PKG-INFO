@@ -19,7 +19,7 @@ Provides-Extra: cuda117
 Provides-Extra: dev
 License-File: LICENSE
 
-# BioNeuralNet: A Graph-Based Multi-Omics Integration and Embedding Framework for Advanced Analytics
+# BioNeuralNet: A Graph-Based Multi-Omics Integration and Embedding Framework for Advanced analysis
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![PyPI](https://img.shields.io/pypi/v/bioneuralnet)

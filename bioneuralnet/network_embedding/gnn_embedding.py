@@ -46,7 +46,7 @@ class GnnEmbedding:
         self.gnn_hidden_dim = gnn_hidden_dim
         self.gnn_layer_num = gnn_layer_num
         self.dropout = dropout
-        self.output_dir = output_dir if output_dir else self._create_output_dir()
+        self.output_dir = output_dir #if output_dir else self._create_output_dir()
 
         self.logger = get_logger(__name__)
         self.logger.info("Initialized GnnEmbedding with direct data inputs.")
@@ -100,9 +100,9 @@ class GnnEmbedding:
         )
 
         embeddings = self._generate_embeddings(model, data)
-        embeddings_file = os.path.join(self.output_dir, "gnn_embeddings.pt")
-        torch.save(embeddings, embeddings_file)
-        self.logger.info(f"GNN embeddings saved to {embeddings_file}")
+        #embeddings_file = os.path.join(self.output_dir, "gnn_embeddings.pt")
+        #torch.save(embeddings, embeddings_file)
+        #self.logger.info(f"GNN embeddings saved to {embeddings_file}")
 
         return {'graph': embeddings}
 

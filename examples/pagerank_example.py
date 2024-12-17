@@ -1,8 +1,8 @@
-from bioneuralnet.clustering import PageRankClustering
+from bioneuralnet.clustering import PageRank
 
 def main():
-    # Initialize PageRankClustering parameters
-    pagerank_cluster = PageRankClustering(
+    # Initialize PageRank parameters
+    pagerank_cluster = PageRank(
         graph_file='input/GFEV1ac110.edgelist',
         omics_data_file='input/X.xlsx',
         phenotype_data_file='input/Y.xlsx',

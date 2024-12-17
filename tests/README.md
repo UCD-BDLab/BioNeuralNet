@@ -226,7 +226,7 @@ Each test module corresponds to a specific component or functionality within the
 - ### **test_pagerank.py**
 
   **Purpose:**  
-  Tests the `PageRankClustering` class responsible for clustering nodes based on personalized PageRank.
+  Tests the `PageRank` class responsible for clustering nodes based on personalized PageRank.
 
   **Key Tests:**
 

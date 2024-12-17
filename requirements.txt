@@ -12,6 +12,7 @@ tensorboardX>=2.5
 networkx>=2.5
 pyvis>=0.2
 leidenalg>=0.8
+dtt>=0.9.0
 
 # We recommend using fast-install.py to install the following dependencies
 # fast-install.py is available at scripts/fast-install.py
