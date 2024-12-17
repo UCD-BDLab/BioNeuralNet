@@ -75,18 +75,21 @@ class GraphEmbedding:
 
         Returns:
             pd.DataFrame:
-                A DataFrame of enhanced omics data where each feature (node) has been weighted by
-                its embedding-derived principal component.
+
+            - A DataFrame of enhanced omics data where each feature (node) has been weighted by
+            - its embedding-derived principal component.
 
         Raises:
-            ValueError: If embeddings are empty or omics data cannot be integrated.
-            Exception: For any unexpected issues during the integration process.
+
+            - ValueError: If embeddings are empty or omics data cannot be integrated.
+            - Exception: For any unexpected issues during the integration process.
 
         Notes:
+
             - The enhanced omics data can be used downstream for clustering, classification, or regression tasks.
-            - Ensure that the PCA step is appropriate for your analysis and consider adjusting the dimensionality 
-            reduction strategy if needed.
+            - Ensure that the PCA step is appropriate for your analysis and consider adjusting the dimensionality reduction strategy if needed.
         """
+
         self.logger.info("Running Subject Representation workflow.")
         #output_dir = self._create_output_dir()
 

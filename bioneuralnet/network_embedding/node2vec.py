@@ -15,11 +15,14 @@ def find_files(directory: str, pattern: str) -> List[str]:
     Find files in a directory matching a given pattern.
 
     Args:
-        directory (str): Directory to search in.
-        pattern (str): Pattern to match, e.g., "*.csv"
+
+    - directory (str): Directory to search in.
+    - pattern (str): Pattern to match, e.g., "*.csv"
 
     Returns:
-        List[str]: List of file paths matching the pattern.
+
+    - List[str]: List of file paths matching the pattern.
+
     """
     return glob.glob(os.path.join(directory, pattern))
 

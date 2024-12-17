@@ -90,21 +90,26 @@ class DPMON:
 
         Steps:
         1. **Combining Omics and Phenotype Data**: Merges the provided omics datasets and ensures that  the phenotype (finalgold_visit) column is included.
-        2. **Tuning or Training**: 
+        2. **Tuning or Training**:
+
             - If tune=True, performs hyperparameter tuning using Ray Tune and returns an empty DataFrame.
             - If tune=False, runs standard training to generate predictions.
+
         3. **Predictions**: If training is performed, returns a DataFrame of predictions with 'Actual' and 'Predicted' columns.
 
         Returns:
             pd.DataFrame:
-                If tune=False, a DataFrame containing disease phenotype predictions for each sample.
-                If tune=True, returns an empty DataFrame since no predictions are generated.
+
+            - If tune=False, a DataFrame containing disease phenotype predictions for each sample.
+            - If tune=True, returns an empty DataFrame since no predictions are generated.
 
         Raises:
-            ValueError: If required inputs (e.g., clinical data) are missing or invalid.
-            Exception: For any unforeseen issues during the pipeline execution.
+
+            - ValueError: If required inputs (e.g., clinical data) are missing or invalid.
+            - Exception: For any unforeseen issues during the pipeline execution.
 
         Notes:
+
             - DPMON relies on internally-generated embeddings (via GNNs), node correlations, and a downstream neural network.
             - Ensure that the adjacency_matrix and omics data are properly aligned and that clinical/phenotype data match the sample indices.
         """
