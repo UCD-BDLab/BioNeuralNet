@@ -12,31 +12,36 @@ def execute_script(script_path):
 
 def main():
     os_type = platform.system()
+    current_dir = os.getcwd()
     print(f"Detected OS: {os_type}")
+    print(f"Current working directory: {current_dir}")
 
     # Step 1: Call setup-env.sh
     print("Running environment setup...")
-    if os_type in ["Linux", "Darwin"]: 
-        if not os.path.exists("setup-env.sh"):
-            print("Error: 'setup-env.sh' not found in the current directory.")
+    if os_type in ["Linux", "Darwin"]:
+        script_path = os.path.join(current_dir, "scripts", "setup-env.sh")
+        if not os.path.exists(script_path):
+            print(f"Error: '{script_path}' not found.")
             exit(1)
-        execute_script("./setup-env.sh")
+        execute_script(f"./{script_path}")
     elif os_type == "Windows":
-        print("Windows detected. Please use a compatible script to setup Python environment.")
+        print("Windows detected. Please use a compatible script to set up the Python environment.")
         exit(1)
 
     # Step 2: Call the appropriate R setup script
     print("Setting up R dependencies...")
     if os_type == "Windows":
-        if not os.path.exists("setup-R.bat"):
-            print("Error: 'setup-R.bat' not found in the current directory.")
+        script_path = os.path.join(current_dir, "scripts", "setup-R.bat")
+        if not os.path.exists(script_path):
+            print(f"Error: '{script_path}' not found.")
             exit(1)
-        execute_script("setup-R.bat")
+        execute_script(script_path)
     elif os_type in ["Linux", "Darwin"]:
-        if not os.path.exists("setup-R.sh"):
-            print("Error: 'setup-R.sh' not found in the current directory.")
+        script_path = os.path.join(current_dir, "scripts", "setup-R.sh")
+        if not os.path.exists(script_path):
+            print(f"Error: '{script_path}' not found.")
             exit(1)
-        execute_script("./setup-R.sh")
+        execute_script(f"./{script_path}")
     else:
         print("Unsupported OS. Please install R dependencies manually.")
         exit(1)
@@ -48,7 +53,6 @@ def main():
     print("source .venv/bin/activate\n")
     print("To deactivate the virtual environment, run:")
     print("deactivate\n")
-    
 
 if __name__ == "__main__":
     main()
