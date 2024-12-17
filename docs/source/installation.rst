@@ -1,42 +1,42 @@
 Installation
 ============
 
-To install BioNeuralNet, follow these steps:
+**Requirements:** Python 3.7+ and optional R for SmCCNet/WGCNA.
 
-1. **Clone the Repository:**
-
-   ```bash
-   git clone https://github.com/https://github.com/UCD-BDLab/BioNeuralNet.git
-   cd bioneuralnet
-   ```
-
-2. **Run the Setup Script:**
+1. **Python Installation via pip:**
 
    ```bash
-   ./setup.sh
+   pip install bioneuralnet
    ```
 
-   The script will:
-   - Create and activate a Python virtual environment.
-   - Install base dependencies.
-   - Prompt you to select between CPU-only or CUDA-enabled installations.
-   - Optionally install development dependencies.
-   - Initialize the project directories and configuration files.
+   *This installs the latest stable release from PyPI, including all base dependencies.*
 
-3. **Activate the Virtual Environment (If Not Automatically Activated):**
+2. **Optional R Dependencies (For WGCNA/SmCCNet):**
+
+   If you need R-based algorithms (e.g., WGCNA, SmCCNet), install R and relevant packages:
+
+   ```r
+   install.packages(c("dplyr", "SmCCNet", "WGCNA"))
+   ```
+
+3. **GPU Acceleration (Optional):**
+
+   For GPU-enabled installations, ensure a compatible NVIDIA GPU and CUDA version are installed. 
+   Refer to PyTorch and PyG documentation for details.
+
+4. **Fast Installation with `fast-install.py`:**
+
+   For an automated setup including development dependencies, run:
 
    ```bash
-   source venv/bin/activate
+   git clone https://github.com/UCD-BDLab/BioNeuralNet.git
+   cd BioNeuralNet/scripts
+   python3 fast-install.py
    ```
 
-4. **Verify Installation:**
+   This script:
+   - Creates and activates a virtual environment
+   - Installs base, development, and optional dependencies (including R, if desired)
+   - Sets up pre-commit hooks
 
-   ```bash
-   python -c "import bioneuralnet; print(bioneuralnet.__version__)"
-   ```
-
-   This should print the version of BioNeuralNet installed.
-
-**Note:** Ensure that you have Python 3.7 or higher installed on your system. For CUDA-enabled installations, make sure that the appropriate CUDA version is installed and compatible with your system's GPU drivers.
-
----
+After installation, proceed to the [Usage](usage) section for examples and workflows.

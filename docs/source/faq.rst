@@ -3,20 +3,26 @@ Frequently Asked Questions (FAQ)
 
 **Q1: What is BioNeuralNet?**
 
-A1: BioNeuralNet is a Python package designed to integrate omics data with neural network embeddings, facilitating advanced data analysis in bioinformatics.
+A1: BioNeuralNet is a Python-based tool for integrating multi-omics data into network-based representations 
+and simplifying them into lower-dimensional embeddings for downstream analyses like clustering, feature 
+selection, and disease prediction.
 
-**Q2: How do I choose between SmCCNet and WGCNA for generating adjacency matrices?**
+**Q2: Should I use SmCCNet or WGCNA for graph generation?**
 
-A2: Both SmCCNet and WGCNA are used for generating adjacency matrices from omics data. SmCCNet focuses on sparse canonical correlation analysis, while WGCNA (Weighted Gene Co-expression Network Analysis) is widely used for finding clusters (modules) of highly correlated genes. Choose based on your specific analysis needs and familiarity.
+A2: SmCCNet is suited for sparse canonical correlation networks, while WGCNA focuses on 
+weighted gene co-expression analysis. Your choice depends on the data type, research focus, and familiarity 
+with these methods. You may also use import a exisiting network, most components are compatabile with adjency matrix as network input.
 
-**Q3: Can I use BioNeuralNet with GPU acceleration?**
+**Q3: Can I accelerate computations using GPUs?**
 
-A3: Yes, BioNeuralNet supports CUDA-enabled installations for GPU acceleration. Ensure that your system has a compatible NVIDIA GPU and the appropriate CUDA version installed.
+A3: Yes. BioNeuralNet supports CUDA-based installations for GPU acceleration. Ensure that your environment 
+is set up with compatible GPU drivers, CUDA, and PyTorch configurations.
 
 **Q4: How do I contribute to BioNeuralNet?**
 
-A4: Contributions are welcome! Please refer to the [Contributing Guidelines](CONTRIBUTING.md) for details on how to contribute.
+A4: Contributions are welcome! Check the repository’s contributing guidelines for details on submitting issues, 
+pull requests, and improving documentation or code.
 
-**Q5: Where can I report bugs or request features?**
+**Q5: Where can I get help or report issues?**
 
-A5: You can report bugs or request features by opening an issue on our [GitHub Issues](https://github.com/https://github.com/UCD-BDLab/BioNeuralNet/issues) page.
+A5: For help, bug reports, or feature requests, open an issue on the GitHub repository’s Issues page.

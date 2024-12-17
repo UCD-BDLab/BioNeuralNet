@@ -22,16 +22,6 @@ def validate_paths(*paths: str) -> None:
         FileNotFoundError: 
             If any of the specified paths do not exist.
 
-    Example:
-        ```python
-        from bioneuralnet.utils.path_utils import validate_paths
-
-        input_dir = './data/input'
-        output_dir = './data/output'
-        log_dir = './data/logs'
-
-        validate_paths(input_dir, output_dir, log_dir)
-        ```
     """
     for path in paths:
         if not os.path.exists(path):
@@ -61,14 +51,7 @@ def get_r_script(script_name: str) -> str:
     Raises:
         FileNotFoundError: 
             If the specified R script is not found within the `graph_generation` package.
-
-    Example:
-        ```python
-        from bioneuralnet.utils.path_utils import get_r_script
-
-        smccnet_script = get_r_script('SmCCNet.R')
-        wgcna_script = get_r_script('WGCNA.R')
-        ```
+    
     """
     try:
         # Retrieve the absolute path to the R script within the 'graph_generation' package
@@ -86,17 +69,17 @@ def get_r_script(script_name: str) -> str:
         raise e
 
 
-# Module-level variables for R scripts
-try:
-    smccnet_r: str = get_r_script('SmCCNet.R')
-    logger.info(f"SmCCNet.R script located at: {smccnet_r}")
-except FileNotFoundError as fnf_error:
-    logger.error(fnf_error)
-    smccnet_r = ""
+# # Module-level variables for R scripts
+# try:
+#     smccnet_r: str = get_r_script('SmCCNet.R')
+#     logger.info(f"SmCCNet.R script located at: {smccnet_r}")
+# except FileNotFoundError as fnf_error:
+#     logger.error(fnf_error)
+#     smccnet_r = ""
 
-try:
-    wgcna_r: str = get_r_script('WGCNA.R')
-    logger.info(f"WGCNA.R script located at: {wgcna_r}")
-except FileNotFoundError as fnf_error:
-    logger.error(fnf_error)
-    wgcna_r = ""
+# try:
+#     wgcna_r: str = get_r_script('WGCNA.R')
+#     logger.info(f"WGCNA.R script located at: {wgcna_r}")
+# except FileNotFoundError as fnf_error:
+#     logger.error(fnf_error)
+#     wgcna_r = ""

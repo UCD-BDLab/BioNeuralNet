@@ -1,4 +1,4 @@
-from bioneuralnet.graph_generation.wgcna import WGCNA
+from bioneuralnet.graph_generation import WGCNA
 
 def main():
     wgcna = WGCNA(

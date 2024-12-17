@@ -80,39 +80,43 @@ class SmCCNet:
 
     def run(self) -> pd.DataFrame:
         """
-        Executes the SmCCNet algorithm and returns the global network adjacency matrix.
+        Execute the SmCCNet pipeline to generate a global network adjacency matrix.
 
-        This method orchestrates the preprocessing of data, execution of the SmCCNet R script,
-        loading of the resulting adjacency matrix, and cleanup of output files.
+        This method orchestrates several steps:
+        1. **Preprocessing Data**: Ensures omics and phenotype data are in the correct format.
+        2. **R Script Execution**: Calls the SmCCNet R script to infer correlations and construct the network.
+        3. **Load Adjacency Matrix**: Retrieves the resulting global network adjacency matrix from the output directory.
 
         Returns:
-            pd.DataFrame: Adjacency matrix representing the global network.
+            pd.DataFrame:
+                A DataFrame representing the global adjacency matrix. Rows and columns correspond to 
+                features (e.g., genes, proteins), and cell values represent the correlation or 
+                association strength between these features.
 
         Raises:
-            FileNotFoundError: If essential files are missing.
+            FileNotFoundError: If essential input files (e.g., phenotype or omics data) are missing.
             subprocess.CalledProcessError: If the R script execution fails.
             Exception: For any other unforeseen errors during execution.
+
+        Notes:
+            Ensure that the required R environment is properly set up and that the SmCCNet package
+            is installed.
+            Verify that the correct omics and phenotype files are present before 
+            calling ``run()``.
         """
         try:
             self.logger.info("Starting SmCCNet Graph Generation")
-
-            # Create a unique output directory for this run
             output_dir = self._create_output_dir()
-
-            # Preprocess data
             self.preprocess_data()
-
-            # Execute SmCCNet R script
             self.run_smccnet(output_dir)
-
-            # Load the global network adjacency matrix
             adjacency_matrix = self.load_global_network(output_dir)
-
             self.logger.info("SmCCNet Algorithm executed successfully.")
             return adjacency_matrix
         except Exception as e:
             self.logger.error(f"Error in SmCCNet Graph Generation: {e}")
             raise
+
+
 
     def preprocess_data(self) -> None:
         """

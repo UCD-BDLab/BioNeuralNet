@@ -1,5 +1,5 @@
 import pandas as pd
-from bioneuralnet.analysis.dynamic_visualization import DynamicVisualizer
+from bioneuralnet.analysis import DynamicVisualizer
 
 def main():
     adjacency_matrix = pd.read_csv('input/adjacency_matrix.csv', index_col=0)

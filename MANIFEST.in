@@ -2,22 +2,21 @@
 include README.md
 include LICENSE
 
-# Include all .yml files in the utils directory
-recursive-include bioneuralnet/utils *.yml
-
-# Include shell scripts in the scripts directory
-recursive-include bioneuralnet/scripts *.sh
-
-# Include all requirements files
-include requirements.txt
-include requirements-cpu.txt
-include requirements-cuda.txt
-include requirements-dev.txt
+# Include assets and images 
+recursive-include assets *.png *.jpg *.svg
 
 # Include documentation source files
-recursive-include docs/source *.rst
-recursive-include docs *.md
+recursive-include docs *
 
-# Include examples
-recursive-include examples *
+# Include example scripts
+recursive-include examples *.py
+
+# Include scripts installation files
+recursive-include scripts *
+
+# Exclude __pycache__ and compiled Python files
+global-exclude __pycache__ *.pyc *.pyo *.pyd
+
+# Exclude editor backup and temporary files
+global-exclude *~ *.bak *.swp
 

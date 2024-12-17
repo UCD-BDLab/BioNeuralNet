@@ -1,6 +1,6 @@
 # BioNeuralNet Documentation
 
-Welcome to the BioNeuralNet documentation! This directory contains all the source files and configurations necessary to build and maintain the project's documentation using [Sphinx](https://www.sphinx-doc.org/).
+Welcome to the BioNeuralNet documentation. This directory contains all the source files and configurations necessary to build and maintain the project's documentation using [Sphinx](https://www.sphinx-doc.org/).
 
 ## **Contents**
 
@@ -56,9 +56,9 @@ To build the documentation locally, follow these steps:
     Open the generated HTML files in your web browser:
 
     ```bash
-    open build/html/index.html  # On MacOS
-    xdg-open build/html/index.html  # On Linux
-    start build\html\index.html  # On Windows
+    open build/html/index.html
+    xdg-open build/html/index.html
+    start build\html\index.html
     ```
 
 ## **Contributing to the Documentation**

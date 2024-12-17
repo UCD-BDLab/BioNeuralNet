@@ -12,6 +12,8 @@ project = 'BioNeuralNet'
 author = 'Vicente Ramos'
 release = pkg_resources.get_distribution("bioneuralnet").version
 
+# -- General configuration ---------------------------------------------------
+
 extensions = [
     'sphinx.ext.autodoc',      
     'sphinx.ext.napoleon',     
@@ -20,8 +22,11 @@ extensions = [
     'sphinx.ext.intersphinx', 
 ]
 
+autosummary_generate = True
+
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
+
 templates_path = ['_templates']
 
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']

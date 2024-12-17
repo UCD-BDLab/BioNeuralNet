@@ -1,3 +1,3 @@
-from .subject_representation import SubjectRepresentationEmbedding
+from .subject_representation import GraphEmbedding
 
-__all__ = ['SubjectRepresentationEmbedding']
+__all__ = ['GraphEmbedding']
