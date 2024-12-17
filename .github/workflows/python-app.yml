@@ -31,16 +31,13 @@ jobs:
     - name: List scripts directory contents
       run: ls -la scripts/
 
-    - name: Install dependencies with fast-install.py
-      shell: bash
+    - name: Run setup-env.sh (Non-Interactive)
+      env:
+        INSTALL_TYPE: 1 #use cpu
+        INSTALL_DEV: y  #install dev dependencies
       run: |
-        if [ "${{ matrix.os }}" = "windows-latest" ]; then
-          python scripts/fast-install.py
-        else
-          chmod +x scripts/setup-env.sh
-          chmod +x scripts/setup-R.sh
-          python scripts/fast-install.py
-        fi
+        chmod +x scripts/setup-env.sh
+        ./scripts/setup-env.sh
 
     - name: Verify R installation
       shell: bash
