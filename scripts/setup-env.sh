@@ -34,29 +34,25 @@ echo "Installing base dependencies from requirements.txt at the root..."
 pip install -r requirements.txt
 
 # Step 6: Install system-specific dependencies
-echo "Select installation type:"
-echo "1. CPU-only"
-echo "2. CUDA-enabled (CUDA 11.7)"
-read -rp "Enter choice [1/2]: " choice
-
-if [ "$choice" -eq 1 ]; then
-    echo "Installing CPU-specific dependencies..."
-    pip install --no-build-isolation -r scripts/requirements-cpu.txt
-elif [ "$choice" -eq 2 ]; then
-    echo "Installing CUDA-specific dependencies..."
-    pip install --no-build-isolation -r scripts/requirements-cuda.txt
+if [ -z "$INSTALL_TYPE" ]; then
+    echo "Select installation type:"
+    echo "1. CPU-only"
+    echo "2. CUDA-enabled (CUDA 11.7)"
+    read -rp "Enter choice [1/2]: " choice
 else
-    echo "Invalid choice. Exiting."
-    exit 1
+    choice=$INSTALL_TYPE
+    echo "Using INSTALL_TYPE from environment: $choice"
 fi
+
 
 # Step 7: Installing development dependencies
-echo "Do you want to install development dependencies? [y/N]"
-read -rp "Enter choice [y/N]: " dev_choice
-
-if [[ "$dev_choice" =~ ^[Yy]$ ]]; then
-    echo "Installing development dependencies..."
-    pip install -r scripts/requirements-dev.txt
+if [ -z "$INSTALL_DEV" ]; then
+    echo "Do you want to install development dependencies? [y/N]"
+    read -rp "Enter choice [y/N]: " dev_choice
+else
+    dev_choice=$INSTALL_DEV
+    echo "Using INSTALL_DEV from environment: $dev_choice"
 fi
+
 
 echo "BioNeuralNet enviroment setup complete."

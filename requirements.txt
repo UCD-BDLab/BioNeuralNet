@@ -15,7 +15,7 @@ leidenalg>=0.8
 
 # We recommend using fast-install.py to install the following dependencies
 # fast-install.py is available at scripts/fast-install.py
-
+# you will be prompted to install either cpu or gpu dependencies. THen you will be prompted to install the development dependencies
 
 # CPU-specific dependencies
 # Add these if CUDA is not used
