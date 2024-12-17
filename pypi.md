@@ -49,13 +49,11 @@ setup(
     ],
     python_requires='>=3.7',
     install_requires=[
-        # List your package dependencies here
         'numpy',
         'pandas',
         'torch',
-        # Add other dependencies
     ],
-    include_package_data=True,  # To include files specified in MANIFEST.in
+    include_package_data=True,  
 )
 ```
 
@@ -131,7 +129,7 @@ Before uploading to the official PyPI, ensure that your package can be installed
 
 ```bash
 python3 -m venv test-env
-source test-env/bin/activate  # On Windows: test-env\Scripts\activate
+source test-env/bin/activate  
 ```
 
 **b. Install Your Package from TestPyPI**
@@ -196,7 +194,7 @@ Ensure that your package can be installed from the official PyPI.
 
 ```bash
 python3 -m venv prod-env
-source prod-env/bin/activate  # On Windows: prod-env\Scripts\activate
+source prod-env/bin/activate  
 ```
 
 **b. Install Your Package from PyPI**

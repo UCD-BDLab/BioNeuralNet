@@ -10,8 +10,8 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]  # All OS
-        python-version: [3.8, 3.9, 3.10]                  # All Python versions
+        os: [ubuntu-latest, macos-latest, windows-latest] 
+        python-version: ['3.8', '3.9', '3.10']                  
 
     runs-on: ${{ matrix.os }}
 
@@ -23,16 +23,17 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+        check-latest: true
 
     - name: Install dependencies with fast-install.py
       shell: bash
       run: |
         if [ "${{ matrix.os }}" = "windows-latest" ]; then
-          python script/fast-install.py
+          python scripts/fast-install.py
         else
-          chmod +x script/setup-env.sh
-          chmod +x script/setup-R.sh
-          python script/fast-install.py
+          chmod +x scripts/setup-env.sh
+          chmod +x scripts/setup-R.sh
+          python scripts/fast-install.py
         fi
 
     - name: Verify R installation
