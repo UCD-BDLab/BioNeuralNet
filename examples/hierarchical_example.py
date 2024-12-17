@@ -1,4 +1,4 @@
-from bioneuralnet.clustering.hierarchical import HierarchicalClustering
+from bioneuralnet.clustering import HierarchicalClustering
 
 def main():
     # Initialize HierarchicalClustering parameters

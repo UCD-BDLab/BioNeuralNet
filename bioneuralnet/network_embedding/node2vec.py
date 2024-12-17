@@ -113,7 +113,13 @@ class Node2VecEmbedding:
         Raises:
             FileNotFoundError: If no CSV files are found in the input directory.
             Exception: For any other unforeseen errors during execution.
-        """
+
+        Notes:
+            - Ensure that the Node2Vec parameters (e.g., walk_length, num_walks) are set appropriately 
+            for your specific dataset and analysis goals.
+            - The resulting embeddings can be used for downstream tasks such as clustering or 
+            visualization.
+    """
         self.logger.info("Running Node2Vec Embedding")
 
         try:

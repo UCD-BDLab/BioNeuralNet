@@ -1,4 +1,4 @@
-from bioneuralnet.network_embedding.node2vec import Node2VecEmbedding
+from bioneuralnet.network_embedding import Node2VecEmbedding
 
 def main():
     # Initialize Node2VecEmbedding parameters

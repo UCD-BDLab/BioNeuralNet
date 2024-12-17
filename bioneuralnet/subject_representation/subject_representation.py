@@ -1,73 +1,64 @@
 import os
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Union
 
 import pandas as pd
 import numpy as np
 from sklearn.decomposition import PCA
 
 from ..utils.logger import get_logger
-from ..network_embedding.gnns import GNNEmbedding
-from ..network_embedding.node2vec import Node2VecEmbedding
-from ..utils.data_utils import combine_omics_data
+from ..network_embedding import GnnEmbedding
+from ..network_embedding import Node2VecEmbedding
 
 
-class SubjectRepresentationEmbedding:
+class GraphEmbedding:
     """
-    SubjectRepresentationEmbedding Class for Integrating Network Embeddings into Omics Data.
+    GraphEmbedding Class for Integrating Network Embeddings into Omics Data.
 
-    This class handles the generation of embeddings using selected embedding methods,
-    reduces node embeddings using PCA (if needed), and integrates these embeddings into
-    the original omics data to enhance subject representations.
+    This class takes already loaded data structures and applies network embeddings to enhance subject representations.
+
+    Args:
+        adjacency_matrix (pd.DataFrame): The adjacency matrix of the graph representing feature interactions.
+        omics_data (pd.DataFrame): Combined omics data with samples as rows and features as columns.
+                                   Must include the phenotype column 'finalgold_visit'.
+        clinical_data (pd.DataFrame): Clinical data for the same samples. Index must align with omics_data.
+        embedding_method (str, optional): The method to use for generating embeddings ('GNNs' or 'Node2Vec').
+                                          Defaults to 'GNNs'.
 
     Attributes:
-        adjacency_matrix (pd.DataFrame): The adjacency matrix of the graph representing feature interactions.
-        omics_list (List[str]): List of paths to omics data CSV files.
-        phenotype_file (str): Path to the phenotype CSV file.
-        clinical_data_file (str): Path to the clinical data CSV file.
-        embedding_method (str): The method to use for generating embeddings ('GNNs' or 'Node2Vec').
-        output_dir (str): Directory to save enhanced omics data.
-        logger (logging.Logger): Logger for the class.
+        adjacency_matrix (pd.DataFrame)
+        omics_data (pd.DataFrame)
+        clinical_data (pd.DataFrame)
+        embedding_method (str)
+        logger (logging.Logger)
+
     """
 
     def __init__(
         self,
         adjacency_matrix: pd.DataFrame,
-        omics_list: List[str],
-        phenotype_file: str,
-        clinical_data_file: str,
+        omics_data: pd.DataFrame,
+        clinical_data: pd.DataFrame,
         embedding_method: str = 'GNNs',
-        output_dir: Optional[str] = None,
     ):
-        """
-        Initializes the SubjectRepresentationEmbedding instance.
+        # Basic checks
+        if adjacency_matrix is None or adjacency_matrix.empty:
+            raise ValueError("Adjacency matrix is required and cannot be empty.")
+        if omics_data is None or omics_data.empty or 'finalgold_visit' not in omics_data.columns:
+            raise ValueError("Omics data must be non-empty and contain 'finalgold_visit' column.")
+        if clinical_data is None or clinical_data.empty:
+            raise ValueError("Clinical data is required and cannot be empty.")
 
-        Args:
-            adjacency_matrix (pd.DataFrame): The adjacency matrix of the graph.
-            omics_list (List[str]): List of paths to omics data CSV files.
-            phenotype_file (str): Path to the phenotype CSV file.
-            clinical_data_file (str): Path to the clinical data CSV file.
-            embedding_method (str, optional): Embedding method to use ('GNNs' or 'Node2Vec'). Defaults to 'GNNs'.
-            output_dir (str, optional): Directory to save outputs. If None, creates a unique directory.
-        """
         self.adjacency_matrix = adjacency_matrix
-        self.omics_list = omics_list
-        self.phenotype_file = phenotype_file
-        self.clinical_data_file = clinical_data_file
+        self.omics_data = omics_data
+        self.clinical_data = clinical_data
         self.embedding_method = embedding_method
-        self.output_dir = output_dir if output_dir else self._create_output_dir()
         self.logger = get_logger(__name__)
-        self.logger.info("Initialized SubjectRepresentationEmbedding.")
+        self.logger.info("Initialized GraphEmbedding with direct data inputs.")
 
     def _create_output_dir(self) -> str:
-        """
-        Creates a unique output directory for the current SubjectRepresentationEmbedding run.
-
-        Returns:
-            str: Path to the created output directory.
-        """
         base_dir = "subject_representation_output"
-        timestamp = datetime.now().strftime("%Y-%m-%d %H.%M.%S")
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         output_dir = f"{base_dir}_{timestamp}"
         os.makedirs(output_dir, exist_ok=True)
         self.logger.info(f"Created output directory: {output_dir}")
@@ -75,36 +66,37 @@ class SubjectRepresentationEmbedding:
 
     def run(self) -> pd.DataFrame:
         """
-        Generate subject representations by integrating network embeddings.
+        Generate subject representations by integrating network embeddings into omics data.
 
-        This method generates embeddings using the selected embedding method,
-        reduces node embeddings using PCA if specified, and integrates these embeddings
-        into the original omics data.
+        Steps:
+        1. **Embedding Generation**: Runs GNN or Node2Vec-based methods to produce node embeddings.
+        2. **Dimensionality Reduction**: Applies PCA to condense embeddings into a single principal component.
+        3. **Integration**: Multiplies original omics features by the reduced embeddings to create enhanced omics data.
 
         Returns:
             pd.DataFrame:
-                Enhanced omics data with integrated network embeddings.
+                A DataFrame of enhanced omics data where each feature (node) has been weighted by
+                its embedding-derived principal component.
 
         Raises:
-            Exception: If any error occurs during the subject representation process.
+            ValueError: If embeddings are empty or omics data cannot be integrated.
+            Exception: For any unexpected issues during the integration process.
+
+        Notes:
+            - The enhanced omics data can be used downstream for clustering, classification, or regression tasks.
+            - Ensure that the PCA step is appropriate for your analysis and consider adjusting the dimensionality 
+            reduction strategy if needed.
         """
-        self.logger.info("Running Subject Representation")
+        self.logger.info("Running Subject Representation workflow.")
+        output_dir = self._create_output_dir()
 
         try:
-            # Step 1: Generate embeddings using the selected method
-            self.logger.info(f"Generating embeddings using {self.embedding_method}")
             embeddings_df = self.generate_embeddings()
-
-            # Step 2: Reduce embeddings with PCA
-            self.logger.info("Reducing node embeddings with PCA")
             node_embedding_values = self.reduce_embeddings(embeddings_df)
-
-            # Step 3: Integrate embeddings into omics data
-            self.logger.info("Integrating embeddings into omics data")
             enhanced_omics_data = self.integrate_embeddings(node_embedding_values)
 
             # Save the enhanced omics data
-            output_file = os.path.join(self.output_dir, "enhanced_omics_data.csv")
+            output_file = os.path.join(output_dir, "enhanced_omics_data.csv")
             enhanced_omics_data.to_csv(output_file)
             self.logger.info(f"Enhanced omics data saved to {output_file}")
 
@@ -114,23 +106,22 @@ class SubjectRepresentationEmbedding:
             self.logger.error(f"Error in Subject Representation: {e}")
             raise
 
+
     def generate_embeddings(self) -> pd.DataFrame:
         """
         Generate node embeddings using the selected embedding method.
 
         Returns:
-            pd.DataFrame: Node embeddings with nodes as index.
-
-        Raises:
-            ValueError: If the embedding method is not recognized.
+            pd.DataFrame: Node embeddings (nodes as index, embedding dimensions as columns).
         """
+        self.logger.info(f"Generating embeddings using {self.embedding_method}")
+
         if self.embedding_method == 'GNNs':
-            self.logger.info("Using GNNEmbedding to generate embeddings")
-            gnn_embedding = GNNEmbedding(
-                omics_list=self.omics_list,
-                phenotype_file=self.phenotype_file,
-                clinical_data_file=self.clinical_data_file,
+            # Default GNN parameters can be adjusted as needed
+            gnn_embedding = GnnEmbedding(
                 adjacency_matrix=self.adjacency_matrix,
+                omics_data=self.omics_data,
+                clinical_data=self.clinical_data,
                 model_type='GCN',
                 gnn_hidden_dim=64,
                 gnn_layer_num=2,
@@ -144,7 +135,8 @@ class SubjectRepresentationEmbedding:
             )
 
         elif self.embedding_method == 'Node2Vec':
-            self.logger.info("Using Node2VecEmbedding to generate embeddings")
+            # Default Node2Vec parameters can be adjusted as needed
+            from ..network_embedding.node2vec import Node2VecEmbedding
             node2vec_embedding = Node2VecEmbedding(
                 adjacency_matrix=self.adjacency_matrix,
                 embedding_dim=128,
@@ -158,32 +150,23 @@ class SubjectRepresentationEmbedding:
             embeddings_df.set_index('node', inplace=True)
 
         else:
-            self.logger.error(f"Embedding method '{self.embedding_method}' is not recognized.")
-            raise ValueError(f"Embedding method '{self.embedding_method}' is not recognized. Choose 'GNNs' or 'Node2Vec'.")
+            raise ValueError(f"Unsupported embedding method: {self.embedding_method}")
 
         return embeddings_df
 
     def reduce_embeddings(self, embeddings: pd.DataFrame) -> pd.Series:
         """
-        Reduce embeddings to a single value per node using PCA.
+        Reduce embeddings to a single principal component per node using PCA.
 
         Args:
-            embeddings (pd.DataFrame):
-                Node embeddings with nodes as index and embedding dimensions as columns.
+            embeddings (pd.DataFrame): Node embeddings.
 
         Returns:
-            pd.Series:
-                Reduced embedding values indexed by node names.
-
-        Raises:
-            ValueError: If embeddings DataFrame is empty or has invalid dimensions.
+            pd.Series: Reduced embedding values indexed by node names.
         """
         if embeddings.empty:
-            self.logger.error("Embeddings DataFrame is empty.")
             raise ValueError("Embeddings DataFrame is empty.")
-
         if embeddings.shape[1] < 1:
-            self.logger.error("Embeddings DataFrame must have at least one dimension.")
             raise ValueError("Embeddings DataFrame must have at least one dimension.")
 
         pca = PCA(n_components=1)
@@ -196,65 +179,29 @@ class SubjectRepresentationEmbedding:
         self.logger.debug("Reduced embeddings using PCA.")
         return node_embedding_values
 
-    def integrate_embeddings(
-        self,
-        node_embedding_values: pd.Series
-    ) -> pd.DataFrame:
+    def integrate_embeddings(self, node_embedding_values: pd.Series) -> pd.DataFrame:
         """
-        Integrate reduced embeddings into omics data.
+        Integrate reduced embeddings into omics data by weighting each feature by the embedding.
 
         Args:
-            node_embedding_values (pd.Series):
-                Reduced embedding values per node.
+            node_embedding_values (pd.Series): Embedding values per node.
 
         Returns:
-            pd.DataFrame:
-                Enhanced omics data with integrated embeddings.
-
-        Raises:
-            KeyError: If a node in omics_data is not found in node_embedding_values.
+            pd.DataFrame: Enhanced omics data with integrated embeddings.
         """
-        # Load and combine omics data
-        self.logger.info("Loading and combining omics data for integration.")
-        omics_data = combine_omics_data(self.omics_list)
+        self.logger.info("Integrating embeddings into omics data.")
 
-        # Clean column names to match nodes
-        omics_data.columns = self._clean_column_names(omics_data.columns)
+        modified_omics_data = self.omics_data.copy()
+        # Exclude the phenotype column when integrating (assuming 'finalgold_visit' is phenotype)
+        feature_cols = [col for col in modified_omics_data.columns if col != 'finalgold_visit']
 
-        # Ensure that node_embedding_values has the same index as omics_data columns
-        missing_nodes = set(omics_data.columns) - set(node_embedding_values.index)
+        missing_nodes = set(feature_cols) - set(node_embedding_values.index)
         if missing_nodes:
-            self.logger.warning(
-                f"The following nodes are missing in embedding values and will be skipped: {missing_nodes}"
-            )
+            self.logger.warning(f"These nodes are missing embeddings and will be skipped: {missing_nodes}")
 
-        # Modify the omics data by weighting features with embedding values
-        modified_omics_data = omics_data.copy()
-        for node in omics_data.columns:
+        for node in feature_cols:
             if node in node_embedding_values.index:
-                modified_omics_data[node] = omics_data[node] * node_embedding_values[node]
-                self.logger.debug(f"Integrated embedding for node '{node}': {node_embedding_values[node]}")
-            else:
-                self.logger.warning(f"Node '{node}' not found in embedding values. Skipping integration.")
+                modified_omics_data[node] = modified_omics_data[node] * node_embedding_values[node]
 
         self.logger.debug("Integrated embeddings into omics data.")
         return modified_omics_data
-
-    def _clean_column_names(self, columns: pd.Index) -> pd.Index:
-        """
-        Clean column names to match node names in the network.
-
-        Args:
-            columns (pd.Index): Original column names.
-
-        Returns:
-            pd.Index: Cleaned column names.
-        """
-        import re
-        clean_columns = []
-        for col in columns:
-            col_clean = re.sub(r'[^0-9a-zA-Z_]', '.', col)
-            if not col_clean[0].isalpha():
-                col_clean = 'X' + col_clean
-            clean_columns.append(col_clean)
-        return pd.Index(clean_columns)

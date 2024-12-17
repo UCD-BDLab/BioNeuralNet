@@ -8,6 +8,8 @@ pytest-mock
 # Documentation
 sphinx
 sphinx_rtd_theme
+sphinx-autosummary-accessors
+sphinxcontrib-napoleon
 
 # Code Quality and Formatting
 flake8

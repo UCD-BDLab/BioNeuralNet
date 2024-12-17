@@ -1,4 +1,4 @@
-from bioneuralnet.graph_generation.smccnet import SmCCNet
+from bioneuralnet.graph_generation import SmCCNet
 
 def main():
     smccnet = SmCCNet(

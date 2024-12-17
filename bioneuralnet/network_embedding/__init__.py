@@ -1,4 +1,5 @@
 from .node2vec import Node2VecEmbedding
-from .gnns import GNNEmbedding
+from .gnn_embedding import GnnEmbedding
+from .gnn_models import GCN, GAT, SAGE, GIN
 
-__all__ = ['Node2VecEmbedding', 'GNNEmbedding']
+__all__ = ['Node2VecEmbedding', 'GnnEmbedding', 'GCN', 'GAT', 'SAGE', 'GIN']

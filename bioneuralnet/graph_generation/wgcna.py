@@ -52,19 +52,29 @@ class WGCNA:
 
     def run(self) -> pd.DataFrame:
         """
-        Executes the WGCNA pipeline and returns the global network adjacency matrix.
+        Execute WGCNA to build a weighted correlation network.
 
         Steps:
-        1. Create output directory.
-        2. Preprocess data.
-        3. Run WGCNA R script.
-        4. Load adjacency matrix.
+        1. **Preprocessing**: Cleans and formats the omics data.
+        2. **WGCNA Execution**: Runs the R-based WGCNA pipeline to construct a weighted correlation network.
+        3. **Load Adjacency Matrix**: Reads the resulting adjacency matrix from disk.
 
-        No cleanup step if not needed.
+        Returns:
+            pd.DataFrame:
+                A DataFrame representing the weighted correlation network adjacency matrix. Each cell value 
+                in the matrix corresponds to the correlation-based edge weight between two omics features.
+
+        Raises:
+            FileNotFoundError: If required data or output files are missing.
+            subprocess.CalledProcessError: If the underlying WGCNA R script fails.
+            Exception: For any other unexpected issues.
+
+        Notes:
+            Ensure that WGCNA is properly installed in your R environment.
+            The omics data should contain no missing values and should be normalized or standardized as required.
         """
         try:
             self.logger.info("Starting WGCNA Network Construction")
-            # Create a unique output directory for this run
             output_dir = self._create_output_dir()
             self.preprocess_data()
             self.run_wgcna(output_dir)
@@ -74,6 +84,7 @@ class WGCNA:
         except Exception as e:
             self.logger.error(f"Error in WGCNA Network Construction: {e}")
             raise
+
 
     def preprocess_data(self) -> None:
         """

@@ -1,31 +1,26 @@
 import pandas as pd
-from bioneuralnet.subject_representation.subject_representation import SubjectRepresentationEmbedding
+from bioneuralnet.subject_representation import GraphEmbedding
 
 def main():
-    # Paths to input files
-    omics_files = ['input/proteins.csv', 'input/metabolites.csv']
-    phenotype_file = 'input/phenotype_data.csv'
-    clinical_data_file = 'input/clinical_data.csv'
-    adjacency_matrix_file = 'input/adjacency_matrix.csv'
+    omics_files = [pd.read_csv('input/proteins.csv', index_col=0),
+                   pd.read_csv('input/metabolites.csv', index_col=0)]
+    phenotype_df = pd.read_csv('input/phenotype_data.csv', index_col=0)
+    clinical_data_df = pd.read_csv('input/clinical_data.csv', index_col=0)
+    adjacency_matrix = pd.read_csv('input/adjacency_matrix.csv', index_col=0)
 
-    # Load adjacency matrix
-    adjacency_matrix = pd.read_csv(adjacency_matrix_file, index_col=0)
-
-    # Initialize SubjectRepresentationEmbedding
-    subject_rep_embedding = SubjectRepresentationEmbedding(
+    graph_embed = GraphEmbedding(
         adjacency_matrix=adjacency_matrix,
         omics_list=omics_files,
-        phenotype_file=phenotype_file,
-        clinical_data_file=clinical_data_file,
+        phenotype_df=phenotype_df,
+        clinical_data_df=clinical_data_df,
         embedding_method='GNNs'
     )
 
-    # Run the subject representation process
-    enhanced_omics_data = subject_rep_embedding.run()
+    # Run the graph embedding process
+    enhanced_omics_data = graph_embed.run()
 
-    # The enhanced omics data is saved to the output directory specified in the class
-    print("Subject representation workflow completed successfully.")
-
+    enhanced_omics_data.to_csv('output/enhanced_omics_data.csv')
+    print("Graph embedding workflow completed successfully.")
 
 if __name__ == "__main__":
     main()

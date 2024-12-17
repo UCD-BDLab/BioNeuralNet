@@ -1,4 +1,4 @@
-from bioneuralnet.clustering.pagerank import PageRankClustering
+from bioneuralnet.clustering import PageRankClustering
 
 def main():
     # Initialize PageRankClustering parameters

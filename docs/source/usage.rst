@@ -3,45 +3,70 @@ Usage
 
 BioNeuralNet provides a suite of tools to integrate omics data with neural network embeddings. Below are some basic usage examples to help you get started.
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Usage Examples:
+.. rubric:: Example Scripts
 
-   ../examples/usage_examples
-```
+**SmCCNet Workflow:**
 
-**Explanation:**
+.. literalinclude:: ../../examples/smccnet_example.py
+   :language: python
+   :caption: Example of running SmCCNet Workflow
 
-- **`toctree`**: Links to the `usage_examples.py` in the `examples/` directory, providing practical examples.
+**WGCNA Workflow:**
 
----
+.. literalinclude:: ../../examples/wgcna_example.py
+   :language: python
+   :caption: Example of running WGCNA Workflow
 
-### **c. `docs/source/api_reference.rst`**
+**GNN Embedding:**
 
-```rst
-API Reference
-=============
+.. literalinclude:: ../../examples/gnn_embedding_example.py
+   :language: python
+   :caption: Example of generating GNN Embeddings
 
-The API Reference provides detailed documentation for each module, class, and function within BioNeuralNet.
+**Node2Vec Embedding:**
 
-.. autosummary::
-    :toctree: _autosummary
-    :recursive:
+.. literalinclude:: ../../examples/node2vec_example.py
+   :language: python
+   :caption: Example of generating Node2Vec Embeddings
 
-    bioneuralnet.graph_generation.SmCCNet
-    bioneuralnet.graph_generation.WGCNA
-    bioneuralnet.network_embedding.GNNEmbedding
-    bioneuralnet.network_embedding.Node2VecEmbedding
-    bioneuralnet.subject_representation.SubjectRepresentationEmbedding
-    bioneuralnet.utils.file_helpers.find_files
-    bioneuralnet.utils.path_utils.validate_paths
-```
+**Subject Representation:**
 
-**Explanation:**
+.. literalinclude:: ../../examples/subject_representation_example.py
+   :language: python
+   :caption: Example of Subject Representation Workflow
 
-- **`autosummary`**: Automatically generates summary tables and links to detailed documentation for each listed component.
-- **`recursive`**: Ensures that all submodules are included.
+**Disease Prediction using Multi-Omics Networks(DPMON):**
 
-**Note:** Ensure that `autosummary_generate = True` is set in `conf.py` to enable automatic generation of summary tables.
+.. literalinclude:: ../../examples/dpmon_example.py
+   :language: python
+   :caption: Example of Subject Representation Workflow
 
----
+**Clustering (Hierarchical):**
+
+.. literalinclude:: ../../examples/hierarchical_example.py
+   :language: python
+   :caption: Example of Hierarchical Clustering
+
+**Clustering (PageRank):**
+
+.. literalinclude:: ../../examples/pagerank_example.py
+   :language: python
+   :caption: Example of PageRank Clustering
+
+**Feature Selection:**
+
+.. literalinclude:: ../../examples/feature_selector_example.py
+   :language: python
+   :caption: Example of Feature Selection
+
+**Static Visualization:**
+
+.. literalinclude:: ../../examples/static_visualization_example.py
+   :language: python
+   :caption: Example of Static Visualization
+
+**Dynamic Visualization:**
+
+.. literalinclude:: ../../examples/dynamic_visualization_example.py
+   :language: python
+   :caption: Example of Dynamic Visualization

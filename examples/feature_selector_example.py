@@ -1,6 +1,6 @@
 import pandas as pd
 from bioneuralnet.analysis.feature_selector import FeatureSelector
-from bioneuralnet.subject_representation.subject_representation import SubjectRepresentationEmbedding
+from bioneuralnet.subject_representation.subject_representation import GraphEmbedding
 
 def main():
     omics_files = ['input/genetic_data.csv', 'input/protein_data.csv', 'input/metabolite_data.csv'] 
@@ -10,7 +10,7 @@ def main():
 
     adjacency_matrix = pd.read_csv(adjacency_matrix_file, index_col=0)
 
-    subject_rep = SubjectRepresentationEmbedding(
+    subject_rep = GraphEmbedding(
         adjacency_matrix=adjacency_matrix,
         omics_list=omics_files,
         phenotype_file=phenotype_file,

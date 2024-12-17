@@ -1,4 +1,4 @@
-from .test_gnns import *
+from .test_gnn_embedding import *
 from .test_node2vec import *
 from .test_utils import *
 from .test_smccnet import *

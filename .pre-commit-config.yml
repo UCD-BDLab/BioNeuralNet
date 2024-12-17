@@ -11,18 +11,27 @@ repos:
     rev: 23.3.0
     hooks:
       - id: black
+        name: Format Python code with Black
         language_version: python3
 
   - repo: https://github.com/PyCQA/flake8
     rev: 6.0.0
     hooks:
       - id: flake8
+        name: Lint Python code with Flake8
         additional_dependencies: [flake8>=6.0.0]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.6.1
+    hooks:
+      - id: mypy
+        name: Static type checking with MyPy
+        args: [--ignore-missing-imports]
 
   - repo: local
     hooks:
       - id: run-tests
-        name: Run Tests
-        entry: pytest
+        name: Run Tests with Pytest
+        entry: pytest --cov=bioneuralnet --cov-report=term-missing
         language: system
         types: [python]

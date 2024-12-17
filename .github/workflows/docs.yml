@@ -1,48 +1,39 @@
-import os
-import sys
-import pkg_resources
+name: Build Documentation for Read the Docs
 
-# -- Path setup --------------------------------------------------------------
+on:
+  push:
+    branches:
+      - main  
+  pull_request:
+    branches:
+      - main  
 
-sys.path.insert(0, os.path.abspath('../../'))
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
 
-# -- Project information -----------------------------------------------------
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  
 
-project = 'BioNeuralNet'
-author = 'Vicente Ramos'
-release = pkg_resources.get_distribution("bioneuralnet").version
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
 
-extensions = [
-    'sphinx.ext.autodoc',      
-    'sphinx.ext.napoleon',     
-    'sphinx.ext.viewcode',     
-    'sphinx.ext.autosummary',  
-    'sphinx.ext.intersphinx', 
-]
+      - name: Install Documentation Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          pip install sphinx sphinx_rtd_theme
 
-napoleon_google_docstring = True
-napoleon_numpy_docstring = False
-templates_path = ['_templates']
+      - name: Build Documentation
+        run: |
+          sphinx-build -b html source/ build/html/
 
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
-# -- Options for HTML output -------------------------------------------------
-
-html_theme = 'sphinx_rtd_theme'  
-html_static_path = ['_static']
-
-# -- Autosummary configuration -----------------------------------------------
-
-autosummary_generate = True
-
-# -- Intersphinx configuration ------------------------------------------------
-
-intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', None),
-    'pandas': ('https://pandas.pydata.org/docs/', None),
-    'numpy': ('https://numpy.org/doc/stable/', None),
-    'torch': ('https://pytorch.org/docs/stable/', None),
-    'scikit-learn': ('https://scikit-learn.org/stable/', None),
-    'matplotlib': ('https://matplotlib.org/stable/', None),
-    'networkx': ('https://networkx.org/documentation/stable/', None),
-}
+      - name: Validate Documentation Build
+        run: |
+          echo "Documentation build completed successfully. Files are located in build/html/"
+          ls -R build/html/

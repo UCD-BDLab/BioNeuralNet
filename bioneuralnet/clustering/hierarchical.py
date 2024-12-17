@@ -43,14 +43,12 @@ class HierarchicalClustering:
             output_dir (str, optional): Directory to save outputs. If None, creates a unique directory.
         """
 
-        # First we assign parameters
         self.adjacency_matrix_file = adjacency_matrix_file
         self.n_clusters = n_clusters
         self.linkage = linkage
         self.affinity = affinity
         self.output_dir = output_dir if output_dir else self._create_output_dir()
 
-        # Initialize logger and print parameters to make sure they are correct
         self.logger = get_logger(__name__)
         self.logger.info("Initialized HierarchicalClustering with the following parameters:")
         self.logger.info(f"Adjacency Matrix File: {self.adjacency_matrix_file}")
@@ -58,8 +56,6 @@ class HierarchicalClustering:
         self.logger.info(f"Linkage: {self.linkage}")
         self.logger.info(f"Affinity: {self.affinity}")
         self.logger.info(f"Output Directory: {self.output_dir}")
-
-        # Initialize data holder (this is our adjacency matrix)
         self.adjacency_matrix = None
 
     def _create_output_dir(self) -> str:
@@ -95,25 +91,20 @@ class HierarchicalClustering:
             Dict[str, Any]: Dictionary containing clustering results.
         """
         try:
-            # Ensure data is loaded
             if self.adjacency_matrix is None:
                 self.load_data()
 
-            # Extract feature matrix
             feature_matrix = self.adjacency_matrix.values
 
-            # Initialize the clustering model
             model = AgglomerativeClustering(
                 n_clusters=self.n_clusters,
                 linkage=self.linkage,
                 affinity=self.affinity
             )
 
-            # Fit the model and predict cluster labels
             labels = model.fit_predict(feature_matrix)
             self.logger.info("Hierarchical clustering completed.")
 
-            # Calculate silhouette score as a measure of clustering quality (optional)
             try:
                 silhouette_avg = silhouette_score(feature_matrix, labels, metric=self.affinity)
                 self.logger.info(f"Silhouette Score: {silhouette_avg}")
@@ -127,12 +118,10 @@ class HierarchicalClustering:
                 'cluster': labels
             })
 
-            # Save cluster labels
             cluster_labels_file = os.path.join(self.output_dir, "cluster_labels.csv")
             cluster_labels_df.to_csv(cluster_labels_file, index=False)
             self.logger.info(f"Cluster labels saved to {cluster_labels_file}")
 
-            # Save clusters as separate adjacency matrices
             for i in range(self.n_clusters):
                 cluster_nodes = self.adjacency_matrix.index[labels == i]
                 cluster_data = self.adjacency_matrix.loc[cluster_nodes, cluster_nodes]
@@ -140,7 +129,6 @@ class HierarchicalClustering:
                 cluster_data.to_csv(cluster_file)
                 self.logger.info(f"Cluster {i + 1} data saved to {cluster_file}")
 
-            # Prepare results
             results = {
                 'cluster_labels': cluster_labels_df,
                 'silhouette_score': silhouette_avg,
