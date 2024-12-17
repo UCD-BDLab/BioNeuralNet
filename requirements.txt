@@ -14,6 +14,11 @@ pyvis>=0.2
 leidenalg>=0.8
 dtt>=0.9.0
 
+
+# pytest>=6.0
+# pytest-cov
+# pytest-mock
+
 # We recommend using fast-install.py to install the following dependencies
 # fast-install.py is available at scripts/fast-install.py
 # you will be prompted to install either cpu or gpu dependencies. THen you will be prompted to install the development dependencies
