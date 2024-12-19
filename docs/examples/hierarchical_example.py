@@ -13,7 +13,6 @@ def main():
         print("Starting Hierarchical Clustering Workflow...")
 
         # Example Adjacency Matrix Data
-        # Replace this with your actual adjacency matrix DataFrame
         adjacency_matrix = pd.DataFrame({
             'GeneA': [1.0, 0.8, 0.3, 0.2],
             'GeneB': [0.8, 1.0, 0.4, 0.3],
@@ -25,9 +24,9 @@ def main():
         hierarchical_clustering = HierarchicalClustering(
             adjacency_matrix=adjacency_matrix,
             n_clusters=2,
-            linkage='ward',        # Options: 'ward', 'complete', 'average', 'single'
-            affinity='euclidean',  # 'ward' linkage only supports 'euclidean'
-            scale_data=True        # Set to True to standardize data
+            linkage='ward',       
+            affinity='euclidean',  
+            scale_data=True        
         )
 
         # Run Clustering

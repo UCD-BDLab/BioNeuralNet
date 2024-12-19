@@ -20,10 +20,10 @@ else
 fi
 
 # Install required R packages, including Bioconductor packages
-echo "Installing R packages: dplyr, SmCCNet, WGCNA, and dependencies..."
+echo "Installing R packages: dplyr, SmCCNet, WGCNA, jsonlite, and dependencies..."
 
 # Install CRAN and Bioconductor packages
-Rscript -e "options(repos = c(CRAN = 'https://cran.r-project.org')); install.packages(c('dplyr', 'SmCCNet'))"
+Rscript -e "options(repos = c(CRAN = 'https://cran.r-project.org')); install.packages(c('dplyr', 'SmCCNet', 'jsonlite'))"
 
 Rscript -e "if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager')"
 Rscript -e "BiocManager::install(c('impute', 'preprocessCore', 'GO.db', 'AnnotationDbi'), update=FALSE, ask=FALSE)"

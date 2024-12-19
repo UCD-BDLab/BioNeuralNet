@@ -1,9 +1,6 @@
 import os
 from datetime import datetime
-from typing import Optional, List, Union
-
 import pandas as pd
-import numpy as np
 from sklearn.decomposition import PCA
 
 from ..utils.logger import get_logger
@@ -30,7 +27,6 @@ class GraphEmbedding:
         omics_data (pd.DataFrame)
         clinical_data (pd.DataFrame)
         embedding_method (str)
-        logger (logging.Logger)
 
     """
 
@@ -137,7 +133,6 @@ class GraphEmbedding:
 
         elif self.embedding_method == 'Node2Vec':
             # Default Node2Vec parameters can be adjusted as needed
-            from ..network_embedding.node2vec import Node2VecEmbedding
             node2vec_embedding = Node2VecEmbedding(
                 adjacency_matrix=self.adjacency_matrix,
                 embedding_dim=128,

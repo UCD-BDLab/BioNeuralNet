@@ -1,7 +1,6 @@
 """
 Example 2: WGCNA Workflow
 ===========================
-
 This script demonstrates how to run the WGCNA component independently using in-memory data structures.
 It constructs a network from multi-omics data and phenotype information without relying on file I/O operations.
 """
@@ -56,10 +55,10 @@ def main():
 
         # Example Omics Data (Genes and miRNA)
         omics_data = pd.DataFrame({
-            'gene_feature1': [2.3, 2.1, 2.4],
-            'gene_feature2': [1.8, 1.9, 1.7],
-            'miRNA_feature1': [0.5, 0.6, 0.4],
-            'miRNA_feature2': [0.7, 0.8, 0.6]
+            'gene_feature1': [0.1, 0.2, 0.3],
+            'gene_feature2': [0.4, 0.5, 0.6],
+            'miRNA_feature1': [0.7, 0.8, 0.9],
+            'miRNA_feature2': [1.0, 1.1, 1.2]
         }, index=['GeneA', 'GeneB', 'GeneC'])
 
         # Example Phenotype Data
@@ -74,6 +73,11 @@ def main():
         # Display the Adjacency Matrix
         print("\nGenerated Adjacency Matrix:")
         print(adjacency_matrix)
+
+        # save adjacency matrix to file
+        output_file = 'output/adjacency_matrix.csv'
+        adjacency_matrix.to_csv(output_file)
+        print(f"Adjacency matrix saved to {output_file}")
 
         print("\nWGCNA Workflow completed successfully.")
 

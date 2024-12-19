@@ -7,7 +7,7 @@ and then use that matrix to run DPMON for disease prediction.
 """
 
 import pandas as pd
-from bioneuralnet.graph_generation.smccnet import SmCCNet
+from bioneuralnet.graph_generation import SmCCNet
 from bioneuralnet.integrated_tasks import DPMON
 
 def run_smccnet_dpmon_workflow(omics_proteins: pd.DataFrame,
@@ -50,9 +50,9 @@ def run_smccnet_dpmon_workflow(omics_proteins: pd.DataFrame,
             omics_list=[omics_proteins, omics_metabolites],
             phenotype_data=phenotype_data,
             features_data=clinical_data,
-            model='GCN',  # Options: 'GAT', 'SAGE', 'GIN'
-            tune=False,   # Set to True for hyperparameter tuning
-            gpu=False     # Set to True if GPU is available and desired
+            model='GCN',  #
+            tune=False,  
+            gpu=False     
         )
 
         # Run DPMON
@@ -72,7 +72,6 @@ if __name__ == "__main__":
     try:
         print("Starting SmCCNet + DPMON Hybrid Workflow...")
 
-        # Example DataFrames (Replace with actual data loading as needed)
         omics_proteins = pd.DataFrame({
             'protein_feature1': [0.1, 0.2],
             'protein_feature2': [0.3, 0.4]
@@ -92,7 +91,6 @@ if __name__ == "__main__":
 
         predictions = run_smccnet_dpmon_workflow(omics_proteins, omics_metabolites, phenotype_data, clinical_data)
 
-        # Optionally, display or further process the predictions
         print("DPMON Predictions:")
         print(predictions)
 

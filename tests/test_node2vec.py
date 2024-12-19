@@ -1,3 +1,4 @@
+import os
 import unittest
 import pandas as pd
 from bioneuralnet.network_embedding import Node2VecEmbedding
@@ -26,14 +27,18 @@ class TestNode2VecEmbedding(unittest.TestCase):
         embeddings = node2vec.run()
 
         # Check if embeddings is a DataFrame
-        self.assertIsInstance(embeddings, pd.DataFrame)
+        self.assertIsInstance(embeddings, pd.DataFrame, f"Expected DataFrame, got {type(embeddings)} instead.")
 
         # Check if 'node' column exists
-        self.assertIn('node', embeddings.columns)
+        self.assertIn('node', embeddings.columns, "'node' column is missing in the embeddings DataFrame.")
 
         # Check if embedding dimensions are correct
         expected_columns = ['node'] + [str(i) for i in range(64)]
-        self.assertTrue(all(col in embeddings.columns for col in expected_columns))
+        self.assertTrue(
+            all(col in embeddings.columns for col in expected_columns),
+            f"Embeddings DataFrame is missing expected columns. Found: {embeddings.columns}"
+        )
+
 
     def test_get_embeddings_before_run(self):
         node2vec = Node2VecEmbedding(adjacency_matrix=self.adjacency_matrix)
@@ -59,7 +64,6 @@ class TestNode2VecEmbedding(unittest.TestCase):
         node2vec.save_embeddings('test_embeddings.csv')
 
         # Check if file exists
-        import os
         self.assertTrue(os.path.exists('test_embeddings.csv'))
 
         # Clean up

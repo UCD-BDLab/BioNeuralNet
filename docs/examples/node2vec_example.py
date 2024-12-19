@@ -13,8 +13,6 @@ def main():
     try:
         print("Starting Node2Vec Embedding Workflow...")
 
-        # Example Adjacency Matrix Data
-        # Replace this with your actual adjacency matrix DataFrame
         adjacency_matrix = pd.DataFrame({
             'GeneA': [1.0, 1.0, 0.0, 0.0],
             'GeneB': [1.0, 1.0, 1.0, 0.0],
@@ -25,12 +23,12 @@ def main():
         # Initialize Node2VecEmbedding Instance
         node2vec = Node2VecEmbedding(
             adjacency_matrix=adjacency_matrix,
-            embedding_dim=64,      # Dimension of the embeddings
-            walk_length=30,        # Length of each walk
-            num_walks=200,         # Number of walks per node
-            window_size=10,        # Window size for Word2Vec
-            workers=4,             # Number of worker threads
-            seed=42                # Random seed for reproducibility
+            embedding_dim=64,      
+            walk_length=30,        
+            num_walks=200,        
+            window_size=10,        
+            workers=4,             
+            seed=42                
         )
 
         # Run Node2Vec Embedding
@@ -40,10 +38,14 @@ def main():
         print("\nNode Embeddings:")
         print(embeddings)
 
-        # Optionally, save embeddings to a CSV file
-        save_path = 'node_embeddings.csv'
-        node2vec.save_embeddings(save_path)
-        print(f"\nEmbeddings saved to {save_path}")
+        # save_path = 'node_embeddings.csv'
+        # node2vec.save_embeddings(save_path)
+        # print(f"\nEmbeddings saved to {save_path}")
+
+        # We have a built in function to save the embeddings to a csv file
+        # But we can also save the embeddings to a csv file using the following code
+        output_file = 'output/embeddings.csv'
+        embeddings.to_csv(output_file)
 
         print("\nNode2Vec Embedding Workflow completed successfully.")
 

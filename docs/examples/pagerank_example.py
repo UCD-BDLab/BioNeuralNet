@@ -22,5 +22,9 @@ def main():
     cluster_nodes = results['cluster_nodes']
     print(f"Identified cluster with {len(cluster_nodes)} nodes.")
 
+    # Save results
+    results.to_csv('output/pagerank_results.csv')
+    print("PageRank clustering results saved to 'output/pagerank_results.csv'.")
+
 if __name__ == "__main__":
     main()

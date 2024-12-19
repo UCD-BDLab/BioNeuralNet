@@ -7,7 +7,7 @@ GNN-based embedding generation and subject representation integration.
 """
 
 import pandas as pd
-from bioneuralnet.graph_generation.smccnet import SmCCNet
+from bioneuralnet.graph_generation import SmCCNet
 from bioneuralnet.network_embedding import GnnEmbedding
 from bioneuralnet.subject_representation import GraphEmbedding
 
@@ -22,7 +22,6 @@ def run_smccnet_workflow(omics_data: pd.DataFrame,
         2. Generates an adjacency matrix using SmCCNet.
         3. Computes node features based on correlations.
         4. Generates embeddings using GnnEmbedding.
-        5. Integrates embeddings into omics data to produce enhanced omics data.
 
     Args:
         omics_data (pd.DataFrame): DataFrame containing omics features (e.g., proteins, metabolites).
@@ -49,8 +48,8 @@ def run_smccnet_workflow(omics_data: pd.DataFrame,
 
         # Step 3: Initialize and run GnnEmbedding
         node_features = pd.concat([
-            omics_data[['protein_feature1', 'protein_feature2']],  # Replace with actual feature names
-            omics_data[['metabolite_feature1', 'metabolite_feature2']]  # Replace with actual feature names
+            omics_data[['protein_feature1', 'protein_feature2']], 
+            omics_data[['metabolite_feature1', 'metabolite_feature2']]  
         ], axis=1)
 
         gnn_embedding = GnnEmbedding(
@@ -65,6 +64,11 @@ def run_smccnet_workflow(omics_data: pd.DataFrame,
         embeddings_tensor = embeddings_dict['graph']
         embeddings_df = pd.DataFrame(embeddings_tensor.numpy(), index=node_features.index)
         print("GNN embeddings generated.")
+        
+        #Embeddings can also be saved to a file
+        #output_file = 'output/embeddings.csv'
+        #embeddings_df.to_csv(output_file)
+        #print(f"Embeddings saved to {output_file}")
 
         # Step 4: Initialize and run GraphEmbedding
         graph_embedding = GraphEmbedding(
@@ -87,7 +91,6 @@ if __name__ == "__main__":
     try:
         print("Starting SmCCNet and GNNs Workflow...")
 
-        # Example DataFrames (Replace with actual data loading as needed)
         omics_data = pd.DataFrame({
             'protein_feature1': [0.1, 0.2],
             'protein_feature2': [0.3, 0.4],
@@ -104,7 +107,6 @@ if __name__ == "__main__":
 
         enhanced_omics = run_smccnet_workflow(omics_data, phenotype_data, clinical_data)
 
-        # Optionally, display or further process the enhanced omics data
         print("Enhanced Omics Data:")
         print(enhanced_omics)
 

@@ -18,6 +18,7 @@ def main():
     
     G = static_vis.generate_graph()
     static_vis.visualize(G)
+    print("Static visualization workflow completed successfully.")
 
 if __name__ == "__main__":
     main()

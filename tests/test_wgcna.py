@@ -1,146 +1,141 @@
 import unittest
 from unittest.mock import patch, MagicMock
 import pandas as pd
+from bioneuralnet.graph_generation import WGCNA
+import os
 import subprocess
-from bioneuralnet.graph_generation.wgcna import WGCNA
 
 class TestWGCNA(unittest.TestCase):
 
+    def setUp(self):
+        # Sample phenotype dataframe
+        self.phenotype_df = pd.DataFrame({
+            'SampleID': ['S1', 'S2', 'S3', 'S4'],
+            'Phenotype': ['Control', 'Treatment', 'Control', 'Treatment']
+        })
+
+        # Sample omics dataframes
+        self.omics_df1 = pd.DataFrame({
+            'SampleID': ['S1', 'S2', 'S3', 'S4'],
+            'GeneA': [1.2, 2.3, 3.1, 4.0],
+            'GeneB': [2.1, 3.4, 1.2, 3.3],
+            'GeneC': [3.3, 1.5, 2.2, 4.1]
+        })
+
+        self.omics_df2 = pd.DataFrame({
+            'SampleID': ['S1', 'S2', 'S3', 'S4'],
+            'GeneD': [4.2, 5.3, 6.1, 7.0],
+            'GeneE': [5.1, 6.4, 4.2, 6.3],
+            'GeneF': [6.3, 4.5, 5.2, 7.1]
+        })
+
+        self.omics_dfs = [self.omics_df1, self.omics_df2]
+        self.data_types = ['Transcriptomics', 'Proteomics']
+
     @patch('bioneuralnet.graph_generation.wgcna.subprocess.run')
-    @patch('bioneuralnet.graph_generation.wgcna.WGCNA._create_output_dir')
-    @patch('bioneuralnet.graph_generation.wgcna.WGCNA.preprocess_data')
-    @patch('bioneuralnet.graph_generation.wgcna.WGCNA.load_global_network')
-    def test_run_wgcna_success(self, mock_load_global, mock_preprocess, mock_create_output_dir, mock_subprocess):
-        # Mock the output directory creation
-        mock_create_output_dir.return_value = 'wgcna_output_1'
-
-        # Mock the subprocess.run to simulate successful R script execution
-        mock_subprocess.return_value = MagicMock(stdout='Success', stderr='')
-
-        # Mock the load_global_network to return a dummy DataFrame
-        dummy_df = pd.DataFrame({'Gene1': [1, 0], 'Gene2': [0, 1]}, index=['Gene1', 'Gene2'])
-        mock_load_global.return_value = dummy_df
+    def test_wgcna_successful_run(self, mock_run):
+        # Mock the subprocess.run to return a successful response
+        mock_completed_process = MagicMock()
+        mock_completed_process.returncode = 0
+        mock_completed_process.stdout = '{"columns":["GeneA","GeneB","GeneC","GeneD","GeneE","GeneF"],"index":["GeneA","GeneB","GeneC","GeneD","GeneE","GeneF"],"data":[[1,0.8,0.3,0.5,0.2,0.1],[0.8,1,0.4,0.6,0.3,0.2],[0.3,0.4,1,0.7,0.4,0.3],[0.5,0.6,0.7,1,0.5,0.4],[0.2,0.3,0.4,0.5,1,0.5],[0.1,0.2,0.3,0.4,0.5,1]]}'
+        mock_run.return_value = mock_completed_process
 
         wgcna = WGCNA(
-            phenotype_file='input/phenotype_data.csv',
-            omics_list=['input/genes.csv', 'input/miRNA.csv'],
-            data_types=['gene', 'miRNA'],
+            phenotype_df=self.phenotype_df,
+            omics_dfs=self.omics_dfs,
+            data_types=self.data_types,
             soft_power=6,
             min_module_size=30,
-            merge_cut_height=0.25,
+            merge_cut_height=0.25
         )
-
-        result = wgcna.run()
-
-        # Assertions
-        mock_create_output_dir.assert_called_once()
-        mock_preprocess.assert_called_once()
-        mock_subprocess.assert_called_once()
-        mock_load_global.assert_called_once_with('wgcna_output_1')
-
-        self.assertTrue(isinstance(result, pd.DataFrame))
-        self.assertEqual(result.shape, (2, 2))
-        self.assertListEqual(list(result.columns), ['Gene1', 'Gene2'])
+        adjacency_matrix = wgcna.run()
+        self.assertIsInstance(adjacency_matrix, pd.DataFrame)
+        self.assertFalse(adjacency_matrix.isnull().values.any())
+        self.assertEqual(adjacency_matrix.shape, (6, 6))
+        self.assertListEqual(list(adjacency_matrix.columns), ['GeneA', 'GeneB', 'GeneC', 'GeneD', 'GeneE', 'GeneF'])
+        self.assertListEqual(list(adjacency_matrix.index), ['GeneA', 'GeneB', 'GeneC', 'GeneD', 'GeneE', 'GeneF'])
+        self.assertAlmostEqual(adjacency_matrix.loc['GeneA', 'GeneB'], 0.8)
+        self.assertAlmostEqual(adjacency_matrix.loc['GeneD', 'GeneF'], 0.4)
 
     @patch('bioneuralnet.graph_generation.wgcna.subprocess.run')
-    @patch('bioneuralnet.graph_generation.wgcna.WGCNA._create_output_dir')
-    @patch('bioneuralnet.graph_generation.wgcna.WGCNA.preprocess_data')
-    def test_run_wgcna_r_script_failure(self, mock_preprocess, mock_create_output_dir, mock_subprocess):
-        # Mock the output directory creation
-        mock_create_output_dir.return_value = 'wgcna_output_2'
-
-        # Mock the subprocess.run to simulate R script execution failure
-        mock_subprocess.side_effect = subprocess.CalledProcessError(
+    def test_wgcna_run_failure(self, mock_run):
+        # Mock the subprocess.run to raise CalledProcessError
+        mock_run.side_effect = subprocess.CalledProcessError(
             returncode=1,
             cmd='Rscript WGCNA.R',
-            stderr='Error executing R script'
+            stderr='Error in readLines(con = "stdin") : incomplete final line found on \'stdin\'\n'
         )
 
         wgcna = WGCNA(
-            phenotype_file='input/phenotype_data.csv',
-            omics_list=['input/genes.csv', 'input/miRNA.csv'],
-            data_types=['gene', 'miRNA'],
+            phenotype_df=self.phenotype_df,
+            omics_dfs=self.omics_dfs,
+            data_types=self.data_types,
             soft_power=6,
             min_module_size=30,
-            merge_cut_height=0.25,
+            merge_cut_height=0.25
         )
 
         with self.assertRaises(subprocess.CalledProcessError):
             wgcna.run()
 
-        # Assertions
-        mock_create_output_dir.assert_called_once()
-        mock_preprocess.assert_called_once()
-        mock_subprocess.assert_called_once()
+    def test_mismatched_omics_and_data_types(self):
+        with self.assertRaises(ValueError):
+            WGCNA(
+                phenotype_df=self.phenotype_df,
+                omics_dfs=self.omics_dfs,
+                data_types=['Transcriptomics'],  # Mismatch in length
+                soft_power=6,
+                min_module_size=30,
+                merge_cut_height=0.25
+            )
 
-    @patch('bioneuralnet.graph_generation.wgcna.pd.read_csv')
-    @patch('bioneuralnet.graph_generation.wgcna.os.path.isfile')
-    def test_load_global_network_success(self, mock_isfile, mock_read_csv):
-        # Setup the mocks
-        mock_isfile.return_value = True
-        mock_read_csv.return_value = pd.DataFrame({'Gene1': [1, 0], 'Gene2': [0, 1]}, index=['Gene1', 'Gene2'])
-
-        wgcna = WGCNA(
-            phenotype_file='input/phenotype_data.csv',
-            omics_list=['input/genes.csv', 'input/miRNA.csv'],
-            data_types=['gene', 'miRNA'],
-            soft_power=6,
-            min_module_size=30,
-            merge_cut_height=0.25,
+    @patch('bioneuralnet.graph_generation.wgcna.subprocess.run')
+    def test_no_valid_samples(self, mock_run):
+        # Mock the subprocess.run to raise CalledProcessError
+        mock_run.side_effect = subprocess.CalledProcessError(
+            returncode=1,
+            cmd='Rscript WGCNA.R',
+            stderr='Error: No valid samples after preprocessing.\nExecution halted'
         )
 
-        result = wgcna.load_global_network('wgcna_output_1')
-        
-        mock_isfile.assert_called_once_with('wgcna_output_1/global_network.csv')
-        mock_read_csv.assert_called_once_with('wgcna_output_1/global_network.csv', index_col=0)
-        
-        self.assertTrue(isinstance(result, pd.DataFrame))
-        self.assertEqual(result.shape, (2, 2))
-
-    @patch('bioneuralnet.graph_generation.wgcna.pd.read_csv')
-    @patch('bioneuralnet.graph_generation.wgcna.os.path.isfile')
-    def test_load_global_network_file_not_found(self, mock_isfile, mock_read_csv):
-        # Setup the mocks
-        mock_isfile.return_value = False
+        # Introduce NaN values to make all samples invalid
+        self.omics_dfs[0].iloc[0, 1] = pd.NA
+        self.omics_dfs[1].iloc[1, 2] = pd.NA
 
         wgcna = WGCNA(
-            phenotype_file='input/phenotype_data.csv',
-            omics_list=['input/genes.csv', 'input/miRNA.csv'],
-            data_types=['gene', 'miRNA'],
+            phenotype_df=self.phenotype_df,
+            omics_dfs=self.omics_dfs,
+            data_types=self.data_types,
             soft_power=6,
             min_module_size=30,
-            merge_cut_height=0.25,
+            merge_cut_height=0.25
         )
 
-        with self.assertRaises(FileNotFoundError):
-            wgcna.load_global_network('wgcna_output_1')
+        with self.assertRaises(subprocess.CalledProcessError):
+            wgcna.run()
 
-        # Assertions
-        mock_isfile.assert_called_once_with('wgcna_output_1/global_network.csv')
-        mock_read_csv.assert_not_called()
-
-    @patch('bioneuralnet.graph_generation.wgcna.pd.read_csv')
-    @patch('bioneuralnet.graph_generation.wgcna.os.path.isfile')
-    def test_load_global_network_empty_csv(self, mock_isfile, mock_read_csv):
-        # Setup the mocks
-        mock_isfile.return_value = True
-        mock_read_csv.side_effect = pd.errors.EmptyDataError
+    @patch('bioneuralnet.graph_generation.wgcna.subprocess.run')
+    def test_save_adjacency_matrix(self, mock_run):
+        # Mock the subprocess.run to return a successful response
+        mock_completed_process = MagicMock()
+        mock_completed_process.returncode = 0
+        mock_completed_process.stdout = '{"columns":["GeneA","GeneB","GeneC","GeneD","GeneE","GeneF"],"index":["GeneA","GeneB","GeneC","GeneD","GeneE","GeneF"],"data":[[1,0.8,0.3,0.5,0.2,0.1],[0.8,1,0.4,0.6,0.3,0.2],[0.3,0.4,1,0.7,0.4,0.3],[0.5,0.6,0.7,1,0.5,0.4],[0.2,0.3,0.4,0.5,1,0.5],[0.1,0.2,0.3,0.4,0.5,1]]}'
+        mock_run.return_value = mock_completed_process
 
         wgcna = WGCNA(
-            phenotype_file='input/phenotype_data.csv',
-            omics_list=['input/genes.csv', 'input/miRNA.csv'],
-            data_types=['gene', 'miRNA'],
+            phenotype_df=self.phenotype_df,
+            omics_dfs=self.omics_dfs,
+            data_types=self.data_types,
             soft_power=6,
             min_module_size=30,
-            merge_cut_height=0.25,
+            merge_cut_height=0.25
         )
-
-        with self.assertRaises(pd.errors.EmptyDataError):
-            wgcna.load_global_network('wgcna_output_1')
-
-        # Assertions
-        mock_isfile.assert_called_once_with('wgcna_output_1/global_network.csv')
-        mock_read_csv.assert_called_once_with('wgcna_output_1/global_network.csv', index_col=0)
+        adjacency_matrix = wgcna.run()
+        save_path = 'test_adjacency_matrix.json'
+        adjacency_matrix.to_json(save_path, orient='split')
+        self.assertTrue(os.path.exists(save_path))
+        # Clean up
+        os.remove(save_path)
 
 if __name__ == '__main__':
     unittest.main()

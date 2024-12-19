@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 import networkx as nx
 
-from bioneuralnet.analysis.static_visualization import StaticVisualizer
+from bioneuralnet.analysis import StaticVisualizer
 from unittest import mock
 
 @pytest.fixture
