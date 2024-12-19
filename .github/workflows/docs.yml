@@ -2,11 +2,9 @@ name: Build Documentation for Read the Docs
 
 on:
   push:
-    branches:
-      - main  
+    branches: [ main ]
   pull_request:
-    branches:
-      - main  
+    branches: [ main ]
 
 jobs:
   build-docs:
@@ -22,18 +20,28 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.8'
+          check-latest: true
 
-      - name: Install Documentation Dependencies
+      - name: List repository contents
+        run: ls -la
+
+      - name: List docs directory contents
+        run: ls -la docs/
+
+      - name: Run setup-env.sh (Non-Interactive)
+        env:
+          INSTALL_TYPE: 1   # cpu only
+          INSTALL_DEV: y    # dev dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
-          pip install sphinx sphinx_rtd_theme
+          chmod +x scripts/setup-env.sh
+          ./scripts/setup-env.sh
 
       - name: Build Documentation
         run: |
-          sphinx-build -b html source/ build/html/
+          source .venv/bin/activate
+          sphinx-build -b html docs/source/ docs/build/html/
 
       - name: Validate Documentation Build
         run: |
-          echo "Documentation build completed successfully. Files are located in build/html/"
-          ls -R build/html/
+          echo "Documentation build completed successfully. Files are located in docs/build/html/"
+          ls -R docs/build/html/

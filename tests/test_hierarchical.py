@@ -1,48 +1,40 @@
-# import unittest
-# from unittest.mock import patch, MagicMock
-# import pandas as pd
-# from bioneuralnet.clustering import HierarchicalClustering
+import unittest
+import pandas as pd
+from bioneuralnet.clustering import HierarchicalClustering
 
-# class TestHierarchicalClustering(unittest.TestCase):
+class TestHierarchicalClustering(unittest.TestCase):
 
-#     @patch('pandas.read_csv')
-#     def test_load_data(self, mock_read_csv):
-#         # Mock the pandas.read_csv function
-#         mock_adjacency_matrix = pd.DataFrame([[0,1],[1,0]], index=['node1','node2'], columns=['node1','node2'])
-#         mock_read_csv.return_value = mock_adjacency_matrix
+    def setUp(self):
+        # Sample adjacency matrix
+        self.adjacency_matrix = pd.DataFrame({
+            'GeneA': [1.0, 0.8, 0.3],
+            'GeneB': [0.8, 1.0, 0.4],
+            'GeneC': [0.3, 0.4, 1.0]
+        }, index=['GeneA', 'GeneB', 'GeneC'])
 
-#         hierarchical_cluster = HierarchicalClustering(adjacency_matrix_file='input/global_network.csv')
+    def test_clustering_output(self):
+        hc = HierarchicalClustering(adjacency_matrix=self.adjacency_matrix, n_clusters=2, linkage='ward', affinity='euclidean')
+        results = hc.run()
+        
+        # Check if cluster_labels is a DataFrame
+        self.assertIsInstance(results['cluster_labels'], pd.DataFrame)
+        
+        # Check if silhouette_score is a float or None
+        self.assertTrue(isinstance(results['silhouette_score'], float) or results['silhouette_score'] is None)
+        
+        # Check the number of unique clusters
+        unique_clusters = results['cluster_labels']['cluster'].nunique()
+        self.assertEqual(unique_clusters, 2)
 
-#         hierarchical_cluster.load_data()
+    def test_without_running_clustering(self):
+        hc = HierarchicalClustering(adjacency_matrix=self.adjacency_matrix)
+        with self.assertRaises(ValueError):
+            hc.get_results()
 
-#         # Assertions
-#         self.assertTrue(hierarchical_cluster.adjacency_matrix.equals(mock_adjacency_matrix))
+    def test_invalid_affinity_with_ward_linkage(self):
+        hc = HierarchicalClustering(adjacency_matrix=self.adjacency_matrix, linkage='ward', affinity='cosine')
+        with self.assertRaises(ValueError):
+            hc.run()
 
-#     @patch('bioneuralnet.clustering.hierarchical.AgglomerativeClustering')
-#     @patch('bioneuralnet.clustering.hierarchical.HierarchicalClustering.load_data')
-#     @patch('pandas.DataFrame.to_csv')
-#     def test_run_clustering(self, mock_to_csv, mock_load_data, mock_agglomerative_clustering):
-#         # Mock the load_data method
-#         mock_load_data.return_value = None
-
-#         # Mock the adjacency matrix
-#         hierarchical_cluster = HierarchicalClustering(adjacency_matrix_file='input/global_network.csv')
-#         hierarchical_cluster.adjacency_matrix = pd.DataFrame([[0,1],[1,0]], index=['node1','node2'], columns=['node1','node2'])
-
-#         # Mock the AgglomerativeClustering
-#         mock_model = MagicMock()
-#         mock_model.fit_predict.return_value = [0,1]
-#         mock_agglomerative_clustering.return_value = mock_model
-
-#         # Run the clustering
-#         results = hierarchical_cluster.run_clustering()
-
-#         # Assertions
-#         mock_agglomerative_clustering.assert_called_once()
-#         mock_model.fit_predict.assert_called_once()
-#         mock_to_csv.assert_any_call(f"{hierarchical_cluster.output_dir}/cluster_labels.csv", index=False)
-#         self.assertIn('cluster_labels', results)
-#         self.assertEqual(len(results['cluster_labels']), 2)
-
-# if __name__ == '__main__':
-#     unittest.main()
+if __name__ == '__main__':
+    unittest.main()

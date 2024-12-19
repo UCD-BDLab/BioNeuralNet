@@ -42,16 +42,15 @@ And for disease prediction tasks leveraging embeddings:
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
    installation
-   usage
-   tutorials
+   tools/index
+   tutorials/index
    api_reference
-   _autosummary/index
+   faq
 
 Indices and tables
-=================
+==================
 
 * :ref:`genindex`
 * :ref:`modindex`

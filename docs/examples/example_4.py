@@ -1,5 +1,5 @@
 """
-Hybrid Example 4: SmCCNet + PageRank Clustering + Visualization
+Example 4: SmCCNet + PageRank Clustering + Visualization
 
 This example demonstrates how to:
 1. Construct a network using SmCCNet from multi-omics data.

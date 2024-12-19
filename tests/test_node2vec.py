@@ -1,70 +1,70 @@
-# import unittest
-# from unittest.mock import patch, MagicMock
-# import pandas as pd
-# from bioneuralnet.network_embedding.node2vec import Node2VecEmbedding
+import unittest
+import pandas as pd
+from bioneuralnet.network_embedding import Node2VecEmbedding
 
-# class TestNode2VecEmbedding(unittest.TestCase):
 
-#     @patch('bioneuralnet.network_embedding.node2vec.Node2Vec')
-#     @patch('bioneuralnet.network_embedding.node2vec.Node2VecEmbedding.load_graphs_from_directory')
-#     def test_run_node2vec_embedding_success(self, mock_load_graphs, mock_node2vec_class):
-#         # Mock the load_graphs_from_directory method
-#         mock_graphs = {
-#             'graph1': pd.DataFrame([[0,1],[1,0]], index=['node1','node2'], columns=['node1','node2'])
-#         }
-#         mock_load_graphs.return_value = mock_graphs
+class TestNode2VecEmbedding(unittest.TestCase):
 
-#         # Mock the Node2Vec model
-#         mock_model = MagicMock()
-#         mock_wv = MagicMock()
-#         mock_wv.vectors = [[0.1, 0.2], [0.3, 0.4]]
-#         mock_wv.index_to_key = ['node1', 'node2']
-#         mock_model.fit.return_value = MagicMock(wv=mock_wv)
-#         mock_node2vec_class.return_value = mock_model
+    def setUp(self):
+        # Sample adjacency matrix
+        self.adjacency_matrix = pd.DataFrame({
+            'GeneA': [1.0, 1.0, 0.0],
+            'GeneB': [1.0, 1.0, 1.0],
+            'GeneC': [0.0, 1.0, 1.0]
+        }, index=['GeneA', 'GeneB', 'GeneC'])
 
-#         # Initialize Node2VecEmbedding
-#         node2vec_embedding = Node2VecEmbedding(
-#             input_dir='input/graphs/',
-#             embedding_dim=128,
-#             walk_length=80,
-#             num_walks=10,
-#             window_size=10,
-#             workers=4,
-#             seed=42,
-#             output_dir='test_output_dir'
-#         )
+    def test_embedding_output(self):
+        node2vec = Node2VecEmbedding(
+            adjacency_matrix=self.adjacency_matrix,
+            embedding_dim=64,
+            walk_length=30,
+            num_walks=200,
+            window_size=10,
+            workers=2,
+            seed=123
+        )
+        embeddings = node2vec.run()
 
-#         # Run the embedding
-#         embeddings = node2vec_embedding.run()
+        # Check if embeddings is a DataFrame
+        self.assertIsInstance(embeddings, pd.DataFrame)
 
-#         # Assertions
-#         mock_load_graphs.assert_called_once()
-#         mock_node2vec_class.assert_called_once()
-#         self.assertIn('graph1', embeddings)
-#         embeddings_df = embeddings['graph1']
-#         self.assertEqual(len(embeddings_df), 2)
-#         self.assertListEqual(embeddings_df['node'].tolist(), ['node1', 'node2'])
-#         self.assertEqual(embeddings_df.shape[1], 1 + node2vec_embedding.embedding_dim)
+        # Check if 'node' column exists
+        self.assertIn('node', embeddings.columns)
 
-#     @patch('bioneuralnet.network_embedding.node2vec.find_files')
-#     @patch('pandas.read_csv')
-#     def test_load_graphs_from_directory(self, mock_read_csv, mock_find_files):
-#         # Mock the find_files function
-#         mock_find_files.return_value = ['graph1.csv', 'graph2.csv']
+        # Check if embedding dimensions are correct
+        expected_columns = ['node'] + [str(i) for i in range(64)]
+        self.assertTrue(all(col in embeddings.columns for col in expected_columns))
 
-#         # Mock the pandas.read_csv function
-#         mock_adjacency_matrix = pd.DataFrame([[0,1],[1,0]], index=['node1','node2'], columns=['node1','node2'])
-#         mock_read_csv.return_value = mock_adjacency_matrix
+    def test_get_embeddings_before_run(self):
+        node2vec = Node2VecEmbedding(adjacency_matrix=self.adjacency_matrix)
+        with self.assertRaises(ValueError):
+            node2vec.get_embeddings()
 
-#         node2vec_embedding = Node2VecEmbedding(input_dir='input/graphs/')
+    def test_save_embeddings_before_run(self):
+        node2vec = Node2VecEmbedding(adjacency_matrix=self.adjacency_matrix)
+        with self.assertRaises(ValueError):
+            node2vec.save_embeddings('embeddings.csv')
 
-#         graphs = node2vec_embedding.load_graphs_from_directory()
+    def test_save_embeddings_after_run(self):
+        node2vec = Node2VecEmbedding(
+            adjacency_matrix=self.adjacency_matrix,
+            embedding_dim=64,
+            walk_length=30,
+            num_walks=200,
+            window_size=10,
+            workers=2,
+            seed=123
+        )
+        embeddings = node2vec.run()
+        node2vec.save_embeddings('test_embeddings.csv')
 
-#         # Assertions
-#         self.assertEqual(len(graphs), 2)
-#         self.assertIn('graph1', graphs)
-#         self.assertIn('graph2', graphs)
-#         self.assertTrue(graphs['graph1'].equals(mock_adjacency_matrix))
+        # Check if file exists
+        import os
+        self.assertTrue(os.path.exists('test_embeddings.csv'))
 
-# if __name__ == '__main__':
-#     unittest.main()
+        # Clean up
+        os.remove('test_embeddings.csv')
+
+
+if __name__ == '__main__':
+    unittest.main()
