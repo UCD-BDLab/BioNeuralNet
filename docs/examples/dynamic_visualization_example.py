@@ -18,6 +18,7 @@ def main():
     
     G = dynamic_vis.generate_graph()
     dynamic_vis.visualize(G)
+    print("Dynamic visualization workflow completed successfully.")
 
 if __name__ == "__main__":
     main()

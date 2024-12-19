@@ -12,23 +12,28 @@ import pandas as pd
 import networkx as nx
 
 from bioneuralnet.graph_generation import SmCCNet
-from bioneuralnet.clustering.pagerank import PageRank
+from bioneuralnet.clustering import PageRank
 from bioneuralnet.analysis import StaticVisualizer
 
 def run_smccnet_pagerank_visualization_workflow():
-    # Step 1: Instantiate SmCCNet parameters
+    # Step 1: Load omics, phenotype, and clinical data
+    omics_proteins = pd.read_csv('input/proteins.csv', index_col=0)
+    omics_metabolites = pd.read_csv('input/metabolites.csv', index_col=0)
+    phenotype_data = pd.read_csv('input/phenotype_data.csv', index_col=0).squeeze()
+
+    # Combine omics data into a list of DataFrames
+    omics_dfs = [omics_proteins, omics_metabolites]
+    data_types = ['protein', 'metabolite']
+
+    # Step 2: Instantiate SmCCNet with data structures
     smccnet_instance = SmCCNet(
-        phenotype_file='input/phenotype_data.csv',
-        omics_list=['input/proteins.csv', 'input/metabolites.csv'],
-        data_types=['protein', 'metabolite'],
+        phenotype_data=phenotype_data,
+        omics_dfs=omics_dfs,
+        data_types=data_types,
         kfold=5,
         summarization='PCA',
         seed=732
     )
-
-    # Step 2: Load omics, phenotype, and clinical data
-    omics_data = pd.read_csv('input/omics_data.csv', index_col=0)
-    phenotype_data = pd.read_csv('input/phenotype_data.csv', index_col=0).squeeze()
 
     # Step 3: Generate adjacency matrix using SmCCNet
     adjacency_matrix = smccnet_instance.run()
@@ -39,11 +44,10 @@ def run_smccnet_pagerank_visualization_workflow():
     # Step 4: Convert adjacency matrix to a NetworkX graph
     G = nx.from_pandas_adjacency(adjacency_matrix)
 
-    # Step 5: Run PageRank clustering
-    # Initialize PageRank clustering instance
+    # Step 5: Run PageRank clustering: First we initialize PageRank clustering instance
     pagerank_instance = PageRank(
         graph=G,
-        omics_data=omics_data,
+        omics_data=pd.concat(omics_dfs, axis=1),
         phenotype_data=phenotype_data,
         alpha=0.9,
         max_iter=100,
@@ -52,7 +56,6 @@ def run_smccnet_pagerank_visualization_workflow():
         output_dir='pagerank_output'
     )
 
-    # Choose seed nodes (adjust based on your graph)
     seed_nodes = ['node1', 'node2'] 
 
     try:
@@ -80,4 +83,3 @@ def run_smccnet_pagerank_visualization_workflow():
 
 if __name__ == "__main__":
     run_smccnet_pagerank_visualization_workflow()
-

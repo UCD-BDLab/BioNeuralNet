@@ -3,7 +3,7 @@ from typing import Dict, Optional
 import pandas as pd
 import networkx as nx
 from node2vec import Node2Vec
-import logging
+from ..utils.logger import get_logger
 
 
 class Node2VecEmbedding:
@@ -55,16 +55,7 @@ class Node2VecEmbedding:
         self.seed = seed
 
         # Initialize logger
-        self.logger = logging.getLogger(self.__class__.__name__)
-        if not self.logger.handlers:
-            # Prevent adding multiple handlers if already added
-            handler = logging.StreamHandler()
-            formatter = logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-            )
-            handler.setFormatter(formatter)
-            self.logger.addHandler(handler)
-            self.logger.setLevel(logging.INFO)
+        self.logger = get_logger(__name__)
 
         self.logger.info("Initialized Node2VecEmbedding with the following parameters:")
         self.logger.info(f"Embedding Dimension: {self.embedding_dim}")
@@ -113,7 +104,7 @@ class Node2VecEmbedding:
                 num_walks=self.num_walks,
                 workers=self.workers,
                 seed=self.seed,
-                quiet=True  # Suppress Node2Vec output
+                quiet=True 
             )
 
             self.logger.info("Fitting Node2Vec model to generate embeddings.")
@@ -122,7 +113,8 @@ class Node2VecEmbedding:
             self.logger.info("Generating embeddings DataFrame.")
             embeddings_df = pd.DataFrame(
                 model.wv.vectors,
-                index=model.wv.index_to_key
+                index=model.wv.index_to_key,
+                columns=[str(i) for i in range(self.embedding_dim)] 
             )
             embeddings_df.index.name = 'node'
             embeddings_df.reset_index(inplace=True)
@@ -133,6 +125,7 @@ class Node2VecEmbedding:
         except Exception as e:
             self.logger.error(f"Error generating embeddings with Node2Vec: {e}")
             raise
+
 
     def run(self) -> pd.DataFrame:
         """

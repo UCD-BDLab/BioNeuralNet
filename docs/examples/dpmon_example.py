@@ -9,7 +9,6 @@ def main():
     clinical_data_df = pd.read_csv('input/clinical_data.csv', index_col=0)
 
     # Initialize DPMON
-    # Mandatory parameters: adjacency_matrix, omics_list, phenotype_file, features_file, and model type
     dpmon = DPMON(
         adjacency_matrix=adjacency_matrix,
         omics_list=[protein_data, metabolite_data],
