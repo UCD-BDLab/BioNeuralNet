@@ -78,6 +78,11 @@ def run_wgcna_workflow_with_gnn(omics_data: pd.DataFrame,
         enhanced_omics_data = graph_embedding.run()
         print("Embeddings integrated into omics data.")
 
+        # Enhanced omics data can be saved to a file
+        #output_file = 'output/enhanced_omics_data.csv'
+        #enhanced_omics_data.to_csv(output_file)
+        #print(f"Enhanced omics data saved to {output_file}")
+
         return enhanced_omics_data
 
     except Exception as e:

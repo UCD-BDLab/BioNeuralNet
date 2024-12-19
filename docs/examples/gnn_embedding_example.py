@@ -21,7 +21,6 @@ def main():
         'GeneF': [6.3, 4.5, 5.2, 7.1]
     })
 
-    # Example Clinical DataFrame
     clinical_data_df = pd.DataFrame({
         'SampleID': ['S1', 'S2', 'S3', 'S4'],
         'Age': [30, 40, 50, 60],
