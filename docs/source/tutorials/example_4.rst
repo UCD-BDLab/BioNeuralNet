@@ -1,5 +1,5 @@
-Hybrid Example 4: SmCCNet + PageRank Clustering + Visualization
-==============================================================
+Example 4: SmCCNet + PageRank Clustering + Visualization
+===============================================================
 
 This tutorial demonstrates a comprehensive workflow that integrates the following steps:
 
@@ -20,7 +20,7 @@ This tutorial demonstrates a comprehensive workflow that integrates the followin
 
 2. **Run SmCCNet**:
 
-   .. literalinclude:: ../examples/hybrid_example_4.py
+   .. literalinclude:: ../../examples/example_4.py
       :language: python
       :lines: 21-31
       :caption: Running SmCCNet to generate the adjacency matrix.
@@ -29,7 +29,7 @@ This tutorial demonstrates a comprehensive workflow that integrates the followin
 
 3. **Run PageRank Clustering**:
 
-   .. literalinclude:: ../examples/hybrid_example_4.py
+   .. literalinclude:: ../../examples/example_4.py
       :language: python
       :lines: 42-65
       :caption: Running PageRank-based clustering.
@@ -38,9 +38,9 @@ This tutorial demonstrates a comprehensive workflow that integrates the followin
 
 4. **Visualization**:
 
-   .. literalinclude:: ../examples/hybrid_example_4.py
+   .. literalinclude:: ../../examples/example_4.py
       :language: python
-      :lines: 76-90
+      :lines: 76-83
       :caption: Visualizing the identified cluster.
 
    With the resulting cluster, a subgraph is extracted and visualized using a static visualization tool. The resulting image is saved to the output directory.
@@ -49,9 +49,9 @@ This tutorial demonstrates a comprehensive workflow that integrates the followin
 
 To run this example:
    
-.. code-block:: bash
-
-   python examples/hybrid_example_4.py
+.. literalinclude:: ../../examples/example_1.py
+      :language: python
+      :caption: SmCCNet + PageRank Clustering + Visualization
 
 Upon successful execution, you will find the adjacency matrix (from SmCCNet), the PageRank clustering results saved in `pagerank_output`, and a network visualization image in `visualization_output`.
 

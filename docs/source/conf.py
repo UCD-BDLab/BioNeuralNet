@@ -20,6 +20,7 @@ extensions = [
     'sphinx.ext.viewcode',     
     'sphinx.ext.autosummary',  
     'sphinx.ext.intersphinx', 
+    #'sphinx.ext.mathjax',
 ]
 
 autosummary_generate = True

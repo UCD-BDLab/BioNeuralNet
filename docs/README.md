@@ -2,6 +2,35 @@
 
 Welcome to the BioNeuralNet documentation. This directory contains all the source files and configurations necessary to build and maintain the project's documentation using [Sphinx](https://www.sphinx-doc.org/).
 
+rebuilding documentation
+```
+4. Rebuilding the Documentation
+
+After making the above changes, follow these steps to rebuild your documentation:
+
+    Remove the _autosummary Directory:
+
+rm -rf docs/source/_autosummary
+
+Clean the Build Directory (Optional but Recommended):
+
+rm -rf docs/build/html/*
+
+Rebuild with Sphinx:
+
+sphinx-build -b html -E docs/source/ docs/build/html/
+
+    Flags Explained:
+        -b html: Specifies the builder (HTML in this case).
+        -E: Forces a full rebuild, ignoring cached information.
+
+Check the Build Output:
+
+    Ensure that the build completes with fewer or no duplicate object description warnings.
+    Open docs/build/html/index.html in your browser to verify the documentation's appearance.
+
+```
+
 ## **Contents**
 
 - **source/**: Contains the reStructuredText (`.rst`) files and Sphinx configuration (`conf.py`) used to generate the documentation.
