@@ -1,11 +1,9 @@
 from typing import Dict, Any
-
 import pandas as pd
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import StandardScaler
 from ..utils.logger import get_logger
-
 
 class HierarchicalClustering:
     """
@@ -74,7 +72,6 @@ class HierarchicalClustering:
         try:
             if self.scale_data and self.scaler is not None:
                 scaled_array = self.scaler.fit_transform(self.adjacency_matrix.values)
-                # Convert back to DataFrame with original index and columns
                 self.scaled_feature_matrix = pd.DataFrame(
                     scaled_array,
                     index=self.adjacency_matrix.index,
@@ -82,7 +79,6 @@ class HierarchicalClustering:
                 )
                 self.logger.info("Data has been scaled using StandardScaler.")
             else:
-                # Retain the original DataFrame
                 self.scaled_feature_matrix = self.adjacency_matrix.copy()
                 self.logger.info("Data scaling skipped.")
         except Exception as e:
@@ -95,7 +91,6 @@ class HierarchicalClustering:
         Executes the hierarchical clustering algorithm.
         """
         try:
-            # Update: Replace 'affinity' with 'metric' and ensure compatibility with 'ward' linkage
             metric = 'euclidean' if self.linkage == 'ward' else self.affinity
             model = AgglomerativeClustering(
                 n_clusters=self.n_clusters,
@@ -106,7 +101,6 @@ class HierarchicalClustering:
             self.labels = model.fit_predict(self.scaled_feature_matrix)
             self.logger.info("Hierarchical clustering completed.")
 
-            # Compute silhouette score if applicable
             if metric in ['euclidean', 'l1', 'l2', 'manhattan', 'cosine']:
                 try:
                     self.silhouette_avg = silhouette_score(self.scaled_feature_matrix, self.labels, metric=metric)
@@ -118,7 +112,6 @@ class HierarchicalClustering:
                 self.logger.warning(f"Silhouette score not computed for metric '{metric}'.")
                 self.silhouette_avg = None
 
-            # Create a DataFrame with cluster labels
             self.cluster_labels_df = pd.DataFrame({
                 'node': self.adjacency_matrix.index,
                 'cluster': self.labels

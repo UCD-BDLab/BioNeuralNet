@@ -1,15 +1,12 @@
 import os
 from typing import List, Tuple, Dict, Any, Optional
 from datetime import datetime
-
 import pandas as pd
 import networkx as nx
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from scipy.stats import pearsonr
-
 from ..utils.logger import get_logger
-
 
 class PageRank:
     """
@@ -51,7 +48,6 @@ class PageRank:
             k (float, optional): Weighting factor for composite score. Defaults to 0.9.
             output_dir (str, optional): Directory to save outputs. If None, creates a unique directory.
         """
-        # Assign parameters
         self.G = graph
         self.B = omics_data
         self.Y = phenotype_data
@@ -61,7 +57,6 @@ class PageRank:
         self.k = k
         self.output_dir = output_dir #if output_dir else self._create_output_dir()
 
-        # Initialize logger
         self.logger = get_logger(__name__)
         self.logger.info("Initialized PageRank with the following parameters:")
         self.logger.info(f"Graph: NetworkX Graph with {self.G.number_of_nodes()} nodes and {self.G.number_of_edges()} edges.")
@@ -73,7 +68,6 @@ class PageRank:
         self.logger.info(f"K (Composite Score Weight): {self.k}")
         self.logger.info(f"Output Directory: {self.output_dir}")
 
-        # Validate input data
         self._validate_inputs()
 
     def _validate_inputs(self):
@@ -90,7 +84,6 @@ class PageRank:
             if not isinstance(self.Y, pd.Series):
                 raise TypeError("phenotype_data must be a pandas Series.")
 
-            # Ensure that all graph nodes are present in omics and phenotype data
             graph_nodes = set(self.G.nodes())
             omics_nodes = set(self.B.index)
             phenotype_nodes = set(self.Y.index)
@@ -134,23 +127,16 @@ class PageRank:
         try:
             if len(nodes) < 2:
                 self.logger.warning(f"Not enough nodes ({len(nodes)}) for correlation. Returning 0 correlation.")
-                return 0.0, "0 (1.0)"  # Default correlation and p-value
+                return 0.0, "0 (1.0)"
 
-            # Subsetting the omics data
             B_sub = self.B.loc[nodes]
-
-            # Scaling the subset data
             scaler = StandardScaler()
             scaled = scaler.fit_transform(B_sub)
 
-            # Applying PCA to the subset data
             pca = PCA(n_components=1)
             g1 = pca.fit_transform(scaled).flatten()
-
-            # Phenotype data
             g2 = self.Y.loc[nodes].values
 
-            # Calculating Pearson correlation
             corr, pvalue = pearsonr(g1, g2)
             corr = round(corr, 2)
             p_value = format(pvalue, '.3g')
@@ -184,8 +170,6 @@ class PageRank:
             cluster = set()
             min_cut, min_cond_corr = len(p), float('inf')
             len_clus, cond, corr, cor_pval = 0, 1, 0, ''
-
-            # Normalizing PageRank scores by node degrees
             degrees = dict(self.G.degree(weight='weight'))
             vec = sorted(
                 [(p[node] / degrees[node] if degrees[node] > 0 else 0, node) for node in p.keys()],
@@ -199,17 +183,14 @@ class PageRank:
                     cluster.add(node)
 
                 if len(self.G.nodes()) > len(cluster):
-                    # Calculating conductance
                     cluster_cond = nx.conductance(self.G, cluster, weight='weight')
                     cond_res.append(round(cluster_cond, 3))
 
-                    # Calculating correlation
                     Nodes = list(cluster)
                     cluster_corr, corr_pvalue = self.phen_omics_corr(Nodes)
                     corr_res.append(round(cluster_corr, 3))
                     cluster_corr_neg = -abs(round(cluster_corr, 3))
 
-                    # Composite correlation-conductance score
                     cond_corr = round((1 - self.k) * cluster_cond + self.k * cluster_corr_neg, 3)
                     cond_corr_res.append(cond_corr)
 
@@ -217,7 +198,7 @@ class PageRank:
                         min_cond_corr, min_cut = cond_corr, i
                         len_clus = len(cluster)
                         cond = cluster_cond
-                        corr = cluster_corr  # Retain positive correlation
+                        corr = cluster_corr 
                         cor_pval = corr_pvalue
 
             if min_cut < len(vec):
@@ -256,7 +237,7 @@ class PageRank:
 
             max_contribution = max(corr_contribution, key=lambda x: abs(x)) if corr_contribution else 1
             if max_contribution == 0:
-                max_contribution = 1  # Prevent division by zero
+                max_contribution = 1
 
             weighted_personalization = {
                 node: self.alpha * (corr_contribution[i] / max_contribution)
@@ -278,7 +259,6 @@ class PageRank:
         Returns:
             Dict[str, Any]: Dictionary containing clustering results.
         """
-        # Specific Error Handling
         if not seed_nodes:
             self.logger.error("No seed nodes provided for PageRank clustering.")
             raise ValueError("Seed nodes list cannot be empty.")
@@ -289,11 +269,9 @@ class PageRank:
             raise ValueError(f"Seed nodes not in graph: {missing}")
 
         try:
-            # Generate personalization vector
             personalization = self.generate_weighted_personalization(seed_nodes)
             self.logger.info(f"Generated personalization vector for seed nodes: {seed_nodes}")
 
-            # Run PageRank
             p = nx.pagerank(
                 self.G,
                 alpha=self.alpha,
@@ -304,14 +282,12 @@ class PageRank:
             )
             self.logger.info("PageRank computation completed.")
 
-            # Perform sweep cut
             nodes, n, cond, corr, min_corr, pval = self.sweep_cut(p)
             if not nodes:
                 self.logger.warning("Sweep cut did not identify any cluster.")
             else:
                 self.logger.info(f"Sweep cut resulted in cluster of size {n} with conductance {cond} and correlation {corr}.")
 
-            # Save results
             results = {
                 'cluster_nodes': nodes,
                 'cluster_size': n,
@@ -321,12 +297,10 @@ class PageRank:
                 'correlation_pvalue': pval
             }
 
-            # Optionally save to file
             self.save_results(results)
             return results
 
         except Exception as e:
-            # Generic Error Handling
             self.logger.error(f"Error in run_pagerank_clustering: {e}")
             raise
 

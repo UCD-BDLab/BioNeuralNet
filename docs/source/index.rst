@@ -1,7 +1,11 @@
 .. BioNeuralNet documentation master file
 
-Welcome to BioNeuralNet
-=======================
+Welcome to BioNeuralNet Beta 0.1
+================================
+
+**Note:** This is a **beta version** of BioNeuralNet. It is under active development, and certain features 
+may be incomplete or subject to change. Feedback and bug reports are highly encouraged to help us 
+improve the tool.
 
 BioNeuralNet is a Python-based software tool designed to streamline the transformation of multi-omics 
 data into network-based representations and lower-dimensional embeddings, enabling advanced analytical 

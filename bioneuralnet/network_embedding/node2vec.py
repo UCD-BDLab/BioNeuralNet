@@ -1,5 +1,4 @@
-from typing import Dict, Optional
-
+from typing import Optional
 import pandas as pd
 import networkx as nx
 from node2vec import Node2Vec
@@ -45,7 +44,6 @@ class Node2VecEmbedding:
             workers (int, optional): Number of worker threads. Defaults to 4.
             seed (int, optional): Random seed for reproducibility. Defaults to 42.
         """
-        # Assign parameters
         self.adjacency_matrix = adjacency_matrix
         self.embedding_dim = embedding_dim
         self.walk_length = walk_length
@@ -53,8 +51,6 @@ class Node2VecEmbedding:
         self.window_size = window_size
         self.workers = workers
         self.seed = seed
-
-        # Initialize logger
         self.logger = get_logger(__name__)
 
         self.logger.info("Initialized Node2VecEmbedding with the following parameters:")
@@ -65,7 +61,6 @@ class Node2VecEmbedding:
         self.logger.info(f"Workers: {self.workers}")
         self.logger.info(f"Seed: {self.seed}")
 
-        # Initialize embeddings
         self.embeddings: Optional[pd.DataFrame] = None
 
     def _convert_to_networkx(self) -> nx.Graph:

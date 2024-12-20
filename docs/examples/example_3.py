@@ -32,7 +32,6 @@ def run_smccnet_dpmon_workflow(omics_proteins: pd.DataFrame,
         pd.DataFrame: Disease prediction results from DPMON.
     """
     try:
-        # Step 1: Generate network using SmCCNet
         smccnet_instance = SmCCNet(
             phenotype_data=phenotype_data,
             omics_data=pd.concat([omics_proteins, omics_metabolites], axis=1),
@@ -44,18 +43,16 @@ def run_smccnet_dpmon_workflow(omics_proteins: pd.DataFrame,
         adjacency_matrix = smccnet_instance.run()
         print("Adjacency matrix generated using SmCCNet.")
 
-        # Step 2: Initialize and run DPMON for disease prediction
         dpmon_instance = DPMON(
             adjacency_matrix=adjacency_matrix,
             omics_list=[omics_proteins, omics_metabolites],
             phenotype_data=phenotype_data,
             features_data=clinical_data,
-            model='GCN',  #
+            model='GCN',  
             tune=False,  
             gpu=False     
         )
 
-        # Run DPMON
         predictions_df = dpmon_instance.run()
         if not predictions_df.empty:
             print("DPMON workflow completed successfully. Predictions generated.")

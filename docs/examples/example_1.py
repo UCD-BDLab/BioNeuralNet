@@ -32,7 +32,6 @@ def run_smccnet_workflow(omics_data: pd.DataFrame,
         pd.DataFrame: Enhanced omics data integrated with GNN embeddings.
     """
     try:
-        # Step 1: Instantiate SmCCNet
         smccnet_instance = SmCCNet(
             phenotype_data=phenotype_data,
             omics_data=omics_data,
@@ -42,11 +41,9 @@ def run_smccnet_workflow(omics_data: pd.DataFrame,
             seed=732,
         )
 
-        # Step 2: Generate adjacency matrix using SmCCNet
         adjacency_matrix = smccnet_instance.run()
         print("Adjacency matrix generated using SmCCNet.")
 
-        # Step 3: Initialize and run GnnEmbedding
         node_features = pd.concat([
             omics_data[['protein_feature1', 'protein_feature2']], 
             omics_data[['metabolite_feature1', 'metabolite_feature2']]  

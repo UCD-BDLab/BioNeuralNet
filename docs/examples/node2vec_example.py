@@ -1,10 +1,3 @@
-"""
-Example: Node2VecEmbedding Usage
-===============================
-This script demonstrates how to use the refactored Node2VecEmbedding class with in-memory data structures.
-It generates Node2Vec-based embeddings for a provided graph represented as a pandas DataFrame.
-"""
-
 import pandas as pd
 from bioneuralnet.network_embedding import Node2VecEmbedding
 
@@ -20,7 +13,6 @@ def main():
             'GeneD': [0.0, 0.0, 1.0, 1.0]
         }, index=['GeneA', 'GeneB', 'GeneC', 'GeneD'])
 
-        # Initialize Node2VecEmbedding Instance
         node2vec = Node2VecEmbedding(
             adjacency_matrix=adjacency_matrix,
             embedding_dim=64,      
@@ -31,10 +23,8 @@ def main():
             seed=42                
         )
 
-        # Run Node2Vec Embedding
         embeddings = node2vec.run()
 
-        # Display Embeddings
         print("\nNode Embeddings:")
         print(embeddings)
 

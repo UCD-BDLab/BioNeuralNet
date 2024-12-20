@@ -8,7 +8,6 @@ def main():
     phenotype_df = pd.read_csv('input/phenotype_data.csv', index_col=0)
     clinical_data_df = pd.read_csv('input/clinical_data.csv', index_col=0)
 
-    # Initialize DPMON
     dpmon = DPMON(
         adjacency_matrix=adjacency_matrix,
         omics_list=[protein_data, metabolite_data],
@@ -17,10 +16,8 @@ def main():
         model='GCN',
     )
 
-    # Run DPMON
     predictions_df = dpmon.run()
 
-    # If tune=False, predictions_df contains the final predictions. Print them
     if not predictions_df.empty:
         print("Disease prediction completed successfully. Sample predictions:")
         print(predictions_df.head())

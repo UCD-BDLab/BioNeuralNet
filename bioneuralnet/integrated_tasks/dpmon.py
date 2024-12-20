@@ -22,8 +22,6 @@ from ray.train import Checkpoint
 
 from bioneuralnet.network_embedding import GCN, GAT, SAGE, GIN
 
-
-# Set up logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -48,7 +46,6 @@ class DPMON:
         cuda: int = 0,
         output_dir: Optional[str] = None
     ):
-        # Mandatory checks
         if clinical_data is None or clinical_data.empty:
             raise ValueError("Clinical data (features_file) is required and cannot be empty.")
 
@@ -61,7 +58,6 @@ class DPMON:
         if adjacency_matrix is None or adjacency_matrix.empty:
             raise ValueError("Adjacency matrix is required and cannot be empty.")
 
-        # Store parameters
         self.adjacency_matrix = adjacency_matrix
         self.omics_list = omics_list
         self.phenotype_data = phenotype_data
@@ -130,10 +126,8 @@ class DPMON:
             'tune': self.tune
         }
 
-        # Combine all omics data and phenotype
         combined_omics = pd.concat(self.omics_list, axis=1)
         if 'finalgold_visit' not in combined_omics.columns:
-            # Merge phenotype
             combined_omics = combined_omics.merge(self.phenotype_data[['finalgold_visit']], left_index=True, right_index=True)
 
         if self.tune:
@@ -146,7 +140,6 @@ class DPMON:
             )
             return pd.DataFrame()
 
-        # Otherwise, run standard training and return predictions
         logger.info("Running standard training for DPMON.")
         predictions = run_standard_training(
             dpmon_params,
@@ -201,14 +194,12 @@ def build_omics_networks_tg(adjacency_matrix: pd.DataFrame, omics_datasets: List
     logger.info("Building PyTorch Geometric Data object from adjacency matrix.")
     omics_network_nodes_names = adjacency_matrix.index.tolist()
 
-    # Create NetworkX graph
     G = nx.from_pandas_adjacency(adjacency_matrix)
     node_mapping = {node_name: idx for idx, node_name in enumerate(omics_network_nodes_names)}
     G = nx.relabel_nodes(G, node_mapping)
     num_nodes = len(node_mapping)
     logger.info(f"Number of nodes in network: {num_nodes}")
 
-    # Use clinical_data to compute correlations
     if clinical_data is not None and not clinical_data.empty:
         clinical_vars = clinical_data.columns.tolist()
         logger.info(f"Using clinical vars for node features: {clinical_vars}")
@@ -229,13 +220,11 @@ def build_omics_networks_tg(adjacency_matrix: pd.DataFrame, omics_datasets: List
         logger.info("No clinical data provided or empty. Using random features.")
 
     edge_index = torch.tensor(list(G.edges()), dtype=torch.long).t().contiguous()
-    # Duplicate edges for undirected graph
     edge_index = torch.cat([edge_index, edge_index.flip(0)], dim=1)
 
     edge_weight = torch.tensor([
         data.get('weight', 1.0) for _, _, data in G.edges(data=True)
     ], dtype=torch.float)
-    # Duplicate edge weights
     edge_weight = torch.cat([edge_weight, edge_weight], dim=0)
 
     data = Data(x=x, edge_index=edge_index, edge_attr=edge_weight)
@@ -249,10 +238,7 @@ def build_omics_networks_tg(adjacency_matrix: pd.DataFrame, omics_datasets: List
 
 def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinical_data, output_dir):
     device = setup_device(dpmon_params['gpu'], dpmon_params['cuda'])
-
-    # Slice omics dataset
     omics_dataset = slice_omics_datasets(combined_omics, adjacency_matrix)
-    # Build network
     omics_networks_tg = build_omics_networks_tg(adjacency_matrix, omics_dataset, clinical_data)
 
     accuracies = []
@@ -284,13 +270,10 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
 
             accuracy = train_model(model, criterion, optimizer, train_features, train_labels, dpmon_params['epoch_num'])
             accuracies.append(accuracy)
-
-            # Save model
             model_path = os.path.join(output_dir, f'dpm_model_iter_{i+1}.pth')
             torch.save(model.state_dict(), model_path)
             logger.info(f"Model saved to {model_path}")
 
-            # Save predictions
             model.eval()
             with torch.no_grad():
                 predictions, _ = model(train_features, omics_network.to(device))
@@ -322,22 +305,13 @@ def run_hyperparameter_tuning(dpmon_params, adjacency_matrix, combined_omics, cl
     omics_networks_tg = build_omics_networks_tg(adjacency_matrix, omics_dataset, clinical_data)
 
     pipeline_configs = {
-        # 'gnn_layer_num': tune.choice([2, 4, 8, 16, 32, 64, 128]),
-        # 'gnn_hidden_dim': tune.choice([4, 8, 16, 32, 64, 128]),
-        # 'lr': tune.loguniform(1e-4, 1e-1),
-        # 'weight_decay': tune.loguniform(1e-4, 1e-1),
-        # 'nn_hidden_dim1': tune.choice([4, 8, 16, 32, 64, 128]),
-        # 'nn_hidden_dim2': tune.choice([4, 8, 16, 32, 64, 128]),
-        # 'num_epochs': tune.choice([2, 16, 64, 512, 1024, 4096, 8192]),
-
-        # Reduced search space for faster tuning (Testing Olnly)
-        'gnn_layer_num': tune.choice([2, 4, 8]),
-        'gnn_hidden_dim': tune.choice([4, 8, 16]),
+        'gnn_layer_num': tune.choice([2, 4, 8, 16, 32, 64, 128]),
+        'gnn_hidden_dim': tune.choice([4, 8, 16, 32, 64, 128]),
         'lr': tune.loguniform(1e-4, 1e-1),
         'weight_decay': tune.loguniform(1e-4, 1e-1),
-        'nn_hidden_dim1': tune.choice([4, 8, 16]),
-        'nn_hidden_dim2': tune.choice([4, 8, 16]),
-        'num_epochs': tune.choice([2, 16, 64]),
+        'nn_hidden_dim1': tune.choice([4, 8, 16, 32, 64, 128]),
+        'nn_hidden_dim2': tune.choice([4, 8, 16, 32, 64, 128]),
+        'num_epochs': tune.choice([2, 16, 64, 512, 1024, 4096, 8192]),
     }
 
     reporter = CLIReporter(metric_columns=["loss", "accuracy", "training_iteration"])
@@ -391,7 +365,6 @@ def run_hyperparameter_tuning(dpmon_params, adjacency_matrix, combined_omics, cl
                     )
                     train.report(metrics=metrics, checkpoint=Checkpoint.from_directory(tempdir))
 
-            # Final evaluation
             model.eval()
             with torch.no_grad():
                 outputs, _ = model(train_features, train_labels['omics_network'])
@@ -438,7 +411,6 @@ def train_model(model, criterion, optimizer, train_data, train_labels, epoch_num
         if (epoch + 1) % 10 == 0 or epoch == 0:
             logger.info(f"Epoch [{epoch+1}/{epoch_num}], Loss: {loss.item():.4f}")
 
-    # Evaluation after training
     model.eval()
     with torch.no_grad():
         predictions, _ = model(train_data, train_labels['omics_network'])

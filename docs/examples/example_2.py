@@ -32,21 +32,17 @@ def run_wgcna_workflow_with_gnn(omics_data: pd.DataFrame,
         pd.DataFrame: Enhanced omics data integrated with GNN embeddings.
     """
     try:
-        # Step 1: Instantiate WGCNA
         wgcna_instance = WGCNA(
             phenotype_data=phenotype_data,
             omics_data=omics_data,
-            data_types=['gene'],  # Adjust based on your data
+            data_types=['gene'], 
             soft_power=6,
             min_module_size=30,
             merge_cut_height=0.25,
         )
 
-        # Step 2: Generate adjacency matrix using WGCNA
         adjacency_matrix = wgcna_instance.run()
         print("Adjacency matrix generated using WGCNA.")
-
-        # Step 3: Initialize and run GnnEmbedding
         node_features = omics_data[['gene_feature1', 'gene_feature2', 'gene_feature3', 'gene_feature4']] 
 
         gnn_embedding = GnnEmbedding(

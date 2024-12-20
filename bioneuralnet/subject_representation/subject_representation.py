@@ -2,7 +2,6 @@ import os
 from datetime import datetime
 import pandas as pd
 from sklearn.decomposition import PCA
-
 from ..utils.logger import get_logger
 from ..network_embedding import GnnEmbedding
 from ..network_embedding import Node2VecEmbedding
@@ -85,18 +84,11 @@ class GraphEmbedding:
             - Ensure that the PCA step is appropriate for your analysis and consider adjusting the dimensionality reduction strategy if needed.
         """
         self.logger.info("Running Subject Representation workflow.")
-        #output_dir = self._create_output_dir()
 
         try:
             embeddings_df = self.generate_embeddings()
             node_embedding_values = self.reduce_embeddings(embeddings_df)
             enhanced_omics_data = self.integrate_embeddings(node_embedding_values)
-
-            # Save the enhanced omics data
-            #output_file = os.path.join(output_dir, "enhanced_omics_data.csv")
-            #enhanced_omics_data.to_csv(output_file)
-            #self.logger.info(f"Enhanced omics data saved to {output_file}")
-
             return enhanced_omics_data
 
         except Exception as e:
@@ -114,7 +106,6 @@ class GraphEmbedding:
         self.logger.info(f"Generating embeddings using {self.embedding_method}")
 
         if self.embedding_method == 'GNNs':
-            # Default GNN parameters can be adjusted as needed
             gnn_embedding = GnnEmbedding(
                 adjacency_matrix=self.adjacency_matrix,
                 omics_data=self.omics_data,
@@ -132,7 +123,6 @@ class GraphEmbedding:
             )
 
         elif self.embedding_method == 'Node2Vec':
-            # Default Node2Vec parameters can be adjusted as needed
             node2vec_embedding = Node2VecEmbedding(
                 adjacency_matrix=self.adjacency_matrix,
                 embedding_dim=128,
@@ -188,7 +178,6 @@ class GraphEmbedding:
         self.logger.info("Integrating embeddings into omics data.")
 
         modified_omics_data = self.omics_data.copy()
-        # Exclude the phenotype column when integrating (assuming 'finalgold_visit' is phenotype)
         feature_cols = [col for col in modified_omics_data.columns if col != 'finalgold_visit']
 
         missing_nodes = set(feature_cols) - set(node_embedding_values.index)
