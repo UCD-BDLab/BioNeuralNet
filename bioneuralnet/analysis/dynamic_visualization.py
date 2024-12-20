@@ -44,14 +44,11 @@ class DynamicVisualizer:
     def visualize(self, G: nx.Graph):
         self.logger.info(f"Generating interactive visualization with layout: {self.layout}")
         
-        # Load the default template from pyvis/templates
         templates_dir = os.path.join(os.path.dirname(pyvis.__file__), 'templates')
         env = Environment(loader=FileSystemLoader(templates_dir))
         template = env.get_template('template.html') 
         
         net = Network(height=self.height, width=self.width, bgcolor=self.bgcolor, font_color=self.font_color, notebook=False)
-        
-        # Assign the loaded template to net.template
         net.template = template
 
         if self.layout == 'hierarchical':

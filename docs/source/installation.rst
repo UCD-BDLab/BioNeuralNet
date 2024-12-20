@@ -13,7 +13,7 @@ Installation
 
 2. **Optional R Dependencies (For WGCNA/SmCCNet):**
 
-   If you need R-based algorithms (e.g., WGCNA, SmCCNet), install R and relevant packages:
+   If you need R-based algorithms (WGCNA, SmCCNet), install R and relevant packages:
 
    ```r
    install.packages(c("dplyr", "SmCCNet", "WGCNA"))
@@ -26,7 +26,7 @@ Installation
 
 4. **Fast Installation with `fast-install.py`:**
 
-   For an automated setup including development dependencies, run:
+   For an automated setup including R-based and development dependencies, run:
 
    ```bash
    git clone https://github.com/UCD-BDLab/BioNeuralNet.git

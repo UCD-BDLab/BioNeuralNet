@@ -1,18 +1,9 @@
-"""
-Example: HierarchicalClustering Usage
-=====================================
-This script demonstrates how to use the refactored HierarchicalClustering class with in-memory data structures.
-It performs Agglomerative Hierarchical Clustering on an adjacency matrix provided as a pandas DataFrame.
-"""
-
 import pandas as pd
 from bioneuralnet.clustering import HierarchicalClustering
 
 def main():
     try:
         print("Starting Hierarchical Clustering Workflow...")
-
-        # Example Adjacency Matrix Data
         adjacency_matrix = pd.DataFrame({
             'GeneA': [1.0, 0.8, 0.3, 0.2],
             'GeneB': [0.8, 1.0, 0.4, 0.3],
@@ -20,7 +11,6 @@ def main():
             'GeneD': [0.2, 0.3, 0.5, 1.0]
         }, index=['GeneA', 'GeneB', 'GeneC', 'GeneD'])
 
-        # Initialize HierarchicalClustering Instance
         hierarchical_clustering = HierarchicalClustering(
             adjacency_matrix=adjacency_matrix,
             n_clusters=2,
@@ -29,14 +19,11 @@ def main():
             scale_data=True        
         )
 
-        # Run Clustering
         clustering_results = hierarchical_clustering.run()
 
-        # Display Cluster Labels
         print("\nCluster Labels:")
         print(clustering_results['cluster_labels'])
 
-        # Display Silhouette Score
         silhouette_score = clustering_results['silhouette_score']
         if silhouette_score is not None:
             print(f"\nSilhouette Score: {silhouette_score:.4f}")

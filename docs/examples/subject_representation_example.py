@@ -52,10 +52,8 @@ def main():
         embedding_method='GNNs'
     )
 
-    # Run the graph embedding process
     enhanced_omics_data = graph_embed.run()
 
-    # Save the enhanced omics data to a file
     enhanced_omics_data.to_csv('output/enhanced_omics_data.csv')
     print("Graph embedding workflow completed successfully.")
 

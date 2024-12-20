@@ -16,16 +16,12 @@ from bioneuralnet.clustering import PageRank
 from bioneuralnet.analysis import StaticVisualizer
 
 def run_smccnet_pagerank_visualization_workflow():
-    # Step 1: Load omics, phenotype, and clinical data
     omics_proteins = pd.read_csv('input/proteins.csv', index_col=0)
     omics_metabolites = pd.read_csv('input/metabolites.csv', index_col=0)
     phenotype_data = pd.read_csv('input/phenotype_data.csv', index_col=0).squeeze()
-
-    # Combine omics data into a list of DataFrames
     omics_dfs = [omics_proteins, omics_metabolites]
     data_types = ['protein', 'metabolite']
 
-    # Step 2: Instantiate SmCCNet with data structures
     smccnet_instance = SmCCNet(
         phenotype_data=phenotype_data,
         omics_dfs=omics_dfs,
@@ -35,16 +31,13 @@ def run_smccnet_pagerank_visualization_workflow():
         seed=732
     )
 
-    # Step 3: Generate adjacency matrix using SmCCNet
     adjacency_matrix = smccnet_instance.run()
     adjacency_output_path = os.path.join(smccnet_instance.output_dir, 'adjacency_matrix.csv')
     adjacency_matrix.to_csv(adjacency_output_path)
     print(f"Adjacency matrix saved to {adjacency_output_path}")
 
-    # Step 4: Convert adjacency matrix to a NetworkX graph
     G = nx.from_pandas_adjacency(adjacency_matrix)
 
-    # Step 5: Run PageRank clustering: First we initialize PageRank clustering instance
     pagerank_instance = PageRank(
         graph=G,
         omics_data=pd.concat(omics_dfs, axis=1),
@@ -66,7 +59,6 @@ def run_smccnet_pagerank_visualization_workflow():
         print(f"Error running PageRank clustering: {e}")
         return
 
-    # Step 6: Visualize the resulting cluster
     cluster_nodes = results.get('cluster_nodes', [])
     if cluster_nodes:
         subgraph = G.subgraph(cluster_nodes).copy()

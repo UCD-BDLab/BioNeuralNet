@@ -1,8 +1,7 @@
 import os
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import pandas as pd
 import networkx as nx
 from torch_geometric.data import Data
@@ -83,7 +82,6 @@ class GnnEmbedding:
             - Adjust `model_type`, `gnn_hidden_dim`, or `gnn_layer_num` as needed to alter the embedding process.
         """
         self.logger.info("Running GNN Embedding process.")
-        # Prepare node features
         node_features = self._prepare_node_features()
 
         if self.gnn_input_dim is None:
@@ -109,14 +107,12 @@ class GnnEmbedding:
 
     def _prepare_node_features(self) -> pd.DataFrame:
         self.logger.info("Preparing node features from omics_data and clinical_data.")
-
-        # Check that nodes in adjacency_matrix are present in omics_data
         nodes_in_network = self.adjacency_matrix.index.tolist()
+        
         missing_nodes = set(nodes_in_network) - set(self.omics_data.columns)
         if missing_nodes:
             raise ValueError(f"Nodes missing in omics_data: {missing_nodes}")
 
-        # Align samples between omics_data and clinical_data
         common_samples = self.omics_data.index.intersection(self.clinical_data.index)
         if len(common_samples) == 0:
             raise ValueError("No common samples between omics_data and clinical_data.")

@@ -1,12 +1,8 @@
-import os
-
 import pandas as pd
 from sklearn.linear_model import LassoCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import SelectKBest, f_classif
-
 from ..utils.logger import get_logger
-
 
 class FeatureSelector:
     """

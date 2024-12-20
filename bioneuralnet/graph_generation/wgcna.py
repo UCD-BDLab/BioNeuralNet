@@ -35,7 +35,6 @@ class WGCNA:
             min_module_size (int, optional): Minimum module size. Defaults to 30.
             merge_cut_height (float, optional): Merge cut height. Defaults to 0.25.
         """
-        # Assign parameters
         self.phenotype_df = phenotype_df
         self.omics_dfs = omics_dfs
         self.data_types = data_types
@@ -43,14 +42,12 @@ class WGCNA:
         self.min_module_size = min_module_size
         self.merge_cut_height = merge_cut_height
 
-        # Initialize logger
         self.logger = get_logger(__name__)
         self.logger.info("Initialized WGCNA with the following parameters:")
         self.logger.info(f"Soft Power: {self.soft_power}")
         self.logger.info(f"Minimum Module Size: {self.min_module_size}")
         self.logger.info(f"Merge Cut Height: {self.merge_cut_height}")
 
-        # Validate inputs
         if len(self.omics_dfs) != len(self.data_types):
             self.logger.error("Number of omics dataframes does not match number of data types.")
             raise ValueError("Number of omics dataframes does not match number of data types.")
@@ -63,12 +60,8 @@ class WGCNA:
             Dict[str, Any]: Dictionary containing serialized phenotype and omics data.
         """
         self.logger.info("Preprocessing omics data for NaN or infinite values.")
-
-        # Ensure that the first column is sample IDs
         phenotype_ids = self.phenotype_df.iloc[:, 0]
         self.logger.info(f"Number of samples in phenotype data: {len(phenotype_ids)}")
-
-        # Initialize a boolean Series to track valid samples
         valid_samples = pd.Series([True] * len(phenotype_ids), index=self.phenotype_df.index)
 
         serialized_data = {
@@ -79,24 +72,20 @@ class WGCNA:
             data_type = self.data_types[idx]
             self.logger.info(f"Processing omics DataFrame {idx+1}/{len(self.omics_dfs)}: Data Type = {data_type}")
 
-            # Ensure sample IDs match
             omics_ids = omics_df.iloc[:, 0]
             if not omics_ids.equals(phenotype_ids):
                 self.logger.warning(f"Sample IDs in omics dataframe {idx+1} do not match phenotype data. Aligning data.")
                 omics_df = omics_df.set_index(omics_ids).loc[phenotype_ids].reset_index()
 
-            # Check for NaN values
             if omics_df.isnull().values.any():
                 self.logger.warning(f"NaN values detected in omics dataframe {idx+1}. Marking samples with NaNs as invalid.")
                 valid_samples &= ~omics_df.isnull().any(axis=1)
 
-            # Check for infinite values
             if (omics_df == float('inf')).any().any() or (omics_df == -float('inf')).any().any():
                 self.logger.warning(f"Infinite values detected in omics dataframe {idx+1}. Replacing with NaN and marking samples as invalid.")
                 omics_df.replace([float('inf'), -float('inf')], pd.NA, inplace=True)
                 valid_samples &= ~omics_df.isnull().any(axis=1)
 
-            # Filter out invalid samples
             num_valid_before = valid_samples.sum()
             self.logger.info(f"Number of valid samples before filtering: {num_valid_before}")
             omics_df_clean = omics_df[valid_samples].reset_index(drop=True)
@@ -107,7 +96,6 @@ class WGCNA:
                 self.logger.error("No valid samples remaining after preprocessing. Aborting WGCNA run.")
                 raise ValueError("No valid samples remaining after preprocessing.")
 
-            # Serialize omics dataframe
             serialized_data[f'omics_{idx+1}'] = omics_df_clean.to_csv(index=False)
 
         self.logger.info("Preprocessing completed successfully.")
@@ -125,11 +113,7 @@ class WGCNA:
         """
         try:
             self.logger.info("Preparing data for WGCNA R script.")
-
-            # Combine serialized data into a JSON string
             json_data = json.dumps(serialized_data)
-
-            # Define the R script path
             script_dir = os.path.dirname(os.path.abspath(__file__))
             r_script = os.path.join(script_dir, "WGCNA.R")
 
@@ -137,7 +121,6 @@ class WGCNA:
                 self.logger.error(f"R script not found: {r_script}")
                 raise FileNotFoundError(f"R script not found: {r_script}")
 
-            # Define command arguments
             command = [
                 "Rscript",
                 r_script,
@@ -147,8 +130,6 @@ class WGCNA:
             ]
 
             self.logger.debug(f"Executing command: {' '.join(command)}")
-
-            # Execute the R script, passing JSON data via stdin
             result = subprocess.run(
                 command,
                 input=json_data,
@@ -160,11 +141,9 @@ class WGCNA:
             self.logger.info("WGCNA R script executed successfully.")
             self.logger.debug(f"WGCNA Output:\n{result.stdout}")
 
-            # Check for warnings or errors
             if result.stderr:
                 self.logger.warning(f"WGCNA Warnings/Errors:\n{result.stderr}")
 
-            # The R script should output the adjacency matrix as a JSON string
             adjacency_json = result.stdout.strip()
 
             return adjacency_json
@@ -185,17 +164,12 @@ class WGCNA:
         """
         try:
             self.logger.info("Starting WGCNA Network Construction Workflow.")
-
-            # Preprocess data
+            
             serialized_data = self.preprocess_data()
-
-            # Run WGCNA R script
             adjacency_json = self.run_wgcna(serialized_data)
-
-            # Deserialize adjacency matrix from JSON
             adjacency_matrix = pd.read_json(StringIO(adjacency_json), orient='split')
-            self.logger.info("Adjacency matrix deserialized successfully.")
 
+            self.logger.info("Adjacency matrix deserialized successfully.")
             self.logger.info("WGCNA Network Construction completed successfully.")
             return adjacency_matrix
 

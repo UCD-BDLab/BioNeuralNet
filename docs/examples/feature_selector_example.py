@@ -4,7 +4,6 @@ from bioneuralnet.network_embedding import GnnEmbedding
 
 
 def main():
-    # Example Input Data
     phenotype_df = pd.DataFrame({
         'SampleID': ['S1', 'S2', 'S3', 'S4'],
         'Phenotype': ['Control', 'Treatment', 'Control', 'Treatment']
@@ -38,11 +37,10 @@ def main():
         'GeneD': [0.0, 0.0, 0.7, 1.0]
     }, index=['GeneA', 'GeneB', 'GeneC', 'GeneD'])
 
-    # Step 1: GNN Embeddings
     gnn_embed = GnnEmbedding(
         omics_list=[omics_df1.set_index('SampleID'), omics_df2.set_index('SampleID')],
         phenotype_df=phenotype_df.set_index('SampleID'),
-        clinical_data_df=clinical_data_df.set_index('SampleID'),  # Required
+        clinical_data_df=clinical_data_df.set_index('SampleID'),
         adjacency_matrix=adjacency_matrix,
         model_type='GCN'
     )
@@ -50,7 +48,6 @@ def main():
     print("\nGNN Embeddings:")
     print(gnn_embeddings['graph'].head())
 
-    # Step 2: Feature Selection
     combined_omics_data = pd.merge(omics_df1, omics_df2, on='SampleID')
     phenotype_series = phenotype_df.set_index('SampleID')['Phenotype']
 

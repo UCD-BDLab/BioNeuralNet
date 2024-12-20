@@ -54,7 +54,6 @@ def get_r_script(script_name: str) -> str:
     
     """
     try:
-        # Retrieve the absolute path to the R script within the 'graph_generation' package
         script_path = pkg_resources.resource_filename('bioneuralnet.graph_generation', script_name)
         if not os.path.isfile(script_path):
             logger.error(f"R script '{script_name}' not found in 'bioneuralnet.graph_generation'.")
@@ -68,18 +67,3 @@ def get_r_script(script_name: str) -> str:
         logger.error(f"An error occurred while retrieving R script '{script_name}': {e}")
         raise e
 
-
-# # Module-level variables for R scripts
-# try:
-#     smccnet_r: str = get_r_script('SmCCNet.R')
-#     logger.info(f"SmCCNet.R script located at: {smccnet_r}")
-# except FileNotFoundError as fnf_error:
-#     logger.error(fnf_error)
-#     smccnet_r = ""
-
-# try:
-#     wgcna_r: str = get_r_script('WGCNA.R')
-#     logger.info(f"WGCNA.R script located at: {wgcna_r}")
-# except FileNotFoundError as fnf_error:
-#     logger.error(fnf_error)
-#     wgcna_r = ""

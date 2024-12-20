@@ -1,7 +1,6 @@
 from bioneuralnet.clustering import PageRank
 
 def main():
-    # Initialize PageRank parameters
     pagerank_cluster = PageRank(
         graph_file='input/GFEV1ac110.edgelist',
         omics_data_file='input/X.xlsx',
@@ -12,13 +11,8 @@ def main():
         k=0.9,
     )
 
-    # Define seed nodes 
     seed_nodes = [94] 
-
-    # Run PageRank clustering
     results = pagerank_cluster.run(seed_nodes=seed_nodes)
-
-    # Access results
     cluster_nodes = results['cluster_nodes']
     print(f"Identified cluster with {len(cluster_nodes)} nodes.")
 
