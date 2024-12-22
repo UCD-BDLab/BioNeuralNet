@@ -3,12 +3,13 @@ Tutorials
 These tutorials demonstrate integrated workflows that combine multiple BioNeuralNet components.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    example_1
    example_2
    example_3
    example_4
+
 
 **Example 1: Sparse Multiple Canonical Correlation Network (SmCCNet) Workflow with Graph Neural Network (GNN) Embeddings**  
 This tutorial demonstrates how to:

@@ -100,12 +100,14 @@ Documentation Overview
 
 .. toctree::
    :maxdepth: 2
+   :caption: Contents:
 
    installation
-   tools/index
    tutorials/index
+   tools/index
    api_reference
    faq
+
 
 Indices and tables
 ==================

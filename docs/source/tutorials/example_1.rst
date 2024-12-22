@@ -22,9 +22,13 @@ the generated embeddings into subject-level omics data, enhancing downstream ana
    - Prepare your omics data (`omics_data`), phenotype data (`phenotype_data`), and clinical data (`clinical_data`) as Pandas DataFrames or Series.
    - These data structures should be loaded or created within your application or script.
 
+   .. literalinclude:: ../examples/example_1.py
+      :language: python
+      :lines: 1-20
+
 2. **Run SmCCNet Workflow:**
 
-   .. literalinclude:: ./examples/example_1.py
+   .. literalinclude:: ../examples/example_1.py
       :language: python
       :lines: 43-53
       :caption: Running SmCCNet to generate the adjacency matrix.
@@ -33,7 +37,7 @@ the generated embeddings into subject-level omics data, enhancing downstream ana
 
 3. **Run GNN Embedding Generation:**
 
-   .. literalinclude:: ./examples/example_1.py
+   .. literalinclude:: ../examples/example_1.py
       :language: python
       :lines: 55-71
       :caption: Generating GNN Embeddings from the Adjacency Matrix.
@@ -42,7 +46,7 @@ the generated embeddings into subject-level omics data, enhancing downstream ana
 
 4. **Integrate Embeddings into Subject Representation:**
 
-   .. literalinclude:: ./examples/example_1.py
+   .. literalinclude:: ../examples/example_1.py
       :language: python
       :lines: 79-87
       :caption: Integrating GNN Embeddings into Subject-Level Omics Data.
@@ -51,7 +55,7 @@ the generated embeddings into subject-level omics data, enhancing downstream ana
 
 5. **Complete Workflow Execution:**
 
-   .. literalinclude:: ./examples/example_1.py
+   .. literalinclude:: ../examples/example_1.py
       :language: python
       :lines: 95-121
       :caption: Complete SmCCNet Workflow Execution with Sample Data.
@@ -60,7 +64,7 @@ the generated embeddings into subject-level omics data, enhancing downstream ana
 
 **Running the Example:**
 
-.. literalinclude:: ./examples/example_1.py
+.. literalinclude:: ../examples/example_1.py
    :language: python
    :caption: Complete SmCCNet Workflow Execution with Sample Data.
 

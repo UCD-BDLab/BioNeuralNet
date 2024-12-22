@@ -31,7 +31,6 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = 'sphinx_rtd_theme'  
 html_static_path = ['_static']
-autosummary_generate = True
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),

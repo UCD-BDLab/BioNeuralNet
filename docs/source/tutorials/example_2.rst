@@ -24,7 +24,7 @@ embeddings into subject-level omics data, enhancing downstream analytical capabi
 
 2. **Run WGCNA Workflow:**
 
-   .. literalinclude:: ./examples/example_2.py
+   .. literalinclude:: ../examples/example_2.py
       :language: python
       :lines: 23-33
       :caption: Running WGCNA to generate the adjacency matrix.
@@ -33,7 +33,7 @@ embeddings into subject-level omics data, enhancing downstream analytical capabi
 
 3. **Run GNN Embedding Generation:**
 
-   .. literalinclude:: ./examples/example_2.py
+   .. literalinclude:: ../examples/example_2.py
       :language: python
       :lines: 35-51
       :caption: Generating GNN Embeddings from the Adjacency Matrix.
@@ -42,7 +42,7 @@ embeddings into subject-level omics data, enhancing downstream analytical capabi
 
 4. **Integrate Embeddings into Subject Representation:**
 
-   .. literalinclude:: ./examples/example_2.py
+   .. literalinclude:: ../examples/example_2.py
       :language: python
       :lines: 53-61
       :caption: Integrating GNN Embeddings into Subject-Level Omics Data.
@@ -51,7 +51,7 @@ embeddings into subject-level omics data, enhancing downstream analytical capabi
 
 5. **Complete Workflow Execution:**
 
-   .. literalinclude:: ./examples/example_2.py
+   .. literalinclude:: ../examples/example_2.py
       :language: python
       :lines: 63-83
       :caption: Complete WGCNA Workflow Execution with Sample Data.
@@ -60,7 +60,7 @@ embeddings into subject-level omics data, enhancing downstream analytical capabi
 
 **Running the Example:**
 
-.. literalinclude:: ./examples/example_2.py
+.. literalinclude:: ../examples/example_2.py
    :language: python
    :caption: Complete WGCNA Workflow Execution with Sample Data.
 
