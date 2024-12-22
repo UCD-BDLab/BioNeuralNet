@@ -104,7 +104,6 @@ def test_visualize_with_invalid_layout(sample_adjacency_matrix, temp_output_dir)
         assert output_file.exists()
         assert output_file.is_file()
     
-        # Ensure a warning was logged for the invalid layout
         mock_warning.assert_called_with(
             f"Layout '{invalid_layout}' not recognized. Falling back to spring layout."
         )

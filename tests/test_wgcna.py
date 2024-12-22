@@ -8,13 +8,11 @@ import subprocess
 class TestWGCNA(unittest.TestCase):
 
     def setUp(self):
-        # Sample phenotype dataframe
         self.phenotype_df = pd.DataFrame({
             'SampleID': ['S1', 'S2', 'S3', 'S4'],
             'Phenotype': ['Control', 'Treatment', 'Control', 'Treatment']
         })
 
-        # Sample omics dataframes
         self.omics_df1 = pd.DataFrame({
             'SampleID': ['S1', 'S2', 'S3', 'S4'],
             'GeneA': [1.2, 2.3, 3.1, 4.0],
@@ -34,7 +32,6 @@ class TestWGCNA(unittest.TestCase):
 
     @patch('bioneuralnet.graph_generation.wgcna.subprocess.run')
     def test_wgcna_successful_run(self, mock_run):
-        # Mock the subprocess.run to return a successful response
         mock_completed_process = MagicMock()
         mock_completed_process.returncode = 0
         mock_completed_process.stdout = '{"columns":["GeneA","GeneB","GeneC","GeneD","GeneE","GeneF"],"index":["GeneA","GeneB","GeneC","GeneD","GeneE","GeneF"],"data":[[1,0.8,0.3,0.5,0.2,0.1],[0.8,1,0.4,0.6,0.3,0.2],[0.3,0.4,1,0.7,0.4,0.3],[0.5,0.6,0.7,1,0.5,0.4],[0.2,0.3,0.4,0.5,1,0.5],[0.1,0.2,0.3,0.4,0.5,1]]}'
@@ -59,7 +56,6 @@ class TestWGCNA(unittest.TestCase):
 
     @patch('bioneuralnet.graph_generation.wgcna.subprocess.run')
     def test_wgcna_run_failure(self, mock_run):
-        # Mock the subprocess.run to raise CalledProcessError
         mock_run.side_effect = subprocess.CalledProcessError(
             returncode=1,
             cmd='Rscript WGCNA.R',
@@ -83,7 +79,7 @@ class TestWGCNA(unittest.TestCase):
             WGCNA(
                 phenotype_df=self.phenotype_df,
                 omics_dfs=self.omics_dfs,
-                data_types=['Transcriptomics'],  # Mismatch in length
+                data_types=['Transcriptomics'],
                 soft_power=6,
                 min_module_size=30,
                 merge_cut_height=0.25
@@ -91,14 +87,12 @@ class TestWGCNA(unittest.TestCase):
 
     @patch('bioneuralnet.graph_generation.wgcna.subprocess.run')
     def test_no_valid_samples(self, mock_run):
-        # Mock the subprocess.run to raise CalledProcessError
         mock_run.side_effect = subprocess.CalledProcessError(
             returncode=1,
             cmd='Rscript WGCNA.R',
             stderr='Error: No valid samples after preprocessing.\nExecution halted'
         )
 
-        # Introduce NaN values to make all samples invalid
         self.omics_dfs[0].iloc[0, 1] = pd.NA
         self.omics_dfs[1].iloc[1, 2] = pd.NA
 
@@ -116,7 +110,6 @@ class TestWGCNA(unittest.TestCase):
 
     @patch('bioneuralnet.graph_generation.wgcna.subprocess.run')
     def test_save_adjacency_matrix(self, mock_run):
-        # Mock the subprocess.run to return a successful response
         mock_completed_process = MagicMock()
         mock_completed_process.returncode = 0
         mock_completed_process.stdout = '{"columns":["GeneA","GeneB","GeneC","GeneD","GeneE","GeneF"],"index":["GeneA","GeneB","GeneC","GeneD","GeneE","GeneF"],"data":[[1,0.8,0.3,0.5,0.2,0.1],[0.8,1,0.4,0.6,0.3,0.2],[0.3,0.4,1,0.7,0.4,0.3],[0.5,0.6,0.7,1,0.5,0.4],[0.2,0.3,0.4,0.5,1,0.5],[0.1,0.2,0.3,0.4,0.5,1]]}'
@@ -134,7 +127,6 @@ class TestWGCNA(unittest.TestCase):
         save_path = 'test_adjacency_matrix.json'
         adjacency_matrix.to_json(save_path, orient='split')
         self.assertTrue(os.path.exists(save_path))
-        # Clean up
         os.remove(save_path)
 
 if __name__ == '__main__':

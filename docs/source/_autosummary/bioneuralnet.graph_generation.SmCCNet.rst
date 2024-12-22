@@ -14,7 +14,6 @@
    .. autosummary::
    
       ~SmCCNet.__init__
-      ~SmCCNet.load_global_network
       ~SmCCNet.preprocess_data
       ~SmCCNet.run
       ~SmCCNet.run_smccnet

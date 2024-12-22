@@ -1,7 +1,7 @@
-﻿bioneuralnet.integrated\_tasks.DPMON
-====================================
+﻿bioneuralnet.downstream\_task.DPMON
+===================================
 
-.. currentmodule:: bioneuralnet.integrated_tasks
+.. currentmodule:: bioneuralnet.downstream_task
 
 .. autoclass:: DPMON
 

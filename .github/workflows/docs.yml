@@ -1,4 +1,4 @@
-name: Build Documentation for Read the Docs
+name: Build and Deploy Documentation
 
 on:
   push:
@@ -7,47 +7,36 @@ on:
     branches: [ main ]
 
 jobs:
-  build-docs:
+  build-deploy-docs:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  
+          fetch-depth: 0
 
-      - name: Set up Python
+      - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: '3.10'
           check-latest: true
 
-      - name: List repository contents
-        run: ls -la
-
-      - name: List docs directory contents
-        run: ls -la docs/
-
-      - name: Run setup-env.sh (Non-Interactive)
-        env:
-          INSTALL_TYPE: 1   # cpu only
-          INSTALL_DEV: y    # dev dependencies
+      - name: Install Dependencies and Set Up Environment
         run: |
-          chmod +x scripts/setup-env.sh
-          ./scripts/setup-env.sh
-
-      # Build and install the package
-      - name: Build and install package
-        run: |
-          source .venv/bin/activate
-          pip install -e .
+          python -m pip install --upgrade pip
+          python fast-install.py --cuda --cuda-version 12.1 --dev
+        shell: bash
 
       - name: Build Documentation
         run: |
-          source .venv/bin/activate
+          source ./bioneuralnet-env/bin/activate
+          mkdir -p docs/build/html
           sphinx-build -b html docs/source/ docs/build/html/
-
-      - name: Validate Documentation Build
-        run: |
-          echo "Documentation build completed successfully. Files are located in docs/build/html/"
-          ls -R docs/build/html/
+        shell: bash
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/build/html

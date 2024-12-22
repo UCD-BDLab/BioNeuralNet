@@ -1,13 +1,22 @@
 """
-Example 6: WGCNA Workflow with GNN Embeddings
-==============================================
-This script demonstrates how to perform a comprehensive workflow using WGCNA for graph generation, followed by
-GNN-based embedding generation and subject representation integration.
+Example 2: Weighted Gene Co-expression Network Analysis (WGCNA) Workflow with Graph Neural Network (GNN) Embeddings
+=============================================================================================================
+
+This script demonstrates a comprehensive workflow where we first generate a graph using Weighted Gene Co-expression Network Analysis
+(WGCNA), and then use Graph Neural Network (GNN)-based embedding generation to create node
+representations from the network. The process integrates the generated embeddings into subject-level omics data, enhancing
+downstream analytical capabilities.
+
+Steps:
+1. Generate an adjacency matrix using WGCNA based on multi-omics and phenotype data.
+2. Compute node features based on correlations.
+3. Use a Graph Convolutional Network (GCN) to generate node embeddings.
+4. Integrate the embeddings into the omics data for enhanced analysis.
 """
 
 import pandas as pd
 from bioneuralnet.graph_generation import WGCNA
-from bioneuralnet.network_embedding import GnnEmbedding
+from bioneuralnet.network_embedding import GNNEmbedding
 from bioneuralnet.subject_representation import GraphEmbedding
 
 def run_wgcna_workflow_with_gnn(omics_data: pd.DataFrame,
@@ -17,10 +26,10 @@ def run_wgcna_workflow_with_gnn(omics_data: pd.DataFrame,
     Executes the WGCNA-based workflow for generating enhanced omics data.
 
     This function performs the following steps:
-        1. Instantiates the WGCNA, GnnEmbedding, and GraphEmbedding components.
+        1. Instantiates the WGCNA, GNNEmbedding, and GraphEmbedding components.
         2. Generates an adjacency matrix using WGCNA.
         3. Computes node features based on correlations.
-        4. Generates embeddings using GnnEmbedding.
+        4. Generates embeddings using GNNEmbedding.
         5. Integrates embeddings into omics data to produce enhanced omics data.
 
     Args:
@@ -43,9 +52,10 @@ def run_wgcna_workflow_with_gnn(omics_data: pd.DataFrame,
 
         adjacency_matrix = wgcna_instance.run()
         print("Adjacency matrix generated using WGCNA.")
+
         node_features = omics_data[['gene_feature1', 'gene_feature2', 'gene_feature3', 'gene_feature4']] 
 
-        gnn_embedding = GnnEmbedding(
+        gnn_embedding = GNNEmbedding(
             adjacency_matrix=adjacency_matrix,
             node_features=node_features,
             model_type='GCN', 
@@ -57,11 +67,11 @@ def run_wgcna_workflow_with_gnn(omics_data: pd.DataFrame,
         embeddings_tensor = embeddings_dict['graph']
         embeddings_df = pd.DataFrame(embeddings_tensor.numpy(), index=node_features.index)
         print("GNN embeddings generated.")
-
-        #Embeddings can also be saved to a file
-        #output_file = 'output/embeddings.csv'
-        #embeddings_df.to_csv(output_file)
-        #print(f"Embeddings saved to {output_file}")
+        
+        # Embeddings can also be saved to a file
+        # output_file = 'output/embeddings.csv'
+        # embeddings_df.to_csv(output_file)
+        # print(f"Embeddings saved to {output_file}")
 
         # Step 4: Initialize and run GraphEmbedding
         graph_embedding = GraphEmbedding(
@@ -75,9 +85,9 @@ def run_wgcna_workflow_with_gnn(omics_data: pd.DataFrame,
         print("Embeddings integrated into omics data.")
 
         # Enhanced omics data can be saved to a file
-        #output_file = 'output/enhanced_omics_data.csv'
-        #enhanced_omics_data.to_csv(output_file)
-        #print(f"Enhanced omics data saved to {output_file}")
+        # output_file = 'output/enhanced_omics_data.csv'
+        # enhanced_omics_data.to_csv(output_file)
+        # print(f"Enhanced omics data saved to {output_file}")
 
         return enhanced_omics_data
 

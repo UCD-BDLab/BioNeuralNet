@@ -9,10 +9,10 @@ The API Reference provides detailed documentation for BioNeuralNet’s modules, 
 
     bioneuralnet.graph_generation.SmCCNet
     bioneuralnet.graph_generation.WGCNA
-    bioneuralnet.network_embedding.GnnEmbedding
+    bioneuralnet.network_embedding.GNNEmbedding
     bioneuralnet.network_embedding.Node2VecEmbedding
     bioneuralnet.subject_representation.GraphEmbedding
-    bioneuralnet.integrated_tasks.DPMON
+    bioneuralnet.downstream_task.DPMON
     bioneuralnet.utils.data_utils.combine_omics_data
     bioneuralnet.utils.file_helpers.find_files
     bioneuralnet.utils.path_utils.validate_paths
@@ -31,10 +31,10 @@ Below are direct references to the `run()` methods for quick access to their wor
 .. automethod:: bioneuralnet.graph_generation.WGCNA.run
    :no-index:
 
-.. automethod:: bioneuralnet.integrated_tasks.dpmon.DPMON.run
+.. automethod:: bioneuralnet.downstream_task.dpmon.DPMON.run
    :no-index:
 
-.. automethod:: bioneuralnet.network_embedding.gnn_embedding.GnnEmbedding.run
+.. automethod:: bioneuralnet.network_embedding.gnn_embedding.GNNEmbedding.run
    :no-index:
 
 .. automethod:: bioneuralnet.network_embedding.node2vec.Node2VecEmbedding.run

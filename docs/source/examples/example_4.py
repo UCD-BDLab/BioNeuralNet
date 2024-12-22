@@ -1,11 +1,17 @@
 """
-Example 4: SmCCNet + PageRank Clustering + Visualization
+Example 4: Sparse Multiple Canonical Correlation Network (SmCCNet) + PageRank Clustering + Visualization
+========================================================================================================
 
-This example demonstrates how to:
-1. Construct a network using SmCCNet from multi-omics data.
-2. Apply PageRank-based clustering to identify meaningful sub-networks.
-3. Visualize the resulting network clusters using static or dynamic visualization tools.
+This script demonstrates a workflow where we first construct a network using Sparse Multiple Canonical Correlation
+Network (SmCCNet) from multi-omics data, apply PageRank-based clustering to identify meaningful sub-networks, and
+visualize the clusters to explore patterns in the data.
+
+Steps:
+1. Generate a graph using SmCCNet based on multi-omics and phenotype data.
+2. Apply PageRank-based clustering to identify clusters of highly connected nodes.
+3. Visualize the resulting clusters using static or dynamic visualization tools to explore the network structure.
 """
+
 
 import os
 import pandas as pd

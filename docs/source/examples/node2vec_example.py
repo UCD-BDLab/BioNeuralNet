@@ -20,7 +20,7 @@ def main():
             num_walks=200,        
             window_size=10,        
             workers=4,             
-            seed=42                
+            seed=42,                
         )
 
         embeddings = node2vec.run()

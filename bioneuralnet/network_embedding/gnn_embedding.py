@@ -11,11 +11,9 @@ from .gnn_models import GCN, GAT, SAGE, GIN
 from ..utils.logger import get_logger
 
 
-class GnnEmbedding:
+class GNNEmbedding:
     """
-    GnnEmbedding Class for Generating Graph Neural Network (GNN) Based Embeddings.
-
-    Accepts dataframes directly (omics_data, clinical_data) and does not load any files internally.
+    GNNEmbedding Class for Generating Graph Neural Network (GNN) Based Embeddings.
     """
 
     def __init__(
@@ -48,7 +46,7 @@ class GnnEmbedding:
         self.output_dir = output_dir #if output_dir else self._create_output_dir()
 
         self.logger = get_logger(__name__)
-        self.logger.info("Initialized GnnEmbedding with direct data inputs.")
+        self.logger.info("Initialized GNNEmbedding with direct data inputs.")
 
     def _create_output_dir(self) -> str:
         base_dir = "gnn_embedding_output"

@@ -1,14 +1,22 @@
 """
-Example 1: SmCCNet Workflow with GNN Embeddings
-===================================================
+Example 1: Sparse Multiple Canonical Correlation Network (SmCCNet) Workflow with Graph Neural Network (GNN) Embeddings
+======================================================================================================================
 
-This tutorial demonstrates how to perform a comprehensive workflow using SmCCNet for graph generation, followed by
-GNN-based embedding generation and subject representation integration.
+This script demonstrates a comprehensive workflow where we first generate a graph using Sparse Multiple Canonical
+Correlation Network (SmCCNet), and then use Graph Neural Network (GNN)-based embedding generation to create node
+representations from the network.
+
+Steps:
+1. Generate an adjacency matrix using SmCCNet based on multi-omics and phenotype data.
+2. Compute node features based on correlations.
+3. Use a Graph Convolutional Network (GCN) to generate node embeddings.
+4. Integrate the embeddings into the omics data for enhanced analysis.
 """
+
 
 import pandas as pd
 from bioneuralnet.graph_generation import SmCCNet
-from bioneuralnet.network_embedding import GnnEmbedding
+from bioneuralnet.network_embedding import GNNEmbedding
 from bioneuralnet.subject_representation import GraphEmbedding
 
 def run_smccnet_workflow(omics_data: pd.DataFrame,
@@ -18,10 +26,11 @@ def run_smccnet_workflow(omics_data: pd.DataFrame,
     Executes the SmCCNet-based workflow for generating enhanced omics data.
 
     This function performs the following steps:
-        1. Instantiates the SmCCNet, GnnEmbedding, and GraphEmbedding components.
+        1. Instantiates the SmCCNet, GNNEmbedding, and GraphEmbedding components.
         2. Generates an adjacency matrix using SmCCNet.
         3. Computes node features based on correlations.
-        4. Generates embeddings using GnnEmbedding.
+        4. Generates embeddings using GNNEmbedding.
+        5. Integrates embeddings into omics data to produce enhanced omics data.
 
     Args:
         omics_data (pd.DataFrame): DataFrame containing omics features (e.g., proteins, metabolites).
@@ -49,7 +58,7 @@ def run_smccnet_workflow(omics_data: pd.DataFrame,
             omics_data[['metabolite_feature1', 'metabolite_feature2']]  
         ], axis=1)
 
-        gnn_embedding = GnnEmbedding(
+        gnn_embedding = GNNEmbedding(
             adjacency_matrix=adjacency_matrix,
             node_features=node_features,
             model_type='GCN', 

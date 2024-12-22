@@ -1,9 +1,9 @@
-﻿bioneuralnet.network\_embedding.GnnEmbedding
+﻿bioneuralnet.network\_embedding.GNNEmbedding
 ============================================
 
 .. currentmodule:: bioneuralnet.network_embedding
 
-.. autoclass:: GnnEmbedding
+.. autoclass:: GNNEmbedding
 
    
    .. automethod:: __init__
@@ -13,8 +13,8 @@
 
    .. autosummary::
    
-      ~GnnEmbedding.__init__
-      ~GnnEmbedding.run
+      ~GNNEmbedding.__init__
+      ~GNNEmbedding.run
    
    
 

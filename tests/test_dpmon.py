@@ -1,8 +1,7 @@
 import unittest
 from unittest.mock import patch
 import pandas as pd
-import torch
-from bioneuralnet.integrated_tasks.dpmon import DPMON  # Ensure correct import path
+from bioneuralnet.downstream_task.dpmon import DPMON 
 
 class TestDPMON(unittest.TestCase):
 
@@ -33,9 +32,8 @@ class TestDPMON(unittest.TestCase):
             'bmi': [22.5,28.0]
         }, index=['sample1', 'sample2'])
 
-    @patch('bioneuralnet.integrated_tasks.dpmon.run_standard_training')
+    @patch('bioneuralnet.downstream_task.dpmon.run_standard_training')
     def test_run_without_tune(self, mock_standard):
-        # Mock run_standard_training to return predictions
         mock_standard.return_value = pd.DataFrame({
             'Actual': [2, 3],
             'Predicted': [2, 2]
@@ -58,7 +56,7 @@ class TestDPMON(unittest.TestCase):
         self.assertIn('Predicted', predictions.columns)
         self.assertEqual(predictions.shape, (2,2))
 
-    @patch('bioneuralnet.integrated_tasks.dpmon.run_hyperparameter_tuning')
+    @patch('bioneuralnet.downstream_task.dpmon.run_hyperparameter_tuning')
     def test_run_with_tune(self, mock_tune):
         dpmon = DPMON(
             adjacency_matrix=self.adjacency_matrix,
@@ -80,7 +78,7 @@ class TestDPMON(unittest.TestCase):
                 adjacency_matrix=self.adjacency_matrix,
                 omics_list=[self.omics_data1, self.omics_data2],
                 phenotype_data=self.phenotype_data,
-                clinical_data=None,  # Set to None to simulate missing clinical data
+                clinical_data=None, 
                 model='SAGE',
                 tune=False,
                 gpu=False

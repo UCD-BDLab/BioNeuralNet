@@ -3,7 +3,7 @@ from datetime import datetime
 import pandas as pd
 from sklearn.decomposition import PCA
 from ..utils.logger import get_logger
-from ..network_embedding import GnnEmbedding
+from ..network_embedding import GNNEmbedding
 from ..network_embedding import Node2VecEmbedding
 
 
@@ -106,7 +106,7 @@ class GraphEmbedding:
         self.logger.info(f"Generating embeddings using {self.embedding_method}")
 
         if self.embedding_method == 'GNNs':
-            gnn_embedding = GnnEmbedding(
+            gnn_embedding = GNNEmbedding(
                 adjacency_matrix=self.adjacency_matrix,
                 omics_data=self.omics_data,
                 clinical_data=self.clinical_data,

@@ -9,6 +9,8 @@ ENV/
 env.bak/
 venv.bak/
 .pytest_cache
+release.md
+bioneuralnet.egg-info
 
 # Sphinx documentation build
 docs/build/
@@ -20,6 +22,7 @@ env/
 env.bak/
 venv.bak/
 .venv/
+bioneuralnet-env/
 
 # IDE and editor directories
 .vscode/
@@ -51,3 +54,6 @@ test_report/
 # Other
 *.bak
 *.tmp
+test_output/
+dpmon_output_*
+lib/
