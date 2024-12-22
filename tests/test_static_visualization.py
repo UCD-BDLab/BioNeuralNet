@@ -100,7 +100,6 @@ def test_visualize_with_invalid_layout(sample_adjacency_matrix, temp_output_dir)
     """
     invalid_layout = 'invalid_layout'
 
-    # Patch get_logger in the static_visualization module, not in utils.logger
     with mock.patch('bioneuralnet.analysis.static_visualization.get_logger') as mock_get_logger:
         mock_logger = mock.Mock()
         mock_get_logger.return_value = mock_logger

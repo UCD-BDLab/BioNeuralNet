@@ -1,7 +1,6 @@
 import pandas as pd
 from bioneuralnet.analysis.feature_selector import FeatureSelector
-from bioneuralnet.network_embedding import GnnEmbedding
-
+from bioneuralnet.network_embedding import GNNEmbedding
 
 def main():
     phenotype_df = pd.DataFrame({
@@ -37,7 +36,7 @@ def main():
         'GeneD': [0.0, 0.0, 0.7, 1.0]
     }, index=['GeneA', 'GeneB', 'GeneC', 'GeneD'])
 
-    gnn_embed = GnnEmbedding(
+    gnn_embed = GNNEmbedding(
         omics_list=[omics_df1.set_index('SampleID'), omics_df2.set_index('SampleID')],
         phenotype_df=phenotype_df.set_index('SampleID'),
         clinical_data_df=clinical_data_df.set_index('SampleID'),

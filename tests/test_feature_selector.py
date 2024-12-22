@@ -6,7 +6,6 @@ from bioneuralnet.analysis.feature_selector import FeatureSelector
 class TestFeatureSelector(unittest.TestCase):
 
     def setUp(self):
-        # Sample enhanced omics data with 15 features and 5 samples
         self.enhanced_omics_data = pd.DataFrame({
             'feature1': [0.1, 0.2, 0.3, 0.4, 0.5],
             'feature2': [1.2, 1.3, 1.1, 1.4, 1.5],
@@ -25,7 +24,6 @@ class TestFeatureSelector(unittest.TestCase):
             'feature15': [14.1, 14.2, 14.3, 14.4, 14.5],
         })
 
-        # Sample phenotype data with 5 samples
         self.phenotype_data = pd.Series([0, 1, 0, 1, 0], name='Phenotype')
 
 

@@ -1,55 +1,13 @@
-# Core Dependencies
-torch==2.0.0
-torch_geometric>=2.0.0
-PyYAML>=5.4
-pandas>=1.0
-numpy>=1.18
-scikit-learn>=0.24
-node2vec>=0.4.1
-matplotlib>=3.3
-ray[tune]>=2.0
-tensorboardX>=2.5
-networkx>=2.5
-pyvis>=0.2
-leidenalg>=0.8
-dtt>=0.9.0
-
-
-# pytest>=6.0
-# pytest-cov
-# pytest-mock
-
-# We recommend using fast-install.py to install the following dependencies
-# fast-install.py is available at scripts/fast-install.py
-# you will be prompted to install either cpu or gpu dependencies. THen you will be prompted to install the development dependencies
-
-# CPU-specific dependencies
-# Add these if CUDA is not used
-# -f https://data.pyg.org/whl/torch-2.0.0+cpu.html
-#torch-scatter
-#torch-sparse
-
-# GPU-specific dependencies (CUDA 11.7)
-# Uncomment the line below when installing on GPU
-# -f https://data.pyg.org/whl/torch-2.0.0+cu117.html
-# torch-scatter
-# torch-sparse
-
-# Development Dependencies
-# Tools for formatting, testing, and documentation
-# pytest>=6.0
-# pytest-cov
-# pytest-mock
-# sphinx
-# sphinx_rtd_theme
-# sphinx-autosummary-accessors
-# sphinxcontrib-napoleon
-# flake8
-# black
-# mypy
-# pre-commit
-# tox
-
-# Build Tools
-# setuptools>=42
-# twine
+# requirements.in
+PyYAML
+pandas
+numpy
+scikit-learn
+node2vec
+matplotlib
+ray[tune]
+tensorboardX
+networkx
+pyvis
+leidenalg
+dtt

@@ -1,25 +1,25 @@
-# Development dependencies for BioNeuralNet
+# Development dependencies
 
-# Testing
+# testing
 pytest>=6.0
 pytest-cov
 pytest-mock
 
-# Documentation
+# docs
 sphinx
 sphinx_rtd_theme
 sphinx-autosummary-accessors
 sphinxcontrib-napoleon
 
-# Code Quality and Formatting
+# code quality and formatting
 flake8
 black
 mypy
 
-# Additional Development Tools
+# dev tools
 pre-commit
 tox
 
-# Build dependencies for BioNeuralNet
+# build dependencies
 setuptools>=42
 twine

@@ -14,7 +14,6 @@
    .. autosummary::
    
       ~WGCNA.__init__
-      ~WGCNA.load_global_network
       ~WGCNA.preprocess_data
       ~WGCNA.run
       ~WGCNA.run_wgcna

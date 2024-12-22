@@ -14,8 +14,9 @@
    .. autosummary::
    
       ~Node2VecEmbedding.__init__
-      ~Node2VecEmbedding.load_graphs_from_directory
+      ~Node2VecEmbedding.get_embeddings
       ~Node2VecEmbedding.run
+      ~Node2VecEmbedding.save_embeddings
    
    
 

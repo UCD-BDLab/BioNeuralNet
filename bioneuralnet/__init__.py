@@ -23,10 +23,10 @@ Modules:
 __version__: str = '0.1.0'
 
 # Import key classes and functions for easy access
-from .network_embedding import GnnEmbedding
+from .network_embedding import GNNEmbedding
 from .network_embedding import Node2VecEmbedding
 from .subject_representation import GraphEmbedding
-from .integrated_tasks import DPMON
+from .downstream_task import DPMON
 from .analysis import FeatureSelector
 from .analysis import StaticVisualizer
 from .analysis import DynamicVisualizer
@@ -38,7 +38,7 @@ __all__: list = [
     'subject_representation',
     'utils',
     '__version__',
-    'GnnEmbedding',
+    'GNNEmbedding',
     'Node2VecEmbedding',
     'GraphEmbedding',
     'DPMON',

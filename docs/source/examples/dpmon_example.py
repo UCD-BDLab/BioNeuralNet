@@ -1,5 +1,5 @@
 import pandas as pd
-from bioneuralnet.integrated_tasks import DPMON
+from bioneuralnet.downstream_task import DPMON
 
 def main():
     adjacency_matrix = pd.read_csv('input/adjacency_matrix.csv', index_col=0)

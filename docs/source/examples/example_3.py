@@ -1,14 +1,19 @@
 """
-Example 3: DPMON-based Hybrid Example (SmCCNet + DPMON)
-=========================================================
+Example 3: Disease Prediction Using Graph Information (SmCCNet + Disease Prediction using Multi-Omics Networks (DPMON))
+======================================================================================================================
 
-This script demonstrates a workflow where we first generate an adjacency matrix using SmCCNet,
-and then use that matrix to run DPMON for disease prediction.
+This script demonstrates a workflow where we first generate a graph using Sparse Multiple Canonical Correlation Network
+(SmCCNet), and then use that network matrix to run Disease Prediction using Multi-Omics Networks (DPMON), a pipeline
+that leverages the power of Graph Neural Networks (GNNs) specifically designed to predict disease phenotypes.
+
+Steps:
+1. Generate an adjacency matrix using SmCCNet based on multi-omics and phenotype data.
+2. Utilize DPMON to predict disease phenotypes using the network information and omics data.
 """
 
 import pandas as pd
 from bioneuralnet.graph_generation import SmCCNet
-from bioneuralnet.integrated_tasks import DPMON
+from bioneuralnet.downstream_task import DPMON
 
 def run_smccnet_dpmon_workflow(omics_proteins: pd.DataFrame,
                                omics_metabolites: pd.DataFrame,

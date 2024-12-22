@@ -1,11 +1,20 @@
 import os
 import sys
-import pkg_resources
+
+try:
+    from importlib import metadata
+except ImportError:
+    import importlib_metadata as metadata
+
 sys.path.insert(0, os.path.abspath('../../'))
 
+try:
+    release = metadata.version("bioneuralnet")
+except metadata.PackageNotFoundError:
+    release = "0.1.0b1"
+
 project = 'BioNeuralNet'
-author = 'Vicente Ramos'
-release = pkg_resources.get_distribution("bioneuralnet").version
+version = release
 
 extensions = [
     'sphinx.ext.autodoc',      

@@ -10,7 +10,7 @@ class Node2VecEmbedding:
     Node2VecEmbedding Class for Generating Node2Vec-Based Embeddings.
 
     This class handles the execution of the Node2Vec algorithm on a provided graph adjacency matrix
-    and returns the resulting node embeddings without relying on file I/O operations.
+    and returns the resulting node embeddings.
 
     Attributes:
         embedding_dim (int): Dimension of the embeddings.
@@ -19,7 +19,9 @@ class Node2VecEmbedding:
         window_size (int): Window size for Word2Vec.
         workers (int): Number of worker threads.
         seed (int): Random seed for reproducibility.
-        logger (logging.Logger): Logger for the class.
+        p (float): Return parameter for Node2Vec.
+        q (float): In-Out parameter for Node2Vec.
+        weight_key (str): Edge weight parameter name.
     """
 
     def __init__(
@@ -31,6 +33,9 @@ class Node2VecEmbedding:
         window_size: int = 10,
         workers: int = 4,
         seed: int = 42,
+        p: float = 1.0,
+        q: float = 1.0,
+        weight_key: str = 'weight',
     ):
         """
         Initializes the Node2VecEmbedding instance.
@@ -43,7 +48,11 @@ class Node2VecEmbedding:
             window_size (int, optional): Window size for Word2Vec. Defaults to 10.
             workers (int, optional): Number of worker threads. Defaults to 4.
             seed (int, optional): Random seed for reproducibility. Defaults to 42.
+            p (float, optional): Return parameter for Node2Vec. Defaults to 1.0.
+            q (float, optional): In-Out parameter for Node2Vec. Defaults to 1.0.
+            weight_key (str, optional): Edge weight parameter name. Defaults to 'weight'.
         """
+
         self.adjacency_matrix = adjacency_matrix
         self.embedding_dim = embedding_dim
         self.walk_length = walk_length
@@ -51,6 +60,9 @@ class Node2VecEmbedding:
         self.window_size = window_size
         self.workers = workers
         self.seed = seed
+        self.p = p
+        self.q = q
+        self.weight_key = weight_key
         self.logger = get_logger(__name__)
 
         self.logger.info("Initialized Node2VecEmbedding with the following parameters:")
@@ -60,6 +72,9 @@ class Node2VecEmbedding:
         self.logger.info(f"Window Size: {self.window_size}")
         self.logger.info(f"Workers: {self.workers}")
         self.logger.info(f"Seed: {self.seed}")
+        self.logger.info(f"Return Parameter (p): {self.p}")
+        self.logger.info(f"In-Out Parameter (q): {self.q}")
+        self.logger.info(f"Weight Key: {self.weight_key}")
 
         self.embeddings: Optional[pd.DataFrame] = None
 
@@ -71,7 +86,15 @@ class Node2VecEmbedding:
             nx.Graph: The converted NetworkX graph.
         """
         try:
-            G = nx.from_pandas_adjacency(self.adjacency_matrix)
+            G = nx.from_pandas_adjacency(self.adjacency_matrix, create_using=nx.Graph())
+            
+            if self.weight_key != 'weight':
+                for u, v, data in G.edges(data=True):
+                    if self.weight_key in data:
+                        data['weight'] = data.pop(self.weight_key)
+                    else:
+                        data['weight'] = 1.0  # Assign default weight if not present
+
             self.logger.info(
                 f"Converted adjacency matrix to NetworkX graph with {G.number_of_nodes()} nodes and {G.number_of_edges()} edges."
             )
@@ -99,6 +122,8 @@ class Node2VecEmbedding:
                 num_walks=self.num_walks,
                 workers=self.workers,
                 seed=self.seed,
+                p=self.p,
+                q=self.q,
                 quiet=True 
             )
 
@@ -120,7 +145,6 @@ class Node2VecEmbedding:
         except Exception as e:
             self.logger.error(f"Error generating embeddings with Node2Vec: {e}")
             raise
-
 
     def run(self) -> pd.DataFrame:
         """

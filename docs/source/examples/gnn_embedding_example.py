@@ -1,5 +1,5 @@
 import pandas as pd
-from bioneuralnet.network_embedding import GnnEmbedding
+from bioneuralnet.network_embedding import GNNEmbedding
 
 def main():
     phenotype_df = pd.DataFrame({
@@ -35,16 +35,11 @@ def main():
         'GeneD': [0.0, 0.0, 0.7, 1.0]
     }, index=['GeneA', 'GeneB', 'GeneC', 'GeneD'])
 
-    # You can also load the data from files directly
-    
-    # omics_files = [pd.read_csv('input/proteins.csv', index_col=0),
-    #                pd.read_csv('input/metabolites.csv', index_col=0)]
-    # phenotype_df = pd.read_csv('input/phenotype_data.csv', index_col=0)
-    # clinical_data_df = pd.read_csv('input/clinical_data.csv', index_col=0)
-    # adjacency_matrix = pd.read_csv('input/adjacency_matrix.csv', index_col=0)
+    omics_data = pd.concat([omics_df1, omics_df2], axis=1)
 
-    gnn_embed = GnnEmbedding(
-        omics_list=[omics_df1.set_index('SampleID'), omics_df2.set_index('SampleID')],
+    gnn_embed = GNNEmbedding(
+        adjacency_matrix=adjacency_matrix,
+        omics_data=omics_data,
         phenotype_df=phenotype_df.set_index('SampleID'),
         clinical_data_df=clinical_data_df.set_index('SampleID'), 
         adjacency_matrix=adjacency_matrix,
