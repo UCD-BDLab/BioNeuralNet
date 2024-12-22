@@ -46,7 +46,7 @@ This example demonstrates a comprehensive workflow that integrates network const
 
    Use `SmCCNet` to construct the network:
 
-   .. literalinclude:: ../../examples/example_4.py
+   .. literalinclude:: ../examples/example_4.py
       :language: python
       :lines: 21-33
       :caption: Running SmCCNet to generate the adjacency matrix.
@@ -57,7 +57,7 @@ This example demonstrates a comprehensive workflow that integrates network const
 
    Apply PageRank-based clustering to identify sub-networks (clusters) from the constructed network:
 
-   .. literalinclude:: ../../examples/example_4.py
+   .. literalinclude:: ../examples/example_4.py
       :language: python
       :lines: 43-67
       :caption: Running PageRank-based clustering.
@@ -68,7 +68,7 @@ This example demonstrates a comprehensive workflow that integrates network const
 
    Visualize the identified clusters using a static visualization tool:
 
-   .. literalinclude:: ../../examples/example_4.py
+   .. literalinclude:: ../examples/example_4.py
       :language: python
       :lines: 77-89
       :caption: Visualizing the identified cluster.
@@ -79,7 +79,7 @@ This example demonstrates a comprehensive workflow that integrates network const
 
 To execute the complete workflow:
 
-.. literalinclude:: ../../examples/example_4.py
+.. literalinclude:: ../examples/example_4.py
    :language: python
    :caption: Complete SmCCNet + PageRank Clustering + Visualization Workflow.
 
