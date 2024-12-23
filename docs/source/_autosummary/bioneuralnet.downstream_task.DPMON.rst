@@ -1,23 +1,27 @@
-﻿bioneuralnet.downstream\_task.DPMON
+bioneuralnet.downstream\_task.dpmon
 ===================================
 
-.. currentmodule:: bioneuralnet.downstream_task
-
-.. autoclass:: DPMON
+.. automodule:: bioneuralnet.downstream_task.dpmon
 
    
-   .. automethod:: __init__
-
-   
-   .. rubric:: Methods
+   .. rubric:: Functions
 
    .. autosummary::
    
-      ~DPMON.__init__
-      ~DPMON.run
+      build_omics_networks_tg
+      run_hyperparameter_tuning
+      run_standard_training
+      setup_device
+      slice_omics_datasets
+      train_model
    
-   
+   .. rubric:: Classes
 
+   .. autosummary::
    
-   
+      Autoencoder
+      DPMON
+      DimensionAveraging
+      DownstreamTaskNN
+      NeuralNetwork
    

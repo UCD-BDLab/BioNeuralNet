@@ -59,25 +59,43 @@ class GNNEmbedding:
         """
         Generate GNN-based embeddings from the provided adjacency matrix and node features.
 
-        Steps:
-        1. **Node Feature Preparation**: Computes correlations between omics nodes and clinical variables.
-        2. **Building PyG Data Object**: Converts the adjacency matrix and node features into a PyTorch Geometric Data object.
-        3. **Model Inference**: Runs the specified GNN model (GCN, GAT, SAGE, or GIN) to compute embeddings.
-        4. **Saving Embeddings**: Stores the resulting embeddings to a file for future use.
+        **Steps:**
 
-        Returns:
-            Dict[str, torch.Tensor]:
-                A dictionary where keys are graph names (e.g., 'graph') and values are PyTorch tensors of shape
-                (num_nodes, embedding_dim) containing the node embeddings.
+        1. **Node Feature Preparation**:
+            - Computes correlations between omics nodes and clinical variables.
+        
+        2. **Building PyG Data Object**:
+            - Converts the adjacency matrix and node features into a PyTorch Geometric `Data` object.
 
-        Raises:
-            ValueError: If node features cannot be computed or if required nodes are missing.
-            Exception: For any other unforeseen errors.
+        3. **Model Inference**:
+            - Runs the specified GNN model (e.g., GCN, GAT, SAGE, or GIN) to compute node embeddings.
 
-        Notes:
+        4. **Saving Embeddings**:
+            - Stores the resulting embeddings to a file for future analysis or downstream tasks.
+
+        **Returns**: Dict[str, torch.Tensor]
+            
+            - A dictionary where keys are graph names (e.g., 'graph') and values are PyTorch tensors of shape
+              `(num_nodes, embedding_dim)` containing the node embeddings.
+
+        **Raises**:
+
+            - **ValueError**: If node features cannot be computed or if required nodes are missing.
+            - **Exception**: For any unforeseen errors encountered during node feature preparation, model inference, or embedding generation.
+
+        **Notes**:
+
             - Ensure that the adjacency matrix aligns with the nodes present in the omics data.
             - Clinical variables should be properly correlated with omics features.
-            - Adjust `model_type`, `gnn_hidden_dim`, or `gnn_layer_num` as needed to alter the embedding process.
+            - Adjust parameters like `model_type`, `gnn_hidden_dim`, or `gnn_layer_num` as needed to customize the embedding process.
+
+        **Example**:
+
+        .. code-block:: python
+
+            gnn_embedding = GNNEmbedding(adjacency_matrix, omics_data, model_type='GCN')
+            embeddings = gnn_embedding.run()
+            print(embeddings['graph'].shape)
         """
         self.logger.info("Running GNN Embedding process.")
         node_features = self._prepare_node_features()
@@ -96,11 +114,9 @@ class GNNEmbedding:
         )
 
         embeddings = self._generate_embeddings(model, data)
-        #embeddings_file = os.path.join(self.output_dir, "gnn_embeddings.pt")
-        #torch.save(embeddings, embeddings_file)
-        #self.logger.info(f"GNN embeddings saved to {embeddings_file}")
 
         return {'graph': embeddings}
+
 
 
     def _prepare_node_features(self) -> pd.DataFrame:

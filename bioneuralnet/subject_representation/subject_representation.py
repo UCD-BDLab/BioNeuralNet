@@ -63,25 +63,38 @@ class GraphEmbedding:
         """
         Generate subject representations by integrating network embeddings into omics data.
 
-        Steps:
-        1. **Embedding Generation**: Runs GNN or Node2Vec-based methods to produce node embeddings.
-        2. **Dimensionality Reduction**: Applies PCA to condense embeddings into a single principal component.
-        3. **Integration**: Multiplies original omics features by the reduced embeddings to create enhanced omics data.
+        **Steps:**
 
-        Returns:
-            pd.DataFrame:
+        1. **Embedding Generation**:
+            - Runs GNN or Node2Vec-based methods to produce node embeddings for the graph.
 
-                - A DataFrame of enhanced omics data where each feature (node) has been weighted by its embedding-derived principal component.
+        2. **Dimensionality Reduction**:
+            - Applies PCA to condense the high-dimensional embeddings into a single principal component.
 
-        Raises:
+        3. **Integration**:
+            - Multiplies original omics features by the reduced embeddings to create enhanced omics data.
 
-            - ValueError: If embeddings are empty or omics data cannot be integrated.
-            - Exception: For any unexpected issues during the integration process.
+        **Returns**: pd.DataFrame
+            
+            - A DataFrame of enhanced omics data where each feature (node) has been weighted by its embedding-derived principal component.
 
-        Notes:
+        **Raises**:
 
-            - The enhanced omics data can be used downstream for clustering, classification, or regression tasks.
-            - Ensure that the PCA step is appropriate for your analysis and consider adjusting the dimensionality reduction strategy if needed.
+            - **ValueError**: If embeddings are empty or omics data cannot be integrated.
+            - **Exception**: For any unexpected issues encountered during the embedding generation, reduction, or integration steps.
+
+        **Notes**:
+
+            - The enhanced omics data can be used downstream for tasks like clustering, classification, or regression.
+            - Ensure that the PCA step is appropriate for your data. Adjust the dimensionality reduction strategy if required.
+
+        **Example**:
+
+        .. code-block:: python
+
+            subject_rep = SubjectRepresentation(adjacency_matrix, omics_data)
+            enhanced_data = subject_rep.run()
+            print(enhanced_data.head())
         """
         self.logger.info("Running Subject Representation workflow.")
 

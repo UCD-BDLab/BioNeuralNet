@@ -1,10 +1,6 @@
 import os
 import sys
-
-try:
-    from importlib import metadata
-except ImportError:
-    import importlib_metadata as metadata
+from importlib import metadata
 
 sys.path.insert(0, os.path.abspath('../../'))
 
@@ -29,8 +25,8 @@ napoleon_google_docstring = True
 napoleon_numpy_docstring = False
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-html_theme = 'sphinx_rtd_theme'  
 html_static_path = ['_static']
+html_theme = 'sphinx_rtd_theme'  
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),

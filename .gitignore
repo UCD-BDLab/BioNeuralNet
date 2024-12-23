@@ -57,3 +57,4 @@ test_report/
 test_output/
 dpmon_output_*
 lib/
+.DS_Store

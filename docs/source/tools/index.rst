@@ -14,6 +14,6 @@ BioNeuralNet provides a suite of tools to integrate omics data with neural netwo
    Disease_Prediction
    Analysis_and_Visualization
 
-By following these tutorials, you can gain insight into how BioNeuralNet’s modules interoperate 
+By following these tutorials, you can gain insight into how BioNeuralNet's modules interoperate 
 to produce meaningful multi-omics analyses and ready-to-use data for downstream tasks such as disease 
 prediction or feature selection.

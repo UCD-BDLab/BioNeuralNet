@@ -32,7 +32,7 @@ class DPMON:
         omics_list: List[pd.DataFrame],
         phenotype_data: pd.DataFrame,  
         clinical_data: pd.DataFrame,  
-        model: str,
+        model: str='GCN',
         gnn_hidden_dim: int = 16,
         layer_num: int = 5,
         nn_hidden_dim1: int = 8,
@@ -84,30 +84,40 @@ class DPMON:
         """
         Execute the DPMON pipeline for disease prediction.
 
-        Steps:
-        1. **Combining Omics and Phenotype Data**: Merges the provided omics datasets and ensures that  the phenotype (finalgold_visit) column is included.
+        **Steps:**
+
+        1. **Combining Omics and Phenotype Data**:
+           - Merges the provided omics datasets and ensures that the phenotype (`finalgold_visit`) column is included.
+        
         2. **Tuning or Training**:
+           - **Tuning**: If `tune=True`, performs hyperparameter tuning using Ray Tune and returns an empty DataFrame.
+           - **Training**: If `tune=False`, runs standard training to generate predictions.
 
-            - If tune=True, performs hyperparameter tuning using Ray Tune and returns an empty DataFrame.
-            - If tune=False, runs standard training to generate predictions.
+        3. **Predictions**:
+           - If training is performed, returns a DataFrame of predictions with 'Actual' and 'Predicted' columns.
 
-        3. **Predictions**: If training is performed, returns a DataFrame of predictions with 'Actual' and 'Predicted' columns.
+        **Returns**: pd.DataFrame
+            
+            - If `tune=False`, a DataFrame containing disease phenotype predictions for each sample.
+            - If `tune=True`, returns an empty DataFrame since no predictions are generated.
 
-        Returns:
-            pd.DataFrame:
+        **Raises**:
 
-            - If tune=False, a DataFrame containing disease phenotype predictions for each sample.
-            - If tune=True, returns an empty DataFrame since no predictions are generated.
+            - **ValueError**: If the input data is improperly formatted or missing.
+            - **Exception**: For any unforeseen errors encountered during preprocessing, tuning, or training.
 
-        Raises:
-
-            - ValueError: If required inputs (e.g., clinical data) are missing or invalid.
-            - Exception: For any unforeseen issues during the pipeline execution.
-
-        Notes:
+        **Notes**:
 
             - DPMON relies on internally-generated embeddings (via GNNs), node correlations, and a downstream neural network.
-            - Ensure that the adjacency_matrix and omics data are properly aligned and that clinical/phenotype data match the sample indices.
+            - Ensure that the adjacency matrix and omics data are properly aligned and that clinical/phenotype data match the sample indices.
+
+        **Example**:
+
+        .. code-block:: python
+
+            dpmon = DPMON(adjacency_matrix, omics_list, phenotype_data, clinical_data, model='GCN')
+            predictions = dpmon.run()
+            print(predictions.head())
         """
         logger.info("Starting DPMON run.")
 
@@ -151,7 +161,6 @@ class DPMON:
 
         logger.info("DPMON run completed.")
         return predictions
-
 
 def setup_device(gpu, cuda):
     if gpu:

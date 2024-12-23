@@ -157,10 +157,44 @@ class WGCNA:
 
     def run(self) -> pd.DataFrame:
         """
-        Executes the entire WGCNA workflow.
+        Executes the entire Weighted Gene Co-expression Network Analysis (WGCNA) workflow.
 
-        Returns:
-            pd.DataFrame: Adjacency matrix representing the weighted correlation network.
+        **Steps:**
+
+        1. **Preprocessing Data:**
+            - Prepares and formats the input omics data for WGCNA analysis.
+            - Serializes the data into a format suitable for the WGCNA pipeline.
+
+        2. **Running WGCNA:**
+            - Constructs a weighted correlation network based on the serialized omics data.
+            - Identifies co-expression modules among genes or features in the dataset.
+
+        3. **Postprocessing Results:**
+            - Deserializes the adjacency matrix (output of WGCNA) into a Pandas DataFrame.
+            - Logs successful completion and prepares the matrix for downstream tasks.
+
+        **Returns**: pd.DataFrame
+            
+            - A DataFrame containing the adjacency matrix, where each entry represents the weighted correlation between features.
+
+        **Raises**:
+
+            - ValueError If the input data is improperly formatted or missing.
+            - Exception For any unforeseen errors encountered during preprocessing, network construction, or postprocessing.
+
+        **Notes**:
+
+            - The WGCNA workflow is sensitive to input data quality and formatting.
+            - Ensure that the input omics data is preprocessed, normalized, and properly indexed to align with expected formats.
+            - This method is designed for large-scale multi-omics data and may require significant computational resources depending on the dataset size.
+
+        Example:
+
+        .. code-block:: python
+
+            wgcna = WGCNA(omics_data)
+            adjacency_matrix = wgcna.run()
+            print(adjacency_matrix.head())
         """
         try:
             self.logger.info("Starting WGCNA Network Construction Workflow.")
