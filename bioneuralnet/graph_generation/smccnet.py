@@ -150,10 +150,40 @@ class SmCCNet:
 
     def run(self) -> pd.DataFrame:
         """
-        Executes the entire SmCCNet workflow.
+        Executes the entire Sparse Multiple Canonical Correlation Network (SmCCNet) workflow.
 
-        Returns:
-            pd.DataFrame: Adjacency matrix representing the global network.
+        **Steps:**
+
+        1. **Preprocessing Data**:
+           - Formats and serializes the input omics and phenotype data for SmCCNet analysis.
+
+        2. **Graph Generation**:
+           - Constructs a global network by generating an adjacency matrix through SmCCNet.
+
+        3. **Postprocessing Results**:
+           - Deserializes the adjacency matrix (output of SmCCNet) into a Pandas DataFrame.
+
+        **Returns**: pd.DataFrame
+            
+            - A DataFrame containing the adjacency matrix, where each entry represents the strength of the correlation between features.
+
+        **Raises**:
+
+            - **ValueError**: If the input data is improperly formatted or missing.
+            - **Exception**: For any unforeseen errors encountered during preprocessing, graph generation, or postprocessing.
+
+        **Notes**:
+
+            - SmCCNet is designed for multi-omics data and requires a well-preprocessed and normalized dataset.
+            - Ensure that omics and phenotype data are properly aligned to avoid errors in graph construction.
+
+        **Example**:
+
+        .. code-block:: python
+
+            smccnet = SmCCNet(omics_data, phenotype_data)
+            adjacency_matrix = smccnet.run()
+            print(adjacency_matrix.head())
         """
         try:
             self.logger.info("Starting SmCCNet Graph Generation Workflow.")
@@ -169,3 +199,4 @@ class SmCCNet:
         except Exception as e:
             self.logger.error(f"Error in SmCCNet Graph Generation: {e}")
             raise
+

@@ -15,6 +15,7 @@ This example demonstrates a hybrid workflow combining SmCCNet for network genera
 
 1. **Setup Input Data:**
    - Prepare the following inputs:
+   
      - **Proteins Data (`omics_proteins`)**: Pandas DataFrame containing protein features.
      - **Metabolites Data (`omics_metabolites`)**: Pandas DataFrame containing metabolite features.
      - **Phenotype Data (`phenotype_data`)**: Pandas Series with phenotype labels.

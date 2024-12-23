@@ -338,13 +338,63 @@ class PageRank:
 
     def run(self, seed_nodes: List[Any]) -> Dict[str, Any]:
         """
-        Main method to run the PageRank clustering pipeline.
+        Executes the PageRank-based clustering pipeline.
 
-        Args:
-            seed_nodes (List[Any]): List of seed node identifiers for personalization.
+        **Steps:**
 
-        Returns:
-            Dict[str, Any]: Clustering results.
+        1. **Initializing Clustering**:
+            - Receives a list of seed nodes to personalize the PageRank algorithm.
+            - Prepares the input graph and relevant parameters for clustering.
+
+        2. **PageRank Execution**:
+            - Applies the PageRank algorithm with personalization based on the seed nodes.
+            - Computes node scores and determines cluster memberships.
+
+        3. **Result Compilation**:
+            - Compiles clustering results, including cluster sizes and node memberships, into a dictionary.
+            - Logs the successful completion of the clustering process.
+
+        **Args**:
+            seed_nodes (List[Any]):
+                - A list of node identifiers used as seed nodes for personalized PageRank.
+                - These nodes influence the clustering process by biasing the algorithm.
+
+        **Returns**: Dict[str, Any]
+            
+            - A dictionary containing the clustering results. Keys may include:
+                - `clusters`: Lists of nodes grouped into clusters.
+                - `scores`: PageRank scores for each node.
+                - `metadata`: Additional metrics or details about the clustering process.
+
+        **Raises**:
+
+            - ValueError: If the input graph is empty or seed nodes are invalid.
+            - Exception: For any unexpected errors during clustering execution.
+
+        **Notes**:
+
+            - Seed nodes strongly influence the clustering outcome; select them carefully based on prior knowledge or experimental goals.
+            - The PageRank algorithm requires a well-defined and connected graph to produce meaningful results.
+            - Results are sensitive to the alpha (damping factor) and other hyperparameters.
+
+        Example:
+
+        .. code-block:: python
+
+            from bioneuralnet.clustering import PageRank
+
+            # Initialize the PageRank clustering instance
+            pagerank_clustering = PageRank(graph=my_graph, alpha=0.9, max_iter=100, tol=1e-6)
+
+            # Define seed nodes for personalization
+            seed_nodes = ['node1', 'node2', 'node3']
+
+            # Run the clustering pipeline
+            results = pagerank_clustering.run(seed_nodes=seed_nodes)
+
+            # Output the results
+            print("Clusters:", results['clusters'])
+            print("Scores:", results['scores'])
         """
         try:
             results = self.run_pagerank_clustering(seed_nodes)

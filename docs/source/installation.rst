@@ -15,15 +15,16 @@ Installation
    We have provided a quick way to install these dependencies using a script.
 
    Download options:
-   - `Download zip content <https://github.com/UCD-BDLab/BioNeuralNet/archive/refs/heads/main.zip>`_
-   - Clone or download from the `BioNeuralNet GitHub repository <https://github.com/UCD-BDLab/BioNeuralNet>`_
+
+     - `Download zip content <https://github.com/UCD-BDLab/BioNeuralNet/archive/refs/heads/main.zip>`_
+     - Clone or download from the `BioNeuralNet GitHub repository <https://github.com/UCD-BDLab/BioNeuralNet>`_
 
    .. figure:: _static/repo.png
       :align: center
       :alt: Repository Screenshot
-      :figwidth: 80%
 
    **Continue from .zip download:**
+
    - Extract the contents of the .zip file to a folder.
      - In the example below, the folder is named 'tutorial'.
    - Open a terminal window and navigate to the folder.
@@ -37,7 +38,6 @@ Installation
    .. figure:: _static/terminal.png
       :align: center
       :alt: Terminal window during installation
-      :figwidth: 80%
 
    **fast-install.py Options:**
 
@@ -121,7 +121,6 @@ Installation
    .. figure:: _static/terminal2.png
       :align: center
       :alt: Terminal window prompts
-      :figwidth: 80%
    
    You can now activate your virtual environment and start using BioNeuralNet:
 
@@ -129,7 +128,7 @@ Installation
 
       source ./bioneuralnet-env/bin/activate
 
-   See the :doc:`tutorials` or :doc:`tools` sections for examples.
+   See the :doc:`tutorials <tutorials/index>` or :doc:`tools <tools/index>` sections for examples.
 
 4. **Running tests:**
    
@@ -144,10 +143,9 @@ Installation
    .. figure:: _static/tests.png
       :align: center
       :alt: Pytest running tests
-      :figwidth: 80%
 
    This script:
    - Creates and activates a virtual environment.
    - Installs base, development, and R dependencies for graph generation.
 
-After installation, proceed to the :doc:`tutorials` or :doc:`tools` sections for examples.
+After installation, proceed to the :doc:`tutorials <tutorials/index>` or :doc:`tools <tools/index>` sections for code examples.

@@ -1,25 +1,12 @@
-﻿bioneuralnet.graph\_generation.SmCCNet
+bioneuralnet.graph\_generation.smccnet
 ======================================
 
-.. currentmodule:: bioneuralnet.graph_generation
-
-.. autoclass:: SmCCNet
+.. automodule:: bioneuralnet.graph_generation.smccnet
 
    
-   .. automethod:: __init__
-
-   
-   .. rubric:: Methods
+   .. rubric:: Classes
 
    .. autosummary::
    
-      ~SmCCNet.__init__
-      ~SmCCNet.preprocess_data
-      ~SmCCNet.run
-      ~SmCCNet.run_smccnet
-   
-   
-
-   
-   
+      SmCCNet
    

@@ -25,7 +25,7 @@ This example demonstrates a comprehensive workflow that integrates network const
 
    Example structure:
 
-   .. code-block:: csv
+   .. code-block:: none
 
       Proteins.csv:
       protein_feature1,protein_feature2
@@ -70,7 +70,7 @@ This example demonstrates a comprehensive workflow that integrates network const
 
    .. literalinclude:: ../examples/example_4.py
       :language: python
-      :lines: 77-89
+      :lines: 77-82
       :caption: Visualizing the identified cluster.
 
    The visualization provides a graphical view of the network, highlighting clusters of interest. The resulting image is saved in the `visualization_output/` directory.

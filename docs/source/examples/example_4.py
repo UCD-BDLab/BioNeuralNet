@@ -12,7 +12,6 @@ Steps:
 3. Visualize the resulting clusters using static or dynamic visualization tools to explore the network structure.
 """
 
-
 import os
 import pandas as pd
 import networkx as nx
@@ -24,7 +23,7 @@ from bioneuralnet.analysis import StaticVisualizer
 def run_smccnet_pagerank_visualization_workflow():
     omics_proteins = pd.read_csv('input/proteins.csv', index_col=0)
     omics_metabolites = pd.read_csv('input/metabolites.csv', index_col=0)
-    phenotype_data = pd.read_csv('input/phenotype_data.csv', index_col=0).squeeze()
+    phenotype_data = pd.read_csv('input/phenotype_data.csv', index_col=0)
     omics_dfs = [omics_proteins, omics_metabolites]
     data_types = ['protein', 'metabolite']
 

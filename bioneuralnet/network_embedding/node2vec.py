@@ -150,8 +150,37 @@ class Node2VecEmbedding:
         """
         Runs the Node2Vec embedding process.
 
-        Returns:
-            pd.DataFrame: DataFrame containing node embeddings.
+        **Steps:**
+
+        1. **Converting to NetworkX Graph**:
+            - Converts the input adjacency matrix to a NetworkX-compatible graph object.
+
+        2. **Embedding Generation**:
+            - Executes the Node2Vec algorithm to generate low-dimensional embeddings for graph nodes.
+
+        3. **Output Preparation**:
+            - Returns the generated embeddings as a Pandas DataFrame.
+
+        **Returns**: pd.DataFrame
+            
+            - A DataFrame containing the node embeddings, with nodes as rows and embedding dimensions as columns.
+
+        **Raises**:
+
+            - **Exception**: For any errors encountered during graph conversion or embedding generation.
+
+        **Notes**:
+
+            - Ensure the adjacency matrix is properly formatted and reflects the graph's structure.
+            - Adjust hyperparameters like `walk_length` or `embedding_dim` to tune the Node2Vec process.
+
+        **Example**:
+
+        .. code-block:: python
+
+            node2vec = Node2VecEmbedding(adjacency_matrix)
+            embeddings = node2vec.run()
+            print(embeddings.head())
         """
         try:
             self.logger.info("Starting Node2Vec embedding process.")
@@ -162,6 +191,7 @@ class Node2VecEmbedding:
         except Exception as e:
             self.logger.error(f"Error in Node2VecEmbedding run method: {e}")
             raise
+
 
     def get_embeddings(self) -> pd.DataFrame:
         """

@@ -144,10 +144,51 @@ class HierarchicalClustering:
         """
         Runs the entire hierarchical clustering pipeline.
 
-        Returns:
-            Dict[str, Any]: Clustering results.
+        **Steps:**
+
+        1. **Preprocessing Data**:
+            - Prepares and formats the input data to be compatible with hierarchical clustering.
+
+        2. **Running Clustering**:
+            - Executes the hierarchical clustering algorithm (e.g., agglomerative clustering) to identify groups or modules in the data.
+
+        3. **Extracting Results**:
+            - Processes and formats clustering outputs, such as cluster assignments and dendrogram structures.
+
+        **Returns**: Dict[str, Any]
+            
+            - A dictionary containing clustering results, including:
+              - Cluster assignments for each data point.
+              - Dendrogram structure for visualization.
+              - Metrics or statistics related to cluster quality.
+
+        **Raises**:
+
+            - **ValueError**: If input data is invalid or preprocessing fails.
+            - **Exception**: For any unforeseen issues during the clustering pipeline.
+
+        **Notes**:
+
+            - Ensure that the input data is properly normalized and formatted before running the clustering pipeline.
+            - Adjust clustering parameters like the linkage method or distance metric to fit the analysis.
+
+        **Example**:
+
+        .. code-block:: python
+
+            cluster_pipeline = HierarchicalClustering(data)
+            results = cluster_pipeline.run()
+            print(results['clusters'])
         """
-        self.preprocess_data()
-        self.run_clustering()
-        self.logger.info("Hierarchical clustering pipeline completed successfully.")
-        return self.get_results()
+        self.logger.info("Running Hierarchical Clustering workflow.")
+
+        try:
+            self.preprocess_data()
+            self.run_clustering()
+            self.logger.info("Hierarchical clustering pipeline completed successfully.")
+            return self.get_results()
+
+        except Exception as e:
+            self.logger.error(f"Error in Hierarchical Clustering: {e}")
+            raise
+

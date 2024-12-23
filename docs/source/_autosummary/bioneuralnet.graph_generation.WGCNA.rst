@@ -1,25 +1,12 @@
-﻿bioneuralnet.graph\_generation.WGCNA
+bioneuralnet.graph\_generation.wgcna
 ====================================
 
-.. currentmodule:: bioneuralnet.graph_generation
-
-.. autoclass:: WGCNA
+.. automodule:: bioneuralnet.graph_generation.wgcna
 
    
-   .. automethod:: __init__
-
-   
-   .. rubric:: Methods
+   .. rubric:: Classes
 
    .. autosummary::
    
-      ~WGCNA.__init__
-      ~WGCNA.preprocess_data
-      ~WGCNA.run
-      ~WGCNA.run_wgcna
-   
-   
-
-   
-   
+      WGCNA
    
