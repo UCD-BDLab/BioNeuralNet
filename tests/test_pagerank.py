@@ -195,30 +195,6 @@ class TestPageRank(unittest.TestCase):
         self.assertEqual(str(context.exception), "Seed nodes list cannot be empty.")
         mock_logger.error.assert_called_with("No seed nodes provided for PageRank clustering.")
 
-    # @patch('bioneuralnet.clustering.pagerank.get_logger')
-    # def test_generate_weighted_personalization_single_node(self, mock_get_logger):
-    #     """
-    #     Test generate_weighted_personalization with a single seed node.
-    #     """
-    #     mock_logger = MagicMock()
-    #     mock_get_logger.return_value = mock_logger
-    #
-    #     pagerank_instance = PageRank(
-    #         graph=self.G,
-    #         omics_data=self.omics_data,
-    #         phenotype_data=self.phenotype_data,
-    #         alpha=0.9,
-    #         k=0.9
-    #     )
-    #
-    #     seed_nodes = ['1']
-    #     personalization = pagerank_instance.generate_weighted_personalization(seed_nodes)
-    #
-    #     self.assertEqual(set(personalization.keys()), set(seed_nodes))
-    #     self.assertEqual(len(personalization), 1)
-    #     self.assertIsInstance(list(personalization.values())[0], float)
-    #
-    #     mock_logger.warning.assert_called_with("Not enough nodes (1) for correlation. Returning 0 correlation.")
 
     @patch('bioneuralnet.clustering.pagerank.get_logger')
     def test_run_pagerank_clustering_valid_seed_nodes(self, mock_get_logger):
