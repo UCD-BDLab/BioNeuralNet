@@ -14,11 +14,11 @@ class TestPageRank(unittest.TestCase):
         self.G = nx.Graph()
         self.G.add_edge('1', '2', weight=1.0)
         self.G.add_edge('2', '3', weight=2.0)
-        self.G.add_edge('3', '4', weight=1.5)
+        self.G.add_edge('3', '1', weight=1.5)
         self.omics_data = pd.DataFrame({
-            'Gene1': [0.1, 0.2, 0.3, 0.4],
-            'Gene2': [0.3, 0.4, 0.5, 0.6],
-            'Gene3': [0.5, 0.6, 0.7, 0.8]
+            '1': [0.1, 0.2, 0.3, 0.4],
+            '2': [0.3, 0.4, 0.5, 0.6],
+            '3': [0.5, 0.6, 0.7, 0.8]
         }, index=['1', '2', '3', '4'])
 
         self.phenotype_data = pd.Series([1, 0, 1, 0], index=['1', '2', '3', '4'])
