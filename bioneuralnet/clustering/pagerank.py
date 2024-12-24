@@ -297,7 +297,8 @@ class PageRank:
                 'correlation_pvalue': pval
             }
 
-            self.save_results(results)
+            if self.output_dir is not None:
+                self.save_results(results)
             return results
 
         except Exception as e:
