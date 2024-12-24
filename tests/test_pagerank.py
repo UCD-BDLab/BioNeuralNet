@@ -60,7 +60,8 @@ class TestPageRank(unittest.TestCase):
             omics_data=self.omics_data,
             phenotype_data=self.phenotype_data,
             alpha=0.9,
-            k=0.9
+            k=0.9,
+            output_dir='test_output'
         )
 
         with patch.object(pagerank_instance, 'generate_weighted_personalization', return_value={'1': 0.5, '2': 0.5}) as mock_gen_pers, \
@@ -232,7 +233,8 @@ class TestPageRank(unittest.TestCase):
             omics_data=self.omics_data,
             phenotype_data=self.phenotype_data,
             alpha=0.9,
-            k=0.9
+            k=0.9,
+            output_dir='test_output'
         )
 
         with patch.object(pagerank_instance, 'generate_weighted_personalization', return_value={'1': 0.5, '2': 0.5}) as mock_gen_pers, \
