@@ -91,10 +91,6 @@ class PageRank:
             if not graph_nodes.issubset(omics_nodes):
                 missing = graph_nodes - omics_nodes
                 raise ValueError(f"Omics data is missing nodes: {missing}")
-            #
-            # if not graph_nodes.issubset(phenotype_nodes):
-            #     missing = graph_nodes - phenotype_nodes
-            #     raise ValueError(f"Phenotype data is missing nodes: {missing}")
 
         except Exception as e:
             self.logger.error(f"Input validation error: {e}")
@@ -125,9 +121,6 @@ class PageRank:
             Tuple[float, str]: Correlation coefficient and formatted correlation with p-value.
         """
         try:
-            # if len(nodes) < 2:
-            #     self.logger.warning(f"Not enough nodes ({len(nodes)}) for correlation. Returning 0 correlation.")
-            #     return 0.0, "0 (1.0)"
 
             B_sub = self.B[nodes]
             scaler = StandardScaler()
