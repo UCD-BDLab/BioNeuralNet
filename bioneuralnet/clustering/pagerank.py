@@ -125,9 +125,9 @@ class PageRank:
             Tuple[float, str]: Correlation coefficient and formatted correlation with p-value.
         """
         try:
-            if len(nodes) < 2:
-                self.logger.warning(f"Not enough nodes ({len(nodes)}) for correlation. Returning 0 correlation.")
-                return 0.0, "0 (1.0)"
+            # if len(nodes) < 2:
+            #     self.logger.warning(f"Not enough nodes ({len(nodes)}) for correlation. Returning 0 correlation.")
+            #     return 0.0, "0 (1.0)"
 
             B_sub = self.B[nodes]
             scaler = StandardScaler()
