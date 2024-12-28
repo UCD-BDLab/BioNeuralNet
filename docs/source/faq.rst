@@ -5,8 +5,6 @@ Frequently Asked Questions (FAQ)
 
 A1: BioNeuralNet is a Python-based framework designed to integrate and analyze multi-omics data through network-based representations and lower-dimensional embeddings. It facilitates advanced analytical processes such as clustering, feature selection, disease prediction, and environmental exposure assessment, enabling researchers to derive actionable insights from complex biological datasets.
 
----
-
 **Q2: What are the key components of BioNeuralNet?**
 
 A2: BioNeuralNet comprises five core components:
@@ -17,19 +15,14 @@ A2: BioNeuralNet comprises five core components:
 4. **Subject Representation**: Integrate embeddings into omics data to enrich subject-level features, enhancing the dataset for downstream analyses.
 5. **Downstream Tasks**: Perform advanced analyses like disease prediction using network information. Seamlessly integrate your own downstream tasks by leveraging existing components.
 
----
 
 **Q3: Can I request new components?**
 
 A3: Yes! Please reach out, and we will gladly work with you to integrate new components into BioNeuralNet. Our goal is to facilitate multi-omics research by providing a flexible and extensible framework, and integrating new custom components is a key part of that.
 
----
-
 **Q4: How do I install BioNeuralNet and its dependencies?**
 
 A4: For detailed installation instructions, follow these steps: :doc:`installation`.
-
----
 
 **Q5: Can I accelerate computations using GPUs?**
 
@@ -49,8 +42,6 @@ A5: Yes, BioNeuralNet supports CUDA-based installations for GPU acceleration, si
 .. code-block:: bash
 
    nvcc --version
-
----
 
 **Q6: How do I contribute to BioNeuralNet?**
 
@@ -101,13 +92,9 @@ A6: Contributions to BioNeuralNet are highly appreciated! To contribute:
 
 For detailed guidelines, `BioNeuralNet README.md <https://github.com/UCD-BDLab/BioNeuralNet/blob/main/README.md>`_.
 
----
+**Q7: Where can I find BioNeuralNet's documentation and examples?**
 
-**Q7: Where can I find BioNeuralNet’s documentation and examples?**
-
-A7: You are already here! For additional questions, please reach out to us at **vicente.ramos@ucdenver.edu**.
-
----
+A7: You are already here! For additional questions, please reach out to **vicente.ramos@ucdenver.edu**.
 
 **Q8: How do I report issues or request features for BioNeuralNet?**
 
@@ -123,32 +110,15 @@ A8: For help, bug reports, or feature requests, please open an issue on the `Bio
 
 Our team will review your submission and respond accordingly.
 
----
-
 **Q9: What license is BioNeuralNet distributed under?**
 
 A9: BioNeuralNet is distributed under the `MIT License <https://github.com/UCD-BDLab/BioNeuralNet/blob/main/LICENSE>`_. This permissive license allows you to freely use, modify, and distribute the software, provided that the original copyright notice and permission notice are included in all copies or substantial portions of the software.
 
----
-
 **Q10: Who are the contributors and maintainers of BioNeuralNet?**
 
-A10: BioNeuralNet is developed and maintained by the `UCD-BDLab <https://github.com/UCD-BDLab>`_ team. We extend our gratitude to all contributors and open-source communities that have supported the development of BioNeuralNet. For a complete list of contributors, visit the `Contributors <https://github.com/UCD-BDLab/BioNeuralNet/graphs/contributors>`_ page on GitHub.
+A10: BioNeuralNet is developed and maintained by the `UCD-BDLab <https://github.com/UCD-BDLab>`_ . 
 
----
-
-**Q11: How can I get involved with the UCD-BDLab?**
-
-A11: The `UCD-BDLab <https://github.com/UCD-BDLab>`_ welcomes collaboration and participation from researchers and developers interested in bioinformatics and computational biology. To get involved:
-
-1. **Explore Our Projects:** Visit the `UCD-BDLab GitHub repository <https://github.com/UCD-BDLab>`_ to see our current projects and initiatives.
-2. **Contribute to Projects:** Fork repositories, contribute code, report issues, and propose new features.
-3. **Join Our Community:** Participate in discussions, attend lab meetings, and collaborate on research endeavors.
-4. **Contact Us:** Reach out via `GitHub Issues <https://github.com/UCD-BDLab/BioNeuralNet/issues>`_ or email the maintainers at **vicente.ramos@ucdenver.edu** for more information.
-
----
-
-**Q12: What acknowledgments are associated with BioNeuralNet?**
+**Q11: What acknowledgments are associated with BioNeuralNet?**
 
 A12: BioNeuralNet leverages several open-source libraries and tools that are integral to its functionality:
 
