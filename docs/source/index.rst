@@ -21,6 +21,8 @@ For installation details and other options, go to :doc:`installation`.
 **Example: Transforming Multi-Omics for Enhanced Disease Prediction** 
 ---------------------------------------------------------------------
 
+`View full-size image: Transforming Multi-Omics for Enhanced Disease Prediction <https://ramosv.github.io/_images/Overview.png>`_
+
 .. figure:: _static/Overview.png
    :align: center
    :alt: BioNeuralNet Overview
@@ -88,13 +90,17 @@ Looking to explore the capabilities of BioNeuralNet? Here is a brief overview of
 4. **Subject Representation**: Integrate embeddings into omics data to enrich subject-level features, enhancing the dataset for downstream analyses.
 5. **Downstream Tasks**: Perform advanced analyses like disease prediction using network information. Seamlessly integrate your own downstream tasks by leveraging existing components.
 
-.. figure:: _static/Overview.png
+`View full-size image: BioNeuralNet Overview <https://ramosv.github.io/_images/BioNeuralNet.png>`_
+
+.. figure:: _static/BioNeuralNet.png
    :align: center
-   :alt: BioNeuralNet Overview
+   :alt: BioNeuralNet
 
    BioNeuralNet Overview
 
 **Subject Representation**
+
+`View full-size image: Subject Representation <https://ramosv.github.io/_images/SubjectRepresentation.png>`_
 
 .. figure:: _static/SubjectRepresentation.png
    :align: center
@@ -104,11 +110,13 @@ Looking to explore the capabilities of BioNeuralNet? Here is a brief overview of
 
 **Disease Prediction**
 
+`View full-size image: Disease Prediction (DPMON) <https://ramosv.github.io/_images/DPMON.png>`_
+
 .. figure:: _static/DPMON.png
    :align: center
    :alt: Disease Prediction (DPMON)
 
-   Embedding-enhanced subject data support models like DPMON for improved disease prediction.
+   Embedding-enhanced subject data using DPMON for improved disease prediction.
 
 Documentation Overview
 -----------------------
