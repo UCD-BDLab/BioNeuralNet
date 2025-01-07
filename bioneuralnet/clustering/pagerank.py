@@ -85,16 +85,12 @@ class PageRank:
                 raise TypeError("phenotype_data must be a pandas Series.")
 
             graph_nodes = set(self.G.nodes())
-            omics_nodes = set(self.B.index)
+            omics_nodes = set(self.B.columns)
             phenotype_nodes = set(self.Y.index)
 
             if not graph_nodes.issubset(omics_nodes):
                 missing = graph_nodes - omics_nodes
                 raise ValueError(f"Omics data is missing nodes: {missing}")
-
-            if not graph_nodes.issubset(phenotype_nodes):
-                missing = graph_nodes - phenotype_nodes
-                raise ValueError(f"Phenotype data is missing nodes: {missing}")
 
         except Exception as e:
             self.logger.error(f"Input validation error: {e}")
@@ -125,17 +121,14 @@ class PageRank:
             Tuple[float, str]: Correlation coefficient and formatted correlation with p-value.
         """
         try:
-            if len(nodes) < 2:
-                self.logger.warning(f"Not enough nodes ({len(nodes)}) for correlation. Returning 0 correlation.")
-                return 0.0, "0 (1.0)"
 
-            B_sub = self.B.loc[nodes]
+            B_sub = self.B[nodes]
             scaler = StandardScaler()
             scaled = scaler.fit_transform(B_sub)
 
             pca = PCA(n_components=1)
             g1 = pca.fit_transform(scaled).flatten()
-            g2 = self.Y.loc[nodes].values
+            g2 = self.Y
 
             corr, pvalue = pearsonr(g1, g2)
             corr = round(corr, 2)
@@ -297,7 +290,8 @@ class PageRank:
                 'correlation_pvalue': pval
             }
 
-            self.save_results(results)
+            if self.output_dir is not None:
+                self.save_results(results)
             return results
 
         except Exception as e:
