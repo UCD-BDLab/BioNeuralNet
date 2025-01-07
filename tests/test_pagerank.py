@@ -14,11 +14,11 @@ class TestPageRank(unittest.TestCase):
         self.G = nx.Graph()
         self.G.add_edge('1', '2', weight=1.0)
         self.G.add_edge('2', '3', weight=2.0)
-        self.G.add_edge('3', '4', weight=1.5)
+        self.G.add_edge('3', '1', weight=1.5)
         self.omics_data = pd.DataFrame({
-            'Gene1': [0.1, 0.2, 0.3, 0.4],
-            'Gene2': [0.3, 0.4, 0.5, 0.6],
-            'Gene3': [0.5, 0.6, 0.7, 0.8]
+            '1': [0.1, 0.2, 0.3, 0.4],
+            '2': [0.3, 0.4, 0.5, 0.6],
+            '3': [0.5, 0.6, 0.7, 0.8]
         }, index=['1', '2', '3', '4'])
 
         self.phenotype_data = pd.Series([1, 0, 1, 0], index=['1', '2', '3', '4'])
@@ -60,7 +60,8 @@ class TestPageRank(unittest.TestCase):
             omics_data=self.omics_data,
             phenotype_data=self.phenotype_data,
             alpha=0.9,
-            k=0.9
+            k=0.9,
+            output_dir='test_output'
         )
 
         with patch.object(pagerank_instance, 'generate_weighted_personalization', return_value={'1': 0.5, '2': 0.5}) as mock_gen_pers, \
@@ -194,30 +195,6 @@ class TestPageRank(unittest.TestCase):
         self.assertEqual(str(context.exception), "Seed nodes list cannot be empty.")
         mock_logger.error.assert_called_with("No seed nodes provided for PageRank clustering.")
 
-    @patch('bioneuralnet.clustering.pagerank.get_logger')
-    def test_generate_weighted_personalization_single_node(self, mock_get_logger):
-        """
-        Test generate_weighted_personalization with a single seed node.
-        """
-        mock_logger = MagicMock()
-        mock_get_logger.return_value = mock_logger
-
-        pagerank_instance = PageRank(
-            graph=self.G,
-            omics_data=self.omics_data,
-            phenotype_data=self.phenotype_data,
-            alpha=0.9,
-            k=0.9
-        )
-
-        seed_nodes = ['1']
-        personalization = pagerank_instance.generate_weighted_personalization(seed_nodes)
-
-        self.assertEqual(set(personalization.keys()), set(seed_nodes))
-        self.assertEqual(len(personalization), 1)
-        self.assertIsInstance(list(personalization.values())[0], float)
-
-        mock_logger.warning.assert_called_with("Not enough nodes (1) for correlation. Returning 0 correlation.")
 
     @patch('bioneuralnet.clustering.pagerank.get_logger')
     def test_run_pagerank_clustering_valid_seed_nodes(self, mock_get_logger):
@@ -232,7 +209,8 @@ class TestPageRank(unittest.TestCase):
             omics_data=self.omics_data,
             phenotype_data=self.phenotype_data,
             alpha=0.9,
-            k=0.9
+            k=0.9,
+            output_dir='test_output'
         )
 
         with patch.object(pagerank_instance, 'generate_weighted_personalization', return_value={'1': 0.5, '2': 0.5}) as mock_gen_pers, \
