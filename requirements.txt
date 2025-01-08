@@ -1,4 +1,6 @@
 # requirements.in
+wheel
+setuptools
 PyYAML
 pandas
 numpy
@@ -11,3 +13,5 @@ networkx
 pyvis
 leidenalg
 dtt
+# pip install torch
+# pip install torch_geometric
