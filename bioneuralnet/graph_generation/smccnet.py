@@ -65,28 +65,29 @@ class SmCCNet:
         valid_samples = pd.Series([True] * len(phenotype_ids), index=self.phenotype_df.index)
 
         serialized_data = {
-            'phenotype': self.phenotype_df.to_csv(index=False)
+            'phenotype': self.phenotype_df.to_csv(index=False), 
+            'omics_1': self.omics_dfs[0].to_csv(index=False)
         }
 
-        for idx, omics_df in enumerate(self.omics_dfs):
-            data_type = self.data_types[idx]
-            self.logger.info(f"Processing omics DataFrame {idx+1}/{len(self.omics_dfs)}: Data Type = {data_type}")
+        # for idx, omics_df in enumerate(self.omics_dfs):
+        #     data_type = self.data_types[idx]
+        #     self.logger.info(f"Processing omics DataFrame {idx+1}/{len(self.omics_dfs)}: Data Type = {data_type}")
 
-            omics_ids = omics_df.iloc[:, 0]
-            if not omics_ids.equals(phenotype_ids):
-                self.logger.warning(f"Sample IDs in omics dataframe {idx+1} do not match phenotype data. Aligning data.")
-                omics_df = omics_df.set_index(omics_ids).loc[phenotype_ids].reset_index()
+        #     omics_ids = omics_df.iloc[:, 0]
+        #     if not omics_ids.equals(phenotype_ids):
+        #         self.logger.warning(f"Sample IDs in omics dataframe {idx+1} do not match phenotype data. Aligning data.")
+        #         omics_df = omics_df.set_index(omics_ids).loc[phenotype_ids].reset_index()
 
-            if omics_df.isnull().values.any():
-                self.logger.warning(f"NaN values detected in omics dataframe {idx+1}. Marking samples with NaNs as invalid.")
-                valid_samples &= ~omics_df.isnull().any(axis=1)
+        #     if omics_df.isnull().values.any():
+        #         self.logger.warning(f"NaN values detected in omics dataframe {idx+1}. Marking samples with NaNs as invalid.")
+        #         valid_samples &= ~omics_df.isnull().any(axis=1)
 
-            if (omics_df == float('inf')).any().any() or (omics_df == -float('inf')).any().any():
-                self.logger.warning(f"Infinite values detected in omics dataframe {idx+1}. Replacing with NaN and marking samples as invalid.")
-                omics_df.replace([float('inf'), -float('inf')], pd.NA, inplace=True)
-                valid_samples &= ~omics_df.isnull().any(axis=1)
+        #     if (omics_df == float('inf')).any().any() or (omics_df == -float('inf')).any().any():
+        #         self.logger.warning(f"Infinite values detected in omics dataframe {idx+1}. Replacing with NaN and marking samples as invalid.")
+        #         omics_df.replace([float('inf'), -float('inf')], pd.NA, inplace=True)
+        #         valid_samples &= ~omics_df.isnull().any(axis=1)
 
-            serialized_data[f'omics_{idx+1}'] = omics_df.to_csv(index=False)
+        #     serialized_data[f'omics_{idx+1}'] = omics_df.to_csv(index=False)
 
         self.logger.info("Preprocessing completed successfully.")
         return serialized_data

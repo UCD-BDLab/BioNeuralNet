@@ -3,9 +3,10 @@
 library("SmCCNet")
 library("jsonlite")
 library("dplyr")
+#library("WGCNA")
 
 options(stringsAsFactors = FALSE)
-allowWGCNAThreads()
+#allowWGCNAThreads()
 json_input <- readLines(con = "stdin")
 
 if (length(json_input) == 0) {
@@ -53,10 +54,10 @@ if (!(summarization %in% c("PCA", "SVD"))) {
 }
 
 set.seed(seed)
-
+omics_df <- read.csv(text = input_data[["omics_1"]], stringsAsFactors = FALSE)
 tryCatch({
   result <- fastAutoSmCCNet(
-    X = omics_list,
+    X = list(omics_df),
     Y = phenotype_df[[2]], 
     DataType = data_types,
     Kfold = kfold,
