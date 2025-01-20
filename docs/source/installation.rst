@@ -21,13 +21,12 @@ BioNeuralNet supports Python 3.10 and 3.11 in this beta release. Follow the step
       pip install torch torchvision torchaudio
       pip install torch_geometric
 
-   For GPU-accelerated builds or other configurations:
-   - Visit the official sites:
+   For GPU-accelerated builds or other configurations visit the official sites:
 
-     - `PyTorch Installation Guide <https://pytorch.org/get-started/locally/>`_
-     - `PyTorch Geometric Installation Guide <https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html>`_
+   - `PyTorch Installation Guide <https://pytorch.org/get-started/locally/>`_
+   - `PyTorch Geometric Installation Guide <https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html>`_
 
-   - Select the appropriate build for your system (e.g., Stable, Linux, pip, Python, CPU).
+   Select the appropriate build for your system (e.g., Stable, Linux, pip, Python, CPU).
 
    .. figure:: _static/pytorch.png
       :align: center

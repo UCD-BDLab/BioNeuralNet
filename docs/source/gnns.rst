@@ -92,12 +92,16 @@ where
 Task-Driven vs. Unsupervised GNNs
 ---------------------------------
 
-1. **Task-Driven**: If each node (e.g., a gene or protein) has a **numeric value**
+1. **Task-Driven**:
+
+   If each node (e.g., a gene or protein) has a **numeric value**
    (e.g., correlation with a disease phenotype), you can train a GNN to predict
    this value with MSE or another loss. This aligns node embeddings with the
    target measure, grouping nodes that have similar values or relationships.
 
-2. **Unsupervised**: If no explicit node label is provided, the GNN can learn from the **graph structure itself**:
+2. **Unsupervised**:
+   If no explicit node label is provided, the GNN can learn from the **graph structure itself**:
+
    - **Intrinsic Objectives**: Methods like graph autoencoders or contrastive losses let GNNs reconstruct edges, distinguish real vs. random neighbors, etc.
    - **Structure as Signal**: Even in the absence of external labels, adjacency patterns guide the GNN to produce meaningful embeddings (local/global relationships).
    - **Practical Implementation**: In some workflows (e.g., a quick exploration), you might skip external labeling entirely. The GNN could run with random weights or minimal self-supervision, still generating a representation that captures the topology to some extent.
