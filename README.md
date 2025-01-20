@@ -8,7 +8,7 @@
 
 ## Welcome to BioNeuralNet Beta 0.1
 
-![BioNeuralNet Logo](/assets/BioNeuralNet_canva_logo_WB.png)
+![BioNeuralNet Logo](/assets/LOGO_WB.png)
 
 **Note:** This is a **beta version** of BioNeuralNet. It is under active development, and certain features
 may be incomplete or subject to change. Feedback and bug reports are highly encouraged to help us
