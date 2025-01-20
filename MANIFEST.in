@@ -2,7 +2,7 @@
 include README.md
 include LICENSE
 
-# Include assets and images 
+# Include assets and images
 recursive-include assets *.png *.jpg *.svg
 
 # Include documentation source files
@@ -19,4 +19,3 @@ global-exclude __pycache__ *.pyc *.pyo *.pyd
 
 # Exclude editor backup and temporary files
 global-exclude *~ *.bak *.swp
-

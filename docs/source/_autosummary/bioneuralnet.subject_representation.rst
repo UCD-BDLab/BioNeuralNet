@@ -3,7 +3,7 @@
 
 .. automodule:: bioneuralnet.subject_representation
 
-   
+
 .. rubric:: Modules
 
 .. autosummary::

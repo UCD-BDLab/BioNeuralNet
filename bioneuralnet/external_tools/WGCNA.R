@@ -62,20 +62,20 @@ tryCatch({
   dynamic_modules <- cutreeDynamic(dendro = gene_tree, distM = dissTOM,
                                    deepSplit = 2, pamRespectsDendro = FALSE,
                                    minClusterSize = min_module_size)
-  
+
   module_colors <- labels2colors(dynamic_modules)
   ME_list <- moduleEigengenes(omics_matrix, colors = module_colors)
   MEs <- ME_list$eigengenes
-  
+
   merged <- mergeCloseModules(omics_matrix, module_colors, cutHeight = merge_cut_height, verbose = 3)
   merged_colors <- merged$colors
   merged_MEs <- merged$newMEs
-  
+
   adjacency_output <- as.data.frame(adjacency_matrix)
   adjacency_output$Gene <- rownames(adjacency_matrix)
   adjacency_output <- adjacency_output[, c(ncol(adjacency_output), 1:(ncol(adjacency_output)-1))]
   adjacency_json <- toJSON(adjacency_output, dataframe = "columns")
-  
+
   cat(adjacency_json)
 }, error = function(e) {
   # Serialize error message to JSON and output

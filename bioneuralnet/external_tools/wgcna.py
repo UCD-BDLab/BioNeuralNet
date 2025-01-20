@@ -49,8 +49,12 @@ class WGCNA:
         self.logger.info(f"Merge Cut Height: {self.merge_cut_height}")
 
         if len(self.omics_dfs) != len(self.data_types):
-            self.logger.error("Number of omics dataframes does not match number of data types.")
-            raise ValueError("Number of omics dataframes does not match number of data types.")
+            self.logger.error(
+                "Number of omics dataframes does not match number of data types."
+            )
+            raise ValueError(
+                "Number of omics dataframes does not match number of data types."
+            )
 
     def preprocess_data(self) -> Dict[str, Any]:
         """
@@ -62,41 +66,59 @@ class WGCNA:
         self.logger.info("Preprocessing omics data for NaN or infinite values.")
         phenotype_ids = self.phenotype_df.iloc[:, 0]
         self.logger.info(f"Number of samples in phenotype data: {len(phenotype_ids)}")
-        valid_samples = pd.Series([True] * len(phenotype_ids), index=self.phenotype_df.index)
+        valid_samples = pd.Series(
+            [True] * len(phenotype_ids), index=self.phenotype_df.index
+        )
 
-        serialized_data = {
-            'phenotype': self.phenotype_df.to_csv(index=False)
-        }
+        serialized_data = {"phenotype": self.phenotype_df.to_csv(index=False)}
 
         for idx, omics_df in enumerate(self.omics_dfs):
             data_type = self.data_types[idx]
-            self.logger.info(f"Processing omics DataFrame {idx+1}/{len(self.omics_dfs)}: Data Type = {data_type}")
+            self.logger.info(
+                f"Processing omics DataFrame {idx+1}/{len(self.omics_dfs)}: Data Type = {data_type}"
+            )
 
             omics_ids = omics_df.iloc[:, 0]
             if not omics_ids.equals(phenotype_ids):
-                self.logger.warning(f"Sample IDs in omics dataframe {idx+1} do not match phenotype data. Aligning data.")
-                omics_df = omics_df.set_index(omics_ids).loc[phenotype_ids].reset_index()
+                self.logger.warning(
+                    f"Sample IDs in omics dataframe {idx+1} do not match phenotype data. Aligning data."
+                )
+                omics_df = (
+                    omics_df.set_index(omics_ids).loc[phenotype_ids].reset_index()
+                )
 
             if omics_df.isnull().values.any():
-                self.logger.warning(f"NaN values detected in omics dataframe {idx+1}. Marking samples with NaNs as invalid.")
+                self.logger.warning(
+                    f"NaN values detected in omics dataframe {idx+1}. Marking samples with NaNs as invalid."
+                )
                 valid_samples &= ~omics_df.isnull().any(axis=1)
 
-            if (omics_df == float('inf')).any().any() or (omics_df == -float('inf')).any().any():
-                self.logger.warning(f"Infinite values detected in omics dataframe {idx+1}. Replacing with NaN and marking samples as invalid.")
-                omics_df.replace([float('inf'), -float('inf')], pd.NA, inplace=True)
+            if (omics_df == float("inf")).any().any() or (
+                omics_df == -float("inf")
+            ).any().any():
+                self.logger.warning(
+                    f"Infinite values detected in omics dataframe {idx+1}. Replacing with NaN and marking samples as invalid."
+                )
+                omics_df.replace([float("inf"), -float("inf")], pd.NA, inplace=True)
                 valid_samples &= ~omics_df.isnull().any(axis=1)
 
             num_valid_before = valid_samples.sum()
-            self.logger.info(f"Number of valid samples before filtering: {num_valid_before}")
+            self.logger.info(
+                f"Number of valid samples before filtering: {num_valid_before}"
+            )
             omics_df_clean = omics_df[valid_samples].reset_index(drop=True)
             num_valid_after = omics_df_clean.shape[0]
-            self.logger.info(f"Number of valid samples after filtering: {num_valid_after}")
+            self.logger.info(
+                f"Number of valid samples after filtering: {num_valid_after}"
+            )
 
             if num_valid_after == 0:
-                self.logger.error("No valid samples remaining after preprocessing. Aborting WGCNA run.")
+                self.logger.error(
+                    "No valid samples remaining after preprocessing. Aborting WGCNA run."
+                )
                 raise ValueError("No valid samples remaining after preprocessing.")
 
-            serialized_data[f'omics_{idx+1}'] = omics_df_clean.to_csv(index=False)
+            serialized_data[f"omics_{idx+1}"] = omics_df_clean.to_csv(index=False)
 
         self.logger.info("Preprocessing completed successfully.")
         return serialized_data
@@ -126,16 +148,12 @@ class WGCNA:
                 r_script,
                 str(self.soft_power),
                 str(self.min_module_size),
-                str(self.merge_cut_height)
+                str(self.merge_cut_height),
             ]
 
             self.logger.debug(f"Executing command: {' '.join(command)}")
             result = subprocess.run(
-                command,
-                input=json_data,
-                text=True,
-                capture_output=True,
-                check=True
+                command, input=json_data, text=True, capture_output=True, check=True
             )
 
             self.logger.info("WGCNA R script executed successfully.")
@@ -174,7 +192,7 @@ class WGCNA:
             - Logs successful completion and prepares the matrix for downstream tasks.
 
         **Returns**: pd.DataFrame
-            
+
             - A DataFrame containing the adjacency matrix, where each entry represents the weighted correlation between features.
 
         **Raises**:
@@ -198,10 +216,10 @@ class WGCNA:
         """
         try:
             self.logger.info("Starting WGCNA Network Construction Workflow.")
-            
+
             serialized_data = self.preprocess_data()
             adjacency_json = self.run_wgcna(serialized_data)
-            adjacency_matrix = pd.read_json(StringIO(adjacency_json), orient='split')
+            adjacency_matrix = pd.read_json(StringIO(adjacency_json), orient="split")
 
             self.logger.info("Adjacency matrix deserialized successfully.")
             self.logger.info("WGCNA Network Construction completed successfully.")

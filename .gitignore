@@ -14,7 +14,7 @@ bioneuralnet.egg-info
 /dist/
 /build/
 /docker_files/
-
+.mypy_cache
 
 # Block sensitive file types globally
 *.csv

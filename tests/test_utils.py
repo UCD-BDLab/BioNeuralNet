@@ -1,6 +1,7 @@
 import pytest
 from bioneuralnet.utils.path_utils import validate_paths
 
+
 def test_validate_paths(tmp_path, caplog):
     input_dir = tmp_path / "input"
     output_dir = tmp_path / "output"

@@ -1,3 +1,3 @@
 from .pagerank import PageRank
 
-__all__ = ['PageRank']
+__all__ = ["PageRank"]

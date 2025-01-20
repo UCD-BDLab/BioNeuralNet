@@ -4,9 +4,9 @@ import pandas as pd
 
 
 def main():
-    graph = nx.read_edgelist('input/GFEV1ac110.edgelist', data=(('weight', float),))
-    omics = pd.read_csv('Input/X.csv').iloc[:, 1:]
-    phenotype = pd.read_csv('Input/Y.csv').iloc[:, 1]
+    graph = nx.read_edgelist("input/GFEV1ac110.edgelist", data=(("weight", float),))
+    omics = pd.read_csv("Input/X.csv").iloc[:, 1:]
+    phenotype = pd.read_csv("Input/Y.csv").iloc[:, 1]
 
     omics.columns = [str(index) for index in range(omics.shape[1])]
 
@@ -20,10 +20,38 @@ def main():
         k=0.9,
     )
 
-    seed_nodes = ['251', '325', '303', '358', '445', '636', '374', '96', '1159', '324', '2221', '1884', '1985']
-    seed_nodes = ['251', '325', '303', '358', '445', '636', '374', '96', '1159', '324', '2221', '1884', '1985']
+    seed_nodes = [
+        "251",
+        "325",
+        "303",
+        "358",
+        "445",
+        "636",
+        "374",
+        "96",
+        "1159",
+        "324",
+        "2221",
+        "1884",
+        "1985",
+    ]
+    seed_nodes = [
+        "251",
+        "325",
+        "303",
+        "358",
+        "445",
+        "636",
+        "374",
+        "96",
+        "1159",
+        "324",
+        "2221",
+        "1884",
+        "1985",
+    ]
     results = pagerank_cluster.run(seed_nodes=seed_nodes)
-    cluster_nodes = results['cluster_nodes']
+    cluster_nodes = results["cluster_nodes"]
     print(f"Identified cluster with {len(cluster_nodes)} nodes: {cluster_nodes}")
 
 

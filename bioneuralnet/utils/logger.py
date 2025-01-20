@@ -1,6 +1,7 @@
 import logging
 import os
 
+
 def get_logger(name: str) -> logging.Logger:
     """
     Retrieves a global logger configured to write to 'bioneuralnet.log' at the project root.
@@ -12,11 +13,11 @@ def get_logger(name: str) -> logging.Logger:
         logging.Logger: Configured logger instance.
     """
     logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG) 
+    logger.setLevel(logging.DEBUG)
 
     if not logger.handlers:
         project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        log_file = os.path.join(project_root, 'bioneuralnet.log')
+        log_file = os.path.join(project_root, "bioneuralnet.log")
 
         fh = logging.FileHandler(log_file)
         fh.setLevel(logging.DEBUG)
@@ -24,7 +25,9 @@ def get_logger(name: str) -> logging.Logger:
         ch = logging.StreamHandler()
         ch.setLevel(logging.INFO)
 
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
         fh.setFormatter(formatter)
         ch.setFormatter(formatter)
 

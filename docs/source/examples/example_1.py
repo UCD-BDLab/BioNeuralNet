@@ -15,7 +15,7 @@ from bioneuralnet.subject_representation import GraphEmbedding
 
 
 def run_smccnet_workflow(
-    omics_data: pd.DataFrame, phenotype_data: pd.Series, clinical_data: pd.DataFrame
+    omics_data: pd.DataFrame, phenotype_data: pd.DataFrame, clinical_data: pd.DataFrame
 ) -> pd.DataFrame:
     """
     Executes the SmCCNet-based workflow for generating enhanced omics data.
@@ -35,8 +35,8 @@ def run_smccnet_workflow(
     """
     try:
         smccnet_instance = SmCCNet(
-            phenotype_data=phenotype_data,
-            omics_data=omics_data,
+            phenotype_df=phenotype_data,
+            omics_dfs=omics_data,
             data_types=["protein", "metabolite"],
             kfold=5,
             summarization="PCA",

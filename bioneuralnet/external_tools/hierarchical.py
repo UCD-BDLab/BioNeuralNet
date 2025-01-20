@@ -5,6 +5,7 @@ from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import StandardScaler
 from ..utils.logger import get_logger
 
+
 class HierarchicalClustering:
     """
     HierarchicalClustering Class for Performing Agglomerative Hierarchical Clustering.
@@ -23,8 +24,8 @@ class HierarchicalClustering:
         self,
         adjacency_matrix: pd.DataFrame,
         n_clusters: int = 2,
-        linkage: str = 'ward',
-        affinity: str = 'euclidean',
+        linkage: str = "ward",
+        affinity: str = "euclidean",
         scale_data: bool = True,
     ):
         """
@@ -38,13 +39,15 @@ class HierarchicalClustering:
             scale_data (bool, optional): Whether to standardize the data. Defaults to True.
         """
 
-        if linkage == 'ward' and affinity != 'euclidean':
-            raise ValueError("The 'ward' linkage method only supports the 'euclidean' metric.")
-        if linkage not in ['ward', 'complete', 'average', 'single']:
+        if linkage == "ward" and affinity != "euclidean":
+            raise ValueError(
+                "The 'ward' linkage method only supports the 'euclidean' metric."
+            )
+        if linkage not in ["ward", "complete", "average", "single"]:
             raise ValueError(f"Unsupported linkage method: {linkage}")
-        if affinity not in ['euclidean', 'l1', 'l2', 'manhattan', 'cosine']:
+        if affinity not in ["euclidean", "l1", "l2", "manhattan", "cosine"]:
             raise ValueError(f"Unsupported affinity metric: {affinity}")
-    
+
         self.n_clusters = n_clusters
         self.linkage = linkage
         self.affinity = affinity
@@ -52,7 +55,9 @@ class HierarchicalClustering:
 
         # Initialize logger
         self.logger = get_logger(__name__)
-        self.logger.info("Initialized HierarchicalClustering with the following parameters:")
+        self.logger.info(
+            "Initialized HierarchicalClustering with the following parameters:"
+        )
         self.logger.info(f"Number of Clusters: {self.n_clusters}")
         self.logger.info(f"Linkage: {self.linkage}")
         self.logger.info(f"Affinity: {self.affinity}")
@@ -75,7 +80,7 @@ class HierarchicalClustering:
                 self.scaled_feature_matrix = pd.DataFrame(
                     scaled_array,
                     index=self.adjacency_matrix.index,
-                    columns=self.adjacency_matrix.columns
+                    columns=self.adjacency_matrix.columns,
                 )
                 self.logger.info("Data has been scaled using StandardScaler.")
             else:
@@ -85,43 +90,42 @@ class HierarchicalClustering:
             self.logger.error(f"Error during data preprocessing: {e}")
             raise
 
-
     def run_clustering(self) -> None:
         """
         Executes the hierarchical clustering algorithm.
         """
         try:
-            metric = 'euclidean' if self.linkage == 'ward' else self.affinity
+            metric = "euclidean" if self.linkage == "ward" else self.affinity
             model = AgglomerativeClustering(
-                n_clusters=self.n_clusters,
-                linkage=self.linkage,
-                metric=metric
+                n_clusters=self.n_clusters, linkage=self.linkage, metric=metric
             )
 
             self.labels = model.fit_predict(self.scaled_feature_matrix)
             self.logger.info("Hierarchical clustering completed.")
 
-            if metric in ['euclidean', 'l1', 'l2', 'manhattan', 'cosine']:
+            if metric in ["euclidean", "l1", "l2", "manhattan", "cosine"]:
                 try:
-                    self.silhouette_avg = silhouette_score(self.scaled_feature_matrix, self.labels, metric=metric)
+                    self.silhouette_avg = silhouette_score(
+                        self.scaled_feature_matrix, self.labels, metric=metric
+                    )
                     self.logger.info(f"Silhouette Score: {self.silhouette_avg:.4f}")
                 except Exception as e:
                     self.logger.warning(f"Could not compute silhouette score: {e}")
                     self.silhouette_avg = None
             else:
-                self.logger.warning(f"Silhouette score not computed for metric '{metric}'.")
+                self.logger.warning(
+                    f"Silhouette score not computed for metric '{metric}'."
+                )
                 self.silhouette_avg = None
 
-            self.cluster_labels_df = pd.DataFrame({
-                'node': self.adjacency_matrix.index,
-                'cluster': self.labels
-            })
+            self.cluster_labels_df = pd.DataFrame(
+                {"node": self.adjacency_matrix.index, "cluster": self.labels}
+            )
             self.logger.info("Cluster labels DataFrame created.")
 
         except Exception as e:
             self.logger.error(f"Error during clustering: {e}")
             raise
-
 
     def get_results(self) -> Dict[str, Any]:
         """
@@ -135,8 +139,8 @@ class HierarchicalClustering:
             raise ValueError("Clustering has not been run yet.")
 
         results = {
-            'cluster_labels': self.cluster_labels_df,
-            'silhouette_score': self.silhouette_avg,
+            "cluster_labels": self.cluster_labels_df,
+            "silhouette_score": self.silhouette_avg,
         }
         return results
 
@@ -156,7 +160,7 @@ class HierarchicalClustering:
             - Processes and formats clustering outputs, such as cluster assignments and dendrogram structures.
 
         **Returns**: Dict[str, Any]
-            
+
             - A dictionary containing clustering results, including:
               - Cluster assignments for each data point.
               - Dendrogram structure for visualization.
@@ -191,4 +195,3 @@ class HierarchicalClustering:
         except Exception as e:
             self.logger.error(f"Error in Hierarchical Clustering: {e}")
             raise
-

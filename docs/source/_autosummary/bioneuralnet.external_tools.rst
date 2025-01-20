@@ -3,7 +3,7 @@
 
 .. automodule:: bioneuralnet.external_tools
 
-   
+
 .. rubric:: Modules
 
 .. autosummary::

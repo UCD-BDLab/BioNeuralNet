@@ -83,7 +83,8 @@ class DPMON:
         self.tune = tune
         self.gpu = gpu
         self.cuda = cuda
-        self.output_dir = output_dir if output_dir else f"dpmon_output_{os.getpid()}"
+        self.output_dir = output_dir if output_dir else f"dpmon_output"
+        # f"dpmon_output_{os.getpid()}" for unique output directory
 
         os.makedirs(self.output_dir, exist_ok=True)
         logger.info("Initialized DPMON with the provided parameters.")

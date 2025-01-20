@@ -52,7 +52,7 @@ def run_smccnet_dpmon_workflow(
             adjacency_matrix=adjacency_matrix,
             omics_list=[omics_genes],
             phenotype_data=phenotype,
-            features_data=clinical_data,
+            clinical_data=clinical_data,
             model="GCN",
             tune=False,
             gpu=False,

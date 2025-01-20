@@ -8,6 +8,7 @@ from sklearn.decomposition import PCA
 from scipy.stats import pearsonr
 from ..utils.logger import get_logger
 
+
 class PageRank:
     """
     PageRank Class for Clustering Nodes Based on Personalized PageRank.
@@ -55,11 +56,13 @@ class PageRank:
         self.max_iter = max_iter
         self.tol = tol
         self.k = k
-        self.output_dir = output_dir #if output_dir else self._create_output_dir()
+        self.output_dir = output_dir  # if output_dir else self._create_output_dir()
 
         self.logger = get_logger(__name__)
         self.logger.info("Initialized PageRank with the following parameters:")
-        self.logger.info(f"Graph: NetworkX Graph with {self.G.number_of_nodes()} nodes and {self.G.number_of_edges()} edges.")
+        self.logger.info(
+            f"Graph: NetworkX Graph with {self.G.number_of_nodes()} nodes and {self.G.number_of_edges()} edges."
+        )
         self.logger.info(f"Omics Data: DataFrame with shape {self.B.shape}.")
         self.logger.info(f"Phenotype Data: Series with {len(self.Y)} samples.")
         self.logger.info(f"Alpha: {self.alpha}")
@@ -132,7 +135,7 @@ class PageRank:
 
             corr, pvalue = pearsonr(g1, g2)
             corr = round(corr, 2)
-            p_value = format(pvalue, '.3g')
+            p_value = format(pvalue, ".3g")
             corr_pvalue = f"{corr} ({p_value})"
             return corr, corr_pvalue
 
@@ -140,7 +143,9 @@ class PageRank:
             self.logger.error(f"Error in phen_omics_corr: {e}")
             raise
 
-    def sweep_cut(self, p: Dict[Any, float]) -> Tuple[List[Any], int, float, float, float, str]:
+    def sweep_cut(
+        self, p: Dict[Any, float]
+    ) -> Tuple[List[Any], int, float, float, float, str]:
         """
         Performs sweep cut based on the PageRank scores.
 
@@ -161,12 +166,15 @@ class PageRank:
             corr_res = []
             cond_corr_res = []
             cluster = set()
-            min_cut, min_cond_corr = len(p), float('inf')
-            len_clus, cond, corr, cor_pval = 0, 1, 0, ''
-            degrees = dict(self.G.degree(weight='weight'))
+            min_cut, min_cond_corr = len(p), float("inf")
+            len_clus, cond, corr, cor_pval = 0, 1, 0, ""
+            degrees = dict(self.G.degree(weight="weight"))
             vec = sorted(
-                [(p[node] / degrees[node] if degrees[node] > 0 else 0, node) for node in p.keys()],
-                reverse=True
+                [
+                    (p[node] / degrees[node] if degrees[node] > 0 else 0, node)
+                    for node in p.keys()
+                ],
+                reverse=True,
             )
 
             for i, (val, node) in enumerate(vec):
@@ -176,7 +184,7 @@ class PageRank:
                     cluster.add(node)
 
                 if len(self.G.nodes()) > len(cluster):
-                    cluster_cond = nx.conductance(self.G, cluster, weight='weight')
+                    cluster_cond = nx.conductance(self.G, cluster, weight="weight")
                     cond_res.append(round(cluster_cond, 3))
 
                     Nodes = list(cluster)
@@ -184,21 +192,32 @@ class PageRank:
                     corr_res.append(round(cluster_corr, 3))
                     cluster_corr_neg = -abs(round(cluster_corr, 3))
 
-                    cond_corr = round((1 - self.k) * cluster_cond + self.k * cluster_corr_neg, 3)
+                    cond_corr = round(
+                        (1 - self.k) * cluster_cond + self.k * cluster_corr_neg, 3
+                    )
                     cond_corr_res.append(cond_corr)
 
                     if cond_corr < min_cond_corr:
                         min_cond_corr, min_cut = cond_corr, i
                         len_clus = len(cluster)
                         cond = cluster_cond
-                        corr = cluster_corr 
+                        corr = cluster_corr
                         cor_pval = corr_pvalue
 
             if min_cut < len(vec):
                 nodes_in_cluster = [vec[i][1] for i in range(min_cut + 1)]
-                return nodes_in_cluster, len_clus, cond, corr, round(min_cond_corr, 3), cor_pval
+                return (
+                    nodes_in_cluster,
+                    len_clus,
+                    cond,
+                    corr,
+                    round(min_cond_corr, 3),
+                    cor_pval,
+                )
             else:
-                self.logger.warning("No valid sweep cut found. Returning empty cluster.")
+                self.logger.warning(
+                    "No valid sweep cut found. Returning empty cluster."
+                )
                 return [], 0, 0.0, 0.0, 0.0, "0 (1.0)"
 
         except Exception as e:
@@ -220,7 +239,7 @@ class PageRank:
             corr_contribution = []
 
             for i in range(len(nodes)):
-                nodes_excl = nodes[:i] + nodes[i + 1:]
+                nodes_excl = nodes[:i] + nodes[i + 1 :]
                 if not nodes_excl:
                     contribution = 0
                 else:
@@ -228,7 +247,9 @@ class PageRank:
                     contribution = abs(corr_excl) - abs(total_corr)
                 corr_contribution.append(contribution)
 
-            max_contribution = max(corr_contribution, key=lambda x: abs(x)) if corr_contribution else 1
+            max_contribution = (
+                max(corr_contribution, key=lambda x: abs(x)) if corr_contribution else 1
+            )
             if max_contribution == 0:
                 max_contribution = 1
 
@@ -263,7 +284,9 @@ class PageRank:
 
         try:
             personalization = self.generate_weighted_personalization(seed_nodes)
-            self.logger.info(f"Generated personalization vector for seed nodes: {seed_nodes}")
+            self.logger.info(
+                f"Generated personalization vector for seed nodes: {seed_nodes}"
+            )
 
             p = nx.pagerank(
                 self.G,
@@ -271,7 +294,7 @@ class PageRank:
                 personalization=personalization,
                 max_iter=self.max_iter,
                 tol=self.tol,
-                weight='weight'
+                weight="weight",
             )
             self.logger.info("PageRank computation completed.")
 
@@ -279,15 +302,17 @@ class PageRank:
             if not nodes:
                 self.logger.warning("Sweep cut did not identify any cluster.")
             else:
-                self.logger.info(f"Sweep cut resulted in cluster of size {n} with conductance {cond} and correlation {corr}.")
+                self.logger.info(
+                    f"Sweep cut resulted in cluster of size {n} with conductance {cond} and correlation {corr}."
+                )
 
             results = {
-                'cluster_nodes': nodes,
-                'cluster_size': n,
-                'conductance': cond,
-                'correlation': corr,
-                'composite_score': min_corr,
-                'correlation_pvalue': pval
+                "cluster_nodes": nodes,
+                "cluster_size": n,
+                "conductance": cond,
+                "correlation": corr,
+                "composite_score": min_corr,
+                "correlation_pvalue": pval,
             }
 
             if self.output_dir is not None:
@@ -297,7 +322,6 @@ class PageRank:
         except Exception as e:
             self.logger.error(f"Error in run_pagerank_clustering: {e}")
             raise
-
 
         except Exception as e:
             self.logger.error(f"Error in run_pagerank_clustering: {e}")
@@ -312,16 +336,25 @@ class PageRank:
         """
         try:
             timestamp = datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
-            filename = os.path.join(self.output_dir, f"pagerank_results_{timestamp}.csv")
+            filename = os.path.join(
+                self.output_dir, f"pagerank_results_{timestamp}.csv"
+            )
 
-            df = pd.DataFrame({
-                'Node': results['cluster_nodes'],
-                'Cluster Size': [results['cluster_size']] * len(results['cluster_nodes']),
-                'Conductance': [results['conductance']] * len(results['cluster_nodes']),
-                'Correlation': [results['correlation']] * len(results['cluster_nodes']),
-                'Composite Score': [results['composite_score']] * len(results['cluster_nodes']),
-                'Correlation P-Value': [results['correlation_pvalue']] * len(results['cluster_nodes']),
-            })
+            df = pd.DataFrame(
+                {
+                    "Node": results["cluster_nodes"],
+                    "Cluster Size": [results["cluster_size"]]
+                    * len(results["cluster_nodes"]),
+                    "Conductance": [results["conductance"]]
+                    * len(results["cluster_nodes"]),
+                    "Correlation": [results["correlation"]]
+                    * len(results["cluster_nodes"]),
+                    "Composite Score": [results["composite_score"]]
+                    * len(results["cluster_nodes"]),
+                    "Correlation P-Value": [results["correlation_pvalue"]]
+                    * len(results["cluster_nodes"]),
+                }
+            )
 
             df.to_csv(filename, index=False)
             self.logger.info(f"Clustering results saved to {filename}")
@@ -354,7 +387,7 @@ class PageRank:
                 - These nodes influence the clustering process by biasing the algorithm.
 
         **Returns**: Dict[str, Any]
-            
+
             - A dictionary containing the clustering results. Keys may include:
                 - `clusters`: Lists of nodes grouped into clusters.
                 - `scores`: PageRank scores for each node.

@@ -30,7 +30,7 @@ def main():
 
         print("\nNode Embeddings:")
         print(embeddings)
-        
+
         output_file = "output/embeddings.csv"
         embeddings.to_csv(output_file)
 

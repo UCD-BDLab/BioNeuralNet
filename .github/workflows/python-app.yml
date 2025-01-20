@@ -48,14 +48,16 @@ jobs:
 
       - name: Install R packages
         run: |
-          Rscript -e "if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager')"
-          Rscript -e "BiocManager::install(update = TRUE, ask = FALSE)"
-          Rscript -e "install.packages(c('SmCCNet', 'jsonlite', 'dplyr'))"
-          Rscript -e "BiocManager::install(c('WGCNA', 'impute', 'GO.db', 'dynamicTreeCut', 'fastcluster'))"
+          Rscript -e "if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager', repos='https://cran.r-project.org')"
+          Rscript -e "install.packages(c('dplyr', 'jsonlite'), repos='https://cran.r-project.org')"
+          Rscript -e "BiocManager::install(c('impute', 'preprocessCore', 'GO.db', 'AnnotationDbi'), update=FALSE, ask=FALSE)"
+          Rscript -e "install.packages('SmCCNet', repos='https://cran.r-project.org')"
+          Rscript -e "install.packages('WGCNA', repos='https://cran.r-project.org')"
         shell: bash
 
       - name: Run tests with pytest
         run: |
+          find . -name ".coverage*" -delete
           pytest --cov=bioneuralnet --cov-report=xml tests/
 
       - name: Upload coverage to Codecov

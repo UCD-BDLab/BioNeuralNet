@@ -178,7 +178,9 @@ class GraphEmbedding:
         embeddings_df = pd.DataFrame(embeddings_tensor.numpy(), index=node_names)
         return embeddings_df
 
-    def reduce_embeddings(self, embeddings: pd.DataFrame, method: str = "pca") -> pd.Series:
+    def reduce_embeddings(
+        self, embeddings: pd.DataFrame, method: str = "pca"
+    ) -> pd.Series:
         """
         Reduce embeddings to a single dimension per node using specified method.
 
@@ -219,7 +221,6 @@ class GraphEmbedding:
             raise ValueError(f"Unsupported reduction method: {method}")
 
         return reduced_embedding
-
 
     def integrate_embeddings(self, node_embedding_values: pd.Series) -> pd.DataFrame:
         """

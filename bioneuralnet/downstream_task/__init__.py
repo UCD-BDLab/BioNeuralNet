@@ -1,3 +1,3 @@
 from .dpmon import DPMON
 
-__all__ = ['DPMON']
+__all__ = ["DPMON"]

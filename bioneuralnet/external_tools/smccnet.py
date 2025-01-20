@@ -166,7 +166,6 @@ class SmCCNet:
             self.logger.error(f"Error during SmCCNet execution: {e}")
             raise
 
-
     def run(self) -> pd.DataFrame:
         """
         Executes the entire Sparse Multiple Canonical Correlation Network (SmCCNet) workflow.

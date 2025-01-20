@@ -31,6 +31,9 @@ jobs:
           pip install torch_geometric
         shell: bash
 
+      - name: Verify Documentation Directory
+        run: test -d docs/source/ || { echo "Docs source directory missing"; exit 1; }
+
       - name: Build Documentation
         run: |
           mkdir -p docs/build/html

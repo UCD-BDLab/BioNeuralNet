@@ -19,7 +19,7 @@ from bioneuralnet.downstream_task import DPMON
 def run_smccnet_dpmon_workflow(
     omics_proteins: pd.DataFrame,
     omics_metabolites: pd.DataFrame,
-    phenotype_data: pd.Series,
+    phenotype_data: pd.DataFrame,
     clinical_data: pd.DataFrame,
 ) -> pd.DataFrame:
     """
@@ -41,8 +41,8 @@ def run_smccnet_dpmon_workflow(
     """
     try:
         smccnet_instance = SmCCNet(
-            phenotype_data=phenotype_data,
-            omics_data=pd.concat([omics_proteins, omics_metabolites], axis=1),
+            phenotype_df=phenotype_data,
+            omics_dfs=[omics_proteins, omics_metabolites],
             data_types=["protein", "metabolite"],
             kfold=5,
             summarization="PCA",
@@ -55,7 +55,7 @@ def run_smccnet_dpmon_workflow(
             adjacency_matrix=adjacency_matrix,
             omics_list=[omics_proteins, omics_metabolites],
             phenotype_data=phenotype_data,
-            features_data=clinical_data,
+            clinical_data=clinical_data,
             model="GCN",
             tune=False,
             gpu=False,
