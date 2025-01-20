@@ -1,0 +1,21 @@
+# Include essential files
+include README.md
+include LICENSE
+
+# Include assets and images
+recursive-include assets *.png *.jpg *.svg
+
+# Include documentation source files
+recursive-include docs *
+
+# Include example scripts
+recursive-include examples *.py
+
+# Include scripts installation files
+recursive-include scripts *
+
+# Exclude __pycache__ and compiled Python files
+global-exclude __pycache__ *.pyc *.pyo *.pyd
+
+# Exclude editor backup and temporary files
+global-exclude *~ *.bak *.swp

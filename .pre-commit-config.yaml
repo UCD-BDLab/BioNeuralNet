@@ -1,0 +1,48 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+
+  - repo: https://github.com/psf/black
+    rev: 24.10.0
+    hooks:
+      - id: black
+        name: Format Python code with Black
+        language_version: python3
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.14.1
+    hooks:
+      - id: mypy
+        name: Static type checking with MyPy
+        args: [--ignore-missing-imports]
+
+  - repo: local
+    hooks:
+      - id: remove-pyc-and-pycache
+        name: Remove .pyc files and __pycache__ directories
+        entry: bash -c "find . \( -path './.venv' -o -path './docs' -o -path './node_modules' \) -prune -o -type f -name '*.pyc' -exec rm -f {} + -o -type d -name '__pycache__' -exec rm -rf {} +"
+        language: system
+        stages: [pre-commit]
+
+      - id: clean-coverage-files
+        name: Remove stale .coverage files
+        entry: bash -c "find . -name '.coverage*' -delete"
+        language: system
+        stages: [pre-commit]
+
+      - id: check-forbidden-files
+        name: Prevent adding forbidden file types
+        entry: bash -c "if git diff --cached --name-only | grep -E '\\.csv$|\\.RData$'; then echo 'Forbidden file types detected!'; exit 1; fi"
+        language: system
+        types: [file]
+
+      - id: run-tests
+        name: Run Tests with Pytest
+        entry: pytest --cov=bioneuralnet --cov-report=term-missing
+        language: system
+        types: [python]
