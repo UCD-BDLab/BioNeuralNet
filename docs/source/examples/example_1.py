@@ -21,7 +21,7 @@ def run_smccnet_workflow(
     Executes the SmCCNet-based workflow for generating enhanced omics data.
 
     1) Instantiates SmCCNet, GNNEmbedding, and GraphEmbedding.
-    2) Generates an adjacency matrix via SmCCNet.
+    2) Generates an <ulti-Omics Network (adjacency matrix) via SmCCNet.
     3) Runs GNNEmbedding to produce node embeddings.
     4) Integrates the embeddings into omics data using GraphEmbedding.
 

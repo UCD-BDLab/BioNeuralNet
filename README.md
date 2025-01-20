@@ -6,90 +6,112 @@
 ![GitHub Issues](https://img.shields.io/github/issues/UCD-BDLab/BioNeuralNet)
 ![GitHub Contributors](https://img.shields.io/github/contributors/UCD-BDLab/BioNeuralNet)
 
-## Overview
+## Welcome to BioNeuralNet Beta 0.1
 
-**BioNeuralNet** is a Python-based framework for **multi-omics integration** that uses
-**Graph Neural Networks (GNNs)** to transform high-dimensional omics networks into
-compact **embeddings**. Researchers can leverage these embeddings for **clustering**,
-**subject representation**, and **disease prediction**. See below for a high-level diagram
-of BioNeuralNet’s workflow:
+![BioNeuralNet Logo](/assets/BioNeuralNet_canva_logo_WB.png)
+
+**Note:** This is a **beta version** of BioNeuralNet. It is under active development, and certain features
+may be incomplete or subject to change. Feedback and bug reports are highly encouraged to help us
+improve the tool.
+
+BioNeuralNet is a Python-based software tool designed to streamline the integration of multi-omics
+data with **Graph Neural Network (GNN)** embeddings. It supports **graph clustering**, **subject representation**,
+and **disease prediction**, enabling advanced analyses of complex multi-omics networks.
 
 ![BioNeuralNet Workflow](assets/BioNeuralNet.png)
+
+---
 
 ## Key Features
 
 BioNeuralNet offers five core steps in a typical workflow:
 
-1. **Graph Construction**:
-   - **Not** performed internally. You provide or build adjacency matrices externally
-     (e.g., via WGCNA, SmCCNet, or your own scripts).
-   - We provide lightweight wrappers in `bioneuralnet.external_tools` (WGCNA, SmCCNet)
-     if you wish, but these are **not** mandatory for BioNeuralNet’s pipeline.
+### 1. Graph Construction
+- **Not** performed internally. You provide or build adjacency matrices externally (e.g., via **WGCNA**, **SmCCNet**, or your own scripts).
+- Lightweight wrappers are available in `bioneuralnet.external_tools` (e.g., WGCNA, SmCCNet) for convenience. However, using these wrappers is **optional** and not mandatory for BioNeuralNet’s pipeline.
 
-2. **Graph Clustering**:
-   - Identify functional modules/communities using , **PageRank**.
-   - Our `PageRank` can be used to find subnetwork clusters via personalized
-     sweep cuts, capturing local neighborhoods influenced by seed nodes.
+### 2. Graph Clustering
+- Identify functional modules or communities using **PageRank**.
+- The `PageRank` module enables finding subnetwork clusters through personalized sweep cuts, capturing local neighborhoods influenced by seed nodes.
 
-3. **Network Embedding**:
-   - Generate embeddings with **GCN**, **GAT**, **GraphSAGE**, **GIN**.
-   - You can attach a numeric label to each node or remain “unsupervised,” relying
-     only on graph structure and node features (e.g. correlation with clinical data).
+### 3. Network Embedding
+- Generate embeddings using methods like **GCN**, **GAT**, **GraphSAGE**, and **GIN**.
+- You can attach numeric labels to nodes or remain “unsupervised,” relying solely on graph structure and node features (e.g., correlation with clinical data).
 
-4. **Subject Representation**:
-   - Integrate node embeddings back into omics data, enriching each subject’s feature
-     vector by weighting columns with the learned embedding scalars.
+### 4. Subject Representation
+- Integrate node embeddings back into omics data, enriching each subject’s feature vector by weighting columns with the learned embedding scalars.
 
-5. **Downstream Tasks**:
-   - Perform advanced analyses such as disease prediction via **DPMON**, which trains a GNN
-     end-to-end with a classifier to incorporate local/global network information.
+### 5. Downstream Tasks
+- Perform advanced analyses, such as disease prediction, via **DPMON**, which trains a GNN end-to-end alongside a classifier to incorporate both local and global network information.
 
 ---
 
-## Installation
+# Installation
 
-### 1. Basic Install
+BioNeuralNet supports Python 3.10 and 3.11 in this beta release. Follow the steps below to set up BioNeuralNet and its dependencies.
 
-1. **Install PyTorch and Pytorch Geometric**:
-   - Follow the [PyTorch official instructions](https://pytorch.org/get-started/locally/) to
-     pick the correct CPU/GPU version for your OS and CUDA drivers.
+## 1. Install BioNeuralNet via pip
 
-   - [PyTorch Geometric official instructions](https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html)
+To install the core BioNeuralNet modules for GNN embeddings, subject representation, disease prediction (DPMON), and clustering:
 
-   - Example (CPU-only):
-     ```bash
-     pip install torch torchvision torchaudio
-     pip install torch_geometric
-     ```
-   - Or a GPU-accelerated version if you have CUDA.
+```bash
+pip install bioneuralnet==0.1.0b1
+```
 
-2. **Install BioNeuralNet**:
-   ```bash
-   pip install bioneuralnet==0.1.0b1
-   ```
+## 2. Install PyTorch and PyTorch Geometric (Separately)
 
-You now have the main Python modules (e.g., `GNNEmbedding`, `DPMON`, etc.) ready to go.
+BioNeuralNet relies on PyTorch and PyTorch Geometric for GNN operations:
 
-### 2. (Optional) R & Additional Tools
+- Install PyTorch:
+  ```bash
+  pip install torch torchvision torchaudio
+  ```
+- Install PyTorch Geometric:
+  ```bash
+  pip install torch_geometric
+  ```
 
-- **R Installation**:
-  - If you want to generate adjacency matrices via WGCNA or SmCCNet, install R from
-    [r-project.org](https://www.r-project.org/).
-  - In R, install packages:
-    ```r
-    install.packages("WGCNA")
-    ```
-- **Other External Tools** in `bioneuralnet.external_tools`:
-  - **`Node2Vec`**: Node2Vec-based embeddings
-  - **`FeatureSelector`**: Basic feature selection strategies (e.g., LassoCV, random forest)
-  - **`HierarchicalClustering`**: Agglomerative clustering, silhouette scoring
-  - **`StaticVisualizer`, `DynamicVisualizer`**: Basic static or interactive network visualization
-  - **`SmCCNet` / `WGCNA`**: Build adjacency matrices using R-based libraries
-- These integrations are purely **optional** and do **not** form part of the core pipeline.
+For GPU-accelerated builds or other configurations, visit their official guides:
+- [PyTorch Installation Guide](https://pytorch.org/get-started/locally/)
+- [PyTorch Geometric Installation Guide](https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html)
 
-### 3. Development Setup (Optional)
+Select the appropriate build for your system (e.g., Stable, Linux, pip, Python, CPU/GPU).
 
-If you plan to contribute:
+![PyTorch Installation](assets/pytorch.png)
+*PyTorch Installation Guide*
+
+![PyTorch Geometric Installation](assets/geometric.png)
+*PyTorch Geometric Installation Guide*
+
+## 3. (Optional) Install R and External Tools
+
+If you plan to use **WGCNA** or **SmCCNet** for network construction:
+
+- Install R from [The R Project](https://www.r-project.org/).
+- Install the required R packages. Open R and run the following:
+
+```r
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+install.packages(c("dplyr", "jsonlite"))
+BiocManager::install(c("impute", "preprocessCore", "GO.db", "AnnotationDbi"))
+install.packages("SmCCNet")
+install.packages("WGCNA")
+```
+
+## 4. Additional Notes for External Tools
+
+For **Node2Vec**, **feature selection**, or **visualization modules**, refer to the external tools documentation in `bioneuralnet.external_tools`. Examples include:
+- **`Node2Vec`**: Node2Vec-based embeddings.
+- **`FeatureSelector`**: Basic feature selection strategies like LassoCV and random forest.
+- **`HierarchicalClustering`**: Agglomerative clustering and silhouette scoring.
+- **`StaticVisualizer` and `DynamicVisualizer`**: Static or interactive network visualization.
+- **`SmCCNet` / `WGCNA`**: Build adjacency matrices using R-based libraries.
+
+These integrations are **optional** and do **not** form part of the core pipeline.
+
+## 5. Development Setup (Optional)
+
+If you plan to contribute to BioNeuralNet:
 
 ```bash
 git clone https://github.com/UCD-BDLab/BioNeuralNet.git
@@ -100,48 +122,77 @@ pytest
 
 ---
 
-## Quick Example
+## Quick Example: Transforming Multi-Omics for Enhanced Disease Prediction
 
-Below is a **minimal** snippet that shows how to load an already-built adjacency matrix,
-generate embeddings via **GNNEmbedding**, and then run **DPMON** for disease prediction:
+![BioNeuralNet Overview](assets/Overview.png)
+*BioNeuralNet: Transforming Multi-Omics for Enhanced Disease Prediction*
+
+### External Tools
+
+We offer a number of external tools available through the `bioneuralnet.external_tools` module:
+- These tools were implemented to facilitate testing and should not be considered part of the package's core functionality.
+- The classes inside the `external_tools` module are lightweight wrappers around existing tools and libraries offering minimal functionality.
+- We highly encourage users to explore these tools outside of BioNeuralNet to fully leverage their capabilities.
+
+### Steps
+
+Below is a quick example demonstrating the following:
+
+1. **Building or Importing a Network Adjacency Matrix**:
+   - For instance, using external tools like **SmCCNet**.
+
+2. **Using DPMON for Disease Prediction**:
+   - A detailed explanation follows.
+
+#### 1. Data Preparation
+- Input your multi-omics data (e.g., proteomics, metabolomics, genomics) along with phenotype data.
+
+#### 2. Network Construction
+- **Not performed internally**: You need to provide or build adjacency matrices externally (e.g., via WGCNA, SmCCNet, or your own scripts).
+- Lightweight wrappers are available in `bioneuralnet.external_tools` (e.g., WGCNA, SmCCNet) for convenience. However, using these wrappers is **optional** and not mandatory for BioNeuralNet’s pipeline.
+
+#### 3. Disease Prediction
+- **DPMON** integrates GNN-based node embeddings with a downstream neural network to predict disease phenotypes.
+
+### Code Example:
 
 ```python
 import pandas as pd
-from bioneuralnet.network_embedding import GNNEmbedding
+from bioneuralnet.external_tools import SmCCNet
 from bioneuralnet.downstream_task import DPMON
 
-omics_data = pd.read_csv("omics_data.csv", index_col=0)
-adjacency_matrix = pd.read_csv("adjacency_matrix.csv", index_col=0)
-clinical_data = pd.read_csv("clinical_data.csv", index_col=0)
-phenotype_data = pd.read_csv("phenotype_data.csv", index_col=0)
+# Step 1: Data Preparation
+phenotype_data = pd.read_csv('phenotype_data.csv', index_col=0)
+omics_proteins = pd.read_csv('omics_proteins.csv', index_col=0)
+omics_metabolites = pd.read_csv('omics_metabolites.csv', index_col=0)
+clinical_data = pd.read_csv('clinical_data.csv', index_col=0)
 
-gnn_embed = GNNEmbedding(
-    adjacency_matrix=adjacency_matrix,
-    omics_data=omics_data,
-    phenotype_data=phenotype_data,
-    clinical_data=clinical_data,
-    model_type='GAT',
-    hidden_dim=64
+# Step 2: Network Construction
+smccnet = SmCCNet(
+    phenotype_df=phenotype_data,
+    omics_dfs=[omics_proteins, omics_metabolites],
+    data_types=["protein", "metabolite"],
+    kfold=5,
+    summarization="PCA",
 )
-embed_out = gnn_embed.run()
-node_embeds = embed_out["graph"]
-print("Node Embeddings shape:", node_embeds.shape)
+adjacency_matrix = smccnet.run()
+print("Adjacency matrix generated.")
 
+# Step 3: Disease Prediction
 dpmon = DPMON(
     adjacency_matrix=adjacency_matrix,
-    omics_list=[omics_data],
+    omics_list=[omics_proteins, omics_metabolites],
     phenotype_data=phenotype_data,
     clinical_data=clinical_data,
-    model='GAT',
-    epoch_num=5
+    model="GAT",
 )
 predictions = dpmon.run()
-print("Predictions:\n", predictions.head())
+print("Disease phenotype predictions:\n", predictions)
 ```
 
-**Result**:
-- **Node Embeddings**: `(num_nodes, embedding_dim)`
-- **Disease Phenotype Predictions**: DataFrame linking each subject to predicted classes
+### Output
+- **Adjacency Matrix**: The multi-omics network representation.
+- **Predictions**: Disease phenotype predictions for each sample as a DataFrame linking subjects to predicted classes.
 
 ---
 

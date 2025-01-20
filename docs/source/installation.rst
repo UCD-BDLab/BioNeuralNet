@@ -1,7 +1,7 @@
 Installation
 ============
 
-BioNeuralNet supports Python 3.10 and 3.11 for this beta release.
+BioNeuralNet supports Python 3.10 and 3.11 in this beta release. Follow the steps below to set up BioNeuralNet and its dependencies.
 
 1. **Install BioNeuralNet via pip**:
 
@@ -9,46 +9,52 @@ BioNeuralNet supports Python 3.10 and 3.11 for this beta release.
 
       pip install bioneuralnet==0.1.0b1
 
-   This installs BioNeuralNet’s Python modules for GNN embeddings, subject representation,
+   This installs the core BioNeuralNet modules for GNN embeddings, subject representation,
    disease prediction (DPMON), and clustering.
 
-2. **Install PyTorch and Pytorch Geometric** (Separately):
+2. **Install PyTorch and PyTorch Geometric** (Separately):
 
-   BioNeuralNet relies on PyTorch for GNN operations. Visit `the official PyTorch site <https://pytorch.org/get-started/locally/>`_
-   and `the official PyTorch Geometric site <https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html>`_ to install CPU or GPU builds. For example:
+   BioNeuralNet relies on PyTorch and PyTorch Geometric for GNN operations:
 
    .. code-block:: bash
 
       pip install torch torchvision torchaudio
       pip install torch_geometric
 
-   or refer to the site for GPU-accelerated builds matching your CUDA version.
+   For GPU-accelerated builds or other configurations:
+   - Visit the official sites:
 
-3. **(Optional) R and External Tools**:
+     - `PyTorch Installation Guide <https://pytorch.org/get-started/locally/>`_
+     - `PyTorch Geometric Installation Guide <https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html>`_
 
-   - If you plan to use **WGCNA** or **SmCCNet** for network construction:
-     1. Install R from `The R Project <https://www.r-project.org/>`_
-     2. In R, install packages:
+   - Select the appropriate build for your system (e.g., Stable, Linux, pip, Python, CPU).
 
-        .. code-block:: r
+   .. figure:: _static/pytorch.png
+      :align: center
+      :alt: PyTorch Installation
 
-           install.packages("WGCNA")
+   .. figure:: _static/geometric.png
+      :align: center
+      :alt: PyTorch Geometric Installation
 
-   - For Node2Vec, feature selection modules, or visualization, see :doc:`external_tools/index`.
+3. **(Optional) Install R and External Tools**:
 
-4. **Verification**:
+   If you plan to use **WGCNA** or **SmCCNet** for network construction:
 
-   After installation, verify that `import bioneuralnet` and `import torch` both run
-   without errors in a Python shell. Optionally, run tests if you’ve cloned the repository:
+   - Install R from `The R Project <https://www.r-project.org/>`_.
+   - Install the required R packages. Open R and run:
 
-   .. code-block:: bash
+     .. code-block:: r
 
-      git clone https://github.com/UCD-BDLab/BioNeuralNet.git
-      cd BioNeuralNet
-      pip install -r requirements-dev.txt
-      pytest
+        if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+        install.packages(c("dplyr", "jsonlite"))
+        BiocManager::install(c("impute", "preprocessCore", "GO.db", "AnnotationDbi"))
+        install.packages("SmCCNet")
+        install.packages("WGCNA")
 
-   This ensures all dependencies are properly set up.
+4. **Additional Notes for External Tools**:
+
+   For **Node2Vec**, **feature selection**, or **visualization modules**, refer to the :doc:`external_tools/index`.
 
 5. **Next Steps**:
 

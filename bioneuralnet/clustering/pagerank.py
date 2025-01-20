@@ -167,7 +167,7 @@ class PageRank:
             cond_corr_res = []
             cluster = set()
             min_cut, min_cond_corr = len(p), float("inf")
-            len_clus, cond, corr, cor_pval = 0, 1, 0, ""
+            len_clus, cond, corr, cor_pval = 0, 1, 0.0, ""
             degrees = dict(self.G.degree(weight="weight"))
             vec = sorted(
                 [
@@ -241,7 +241,7 @@ class PageRank:
             for i in range(len(nodes)):
                 nodes_excl = nodes[:i] + nodes[i + 1 :]
                 if not nodes_excl:
-                    contribution = 0
+                    contribution = 0.0
                 else:
                     corr_excl, _ = self.phen_omics_corr(nodes_excl)
                     contribution = abs(corr_excl) - abs(total_corr)
@@ -337,7 +337,8 @@ class PageRank:
         try:
             timestamp = datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
             filename = os.path.join(
-                self.output_dir, f"pagerank_results_{timestamp}.csv"
+                self.output_dir if self.output_dir is not None else "",
+                f"pagerank_results_{timestamp}.csv",
             )
 
             df = pd.DataFrame(

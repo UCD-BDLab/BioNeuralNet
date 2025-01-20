@@ -3,6 +3,17 @@
 Welcome to BioNeuralNet Beta 0.1
 ================================
 
+.. image:: https://img.shields.io/badge/license-MIT-blue.svg
+   :target: https://github.com/UCD-BDLab/BioNeuralNet/blob/main/LICENSE
+.. image:: https://img.shields.io/pypi/v/bioneuralnet
+   :target: https://pypi.org/project/bioneuralnet/
+.. image:: https://img.shields.io/pypi/pyversions/bioneuralnet
+   :target: https://pypi.org/project/bioneuralnet/
+
+.. figure:: _static/BioNeuralNet_canva_logo_TB.png
+   :align: center
+   :alt: bioneuralnet logo
+
 **Note:** This is a **beta version** of BioNeuralNet. It is under active development, and certain features
 may be incomplete or subject to change. Feedback and bug reports are highly encouraged to help us
 improve the tool.
@@ -19,6 +30,14 @@ and **disease prediction**, enabling advanced analyses of complex multi-omics ne
 
 For additional installation details, including GPU usage for GNNs, see :doc:`installation`.
 
+.. note::
+
+   **External Tools**:
+   * We offer a number of external tools available through the `bioneuralnet.external_tools` module.
+   * These tools were implemented to facilitate testing, and should not be considered part of the package's core functionality.
+   * The classes inside the `external_tools` module are lightweight wrappers around existing tools and libraries offering minimal functionality.
+   * We highly encourage users to explore these tools outside of BioNeuralNet to fully leverage their capabilities.
+
 **Example: Transforming Multi-Omics for Enhanced Disease Prediction**
 ---------------------------------------------------------------------
 
@@ -26,24 +45,30 @@ For additional installation details, including GPU usage for GNNs, see :doc:`ins
 
 .. figure:: _static/Overview.png
    :align: center
-   :alt: BioNeuralNet Overview
+   :alt: Overview of BioNeuralNet's multi-omics integration process
 
    **BioNeuralNet**: Transforming Multi-Omics for Enhanced Disease Prediction
 
-Below is a quick example demonstrating **(1) building or importing** a network adjacency matrix
-(e.g., with SmCCNet) and **(2) using DPMON** for disease prediction:
+Below is a quick example demonstrating the following steps:
 
-.. note::
+1. **Building or Importing a Network Adjacency Matrix**:
+   - For instance, using external tools like **SmCCNet**.
 
-   1. **Data Preparation**:
-      - Input your multi-omics data (e.g., proteomics, metabolomics, genomics) plus phenotype data.
+2. **Using DPMON for Disease Prediction**:
+   - A detailed explanation follows.
 
-   2. **Network Construction**:
-      - Not performed internally. You provide or build adjacency matrices externally (e.g., via WGCNA, SmCCNet, or your own scripts).
-      - We provide lightweight wrappers in bioneuralnet.external_tools (WGCNA, SmCCNet) if you wish, but these are not mandatory for BioNeuralNet’s pipeline.
+**Steps:**
 
-   3. **Disease Prediction**:
-      - **DPMON** fuses GNN-based node embeddings with a downstream neural network to predict disease phenotypes.
+1. **Data Preparation**:
+   - Input your multi-omics data (e.g., proteomics, metabolomics) along with phenotype and clinical data.
+
+2. **Network Construction**:
+   - **Not performed internally**: You need to generate the adjacency matrix externally, using tools like **SmCCNet**.
+   - Lightweight wrappers are available in `bioneuralnet.external_tools` (e.g., WGCNA, SmCCNet) for convenience.
+
+3. **Disease Prediction**:
+   - Use **DPMON** to predict disease phenotypes using the network information and omics data.
+
 
 **Code Example**:
 
@@ -53,38 +78,67 @@ Below is a quick example demonstrating **(1) building or importing** a network a
    from bioneuralnet.external_tools import SmCCNet
    from bioneuralnet.downstream_task import DPMON
 
-   omics_data = pd.read_csv('omics_data.csv', index_col=0)
+   # Step 1: Data Preparation
    phenotype_data = pd.read_csv('phenotype_data.csv', index_col=0)
+   omics_proteins = pd.read_csv('omics_proteins.csv', index_col=0)
+   omics_metabolites = pd.read_csv('omics_metabolites.csv', index_col=0)
+   clinical_data = pd.read_csv('clinical_data.csv', index_col=0)
 
-   smccnet = SmCCNet(phenotype_data=phenotype_data, omics_data=omics_data)
+   # Step 2: Network Construction
+   smccnet = SmCCNet(
+       phenotype_df=phenotype_data,
+       omics_dfs=[omics_proteins, omics_metabolites],
+       data_types=["protein", "metabolite"],
+       kfold=5,
+       summarization="PCA",
+   )
    adjacency_matrix = smccnet.run()
-   print("Multi-Omics Network generated via SmCCNet.")
+   print("Adjacency matrix generated.")
 
-   dpmon = DPMON(adjacency_matrix=adjacency_matrix, omics_list=[omics_data], phenotype_data=phenotype_data)
+   # Step 3: Disease Prediction
+   dpmon = DPMON(
+       adjacency_matrix=adjacency_matrix,
+       omics_list=[omics_proteins, omics_metabolites],
+       phenotype_data=phenotype_data,
+       clinical_data=clinical_data,
+       model="GCN",
+   )
    predictions = dpmon.run()
    print("Disease phenotype predictions:\n", predictions)
+
 
 **Output**:
   - **Adjacency Matrix**: The multi-omics network representation.
   - **Predictions**: Disease phenotype predictions for each sample.
 
-.. note::
-   **External Tools**:
-   - We offer a number of external tools availble through the `bioneuralnet.external_tools` module.
-   - These tools were implemented to facilitate testing, and should not be considered part of the package's core functionality.
-   - The classes inside the `external_tools` module are lightweight wrappers around existing tools and libraries offering minimal functionality.
-   - We highly encourage users to explore these tools outside of BioNeuralNet to fully leverage their capabilities.
+**BioNeuralNet Overview: Multi-Omics Integration with Graph Neural Networks**
+-----------------------------------------------------------------------------
 
-**BioNeuralNet Overview**
--------------------------
+BioNeuralNet offers five core steps in a typical workflow:
 
-Below is a brief overview of BioNeuralNet's five main components:
+1. **Graph Construction**:
+   - **Not** performed internally. You provide or build adjacency matrices externally
+   (e.g., via WGCNA, SmCCNet, or your own scripts).
+   - Lightweight wrappers are available in `bioneuralnet.external_tools` (e.g., WGCNA, SmCCNet)
+   for convenience, but they are **not** mandatory for BioNeuralNet’s pipeline.
 
-1. **Graph Construction**: (External or custom) Build or import adjacency matrices from WGCNA, SmCCNet, etc.
-2. **Graph Clustering**: Identify modules or communities using Hierarchical Clustering, PageRank, or Louvain.
-3. **Network Embedding**: Use GNNs or Node2Vec to embed multi-omics networks into lower dimensions.
-4. **Subject Representation**: Integrate embeddings into omics data for enriched subject-level features.
-5. **Downstream Tasks**: Perform advanced tasks like disease prediction (DPMON). You can also integrate your own pipelines.
+2. **Graph Clustering**:
+   - Identify functional modules or communities using `PageRank`.
+   - The `PageRank` module enables finding subnetwork clusters through personalized sweep cuts,
+   capturing local neighborhoods influenced by seed nodes.
+
+3. **Network Embedding**:
+   - Generate embeddings with methods like **GCN**, **GAT**, **GraphSAGE**, and **GIN**.
+   - You can attach numeric labels to nodes or remain "unsupervised," relying solely on graph
+   structure and node features (e.g., correlation with clinical data).
+
+4. **Subject Representation**:
+   - Integrate node embeddings back into omics data to enrich each subject’s feature vector by
+   weighting columns with the learned embedding scalars.
+
+5. **Downstream Tasks**:
+   - Perform advanced analyses such as disease prediction via **DPMON**, which trains a GNN
+   end-to-end alongside a classifier, incorporating both local and global network information.
 
 `View full-size image: BioNeuralNet Overview <https://ramosv.github.io/_images/BioNeuralNet.png>`_
 
@@ -95,6 +149,8 @@ Below is a brief overview of BioNeuralNet's five main components:
    BioNeuralNet Overview
 
 **Subject Representation**
+
+Subject representation integrates node embeddings into omics data, enriching phenotypic and clinical context. Below is an example workflow:
 
 `View full-size image: Subject Representation <https://ramosv.github.io/_images/SubjectRepresentation.png>`_
 
@@ -119,7 +175,7 @@ Documentation Overview
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Documentation Contents:
 
    installation
    tutorials/index
@@ -128,6 +184,7 @@ Documentation Overview
    gnns
    user_api
    faq
+
 
 Indices and tables
 ==================
