@@ -1,391 +1,258 @@
-# BioNeuralNet
+# BioNeuralNet: A Multi-Omics Integration and GNN-Based Embedding Framework
 
-BioNeuralNet is a **modular**, **flexible**, and **extensible** bioinformatics pipeline designed to streamline the analysis of multi-omics data. It facilitates a seamless workflow encompassing graph generation, clustering, network embedding, subject representation, and task optimization. Tailored for scientists and researchers, BioNeuralNet simplifies complex computational tasks, enabling efficient data processing and insightful biological discoveries.
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![PyPI](https://img.shields.io/pypi/v/bioneuralnet)
+![Python Versions](https://img.shields.io/pypi/pyversions/bioneuralnet)
+![GitHub Issues](https://img.shields.io/github/issues/UCD-BDLab/BioNeuralNet)
+![GitHub Contributors](https://img.shields.io/github/contributors/UCD-BDLab/BioNeuralNet)
 
-## Table of Contents
+## Welcome to BioNeuralNet Beta 0.1
 
-- [Introduction](#introduction)
-- [Features](#features)
-- [Pipeline Architecture](#pipeline-architecture)
-- [Pipeline Components](#pipeline-components)
-  - [1. Graph Generation](#1-graph-generation)
-  - [2. Clustering](#2-clustering)
-  - [3. Network Embedding](#3-network-embedding)
-  - [4. Subject Representation](#4-subject-representation)
-  - [5. Task Optimization](#5-task-optimization)
-- [Configuration](#configuration)
-  - [Root Configuration](#root-configuration)
-  - [Component Configuration](#component-configuration)
-- [Installation](#installation)
-- [Usage](#usage)
-  - [Running the Entire Pipeline](#running-the-entire-pipeline)
-  - [Running Individual Components](#running-individual-components)
-- [Workflow Overview](#workflow-overview)
-  - [Data Flow and Dependencies](#data-flow-and-dependencies)
-- [Logging](#logging)
-- [Extending the Pipeline](#extending-the-pipeline)
-  - [Adding New Algorithms](#adding-new-algorithms)
-- [Best Practices](#best-practices)
-- [License](#license)
-- [Contact](#contact)
+![BioNeuralNet Logo](/assets/BioNeuralNet_canva_logo_WB.png)
 
-## Introduction
+**Note:** This is a **beta version** of BioNeuralNet. It is under active development, and certain features
+may be incomplete or subject to change. Feedback and bug reports are highly encouraged to help us
+improve the tool.
 
-BioNeuralNet is a **modular** and **flexible** network embedding framework tailored for bioinformatics applications. Designed as a comprehensive toolkit, BioNeuralNet streamlines the processes of network generation, embedding, clustering, and analysis, enabling scientists to extract meaningful insights from complex multi-omics data. By allowing users to run individual components or the entire pipeline sequentially, BioNeuralNet offers unparalleled adaptability to meet diverse research needs.
+BioNeuralNet is a Python-based software tool designed to streamline the integration of multi-omics
+data with **Graph Neural Network (GNN)** embeddings. It supports **graph clustering**, **subject representation**,
+and **disease prediction**, enabling advanced analyses of complex multi-omics networks.
 
-### Key Benefits:
+![BioNeuralNet Workflow](assets/BioNeuralNet.png)
 
-- **Modularity:** Each component operates independently, facilitating easy updates and maintenance.
-- **Flexibility:** Users can customize the pipeline by selecting specific components or running the full workflow.
-- **Extensibility:** Seamlessly integrate new algorithms and methods without disrupting existing functionalities.
-- **Usability:** User-friendly configuration through YAML files simplifies setup and execution.
-- **Scalability:** Efficiently handles large datasets, making it suitable for extensive bioinformatics analyses.
+---
 
-## Features
+## Key Features
 
-- **Modular Architecture:** Each analysis step—network generation, embedding, clustering, and optimization—is encapsulated within its own module, allowing for independent development and testing.
-- **Dynamic Algorithm Integration:** Effortlessly switch between different algorithms or introduce new ones by updating configuration files, without altering the core pipeline scripts.
-- **Comprehensive Logging System:** Maintain detailed logs for both the overall pipeline (`pipeline.log`) and individual components (`component.log`), aiding in monitoring and debugging.
-- **Reusable Helper Functions:** Streamlined file operations and data handling through centralized helper utilities, promoting code reuse and consistency.
-- **Consistent Naming Conventions:** Standardized output file naming ensures clarity and prevents overwriting of results.
-- **Robust Error Handling:** Implemented validation checks and exception handling mechanisms ensure the pipeline fails gracefully, providing informative error messages.
-- **User-Friendly Configuration:** Centralized and component-specific YAML configuration files simplify the setup process, making the pipeline accessible to users with varying levels of technical expertise.
-- **Scalability and Performance:** Optimized to handle large-scale multi-omics datasets efficiently, making it suitable for extensive bioinformatics research.
+BioNeuralNet offers five core steps in a typical workflow:
 
-## Pipeline Architecture
+### 1. Graph Construction
+- **Not** performed internally. You provide or build adjacency matrices externally (e.g., via **WGCNA**, **SmCCNet**, or your own scripts).
+- Lightweight wrappers are available in `bioneuralnet.external_tools` (e.g., WGCNA, SmCCNet) for convenience. However, using these wrappers is **optional** and not mandatory for BioNeuralNet’s pipeline.
 
-![BioNeuralNet Diagram](assets/BioNeuralNet-wb.png)
+### 2. Graph Clustering
+- Identify functional modules or communities using **PageRank**.
+- The `PageRank` module enables finding subnetwork clusters through personalized sweep cuts, capturing local neighborhoods influenced by seed nodes.
 
-BioNeuralNet's architecture is meticulously designed to promote clarity and efficiency. Each component is encapsulated within its own directory, containing all necessary scripts, configurations, and dependencies. The pipeline orchestrates these components in a sequential manner, ensuring data flows seamlessly from one analysis stage to the next.
+### 3. Network Embedding
+- Generate embeddings using methods like **GCN**, **GAT**, **GraphSAGE**, and **GIN**.
+- You can attach numeric labels to nodes or remain “unsupervised,” relying solely on graph structure and node features (e.g., correlation with clinical data).
 
-### Architecture Overview
+### 4. Subject Representation
+- Integrate node embeddings back into omics data, enriching each subject’s feature vector by weighting columns with the learned embedding scalars.
 
-1. **Graph Generation:** Constructs a global network from multi-omics and phenotype data.
-2. **Clustering:** Segments the global graph into meaningful clusters.
-3. **Network Embedding:** Generates embeddings for each sub-network using specified embedding techniques.
-4. **Subject Representation:** Integrates network embeddings with omics data to create comprehensive subject profiles.
-5. **Task Optimization:** Performs predictive modeling based on subject representations to optimize downstream tasks.
+### 5. Downstream Tasks
+- Perform advanced analyses, such as disease prediction, via **DPMON**, which trains a GNN end-to-end alongside a classifier to incorporate both local and global network information.
 
-## Pipeline Components
+---
 
-### 1. Graph Generation (`m1_graph_generation`)
+# Installation
 
-**Purpose:** Constructs a global graph from multi-omics and phenotype data using specified algorithms.
+BioNeuralNet supports Python 3.10 and 3.11 in this beta release. Follow the steps below to set up BioNeuralNet and its dependencies.
 
-- **Input:** Multi-Omics Data Files, Phenotype File.
-- **Output:** `global_network.csv` saved in `m1_graph_generation/output/`.
-- **Algorithms:** Implemented in `config/smccnet.py` and can be extended with additional algorithms.
+## 1. Install BioNeuralNet via pip
 
-### 2. Clustering (`m2_clustering`)
-
-**Purpose:** Segments the global graph into sub-networks using clustering methods.
-
-- **Input:** `global_network.csv` from `m1_graph_generation/output/`.
-- **Output:** `cluster_1.csv`, `cluster_2.csv`, etc., saved in `m2_clustering/output/`.
-- **Algorithms:** Hierarchical Clustering (`config/hierarchical.py`), PageRank Clustering (`config/pagerank.py`).
-
-### 3. Network Embedding (`m3_network_embedding`)
-
-**Purpose:** Generates embeddings for each sub-network using network embedding techniques.
-
-- **Input:** `cluster_1.csv`, `cluster_2.csv`, etc., from `m2_clustering/output/`.
-- **Output:** `cluster_1_embeddings.csv`, `cluster_2_embeddings.csv`, etc., saved in `m3_network_embedding/output/`.
-- **Algorithms:** Node2Vec (`config/node2vec.py`).
-
-### 4. Subject Representation (`m4_subject_representation`)
-
-**Purpose:** Integrates network embeddings with omics data to create comprehensive subject representations.
-
-- **Input:** Embeddings from `m3_network_embedding/output/`, Raw Multi-Omics Data.
-- **Output:** `integrated_data.csv` saved in `m4_subject_representation/output/`.
-- **Methods:** Concatenation (`config/concatenate.py`), Scalar Representation (`config/scalar_representation.py`).
-
-### 5. Task Optimization (`m5_task_optimization`)
-
-**Purpose:** Performs predictive modeling based on subject representations to optimize downstream tasks.
-
-- **Input:** `integrated_data.csv` from `m4_subject_representation/output/`.
-- **Output:** `predictions_<timestamp>.csv` saved in `m5_task_optimization/output/`.
-- **Algorithms:** Random Forest, SVM, Logistic Regression (`config/prediction.py`).
-
-## Configuration
-
-### Root Configuration
-
-The root `config.yml` centralizes the configuration settings for the entire pipeline. It specifies which algorithms to use for each component and general pipeline settings.
-
-**Example `config.yml`:**
-
-```yaml
-# General pipeline settings
-pipeline:
-  run_all: true
-  output_dir: "log_output"
-  log_file: "pipeline.log"
-
-# Graph Generation Settings
-m1_graph_generation:
-  algorithm: "smccnet"
-
-# Clustering Settings
-m2_clustering:
-  algorithm: "Hierarchical"
-
-# Network Embedding Settings
-m3_network_embedding:
-  algorithm: "node2vec"
-
-# Subject Representation Settings
-m4_subject_representation:
-  integration_method: "scalar-representation"
-
-# Task Optimization Settings
-m5_task_optimization:
-  task_type: "prediction"
-  algorithm: "RandomForest"
-```
-### Component Configuration
-
-Each component has its own `config.yml` file located in its respective `config/` directory. These files contain algorithm-specific parameters.
-
-**Example for Clustering (`m2_clustering/config/config.yml`):**
-
-```yaml
-clustering:
-  paths:
-    input_dir: "../input"
-    output_dir: "../output"
-
-  Hierarchical:
-    n_clusters: 5
-    linkage: "ward"
-    affinity: "euclidean"
-
-  PageRank:
-    damping_factor: 0.85
-    max_iter: 100
-    tol: 1e-6
-```
-**Example for Network Embedding (`m3_network_embedding/config/config.yml`):**
-
-```yaml
-network_embedding:
-  paths:
-    input_dir: "../input"
-    output_dir: "../output"
-
-  node2vec:
-    embedding_dim: 128
-    walk_length: 80
-    num_walks: 10
-    window_size: 10
-```
-## Installation
-
-**Clone the Repository:**
+To install the core BioNeuralNet modules for GNN embeddings, subject representation, disease prediction (DPMON), and clustering:
 
 ```bash
-git clone https://github.com/bdlab-ucd/BioNeuralNet.git
+pip install bioneuralnet==0.1.0b1
+```
+
+## 2. Install PyTorch and PyTorch Geometric (Separately)
+
+BioNeuralNet relies on PyTorch and PyTorch Geometric for GNN operations:
+
+- Install PyTorch:
+  ```bash
+  pip install torch torchvision torchaudio
+  ```
+- Install PyTorch Geometric:
+  ```bash
+  pip install torch_geometric
+  ```
+
+For GPU-accelerated builds or other configurations, visit their official guides:
+- [PyTorch Installation Guide](https://pytorch.org/get-started/locally/)
+- [PyTorch Geometric Installation Guide](https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html)
+
+Select the appropriate build for your system (e.g., Stable, Linux, pip, Python, CPU/GPU).
+
+![PyTorch Installation](assets/pytorch.png)
+*PyTorch Installation Guide*
+
+![PyTorch Geometric Installation](assets/geometric.png)
+*PyTorch Geometric Installation Guide*
+
+## 3. (Optional) Install R and External Tools
+
+If you plan to use **WGCNA** or **SmCCNet** for network construction:
+
+- Install R from [The R Project](https://www.r-project.org/).
+- Install the required R packages. Open R and run the following:
+
+```r
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+install.packages(c("dplyr", "jsonlite"))
+BiocManager::install(c("impute", "preprocessCore", "GO.db", "AnnotationDbi"))
+install.packages("SmCCNet")
+install.packages("WGCNA")
+```
+
+## 4. Additional Notes for External Tools
+
+For **Node2Vec**, **feature selection**, or **visualization modules**, refer to the external tools documentation in `bioneuralnet.external_tools`. Examples include:
+- **`Node2Vec`**: Node2Vec-based embeddings.
+- **`FeatureSelector`**: Basic feature selection strategies like LassoCV and random forest.
+- **`HierarchicalClustering`**: Agglomerative clustering and silhouette scoring.
+- **`StaticVisualizer` and `DynamicVisualizer`**: Static or interactive network visualization.
+- **`SmCCNet` / `WGCNA`**: Build adjacency matrices using R-based libraries.
+
+These integrations are **optional** and do **not** form part of the core pipeline.
+
+## 5. Development Setup (Optional)
+
+If you plan to contribute to BioNeuralNet:
+
+```bash
+git clone https://github.com/UCD-BDLab/BioNeuralNet.git
 cd BioNeuralNet
-```
-**Set Up a Virtual Environment:**
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-**Install Required Packages:**
-
-```bash
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
+pytest
 ```
 
-## Usage
+---
 
-BioNeuralNet is designed with user-friendliness and flexibility in mind. Whether you're looking to execute the entire pipeline or focus on specific analysis steps, BioNeuralNet accommodates your research needs seamlessly.
+## Quick Example: Transforming Multi-Omics for Enhanced Disease Prediction
 
-### Running the Entire Pipeline
+![BioNeuralNet Overview](assets/Overview.png)
+*BioNeuralNet: Transforming Multi-Omics for Enhanced Disease Prediction*
 
-Execute all components sequentially to process your multi-omics data from network generation to task optimization.
+### External Tools
 
-```bash
-python main.py --start 1 --end 5
-```
-**Description:**
+We offer a number of external tools available through the `bioneuralnet.external_tools` module:
+- These tools were implemented to facilitate testing and should not be considered part of the package's core functionality.
+- The classes inside the `external_tools` module are lightweight wrappers around existing tools and libraries offering minimal functionality.
+- We highly encourage users to explore these tools outside of BioNeuralNet to fully leverage their capabilities.
 
-- `--start 1`: Begins execution from Component 1 (Graph Generation).
-- `--end 5`: Ends execution at Component 5 (Task Optimization).
+### Steps
 
-### Running Individual Components
+Below is a quick example demonstrating the following:
 
-Focus on specific components without executing the entire pipeline. Useful for testing or when certain stages are already completed.
+1. **Building or Importing a Network Adjacency Matrix**:
+   - For instance, using external tools like **SmCCNet**.
 
-**Example**: Run only Component 3 (Network Embedding).
+2. **Using DPMON for Disease Prediction**:
+   - A detailed explanation follows.
 
-```bash
-python main.py --start 3 --end 3
-```
+#### 1. Data Preparation
+- Input your multi-omics data (e.g., proteomics, metabolomics, genomics) along with phenotype data.
 
-Note: Ensure that the `input_dir` of the component contains the necessary input files.
+#### 2. Network Construction
+- **Not performed internally**: You need to provide or build adjacency matrices externally (e.g., via WGCNA, SmCCNet, or your own scripts).
+- Lightweight wrappers are available in `bioneuralnet.external_tools` (e.g., WGCNA, SmCCNet) for convenience. However, using these wrappers is **optional** and not mandatory for BioNeuralNet’s pipeline.
 
-## Workflow Overview
-### Data Flow and Dependencies
+#### 3. Disease Prediction
+- **DPMON** integrates GNN-based node embeddings with a downstream neural network to predict disease phenotypes.
 
-1. **Graph Generation**(`m1_graph_generation`):
-    - **Input**: Multi-Omics Data Files, Phenotype File.
-    - **Output**: `global_graph.csv` saved in `m1_graph_generation/output/`.
-
-2. **Clustering** (`m2_clustering`):
-    - **Input**: `global_graph.csv` from `m1_graph_generation/output/`.
-    - **Output**: `cluster1.csv`, `cluster2.csv`, etc., saved in `m2_clustering/output/`.
-
-3. **Network Embedding** (`m3_network_embedding`):
-    - **Input**: `cluster1.csv`, `cluster2.cs`v, etc., from `m2_clustering/output/`.
-    - **Output**: `node_embeddings_cluster1.csv`, `node_embeddings_cluster2.csv`, etc., saved in `m3_network_embedding/output`/.
-
-4. **Subject Representation** (`m4_subject_representation`):
-    - **Input**: `node_embeddings_cluster1.csv`, `node_embeddings_cluster2.csv`, etc., `from m3_network_embedding/output/`, Raw Multi-Omics Data.
-    - **Output**: integrated_data.csv saved in `m4_subject_representation/output/`.
-
-5. **Task Optimization** (`m5_task_optimization`):
-    - **Input**: integrated_data.csv from `m4_subject_representation/output/`.
-    - **Output**: predictions_<timestamp>.csv saved in `m5_task_optimization/output/`.
-
-## Logging
-
-BioNeuralNet implements comprehensive logging to facilitate monitoring and debugging.
-
-- **Root Log** (`pipeline.log`): Located in the global `output_dir`, records high-level pipeline execution details.
-- **Component Logs** (`component.log`): Located within each component's `output/` directory, contain detailed logs specific to that component's execution.
-
-**Example Locations:**
-
-- `global_output/pipeline.log`
-- `m2_clustering/output/component.log`
-
-## Extending the Pipeline
-
-BioNeuralNet's **modular** and **extensible** design allows researchers to incorporate new algorithms and methods effortlessly. This flexibility ensures that the pipeline can evolve alongside advancements in bioinformatics and network analysis.
-
-### Adding New Algorithms
-
-Integrate new algorithms into BioNeuralNet by following these streamlined steps:
-
-1. **Create the Algorithm Script:**
-   - Navigate to the target component's `config/` directory.
-   - Add a new Python script named after the algorithm (e.g., `new_algorithm.py`).
-
-2. **Implement the Algorithm:**
-   - Define a `run_method` function (or appropriately named) that encapsulates the algorithm's logic.
-   - Ensure the function accepts necessary parameters such as `config`, `input_dir`, and `output_dir`.
-
-**Example: `m2_clustering/config/new_algorithm.py`**
+### Code Example:
 
 ```python
-import logging
 import pandas as pd
-from sklearn.cluster import KMeans
+from bioneuralnet.external_tools import SmCCNet
+from bioneuralnet.downstream_task import DPMON
 
-def run_method(network_file, config, output_dir):
-    """
-    Perform K-Means Clustering on the network data.
-    """
-    logger = logging.getLogger(__name__)
-    logger.info("Running K-Means Clustering")
+# Step 1: Data Preparation
+phenotype_data = pd.read_csv('phenotype_data.csv', index_col=0)
+omics_proteins = pd.read_csv('omics_proteins.csv', index_col=0)
+omics_metabolites = pd.read_csv('omics_metabolites.csv', index_col=0)
+clinical_data = pd.read_csv('clinical_data.csv', index_col=0)
 
-    try:
-        # Load network data
-        network_df = pd.read_csv(network_file, index_col=0)
-        feature_matrix = network_df.values
+# Step 2: Network Construction
+smccnet = SmCCNet(
+    phenotype_df=phenotype_data,
+    omics_dfs=[omics_proteins, omics_metabolites],
+    data_types=["protein", "metabolite"],
+    kfold=5,
+    summarization="PCA",
+)
+adjacency_matrix = smccnet.run()
+print("Adjacency matrix generated.")
 
-        # Initialize the clustering model
-        model = KMeans(
-            n_clusters=config['clustering']['KMeans']['n_clusters'],
-            random_state=config['clustering']['KMeans']['random_state']
-        )
-
-        # Fit the model
-        labels = model.fit_predict(feature_matrix)
-
-        # Save cluster labels
-        cluster_labels_file = os.path.join(output_dir, "cluster_labels_kmeans.csv")
-        cluster_labels_df = pd.DataFrame({
-            'node': network_df.index,
-            'cluster': labels
-        })
-        cluster_labels_df.to_csv(cluster_labels_file, index=False)
-        logger.info(f"K-Means cluster labels saved to {cluster_labels_file}")
-
-    except Exception as e:
-        logger.error(f"Error in K-Means Clustering: {e}")
-        raise
-```
-**3. Update Component Configuration:**
-
-- Modify the component's `config.yml` to include the new algorithm and its specific parameters.
-
-**Example: `m2_clustering/config/config.yml`**
-
-```yaml
-clustering:
-  paths:
-    input_dir: "../input"
-    output_dir: "../output"
-
-  Hierarchical:
-    n_clusters: 5
-    linkage: "ward"
-    affinity: "euclidean"
-
-  PageRank:
-    damping_factor: 0.85
-    max_iter: 100
-    tol: 1e-6
-
-  KMeans:
-    n_clusters: 5
-    random_state: 42
-```
-**4. Update Root Configuration:**
-
-- Specify the new algorithm in the root `config.yml` for the respective component. In the example below we specify the new clustering algorithm.
-
-**Example:**
-```yaml
-# Clustering Settings
-m2_clustering:
-  algorithm: "KMeans"
+# Step 3: Disease Prediction
+dpmon = DPMON(
+    adjacency_matrix=adjacency_matrix,
+    omics_list=[omics_proteins, omics_metabolites],
+    phenotype_data=phenotype_data,
+    clinical_data=clinical_data,
+    model="GAT",
+)
+predictions = dpmon.run()
+print("Disease phenotype predictions:\n", predictions)
 ```
 
-**5. Run the Pipeline:**
+### Output
+- **Adjacency Matrix**: The multi-omics network representation.
+- **Predictions**: Disease phenotype predictions for each sample as a DataFrame linking subjects to predicted classes.
 
-- Execute the pipeline or the specific component to utilize the new algorithm.
+---
 
-```bash
-python main.py --start 2 --end 2
-```
+## Documentation & Tutorials
 
-### Best Practices for Extending code base:
+- Extensive documentation at [Read the Docs](https://bioneuralnet.readthedocs.io/en/latest/index.html)
+- Tutorials illustrating:
+  - Unsupervised vs. label-based GNN usage
+  - PageRank clustering and hierarchical clustering
+  - Subject representation
+  - Integrating external tools like WGCNA, SmCCNet
 
-*   **Consistent Naming:** Follow standardized naming conventions for new scripts and modules to ensure seamless integration.
+## Frequently Asked Questions (FAQ)
 
-*   **Documentation:** Update relevant sections of the `README.md` and any in-code documentation to reflect the addition of new algorithms.
+Key topics include:
+- **GPU acceleration** vs. CPU-only
+- **External Tools** usage (R-based adjacency construction, Node2Vec, etc.)
+- **DPMON** for local/global structure-based disease prediction
+- **PageRank or HierarchicalClustering** for subnetwork identification
 
-*   **Testing:** After adding a new algorithm, perform both unit tests and integration tests to verify functionality and compatibility.
+See [FAQ](https://bioneuralnet.readthedocs.io/en/latest/faq.html) for more.
 
-*   **Version Control:** Commit changes systematically using Git, documenting the integration steps for future reference.
+---
 
-## License
+## Acknowledgments
 
-[MIT License](/LICENSE)
+BioNeuralNet relies on or interfaces with various open-source libraries:
 
-## Contact
+- [PyTorch](https://pytorch.org/) / [PyTorch Geometric](https://github.com/pyg-team/pytorch_geometric)
+- [Node2Vec](https://github.com/aditya-grover/node2vec)
+- [WGCNA](https://cran.r-project.org/package=WGCNA) / [SmCCNet](https://cran.r-project.org/package=SmCCNet)
+- [Pytest](https://pytest.org/), [Sphinx](https://www.sphinx-doc.org), [Black](https://black.readthedocs.io/), [Flake8](https://flake8.pycqa.org/)
 
-For questions or support, please contact:
+We appreciate the efforts of these communities and all contributors.
 
-- Vicente Ramos
-  - Email: vicente.ramos@ucdenver.edu
+## Testing & CI
 
-- Big Data Management and Mining Laboratory
-  - Email: bdlab@ucdenver.edu
+1. **Local Testing**:
+   ```bash
+   pytest --cov=bioneuralnet --cov-report=html
+   open htmlcov/index.html
+   ```
 
+2. **Continuous Integration**:
+   - GitHub Actions run our test suite and code checks on each commit and PR.
+
+## Contributing
+
+- **Fork** the repository, create a new branch, implement your changes.
+- **Add/Update** tests, docstrings, and examples if appropriate.
+- **Open** a pull request describing your modifications.
+
+For more details, see our [FAQ](https://bioneuralnet.readthedocs.io/en/latest/faq.html)
+or open an [issue](https://github.com/UCD-BDLab/BioNeuralNet/issues).
+
+## License & Contact
+
+- **License**: [MIT License](https://github.com/UCD-BDLab/BioNeuralNet/blob/main/LICENSE)
+- **Contact**: Questions or feature requests? [Open an issue](https://github.com/UCD-BDLab/BioNeuralNet) or email [vicente.ramos@ucdenver.edu](mailto:vicente.ramos@ucdenver.edu).
+
+---
+
+BioNeuralNet aims to **streamline** multi-omics network analysis by providing **graph clustering**, **GNN embedding**, **subject representation**, and **disease prediction** tools. We hope it helps uncover new insights in multi-omics research.

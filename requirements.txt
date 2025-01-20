@@ -1,7 +1,18 @@
-# Python package dependencies for the BioNetwork Pipeline
-PyYAML>=5.4
-pandas>=1.0
-numpy>=1.18
-scikit-learn>=0.24
-node2vec>=0.4.1
-
+# requirements.in
+wheel
+setuptools
+PyYAML
+pandas
+numpy
+scikit-learn
+node2vec
+matplotlib
+ray[tune]
+tensorboardX
+networkx
+pyvis
+leidenalg
+dtt
+pyreadr
+# pip install torch
+# pip install torch_geometric

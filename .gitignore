@@ -1,2 +1,69 @@
+# Python
+*.pyc
 __pycache__/
+*.pyo
+*.pyd
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.pytest_cache
+release.md
+bioneuralnet.egg-info
+/dist/
+/build/
+/docker_files/
+.mypy_cache
+
+# Block sensitive file types globally
+*.csv
+*.RData
+
+
+# Sphinx documentation build
+docs/build/
+
+# Virtual environment
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
 .venv/
+bioneuralnet-env/
+
+# IDE and editor directories
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Test reports
+test_report/
+
+# Other
+*.bak
+*.tmp
+test_output/
+dpmon_output_*
+lib/
+.DS_Store

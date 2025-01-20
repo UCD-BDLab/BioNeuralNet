@@ -1,0 +1,26 @@
+# Development dependencies
+
+# testing
+pytest>=6.0
+pytest-cov
+pytest-mock
+
+# docs
+sphinx
+sphinx_rtd_theme
+sphinx-autosummary-accessors
+sphinxcontrib-napoleon
+
+# code quality and formatting
+flake8
+black
+mypy
+git-filter-repo
+
+# dev tools
+pre-commit
+tox
+
+# build dependencies
+setuptools>=42
+twine
