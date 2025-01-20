@@ -1,80 +1,70 @@
-Example 1: Sparse Multiple Canonical Correlation Network (SmCCNet) Workflow with Graph Neural Network (GNN) Embeddings
-======================================================================================================================
+Example 1: SmCCNet + GNN Embeddings + Subject Representation
+============================================================
 
-This tutorial demonstrates a comprehensive workflow using **SmCCNet** for graph generation, followed by
-**GNN-based embedding generation** to create node representations from the network. The process integrates
-the generated embeddings into subject-level omics data, enhancing downstream analytical capabilities.
+This tutorial shows how to:
 
-**Workflow Overview:**
+1. **Construct** a multi-omics network adjacency using SmCCNet (an external R-based tool).
+2. **Generate** node embeddings with a Graph Neural Network (GNN).
+3. **Integrate** those embeddings into subject-level omics data for enhanced representation.
 
-1. **Network Construction (SmCCNet):**
-   Generates a network from multi-omics data using `SmCCNet`. The resulting adjacency matrix represents relationships between features.
+**Step-by-Step**:
 
-2. **GNN-Based Embedding Generation:**
-   Utilizes Graph Neural Networks (GNNs) to create embeddings from the constructed network, capturing intricate feature relationships.
+1. **Data Setup**:
+   - Omics data, phenotype data, clinical data as Pandas DataFrames or Series.
 
-3. **Subject Representation Integration:**
-   Integrates the generated embeddings into subject-level omics data, enhancing the dataset for downstream analyses such as clustering or disease prediction.
+2. **Network Construction** (SmCCNet):
+   - We call `SmCCNet.run()` to produce an adjacency matrix from the multi-omics data.
 
-**Step-by-Step Guide:**
+3. **GNN Embedding**:
+   - We pass the adjacency, omics data, and (optionally) clinical data to `GNNEmbedding`.
+   - GNNEmbedding’s `.run()` yields node embeddings.
 
-1. **Setup Input Data:**
-   - Prepare your omics data (`omics_data`), phenotype data (`phenotype_data`), and clinical data (`clinical_data`) as Pandas DataFrames or Series.
-   - These data structures should be loaded or created within your application or script.
+4. **Subject Representation**:
+   - We can integrate these embeddings back into omics data via `GraphEmbedding`.
 
-   .. literalinclude:: ../examples/example_1.py
-      :language: python
-      :lines: 1-20
+.. note::
+   For a **complete** script, see `examples/example_1.py` in the repository.
 
-2. **Run SmCCNet Workflow:**
+Below is a **partial** snippet:
 
-   .. literalinclude:: ../examples/example_1.py
-      :language: python
-      :lines: 43-53
-      :caption: Running SmCCNet to generate the adjacency matrix.
+.. code-block:: python
 
-   This step instantiates the `SmCCNet` class and generates an adjacency matrix using your multi-omics and phenotype data.
+   from bioneuralnet.external_tools import SmCCNet
+   from bioneuralnet.network_embedding import GNNEmbedding
+   from bioneuralnet.subject_representation import GraphEmbedding
 
-3. **Run GNN Embedding Generation:**
+   # 1) Prepare data
+   omics_data = ...
+   phenotype_data = ...
+   clinical_data = ...
 
-   .. literalinclude:: ../examples/example_1.py
-      :language: python
-      :lines: 55-71
-      :caption: Generating GNN Embeddings from the Adjacency Matrix.
+   # 2) Run SmCCNet to get adjacency
+   smcc = SmCCNet(phenotype_data=phenotype_data, omics_data=omics_data)
+   adjacency_matrix = smcc.run()
 
-   This section computes node features based on correlations and employs a Graph Neural Network (GNN) to generate embeddings from the adjacency matrix.
+   # 3) Generate embeddings
+   gnn = GNNEmbedding(
+       adjacency_matrix=adjacency_matrix,
+       omics_data=omics_data,
+       phenotype_data=phenotype_data,
+       clinical_data=clinical_data,
+       model_type='GCN'
+   )
+   embedding_dict = gnn.run()
+   node_embeddings = embedding_dict["graph"]
 
-4. **Integrate Embeddings into Subject Representation:**
+   # 4) Subject-level representation
+   graph_embed = GraphEmbedding(
+       adjacency_matrix=adjacency_matrix,
+       omics_data=omics_data,
+       phenotype_data=phenotype_data,
+       clinical_data=clinical_data
+   )
+   enhanced_data = graph_embed.run()
 
-   .. literalinclude:: ../examples/example_1.py
-      :language: python
-      :lines: 79-87
-      :caption: Integrating GNN Embeddings into Subject-Level Omics Data.
+   print("Enhanced omics data shape:", enhanced_data.shape)
 
-   Here, the generated embeddings are integrated into the subject-level omics data, enhancing the dataset for downstream analyses such as clustering or disease prediction.
-
-5. **Complete Workflow Execution:**
-
-   .. literalinclude:: ../examples/example_1.py
-      :language: python
-      :lines: 95-121
-      :caption: Complete SmCCNet Workflow Execution with Sample Data.
-
-   This section demonstrates the full execution of the workflow using sample data. It initializes the input data, runs the SmCCNet workflow, and outputs the enhanced omics data integrated with GNN embeddings.
-
-**Running the Example:**
-
-.. literalinclude:: ../examples/example_1.py
-   :language: python
-   :caption: Complete SmCCNet Workflow Execution with Sample Data.
-
-Upon successful execution, you will find:
-- **Adjacency Matrix**: Generated by SmCCNet, stored as a DataFrame.
-- **GNN Embeddings**: Created using GNNs, stored as `embeddings_df`.
-- **Enhanced Omics Data**: Subject-level data enriched with embeddings, stored as `enhanced_omics_data`.
-
-**Result Interpretation:**
-
-- **Adjacency Matrix**: Represents the constructed network from multi-omics data, indicating the strength and presence of relationships between features.
-- **GNN Embeddings**: Numerical representations capturing the structural and feature-based intricacies of the network, facilitating advanced analyses.
-- **Enhanced Omics Data**: Combines original omics data with embedding information, providing a richer dataset for downstream tasks like clustering or predictive modeling.
+**Results**:
+- **Adjacency Matrix** from SmCCNet
+- **Node Embeddings** from GNN
+- **Enhanced Omics Data**, integrating node embeddings for subject-level analysis

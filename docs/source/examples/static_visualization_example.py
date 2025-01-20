@@ -1,12 +1,12 @@
 import pandas as pd
-from bioneuralnet.analysis import StaticVisualizer
+from bioneuralnet.external_tools import StaticVisualizer
 
 def main():
     adjacency_matrix = pd.read_csv('input/adjacency_matrix.csv', index_col=0)
-    
+
     static_vis = StaticVisualizer(
         adjacency_matrix=adjacency_matrix,
-        layout='spring',  
+        layout='spring',
         node_size=300,
         node_color='skyblue',
         edge_color='gray',
@@ -15,7 +15,7 @@ def main():
         output_dir='visualizations/static',
         output_filename='static_network.png'
     )
-    
+
     G = static_vis.generate_graph()
     static_vis.visualize(G)
     print("Static visualization workflow completed successfully.")

@@ -20,19 +20,20 @@ from ray.tune.schedulers import ASHAScheduler
 from ray import train
 from ray.train import Checkpoint
 
-from bioneuralnet.network_embedding import GCN, GAT, SAGE, GIN
+from torch_geometric.nn import GCNConv, GATConv, SAGEConv, GINConv
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
 
 class DPMON:
     def __init__(
         self,
         adjacency_matrix: pd.DataFrame,
         omics_list: List[pd.DataFrame],
-        phenotype_data: pd.DataFrame,  
-        clinical_data: pd.DataFrame,  
-        model: str='GCN',
+        phenotype_data: pd.DataFrame,
+        clinical_data: pd.DataFrame,
+        model: str = "GCN",
         gnn_hidden_dim: int = 16,
         layer_num: int = 5,
         nn_hidden_dim1: int = 8,
@@ -44,13 +45,21 @@ class DPMON:
         tune: bool = False,
         gpu: bool = False,
         cuda: int = 0,
-        output_dir: Optional[str] = None
+        output_dir: Optional[str] = None,
     ):
         if clinical_data is None or clinical_data.empty:
-            raise ValueError("Clinical data (features_file) is required and cannot be empty.")
+            raise ValueError(
+                "Clinical data (features_file) is required and cannot be empty."
+            )
 
-        if phenotype_data is None or phenotype_data.empty or 'finalgold_visit' not in phenotype_data.columns:
-            raise ValueError("Phenotype data must contain 'finalgold_visit' and cannot be empty.")
+        if (
+            phenotype_data is None
+            or phenotype_data.empty
+            or "finalgold_visit" not in phenotype_data.columns
+        ):
+            raise ValueError(
+                "Phenotype data must contain 'finalgold_visit' and cannot be empty."
+            )
 
         if not omics_list or any(df.empty for df in omics_list):
             raise ValueError("All provided omics data files must be non-empty.")
@@ -79,7 +88,6 @@ class DPMON:
         os.makedirs(self.output_dir, exist_ok=True)
         logger.info("Initialized DPMON with the provided parameters.")
 
-
     def run(self) -> pd.DataFrame:
         """
         Execute the DPMON pipeline for disease prediction.
@@ -88,7 +96,7 @@ class DPMON:
 
         1. **Combining Omics and Phenotype Data**:
            - Merges the provided omics datasets and ensures that the phenotype (`finalgold_visit`) column is included.
-        
+
         2. **Tuning or Training**:
            - **Tuning**: If `tune=True`, performs hyperparameter tuning using Ray Tune and returns an empty DataFrame.
            - **Training**: If `tune=False`, runs standard training to generate predictions.
@@ -97,7 +105,7 @@ class DPMON:
            - If training is performed, returns a DataFrame of predictions with 'Actual' and 'Predicted' columns.
 
         **Returns**: pd.DataFrame
-            
+
             - If `tune=False`, a DataFrame containing disease phenotype predictions for each sample.
             - If `tune=True`, returns an empty DataFrame since no predictions are generated.
 
@@ -122,31 +130,32 @@ class DPMON:
         logger.info("Starting DPMON run.")
 
         dpmon_params = {
-            'model': self.model,
-            'gnn_hidden_dim': self.gnn_hidden_dim,
-            'layer_num': self.layer_num,
-            'nn_hidden_dim1': self.nn_hidden_dim1,
-            'nn_hidden_dim2': self.nn_hidden_dim2,
-            'epoch_num': self.epoch_num,
-            'repeat_num': self.repeat_num,
-            'lr': self.lr,
-            'weight_decay': self.weight_decay,
-            'gpu': self.gpu,
-            'cuda': self.cuda,
-            'tune': self.tune
+            "model": self.model,
+            "gnn_hidden_dim": self.gnn_hidden_dim,
+            "layer_num": self.layer_num,
+            "nn_hidden_dim1": self.nn_hidden_dim1,
+            "nn_hidden_dim2": self.nn_hidden_dim2,
+            "epoch_num": self.epoch_num,
+            "repeat_num": self.repeat_num,
+            "lr": self.lr,
+            "weight_decay": self.weight_decay,
+            "gpu": self.gpu,
+            "cuda": self.cuda,
+            "tune": self.tune,
         }
 
         combined_omics = pd.concat(self.omics_list, axis=1)
-        if 'finalgold_visit' not in combined_omics.columns:
-            combined_omics = combined_omics.merge(self.phenotype_data[['finalgold_visit']], left_index=True, right_index=True)
+        if "finalgold_visit" not in combined_omics.columns:
+            combined_omics = combined_omics.merge(
+                self.phenotype_data[["finalgold_visit"]],
+                left_index=True,
+                right_index=True,
+            )
 
         if self.tune:
             logger.info("Running hyperparameter tuning for DPMON.")
             run_hyperparameter_tuning(
-                dpmon_params,
-                self.adjacency_matrix,
-                combined_omics,
-                self.clinical_data
+                dpmon_params, self.adjacency_matrix, combined_omics, self.clinical_data
             )
             return pd.DataFrame()
 
@@ -156,37 +165,40 @@ class DPMON:
             self.adjacency_matrix,
             combined_omics,
             self.clinical_data,
-            output_dir=self.output_dir
+            output_dir=self.output_dir,
         )
 
         logger.info("DPMON run completed.")
         return predictions
 
+
 def setup_device(gpu, cuda):
     if gpu:
         os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-        os.environ['CUDA_VISIBLE_DEVICES'] = str(cuda)
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        os.environ["CUDA_VISIBLE_DEVICES"] = str(cuda)
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         if torch.cuda.is_available():
-            logger.info(f'Using GPU {cuda}')
+            logger.info(f"Using GPU {cuda}")
         else:
-            logger.warning(f'GPU {cuda} requested but not available, using CPU')
+            logger.warning(f"GPU {cuda} requested but not available, using CPU")
     else:
-        device = torch.device('cpu')
-        logger.info('Using CPU')
+        device = torch.device("cpu")
+        logger.info("Using CPU")
     return device
 
 
-def slice_omics_datasets(omics_dataset: pd.DataFrame, adjacency_matrix: pd.DataFrame) -> List[pd.DataFrame]:
+def slice_omics_datasets(
+    omics_dataset: pd.DataFrame, adjacency_matrix: pd.DataFrame
+) -> List[pd.DataFrame]:
     logger.info("Slicing omics dataset based on network nodes.")
     omics_network_nodes_names = adjacency_matrix.index.tolist()
 
     # Clean omics dataset columns
     clean_columns = []
     for node in omics_dataset.columns:
-        node_clean = re.sub(r'[^0-9a-zA-Z_]', '.', node)
+        node_clean = re.sub(r"[^0-9a-zA-Z_]", ".", node)
         if not node_clean[0].isalpha():
-            node_clean = 'X' + node_clean
+            node_clean = "X" + node_clean
         clean_columns.append(node_clean)
     omics_dataset.columns = clean_columns
 
@@ -195,16 +207,22 @@ def slice_omics_datasets(omics_dataset: pd.DataFrame, adjacency_matrix: pd.DataF
         logger.error(f"Nodes missing in omics data: {missing_nodes}")
         raise ValueError("Missing nodes in omics dataset.")
 
-    selected_columns = omics_network_nodes_names + ['finalgold_visit']
+    selected_columns = omics_network_nodes_names + ["finalgold_visit"]
     return [omics_dataset[selected_columns]]
 
 
-def build_omics_networks_tg(adjacency_matrix: pd.DataFrame, omics_datasets: List[pd.DataFrame], clinical_data: pd.DataFrame) -> List[Data]:
+def build_omics_networks_tg(
+    adjacency_matrix: pd.DataFrame,
+    omics_datasets: List[pd.DataFrame],
+    clinical_data: pd.DataFrame,
+) -> List[Data]:
     logger.info("Building PyTorch Geometric Data object from adjacency matrix.")
     omics_network_nodes_names = adjacency_matrix.index.tolist()
 
     G = nx.from_pandas_adjacency(adjacency_matrix)
-    node_mapping = {node_name: idx for idx, node_name in enumerate(omics_network_nodes_names)}
+    node_mapping = {
+        node_name: idx for idx, node_name in enumerate(omics_network_nodes_names)
+    }
     G = nx.relabel_nodes(G, node_mapping)
     num_nodes = len(node_mapping)
     logger.info(f"Number of nodes in network: {num_nodes}")
@@ -220,7 +238,9 @@ def build_omics_networks_tg(adjacency_matrix: pd.DataFrame, omics_datasets: List
         for node_name in omics_network_nodes_names:
             correlations = []
             for var in clinical_vars:
-                corr_value = abs(omics_dataset[node_name].corr(clinical_data[var].astype('float64')))
+                corr_value = abs(
+                    omics_dataset[node_name].corr(clinical_data[var].astype("float64"))
+                )
                 correlations.append(corr_value)
             node_features.append(correlations)
         x = torch.tensor(node_features, dtype=torch.float)
@@ -231,9 +251,10 @@ def build_omics_networks_tg(adjacency_matrix: pd.DataFrame, omics_datasets: List
     edge_index = torch.tensor(list(G.edges()), dtype=torch.long).t().contiguous()
     edge_index = torch.cat([edge_index, edge_index.flip(0)], dim=1)
 
-    edge_weight = torch.tensor([
-        data.get('weight', 1.0) for _, _, data in G.edges(data=True)
-    ], dtype=torch.float)
+    edge_weight = torch.tensor(
+        [data.get("weight", 1.0) for _, _, data in G.edges(data=True)],
+        dtype=torch.float,
+    )
     edge_weight = torch.cat([edge_weight, edge_weight], dim=0)
 
     data = Data(x=x, edge_index=edge_index, edge_attr=edge_weight)
@@ -245,41 +266,60 @@ def build_omics_networks_tg(adjacency_matrix: pd.DataFrame, omics_datasets: List
     return [data]
 
 
-def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinical_data, output_dir):
-    device = setup_device(dpmon_params['gpu'], dpmon_params['cuda'])
+def run_standard_training(
+    dpmon_params, adjacency_matrix, combined_omics, clinical_data, output_dir
+):
+    device = setup_device(dpmon_params["gpu"], dpmon_params["cuda"])
     omics_dataset = slice_omics_datasets(combined_omics, adjacency_matrix)
-    omics_networks_tg = build_omics_networks_tg(adjacency_matrix, omics_dataset, clinical_data)
+    omics_networks_tg = build_omics_networks_tg(
+        adjacency_matrix, omics_dataset, clinical_data
+    )
 
     accuracies = []
     last_predictions_df = pd.DataFrame()
 
     for omics_data, omics_network in zip(omics_dataset, omics_networks_tg):
-        for i in range(dpmon_params['repeat_num']):
+        for i in range(dpmon_params["repeat_num"]):
             logger.info(f"Training iteration {i+1}/{dpmon_params['repeat_num']}")
             model = NeuralNetwork(
-                model_type=dpmon_params['model'],
+                model_type=dpmon_params["model"],
                 gnn_input_dim=omics_network.x.shape[1],
-                gnn_hidden_dim=dpmon_params['gnn_hidden_dim'],
-                gnn_layer_num=dpmon_params['layer_num'],
+                gnn_hidden_dim=dpmon_params["gnn_hidden_dim"],
+                gnn_layer_num=dpmon_params["layer_num"],
                 ae_encoding_dim=1,
-                nn_input_dim=omics_data.drop(['finalgold_visit'], axis=1).shape[1],
-                nn_hidden_dim1=dpmon_params['nn_hidden_dim1'],
-                nn_hidden_dim2=dpmon_params['nn_hidden_dim2'],
-                nn_output_dim=omics_data['finalgold_visit'].nunique()
+                nn_input_dim=omics_data.drop(["finalgold_visit"], axis=1).shape[1],
+                nn_hidden_dim1=dpmon_params["nn_hidden_dim1"],
+                nn_hidden_dim2=dpmon_params["nn_hidden_dim2"],
+                nn_output_dim=omics_data["finalgold_visit"].nunique(),
             ).to(device)
 
             criterion = nn.CrossEntropyLoss()
-            optimizer = optim.Adam(model.parameters(), lr=dpmon_params['lr'], weight_decay=dpmon_params['weight_decay'])
+            optimizer = optim.Adam(
+                model.parameters(),
+                lr=dpmon_params["lr"],
+                weight_decay=dpmon_params["weight_decay"],
+            )
 
-            train_features = torch.FloatTensor(omics_data.drop(['finalgold_visit'], axis=1).values).to(device)
+            train_features = torch.FloatTensor(
+                omics_data.drop(["finalgold_visit"], axis=1).values
+            ).to(device)
             train_labels = {
-                'labels': torch.LongTensor(omics_data['finalgold_visit'].values.copy()).to(device),
-                'omics_network': omics_network.to(device)
+                "labels": torch.LongTensor(
+                    omics_data["finalgold_visit"].values.copy()
+                ).to(device),
+                "omics_network": omics_network.to(device),
             }
 
-            accuracy = train_model(model, criterion, optimizer, train_features, train_labels, dpmon_params['epoch_num'])
+            accuracy = train_model(
+                model,
+                criterion,
+                optimizer,
+                train_features,
+                train_labels,
+                dpmon_params["epoch_num"],
+            )
             accuracies.append(accuracy)
-            model_path = os.path.join(output_dir, f'dpm_model_iter_{i+1}.pth')
+            model_path = os.path.join(output_dir, f"dpm_model_iter_{i+1}.pth")
             torch.save(model.state_dict(), model_path)
             logger.info(f"Model saved to {model_path}")
 
@@ -287,11 +327,15 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
             with torch.no_grad():
                 predictions, _ = model(train_features, omics_network.to(device))
                 _, predicted = torch.max(predictions, 1)
-                predictions_path = os.path.join(output_dir, f'predictions_iter_{i+1}.csv')
-                predictions_df = pd.DataFrame({
-                    'Actual': omics_data['finalgold_visit'].values,
-                    'Predicted': predicted.cpu().numpy()
-                })
+                predictions_path = os.path.join(
+                    output_dir, f"predictions_iter_{i+1}.csv"
+                )
+                predictions_df = pd.DataFrame(
+                    {
+                        "Actual": omics_data["finalgold_visit"].values,
+                        "Predicted": predicted.cpu().numpy(),
+                    }
+                )
                 predictions_df.to_csv(predictions_path, index=False)
                 logger.info(f"Predictions saved to {predictions_path}")
                 last_predictions_df = predictions_df
@@ -307,63 +351,77 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
     return last_predictions_df
 
 
-def run_hyperparameter_tuning(dpmon_params, adjacency_matrix, combined_omics, clinical_data):
-    device = setup_device(dpmon_params['gpu'], dpmon_params['cuda'])
+def run_hyperparameter_tuning(
+    dpmon_params, adjacency_matrix, combined_omics, clinical_data
+):
+    device = setup_device(dpmon_params["gpu"], dpmon_params["cuda"])
 
     omics_dataset = slice_omics_datasets(combined_omics, adjacency_matrix)
-    omics_networks_tg = build_omics_networks_tg(adjacency_matrix, omics_dataset, clinical_data)
+    omics_networks_tg = build_omics_networks_tg(
+        adjacency_matrix, omics_dataset, clinical_data
+    )
 
     pipeline_configs = {
-        'gnn_layer_num': tune.choice([2, 4, 8, 16, 32, 64, 128]),
-        'gnn_hidden_dim': tune.choice([4, 8, 16, 32, 64, 128]),
-        'lr': tune.loguniform(1e-4, 1e-1),
-        'weight_decay': tune.loguniform(1e-4, 1e-1),
-        'nn_hidden_dim1': tune.choice([4, 8, 16, 32, 64, 128]),
-        'nn_hidden_dim2': tune.choice([4, 8, 16, 32, 64, 128]),
-        'num_epochs': tune.choice([2, 16, 64, 512, 1024, 4096, 8192]),
+        "gnn_layer_num": tune.choice([2, 4, 8, 16, 32, 64, 128]),
+        "gnn_hidden_dim": tune.choice([4, 8, 16, 32, 64, 128]),
+        "lr": tune.loguniform(1e-4, 1e-1),
+        "weight_decay": tune.loguniform(1e-4, 1e-1),
+        "nn_hidden_dim1": tune.choice([4, 8, 16, 32, 64, 128]),
+        "nn_hidden_dim2": tune.choice([4, 8, 16, 32, 64, 128]),
+        "num_epochs": tune.choice([2, 16, 64, 512, 1024, 4096, 8192]),
     }
 
     reporter = CLIReporter(metric_columns=["loss", "accuracy", "training_iteration"])
-    scheduler = ASHAScheduler(metric="loss", mode="min", grace_period=10, reduction_factor=2)
-    gpu_resources = 1 if dpmon_params['gpu'] else 0
+    scheduler = ASHAScheduler(
+        metric="loss", mode="min", grace_period=10, reduction_factor=2
+    )
+    gpu_resources = 1 if dpmon_params["gpu"] else 0
 
     for omics_data, omics_network_tg in zip(omics_dataset, omics_networks_tg):
-        os.environ['TUNE_DISABLE_STRICT_METRIC_CHECKING'] = '1'
-        logger.info(f"Starting hyperparameter tuning for dataset shape: {omics_data.shape}")
+        os.environ["TUNE_DISABLE_STRICT_METRIC_CHECKING"] = "1"
+        logger.info(
+            f"Starting hyperparameter tuning for dataset shape: {omics_data.shape}"
+        )
 
         def tune_train_n(config):
             model = NeuralNetwork(
-                model_type=dpmon_params['model'],
+                model_type=dpmon_params["model"],
                 gnn_input_dim=omics_network_tg.x.shape[1],
-                gnn_hidden_dim=config['gnn_hidden_dim'],
-                gnn_layer_num=config['gnn_layer_num'],
+                gnn_hidden_dim=config["gnn_hidden_dim"],
+                gnn_layer_num=config["gnn_layer_num"],
                 ae_encoding_dim=1,
-                nn_input_dim=omics_data.drop(['finalgold_visit'], axis=1).shape[1],
-                nn_hidden_dim1=config['nn_hidden_dim1'],
-                nn_hidden_dim2=config['nn_hidden_dim2'],
-                nn_output_dim=omics_data['finalgold_visit'].nunique()
+                nn_input_dim=omics_data.drop(["finalgold_visit"], axis=1).shape[1],
+                nn_hidden_dim1=config["nn_hidden_dim1"],
+                nn_hidden_dim2=config["nn_hidden_dim2"],
+                nn_output_dim=omics_data["finalgold_visit"].nunique(),
             ).to(device)
 
             criterion = nn.CrossEntropyLoss()
-            optimizer = optim.Adam(model.parameters(), lr=config['lr'], weight_decay=config['weight_decay'])
+            optimizer = optim.Adam(
+                model.parameters(), lr=config["lr"], weight_decay=config["weight_decay"]
+            )
 
-            train_features = torch.FloatTensor(omics_data.drop(['finalgold_visit'], axis=1).values).to(device)
+            train_features = torch.FloatTensor(
+                omics_data.drop(["finalgold_visit"], axis=1).values
+            ).to(device)
             train_labels = {
-                'labels': torch.LongTensor(omics_data['finalgold_visit'].values.copy()).to(device),
-                'omics_network': omics_network_tg.to(device)
+                "labels": torch.LongTensor(
+                    omics_data["finalgold_visit"].values.copy()
+                ).to(device),
+                "omics_network": omics_network_tg.to(device),
             }
 
-            for epoch in range(config['num_epochs']):
+            for epoch in range(config["num_epochs"]):
                 model.train()
                 optimizer.zero_grad()
-                outputs, _ = model(train_features, train_labels['omics_network'])
-                loss = criterion(outputs, train_labels['labels'])
+                outputs, _ = model(train_features, train_labels["omics_network"])
+                loss = criterion(outputs, train_labels["labels"])
                 loss.backward()
                 optimizer.step()
 
                 _, predicted = torch.max(outputs, 1)
-                total = train_labels['labels'].size(0)
-                correct = (predicted == train_labels['labels']).sum().item()
+                total = train_labels["labels"].size(0)
+                correct = (predicted == train_labels["labels"]).sum().item()
                 accuracy = correct / total
 
                 metrics = {"loss": loss.item(), "accuracy": accuracy}
@@ -372,23 +430,30 @@ def run_hyperparameter_tuning(dpmon_params, adjacency_matrix, combined_omics, cl
                         {"epoch": epoch, "model_state": model.state_dict()},
                         os.path.join(tempdir, "checkpoint.pt"),
                     )
-                    train.report(metrics=metrics, checkpoint=Checkpoint.from_directory(tempdir))
+                    train.report(
+                        metrics=metrics, checkpoint=Checkpoint.from_directory(tempdir)
+                    )
 
             model.eval()
             with torch.no_grad():
-                outputs, _ = model(train_features, train_labels['omics_network'])
-                loss = criterion(outputs, train_labels['labels'])
+                outputs, _ = model(train_features, train_labels["omics_network"])
+                loss = criterion(outputs, train_labels["labels"])
                 _, predicted = torch.max(outputs, 1)
-                total = train_labels['labels'].size(0)
-                correct = (predicted == train_labels['labels']).sum().item()
+                total = train_labels["labels"].size(0)
+                correct = (predicted == train_labels["labels"]).sum().item()
                 accuracy = correct / total
                 metrics = {"loss": loss.item(), "accuracy": accuracy}
                 with tempfile.TemporaryDirectory() as tempdir:
                     torch.save(
-                        {"epoch": config['num_epochs'], "model_state": model.state_dict()},
+                        {
+                            "epoch": config["num_epochs"],
+                            "model_state": model.state_dict(),
+                        },
                         os.path.join(tempdir, "checkpoint.pt"),
                     )
-                    train.report(metrics=metrics, checkpoint=Checkpoint.from_directory(tempdir))
+                    train.report(
+                        metrics=metrics, checkpoint=Checkpoint.from_directory(tempdir)
+                    )
 
         result = tune.run(
             tune_train_n,
@@ -396,24 +461,26 @@ def run_hyperparameter_tuning(dpmon_params, adjacency_matrix, combined_omics, cl
             config=pipeline_configs,
             num_samples=10,
             scheduler=scheduler,
-            name='Hyperparameter_Tuning',
+            name="Hyperparameter_Tuning",
             progress_reporter=reporter,
             keep_checkpoints_num=1,
-            checkpoint_score_attr='min-loss'
+            checkpoint_score_attr="min-loss",
         )
 
         best_trial = result.get_best_trial("loss", "min", "last")
         logger.info("Best trial config: {}".format(best_trial.config))
         logger.info("Best trial final loss: {}".format(best_trial.last_result["loss"]))
-        logger.info("Best trial final accuracy: {}".format(best_trial.last_result["accuracy"]))
+        logger.info(
+            "Best trial final accuracy: {}".format(best_trial.last_result["accuracy"])
+        )
 
 
 def train_model(model, criterion, optimizer, train_data, train_labels, epoch_num):
     model.train()
     for epoch in range(epoch_num):
         optimizer.zero_grad()
-        outputs, _ = model(train_data, train_labels['omics_network'])
-        loss = criterion(outputs, train_labels['labels'])
+        outputs, _ = model(train_data, train_labels["omics_network"])
+        loss = criterion(outputs, train_labels["labels"])
         loss.backward()
         optimizer.step()
 
@@ -422,49 +489,161 @@ def train_model(model, criterion, optimizer, train_data, train_labels, epoch_num
 
     model.eval()
     with torch.no_grad():
-        predictions, _ = model(train_data, train_labels['omics_network'])
+        predictions, _ = model(train_data, train_labels["omics_network"])
         _, predicted = torch.max(predictions, 1)
-        accuracy = (predicted == train_labels['labels']).sum().item() / len(train_labels['labels'])
+        accuracy = (predicted == train_labels["labels"]).sum().item() / len(
+            train_labels["labels"]
+        )
         logger.info(f"Training Accuracy: {accuracy:.4f}")
 
     return accuracy
 
 
+class GCN(nn.Module):
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True):
+        super(GCN, self).__init__()
+        self.convs = nn.ModuleList()
+        self.convs.append(GCNConv(input_dim, hidden_dim))
+        for _ in range(layer_num - 1):
+            self.convs.append(GCNConv(hidden_dim, hidden_dim))
+        self.dropout = dropout
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+        for conv in self.convs:
+            x = conv(x, edge_index)
+            x = F.relu(x)
+            if self.dropout:
+                x = F.dropout(x, training=self.training)
+        return x
+
+
+class GAT(nn.Module):
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, heads=1):
+        super(GAT, self).__init__()
+        self.convs = nn.ModuleList()
+        self.convs.append(GATConv(input_dim, hidden_dim, heads=heads))
+        for _ in range(layer_num - 1):
+            self.convs.append(GATConv(hidden_dim * heads, hidden_dim, heads=heads))
+        self.dropout = dropout
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+        for conv in self.convs:
+            x = conv(x, edge_index)
+            x = F.elu(x)
+            if self.dropout:
+                x = F.dropout(x, training=self.training)
+        return x
+
+
+class SAGE(nn.Module):
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True):
+        super(SAGE, self).__init__()
+        self.convs = nn.ModuleList()
+        self.convs.append(SAGEConv(input_dim, hidden_dim))
+        for _ in range(layer_num - 1):
+            self.convs.append(SAGEConv(hidden_dim, hidden_dim))
+        self.dropout = dropout
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+        for conv in self.convs:
+            x = conv(x, edge_index)
+            x = F.relu(x)
+            if self.dropout:
+                x = F.dropout(x, training=self.training)
+        return x
+
+
+class GIN(nn.Module):
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True):
+        super(GIN, self).__init__()
+        self.convs = nn.ModuleList()
+        for i in range(layer_num):
+            nn_module = nn.Sequential(
+                nn.Linear(hidden_dim if i > 0 else input_dim, hidden_dim),
+                nn.ReLU(),
+                nn.Linear(hidden_dim, hidden_dim),
+            )
+            self.convs.append(GINConv(nn_module))
+        self.dropout = dropout
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+        for conv in self.convs:
+            x = conv(x, edge_index)
+            x = F.relu(x)
+            if self.dropout:
+                x = F.dropout(x, training=self.training)
+        return x
+
+
 class NeuralNetwork(nn.Module):
-    def __init__(self,
-                 model_type,
-                 gnn_input_dim,
-                 gnn_hidden_dim,
-                 gnn_layer_num,
-                 ae_encoding_dim,
-                 nn_input_dim,
-                 nn_hidden_dim1,
-                 nn_hidden_dim2,
-                 nn_output_dim):
+    def __init__(
+        self,
+        model_type,
+        gnn_input_dim,
+        gnn_hidden_dim,
+        gnn_layer_num,
+        ae_encoding_dim,
+        nn_input_dim,
+        nn_hidden_dim1,
+        nn_hidden_dim2,
+        nn_output_dim,
+    ):
         super(NeuralNetwork, self).__init__()
 
-        if model_type == 'GCN':
-            self.gnn = GCN(input_dim=gnn_input_dim, hidden_dim=gnn_hidden_dim, layer_num=gnn_layer_num)
-        elif model_type == 'GAT':
-            self.gnn = GAT(input_dim=gnn_input_dim, hidden_dim=gnn_hidden_dim, layer_num=gnn_layer_num)
-        elif model_type == 'SAGE':
-            self.gnn = SAGE(input_dim=gnn_input_dim, hidden_dim=gnn_hidden_dim, output_dim=gnn_hidden_dim, layer_num=gnn_layer_num)
-        elif model_type == 'GIN':
-            self.gnn = GIN(input_dim=gnn_input_dim, hidden_dim=gnn_hidden_dim, output_dim=gnn_hidden_dim, layer_num=gnn_layer_num)
+        if model_type == "GCN":
+            self.gnn = GCN(
+                input_dim=gnn_input_dim,
+                hidden_dim=gnn_hidden_dim,
+                layer_num=gnn_layer_num,
+            )
+        elif model_type == "GAT":
+            self.gnn = GAT(
+                input_dim=gnn_input_dim,
+                hidden_dim=gnn_hidden_dim,
+                layer_num=gnn_layer_num,
+            )
+        elif model_type == "SAGE":
+            self.gnn = SAGE(
+                input_dim=gnn_input_dim,
+                hidden_dim=gnn_hidden_dim,
+                output_dim=gnn_hidden_dim,
+                layer_num=gnn_layer_num,
+            )
+        elif model_type == "GIN":
+            self.gnn = GIN(
+                input_dim=gnn_input_dim,
+                hidden_dim=gnn_hidden_dim,
+                output_dim=gnn_hidden_dim,
+                layer_num=gnn_layer_num,
+            )
         else:
             raise ValueError(f"Unsupported GNN model type: {model_type}")
 
-        self.autoencoder = Autoencoder(input_dim=gnn_hidden_dim, encoding_dim=ae_encoding_dim)
+        self.autoencoder = Autoencoder(
+            input_dim=gnn_hidden_dim, encoding_dim=ae_encoding_dim
+        )
         self.dim_averaging = DimensionAveraging()
-        self.predictor = DownstreamTaskNN(nn_input_dim, nn_hidden_dim1, nn_hidden_dim2, nn_output_dim)
+        self.predictor = DownstreamTaskNN(
+            nn_input_dim, nn_hidden_dim1, nn_hidden_dim2, nn_output_dim
+        )
 
     def forward(self, omics_dataset, omics_network_tg):
         omics_network_nodes_embedding = self.gnn(omics_network_tg)
-        omics_network_nodes_embedding_ae = self.autoencoder(omics_network_nodes_embedding)
-        omics_network_nodes_embedding_avg = self.dim_averaging(omics_network_nodes_embedding_ae)
+        omics_network_nodes_embedding_ae = self.autoencoder(
+            omics_network_nodes_embedding
+        )
+        omics_network_nodes_embedding_avg = self.dim_averaging(
+            omics_network_nodes_embedding_ae
+        )
         omics_dataset_with_embeddings = torch.mul(
             omics_dataset,
-            omics_network_nodes_embedding_avg.expand(omics_dataset.shape[1], omics_dataset.shape[0]).t()
+            omics_network_nodes_embedding_avg.expand(
+                omics_dataset.shape[1], omics_dataset.shape[0]
+            ).t(),
         )
         predictions = self.predictor(omics_dataset_with_embeddings)
         return predictions, omics_dataset_with_embeddings
@@ -478,14 +657,14 @@ class Autoencoder(nn.Module):
             nn.ReLU(),
             nn.Linear(8, 4),
             nn.ReLU(),
-            nn.Linear(4, encoding_dim)
+            nn.Linear(4, encoding_dim),
         )
         self.decoder = nn.Sequential(
             nn.Linear(encoding_dim, 4),
             nn.ReLU(),
             nn.Linear(4, 8),
             nn.ReLU(),
-            nn.Linear(8, input_dim)
+            nn.Linear(8, input_dim),
         )
 
     def forward(self, x):

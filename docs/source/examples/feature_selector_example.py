@@ -1,5 +1,5 @@
 import pandas as pd
-from bioneuralnet.analysis.feature_selector import FeatureSelector
+from bioneuralnet.external_tools import FeatureSelector
 from bioneuralnet.network_embedding import GNNEmbedding
 
 def main():

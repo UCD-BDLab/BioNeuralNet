@@ -1,6 +1,6 @@
 import unittest
 import pandas as pd
-from bioneuralnet.clustering import HierarchicalClustering
+from bioneuralnet.external_tools import HierarchicalClustering
 
 class TestHierarchicalClustering(unittest.TestCase):
 

@@ -1,5 +1,5 @@
 import pandas as pd
-from bioneuralnet.clustering import HierarchicalClustering
+from bioneuralnet.external_tools import HierarchicalClustering
 
 def main():
     try:
@@ -14,9 +14,9 @@ def main():
         hierarchical_clustering = HierarchicalClustering(
             adjacency_matrix=adjacency_matrix,
             n_clusters=2,
-            linkage='ward',       
-            affinity='euclidean',  
-            scale_data=True        
+            linkage='ward',
+            affinity='euclidean',
+            scale_data=True
         )
 
         clustering_results = hierarchical_clustering.run()

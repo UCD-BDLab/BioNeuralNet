@@ -12,4 +12,3 @@
 
    gnn_embedding
    gnn_models
-   node2vec

@@ -1,5 +1,5 @@
 import pandas as pd
-from bioneuralnet.graph_generation.wgcna import WGCNA
+from bioneuralnet.external_tools import WGCNA
 
 def run_wgcna_workflow(omics_data: pd.DataFrame,
                        phenotype_data: pd.Series,

@@ -41,12 +41,11 @@ def main():
         adjacency_matrix=adjacency_matrix,
         omics_data=omics_data,
         phenotype_df=phenotype_df.set_index('SampleID'),
-        clinical_data_df=clinical_data_df.set_index('SampleID'), 
+        clinical_data_df=clinical_data_df.set_index('SampleID'),
         adjacency_matrix=adjacency_matrix,
         model_type='GCN'
     )
 
-    # Run GNN embedding process
     print("Generating GNN embeddings...")
     embeddings_dict = gnn_embed.run()
     embeddings = embeddings_dict['graph']

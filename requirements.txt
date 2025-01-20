@@ -13,5 +13,6 @@ networkx
 pyvis
 leidenalg
 dtt
+pyreadr
 # pip install torch
 # pip install torch_geometric

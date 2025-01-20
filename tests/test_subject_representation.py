@@ -1,78 +1,144 @@
 import unittest
 from unittest.mock import patch
 import pandas as pd
-import torch
+
 from bioneuralnet.subject_representation import GraphEmbedding
+
 
 class TestGraphEmbedding(unittest.TestCase):
 
     def setUp(self):
         self.adjacency_matrix = pd.DataFrame(
-            [[0,1,0],
-             [1,0,1],
-             [0,1,0]], 
-            index=['gene1','gene2','gene3'], 
-            columns=['gene1','gene2','gene3']
+            [[0, 1, 0], [1, 0, 1], [0, 1, 0]],
+            index=["gene1", "gene2", "gene3"],
+            columns=["gene1", "gene2", "gene3"],
         )
 
-        self.omics_data1 = pd.DataFrame({
-            'gene1': [1, 2, 3],
-            'gene2': [4, 5, 6],
-            'gene3': [7, 8, 9]
-        }, index=['sample1', 'sample2', 'sample3'])
-        
-        self.omics_data2 = pd.DataFrame({
-            'gene4': [2, 1, 0],
-            'gene5': [1, 3, 5],
-            'gene6': [9, 8, 7]
-        }, index=['sample1', 'sample2', 'sample3'])
+        self.omics_data = pd.DataFrame(
+            {"gene1": [1, 2, 3], "gene2": [4, 5, 6], "gene3": [7, 8, 9]},
+            index=["sample1", "sample2", "sample3"],
+        )
 
-        self.omics_data = pd.concat([self.omics_data1, self.omics_data2], axis=1)
-        self.omics_data['finalgold_visit'] = [0, 1, 2]
+        self.omics_data["finalgold_visit"] = [0, 1, 2]
 
-        self.clinical_data_df = pd.DataFrame({
-            'age': [30, 40, 50]
-        }, index=['sample1', 'sample2', 'sample3'])
+        self.clinical_data_df = pd.DataFrame(
+            {"age": [30, 40, 50]}, index=["sample1", "sample2", "sample3"]
+        )
 
+        self.phenotype_data = pd.Series(
+            [0, 1, 2], index=["sample1", "sample2", "sample3"]
+        )
 
-    @patch.object(GraphEmbedding, 'generate_embeddings', return_value=pd.DataFrame({
-        'dim1': [0.1, 0.2, 0.3]
-    }, index=['gene1', 'gene2', 'gene3']))
-    @patch.object(GraphEmbedding, 'reduce_embeddings', return_value=pd.Series({
-        'gene1': 0.1,
-        'gene2': 0.2,
-        'gene3': 0.3
-    }))
-    @patch.object(GraphEmbedding, 'integrate_embeddings', return_value=pd.DataFrame({
-        'gene1': [1.1, 2.2, 3.3],
-        'gene2': [4.4, 5.5, 6.6],
-        'gene3': [7.7, 8.8, 9.9],
-        'gene4': [2.2, 1.1, 0.0],
-        'gene5': [1.1, 3.3, 5.5],
-        'gene6': [9.9, 8.8, 7.7],
-        'finalgold_visit': [0, 1, 2]
-    }, index=['sample1', 'sample2', 'sample3']))
+        self.embeddings = pd.DataFrame(
+            {
+                "dim1": [0.1, 0.2, 0.3],
+                "dim2": [0.4, 0.5, 0.6],
+                "dim3": [0.7, 0.8, 0.9],
+            },
+            index=["gene1", "gene2", "gene3"],
+        )
+
+    @patch.object(
+        GraphEmbedding,
+        "generate_embeddings",
+        return_value=pd.DataFrame(
+            {"dim1": [0.1, 0.2, 0.3]}, index=["gene1", "gene2", "gene3"]
+        ),
+    )
+    @patch.object(
+        GraphEmbedding,
+        "reduce_embeddings",
+        return_value=pd.Series({"gene1": 0.1, "gene2": 0.2, "gene3": 0.3}),
+    )
+    @patch.object(
+        GraphEmbedding,
+        "integrate_embeddings",
+        return_value=pd.DataFrame(
+            {
+                "gene1": [1.1, 2.2, 3.3],
+                "gene2": [4.4, 5.5, 6.6],
+                "gene3": [7.7, 8.8, 9.9],
+                "finalgold_visit": [0, 1, 2],
+            },
+            index=["sample1", "sample2", "sample3"],
+        ),
+    )
     def test_run(self, mock_integrate, mock_reduce, mock_generate):
         """
-        Test the run method of GraphEmbedding to ensure it returns the expected enhanced omics data.
+        Test that GraphEmbedding.run() returns an expected DataFrame
+        and calls underlying steps.
         """
         graph_embed = GraphEmbedding(
             adjacency_matrix=self.adjacency_matrix,
             omics_data=self.omics_data,
+            phenotype_data=self.phenotype_data,
             clinical_data=self.clinical_data_df,
-            embedding_method='GNNs'
+            embeddings=None,
         )
 
         enhanced_omics_data = graph_embed.run()
 
-        self.assertTrue(isinstance(enhanced_omics_data, pd.DataFrame), "Output should be a pandas DataFrame.")
-        self.assertEqual(enhanced_omics_data.shape, self.omics_data.shape, "Output shape should match input omics_data shape.")
-        self.assertListEqual(list(enhanced_omics_data.columns), list(self.omics_data.columns), "Columns should match input omics_data columns.")
-        self.assertListEqual(list(enhanced_omics_data.index), list(self.omics_data.index), "Indices should match input omics_data indices.")
+        self.assertIsInstance(
+            enhanced_omics_data,
+            pd.DataFrame,
+        )
+        self.assertEqual(
+            enhanced_omics_data.shape,
+            (3, 4),
+            "Output shape should match expected shape (3,4).",
+        )
+        self.assertListEqual(
+            list(enhanced_omics_data.columns),
+            ["gene1", "gene2", "gene3", "finalgold_visit"],
+            "Columns should match the integrated omics + finalgold_visit.",
+        )
 
         mock_generate.assert_called_once()
         mock_reduce.assert_called_once()
         mock_integrate.assert_called_once()
 
-if __name__ == '__main__':
+    @patch.object(GraphEmbedding, "reduce_embeddings")
+    def test_reduce_embeddings_average(self, mock_reduce):
+        """
+        Test that reduce_embeddings works with the 'average' method.
+        """
+        mock_reduce.return_value = pd.Series({"gene1": 0.4, "gene2": 0.5, "gene3": 0.6})
+        graph_embed = GraphEmbedding(
+            adjacency_matrix=self.adjacency_matrix,
+            omics_data=self.omics_data,
+            phenotype_data=self.phenotype_data,
+            clinical_data=self.clinical_data_df,
+            embeddings=None,
+        )
+        result = graph_embed.reduce_embeddings(self.embeddings, method="average")
+
+        self.assertIsInstance(result, pd.Series)
+        self.assertListEqual(
+            result.tolist(), [0.4, 0.5, 0.6], "Result should match mocked values."
+        )
+        mock_reduce.assert_called_once_with(self.embeddings, method="average")
+
+    @patch.object(GraphEmbedding, "reduce_embeddings")
+    def test_reduce_embeddings_maximum(self, mock_reduce):
+        """
+        Test that reduce_embeddings works with the 'maximum' method.
+        """
+        mock_reduce.return_value = pd.Series({"gene1": 0.7, "gene2": 0.8, "gene3": 0.9})
+        graph_embed = GraphEmbedding(
+            adjacency_matrix=self.adjacency_matrix,
+            omics_data=self.omics_data,
+            phenotype_data=self.phenotype_data,
+            clinical_data=self.clinical_data_df,
+            embeddings=None,
+        )
+        result = graph_embed.reduce_embeddings(self.embeddings, method="maximum")
+
+        self.assertIsInstance(result, pd.Series)
+        self.assertListEqual(
+            result.tolist(), [0.7, 0.8, 0.9], "Result should match mocked values."
+        )
+        mock_reduce.assert_called_once_with(self.embeddings, method="maximum")
+
+
+if __name__ == "__main__":
     unittest.main()

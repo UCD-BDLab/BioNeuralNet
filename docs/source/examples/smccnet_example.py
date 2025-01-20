@@ -1,5 +1,5 @@
 import pandas as pd
-from bioneuralnet.graph_generation import SmCCNet
+from bioneuralnet.external_tools import SmCCNet
 
 def main():
     try:

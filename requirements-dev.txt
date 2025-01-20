@@ -15,6 +15,7 @@ sphinxcontrib-napoleon
 flake8
 black
 mypy
+git-filter-repo
 
 # dev tools
 pre-commit

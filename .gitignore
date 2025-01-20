@@ -11,6 +11,15 @@ venv.bak/
 .pytest_cache
 release.md
 bioneuralnet.egg-info
+/dist/
+/build/
+/docker_files/
+
+
+# Block sensitive file types globally
+*.csv
+*.RData
+
 
 # Sphinx documentation build
 docs/build/

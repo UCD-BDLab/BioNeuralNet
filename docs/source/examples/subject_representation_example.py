@@ -49,7 +49,7 @@ def main():
         omics_list=[omics_df1, omics_df2],
         phenotype_df=phenotype_df,
         clinical_data_df=clinical_data_df,
-        embedding_method='GNNs'
+        embeddings='GNNs'
     )
 
     enhanced_omics_data = graph_embed.run()

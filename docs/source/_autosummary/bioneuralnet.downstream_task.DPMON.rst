@@ -23,5 +23,9 @@ bioneuralnet.downstream\_task.dpmon
       DPMON
       DimensionAveraging
       DownstreamTaskNN
+      GAT
+      GCN
+      GIN
       NeuralNetwork
+      SAGE
    
