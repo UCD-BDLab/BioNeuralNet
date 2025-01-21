@@ -5,6 +5,8 @@ on:
     branches:
       - "**"
   pull_request:
+    branches:
+      - main
 
 jobs:
   pre-commit:
@@ -26,10 +28,14 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/requirements-dev.txt') }}
           restore-keys: ${{ runner.os }}-pip-
 
-      - name: Install Pre-Commit and Dependencies
+      - name: Install Python dependencies
         run: |
+          set -e
           python -m pip install --upgrade pip
-          pip install pre-commit
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+          pip install torch
+          pip install torch_geometric
 
       - name: Run Pre-Commit Checks
         run: pre-commit run --all-files --show-diff-on-failure
