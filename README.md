@@ -117,6 +117,7 @@ If you plan to contribute to BioNeuralNet:
 git clone https://github.com/UCD-BDLab/BioNeuralNet.git
 cd BioNeuralNet
 pip install -r requirements-dev.txt
+pre-commit install
 pytest
 ```
 
