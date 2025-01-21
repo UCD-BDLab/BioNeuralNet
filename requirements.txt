@@ -14,5 +14,5 @@ pyvis
 leidenalg
 dtt
 pyreadr
-torch
-torch_geometric
+# torch
+# torch_geometric
