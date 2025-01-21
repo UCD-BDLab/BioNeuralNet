@@ -37,3 +37,5 @@ intersphinx_mapping = {
     "matplotlib": ("https://matplotlib.org/stable/", None),
     "networkx": ("https://networkx.org/documentation/stable/", None),
 }
+
+autodoc_mock_imports = ["torch", "torch_geometric"]
