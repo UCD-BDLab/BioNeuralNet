@@ -2,3 +2,7 @@ sphinx
 sphinx_rtd_theme
 sphinx-autosummary-accessors
 sphinxcontrib-napoleon
+
+# Dependencies
+torch
+torch_geometric
