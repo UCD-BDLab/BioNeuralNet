@@ -19,6 +19,7 @@ bioneuralnet.egg-info
 # Block sensitive file types globally
 *.csv
 *.RData
+dpmon_output/
 
 
 # Sphinx documentation build
