@@ -9,6 +9,8 @@ Welcome to BioNeuralNet Beta 0.1
    :target: https://pypi.org/project/bioneuralnet/
 .. image:: https://img.shields.io/pypi/pyversions/bioneuralnet
    :target: https://pypi.org/project/bioneuralnet/
+.. image:: https://static.pepy.tech/badge/bioneuralnet
+   :target: https://pepy.tech/project/bioneuralnet
 
 .. figure:: _static/LOGO_WB.png
    :align: center
