@@ -11,10 +11,13 @@ Welcome to BioNeuralNet Beta 0.1
    :target: https://pypi.org/project/bioneuralnet/
 .. image:: https://static.pepy.tech/badge/bioneuralnet
    :target: https://pepy.tech/project/bioneuralnet
+.. image:: https://img.shields.io/badge/GitHub-View%20Code-blue
+   :target: https://github.com/UCD-BDLab/BioNeuralNet
 
 .. figure:: _static/LOGO_WB.png
    :align: center
    :alt: bioneuralnet logo
+
 
 **Note:** This is a **beta version** of BioNeuralNet. It is under active development, and certain features
 may be incomplete or subject to change. Feedback and bug reports are highly encouraged to help us
@@ -118,7 +121,9 @@ Below is a quick example demonstrating the following steps:
   - **Adjacency Matrix**: The multi-omics network representation.
   - **Predictions**: Disease phenotype predictions for each sample.
 
-**Note**: For a complete script, see `examples/example_2.py` in the repository.
+.. note::
+
+   - For a complete script of DPMON and subject representation example, see :doc:`tutorials`.
 
 **BioNeuralNet Overview: Multi-Omics Integration with Graph Neural Networks**
 -----------------------------------------------------------------------------
@@ -156,8 +161,6 @@ BioNeuralNet offers five core steps in a typical workflow:
 
    BioNeuralNet Overview
 
-Documentation Overview
-----------------------
 
 .. toctree::
    :maxdepth: 2
