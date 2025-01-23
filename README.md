@@ -2,9 +2,10 @@
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![PyPI](https://img.shields.io/pypi/v/bioneuralnet)
-![Python Versions](https://img.shields.io/pypi/pyversions/bioneuralnet)
 ![GitHub Issues](https://img.shields.io/github/issues/UCD-BDLab/BioNeuralNet)
 ![GitHub Contributors](https://img.shields.io/github/contributors/UCD-BDLab/BioNeuralNet)
+![Downloads](https://static.pepy.tech/badge/bioneuralnet)
+
 
 ## Welcome to [BioNeuralNet Beta 0.1](https://bioneuralnet.readthedocs.io/en/latest/index.html)
 
