@@ -21,15 +21,7 @@ class GraphEmbedding:
         phenotype_data: pd.DataFrame,
         clinical_data: pd.DataFrame,
         embeddings: pd.DataFrame = None,
-        model_type: str = "GCN",
-        phenotype_col: str = "DiseaseStage",
-        hidden_dim: int = 64,
-        layer_num: int = 2,
-        dropout: bool = True,
-        num_epochs: int = 100,
-        lr: float = 1e-3,
-        weight_decay: float = 1e-4,
-        gpu: bool = False,
+        reduce_method: str = "PCA",
     ):
         """
         Parameters
@@ -44,24 +36,6 @@ class GraphEmbedding:
             (samples x clinical_vars) table.
         embeddings : pd.DataFrame, optional
             Precomputed node embeddings to skip GNN if not None or empty.
-        model_type : str, optional
-            GNN model type ("GCN", "GAT", "SAGE", "GIN").
-        phenotype_col : str, optional
-            Column in phenotype_data for correlation-based node label. Defaults to "DiseaseStage".
-        hidden_dim : int, optional
-            The GNN hidden dimension. Defaults to 64.
-        layer_num : int, optional
-            Number of GNN layers. Defaults to 2.
-        dropout : bool, optional
-            Whether to apply dropout in GNN. Defaults to True.
-        num_epochs : int, optional
-            Number of epochs if we train the GNN. Defaults to 100.
-        lr : float, optional
-            Learning rate. Defaults to 1e-3.
-        weight_decay : float, optional
-            L2 weight decay. Defaults to 1e-4.
-        gpu : bool, optional
-            Whether to use GPU if available. Defaults to False.
         """
         if adjacency_matrix is None or adjacency_matrix.empty:
             raise ValueError("Adjacency matrix is required and cannot be empty.")
@@ -75,7 +49,7 @@ class GraphEmbedding:
         if embeddings is None or embeddings.empty:
             self.logger = get_logger(__name__)
             self.logger.info(
-                "No precomputed embeddings; defaulting to GNN-based approach."
+                "No precomputed embeddings -> defaulting to GNN-based approach."
             )
             self.embedding_method = "GNNs"
         else:
@@ -86,16 +60,7 @@ class GraphEmbedding:
         self.phenotype_data = phenotype_data
         self.clinical_data = clinical_data
         self.embeddings = embeddings
-
-        self.model_type = model_type
-        self.phenotype_col = phenotype_col
-        self.hidden_dim = hidden_dim
-        self.layer_num = layer_num
-        self.dropout = dropout
-        self.num_epochs = num_epochs
-        self.lr = lr
-        self.weight_decay = weight_decay
-        self.gpu = gpu
+        self.reduce_method = reduce_method
 
         self.logger = get_logger(__name__)
         self.logger.info("Initialized GraphEmbedding with direct data inputs.")
@@ -152,24 +117,13 @@ class GraphEmbedding:
                 raise ValueError("Provided embeddings are empty.")
             return self.embeddings
 
-        # Otherwise, we do a GNN-based approach
-        from ..network_embedding import GNNEmbedding
-
-        gnn_embedder = GNNEmbedding(
-            adjacency_matrix=self.adjacency_matrix,
-            omics_data=self.omics_data,
-            phenotype_data=self.phenotype_data,
-            clinical_data=self.clinical_data,
-            phenotype_col=self.phenotype_col,
-            model_type=self.model_type,
-            hidden_dim=self.hidden_dim,
-            layer_num=self.layer_num,
-            dropout=self.dropout,
-            num_epochs=self.num_epochs,
-            lr=self.lr,
-            weight_decay=self.weight_decay,
-            gpu=self.gpu,
-        )
+        else:
+            gnn_embedder = GNNEmbedding(
+                adjacency_matrix=self.adjacency_matrix,
+                omics_data=self.omics_data,
+                phenotype_data=self.phenotype_data,
+                clinical_data=self.clinical_data,
+            )
 
         embeddings_dict = gnn_embedder.run()
         embeddings_tensor = embeddings_dict["graph"]
@@ -178,9 +132,7 @@ class GraphEmbedding:
         embeddings_df = pd.DataFrame(embeddings_tensor.numpy(), index=node_names)
         return embeddings_df
 
-    def reduce_embeddings(
-        self, embeddings: pd.DataFrame, method: str = "pca"
-    ) -> pd.Series:
+    def reduce_embeddings(self, embeddings: pd.DataFrame) -> pd.Series:
         """
         Reduce embeddings to a single dimension per node using specified method.
 
@@ -204,21 +156,21 @@ class GraphEmbedding:
         if embeddings.empty:
             raise ValueError("Embeddings DataFrame is empty.")
 
-        if method == "pca":
+        if self.reduce_method == "PCA":
             self.logger.info("Reducing node embeddings to 1D via PCA.")
             pca = PCA(n_components=1)
             principal_components = pca.fit_transform(embeddings)
             reduced_embedding = pd.Series(
                 principal_components.flatten(), index=embeddings.index, name="PC1"
             )
-        elif method == "average":
+        elif self.reduce_method == "AVG":
             self.logger.info("Reducing node embeddings to 1D via averaging.")
             reduced_embedding = embeddings.mean(axis=1)
-        elif method == "maximum":
+        elif self.reduce_method == "MAX":
             self.logger.info("Reducing node embeddings to 1D via maximum.")
             reduced_embedding = embeddings.max(axis=1)
         else:
-            raise ValueError(f"Unsupported reduction method: {method}")
+            raise ValueError(f"Unsupported reduction method: {self.reduce_method}")
 
         return reduced_embedding
 

@@ -28,7 +28,7 @@ class TestGNNEmbedding(unittest.TestCase):
         )
 
         self.phenotype_data = pd.DataFrame(
-            {"finalgold_visit": [0, 1]}, index=["sample1", "sample2"]
+            {"phenotype": [0, 1]}, index=["sample1", "sample2"]
         )
 
     @patch.object(
@@ -46,6 +46,7 @@ class TestGNNEmbedding(unittest.TestCase):
             omics_data=self.omics_data,
             phenotype_data=self.phenotype_data,
             clinical_data=self.clinical_data,
+            phenotype_col="phenotype",
             model_type="GCN",
             hidden_dim=2,
             layer_num=2,
