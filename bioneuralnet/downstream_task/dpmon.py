@@ -33,7 +33,7 @@ class DPMON:
         omics_list: List[pd.DataFrame],
         phenotype_data: pd.DataFrame,
         clinical_data: pd.DataFrame,
-        model: str = "GCN",
+        model: str = "GAT",
         gnn_hidden_dim: int = 16,
         layer_num: int = 5,
         nn_hidden_dim1: int = 8,
@@ -55,10 +55,10 @@ class DPMON:
         if (
             phenotype_data is None
             or phenotype_data.empty
-            or "finalgold_visit" not in phenotype_data.columns
+            or "phenotype" not in phenotype_data.columns
         ):
             raise ValueError(
-                "Phenotype data must contain 'finalgold_visit' and cannot be empty."
+                "Phenotype data must contain 'phenotype' and cannot be empty."
             )
 
         if not omics_list or any(df.empty for df in omics_list):
@@ -84,7 +84,6 @@ class DPMON:
         self.gpu = gpu
         self.cuda = cuda
         self.output_dir = output_dir if output_dir else f"dpmon_output"
-        # f"dpmon_output_{os.getpid()}" for unique output directory
 
         os.makedirs(self.output_dir, exist_ok=True)
         logger.info("Initialized DPMON with the provided parameters.")
@@ -96,7 +95,7 @@ class DPMON:
         **Steps:**
 
         1. **Combining Omics and Phenotype Data**:
-           - Merges the provided omics datasets and ensures that the phenotype (`finalgold_visit`) column is included.
+           - Merges the provided omics datasets and ensures that the phenotype (`phenotype`) column is included.
 
         2. **Tuning or Training**:
            - **Tuning**: If `tune=True`, performs hyperparameter tuning using Ray Tune and returns an empty DataFrame.
@@ -145,10 +144,11 @@ class DPMON:
             "tune": self.tune,
         }
 
+        # Combine omics datasets
         combined_omics = pd.concat(self.omics_list, axis=1)
-        if "finalgold_visit" not in combined_omics.columns:
+        if "phenotype" not in combined_omics.columns:
             combined_omics = combined_omics.merge(
-                self.phenotype_data[["finalgold_visit"]],
+                self.phenotype_data[["phenotype"]],
                 left_index=True,
                 right_index=True,
             )
@@ -208,7 +208,7 @@ def slice_omics_datasets(
         logger.error(f"Nodes missing in omics data: {missing_nodes}")
         raise ValueError("Missing nodes in omics dataset.")
 
-    selected_columns = omics_network_nodes_names + ["finalgold_visit"]
+    selected_columns = omics_network_nodes_names + ["phenotype"]
     return [omics_dataset[selected_columns]]
 
 
@@ -288,10 +288,10 @@ def run_standard_training(
                 gnn_hidden_dim=dpmon_params["gnn_hidden_dim"],
                 gnn_layer_num=dpmon_params["layer_num"],
                 ae_encoding_dim=1,
-                nn_input_dim=omics_data.drop(["finalgold_visit"], axis=1).shape[1],
+                nn_input_dim=omics_data.drop(["phenotype"], axis=1).shape[1],
                 nn_hidden_dim1=dpmon_params["nn_hidden_dim1"],
                 nn_hidden_dim2=dpmon_params["nn_hidden_dim2"],
-                nn_output_dim=omics_data["finalgold_visit"].nunique(),
+                nn_output_dim=omics_data["phenotype"].nunique(),
             ).to(device)
 
             criterion = nn.CrossEntropyLoss()
@@ -302,12 +302,12 @@ def run_standard_training(
             )
 
             train_features = torch.FloatTensor(
-                omics_data.drop(["finalgold_visit"], axis=1).values
+                omics_data.drop(["phenotype"], axis=1).values
             ).to(device)
             train_labels = {
-                "labels": torch.LongTensor(
-                    omics_data["finalgold_visit"].values.copy()
-                ).to(device),
+                "labels": torch.LongTensor(omics_data["phenotype"].values.copy()).to(
+                    device
+                ),
                 "omics_network": omics_network.to(device),
             }
 
@@ -333,7 +333,7 @@ def run_standard_training(
                 )
                 predictions_df = pd.DataFrame(
                     {
-                        "Actual": omics_data["finalgold_visit"].values,
+                        "Actual": omics_data["phenotype"].values,
                         "Predicted": predicted.cpu().numpy(),
                     }
                 )
@@ -391,10 +391,10 @@ def run_hyperparameter_tuning(
                 gnn_hidden_dim=config["gnn_hidden_dim"],
                 gnn_layer_num=config["gnn_layer_num"],
                 ae_encoding_dim=1,
-                nn_input_dim=omics_data.drop(["finalgold_visit"], axis=1).shape[1],
+                nn_input_dim=omics_data.drop(["phenotype"], axis=1).shape[1],
                 nn_hidden_dim1=config["nn_hidden_dim1"],
                 nn_hidden_dim2=config["nn_hidden_dim2"],
-                nn_output_dim=omics_data["finalgold_visit"].nunique(),
+                nn_output_dim=omics_data["phenotype"].nunique(),
             ).to(device)
 
             criterion = nn.CrossEntropyLoss()
@@ -403,12 +403,12 @@ def run_hyperparameter_tuning(
             )
 
             train_features = torch.FloatTensor(
-                omics_data.drop(["finalgold_visit"], axis=1).values
+                omics_data.drop(["phenotype"], axis=1).values
             ).to(device)
             train_labels = {
-                "labels": torch.LongTensor(
-                    omics_data["finalgold_visit"].values.copy()
-                ).to(device),
+                "labels": torch.LongTensor(omics_data["phenotype"].values.copy()).to(
+                    device
+                ),
                 "omics_network": omics_network_tg.to(device),
             }
 
