@@ -20,7 +20,7 @@ class TestDPMON(unittest.TestCase):
         self.omics_data2 = pd.DataFrame({"gene3": [5, 6]}, index=["sample1", "sample2"])
 
         self.phenotype_data = pd.DataFrame(
-            {"finalgold_visit": [2, 3]}, index=["sample1", "sample2"]
+            {"phenotype": [2, 3]}, index=["sample1", "sample2"]
         )
 
         self.features_data = pd.DataFrame(
