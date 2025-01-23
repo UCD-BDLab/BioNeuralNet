@@ -6,7 +6,7 @@
 ![GitHub Issues](https://img.shields.io/github/issues/UCD-BDLab/BioNeuralNet)
 ![GitHub Contributors](https://img.shields.io/github/contributors/UCD-BDLab/BioNeuralNet)
 
-## Welcome to BioNeuralNet Beta 0.1
+## Welcome to [BioNeuralNet Beta 0.1](https://bioneuralnet.readthedocs.io/en/latest/index.html)
 
 ![BioNeuralNet Logo](/assets/LOGO_WB.png)
 

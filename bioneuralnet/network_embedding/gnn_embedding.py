@@ -29,7 +29,7 @@ class GNNEmbedding:
         omics_data: pd.DataFrame,
         phenotype_data: pd.DataFrame,
         clinical_data: pd.DataFrame,
-        phenotype_col: str = "finalgold_visit",
+        phenotype_col: str = "phenotype",
         model_type: str = "GAT",
         hidden_dim: int = 64,
         layer_num: int = 2,

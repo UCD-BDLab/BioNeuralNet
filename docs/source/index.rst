@@ -42,7 +42,7 @@ For additional installation details, including GPU usage for GNNs, see :doc:`ins
 **Example: Transforming Multi-Omics for Enhanced Disease Prediction**
 ---------------------------------------------------------------------
 
-`View full-size image: Transforming Multi-Omics for Enhanced Disease Prediction <https://ramosv.github.io/_images/Overview.png>`_
+`View full-size image: Transforming Multi-Omics for Enhanced Disease Prediction <https://bioneuralnet.readthedocs.io/en/latest/_images/Overview.png>`_
 
 .. figure:: _static/Overview.png
    :align: center
@@ -116,6 +116,8 @@ Below is a quick example demonstrating the following steps:
   - **Adjacency Matrix**: The multi-omics network representation.
   - **Predictions**: Disease phenotype predictions for each sample.
 
+**Note**: For a complete script, see `examples/example_2.py` in the repository.
+
 **BioNeuralNet Overview: Multi-Omics Integration with Graph Neural Networks**
 -----------------------------------------------------------------------------
 
@@ -139,40 +141,18 @@ BioNeuralNet offers five core steps in a typical workflow:
 4. **Subject Representation**:
 
    - Integrate node embeddings back into omics data to enrich each subject’s feature vector by weighting columns with the learned embedding scalars.
-
+   - For a complete example, see `examples/example_1.py` in the repository.
 5. **Downstream Tasks**:
 
    - Perform advanced analyses such as disease prediction via **DPMON**, which trains a GNN end-to-end alongside a classifier, incorporating both local and global network information.
 
-`View full-size image: BioNeuralNet Overview <https://ramosv.github.io/_images/BioNeuralNet.png>`_
+`View full-size image: BioNeuralNet Overview <https://bioneuralnet.readthedocs.io/en/latest/_images/BioNeuralNet.png>`_
 
 .. figure:: _static/BioNeuralNet.png
    :align: center
    :alt: BioNeuralNet
 
    BioNeuralNet Overview
-
-**Subject Representation**
-
-Subject representation integrates node embeddings into omics data, enriching phenotypic and clinical context. Below is an example workflow:
-
-`View full-size image: Subject Representation <https://ramosv.github.io/_images/SubjectRepresentation.png>`_
-
-.. figure:: _static/SubjectRepresentation.png
-   :align: center
-   :alt: Subject Representation Workflow
-
-   Subject-level embeddings provide richer phenotypic and clinical context.
-
-**Disease Prediction**
-
-`View full-size image: Disease Prediction (DPMON) <https://ramosv.github.io/_images/DPMON.png>`_
-
-.. figure:: _static/DPMON.png
-   :align: center
-   :alt: Disease Prediction (DPMON)
-
-   Embedding-enhanced subject data using DPMON for improved disease prediction.
 
 Documentation Overview
 ----------------------
