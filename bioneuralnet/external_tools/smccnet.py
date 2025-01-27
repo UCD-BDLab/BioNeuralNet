@@ -4,6 +4,7 @@ import pandas as pd
 from typing import List, Dict, Any
 from ..utils.logger import get_logger
 import json
+from pathlib import Path
 
 
 class SmCCNet:
@@ -197,9 +198,14 @@ class SmCCNet:
             self.run_smccnet(serialized_data)
 
             self.logger.info("Loading adjacency matrix from CSV.")
-            adjacency_df = pd.read_csv(
-                f"{os.getcwd()}\\adjacencyMatrix.csv", index_col=0
+            adjacency_path = Path.cwd() / "adjacencyMatrix.csv"
+            self.logger.debug(f"Adjacency matrix path: {adjacency_path}")
+
+            adjacency_df = pd.read_csv(adjacency_path, index_col=0)
+            self.logger.info(
+                "Adjacency matrix loaded with shape: %s", adjacency_df.shape
             )
+
             self.logger.info(
                 "Adjacency matrix loaded with shape: %s", adjacency_df.shape
             )
