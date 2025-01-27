@@ -28,10 +28,19 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/requirements-dev.txt') }}
           restore-keys: ${{ runner.os }}-pip-
 
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Verify pre-commit installation
+        run: pre-commit --version
+
       - name: Install system dependencies
         run: |
           brew update
-          brew install libxml2 qpdf pkgconfig checkbashisms ghostscript
+          brew install qpdf pkgconf ghostscript
           brew cleanup
 
       - name: Install R
@@ -40,6 +49,8 @@ jobs:
           r-version: "latest"
 
       - name: Install R packages
+        env:
+          R_LIBS_USER: ${{ runner.temp }}/Library
         run: |
           Rscript -e "if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager', repos='https://cran.r-project.org')"
           Rscript -e "install.packages('dplyr', repos='https://cran.r-project.org')"
