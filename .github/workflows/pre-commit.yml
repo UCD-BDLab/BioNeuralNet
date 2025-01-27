@@ -10,7 +10,7 @@ on:
 
 jobs:
   pre-commit:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - name: Checkout code
@@ -45,10 +45,8 @@ jobs:
       - name: Install R packages
         run: |
           Rscript -e "if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager', repos='https://cran.r-project.org')"
-          Rscript -e "install.packages(c('dplyr', 'jsonlite'), repos='https://cran.r-project.org')"
           Rscript -e "BiocManager::install(c('impute', 'preprocessCore', 'GO.db', 'AnnotationDbi'), update=FALSE, ask=FALSE)"
-          Rscript -e "install.packages('SmCCNet', repos='https://cran.r-project.org')"
-          Rscript -e "install.packages('WGCNA', repos='https://cran.r-project.org')"
+          Rscript -e "BiocManager::install(c('SmCCNet', 'WGCNA'), update=FALSE, ask=FALSE)"
         shell: bash
 
       - name: Run Pre-Commit Checks
