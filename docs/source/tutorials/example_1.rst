@@ -69,7 +69,7 @@ Below is a **complete** snippet:
    adjacency_matrix = smccnet.run()
 
    # 3) Generate embeddings
-   gnn = GNNEmbedding(
+   gnn_embedding = GNNEmbedding(
        adjacency_matrix=adjacency_matrix,
        omics_data=omics_data,
        phenotype_data=phenotype_data,
@@ -83,13 +83,12 @@ Below is a **complete** snippet:
        lr=1e-3,
        weight_decay=1e-4,
    )
-   embedding_dict = gnn.run()
+   gnn_embedding.fit()
+   embeddings_tensor = gnn_embedding.embed()
 
-   # Node embeddings tensor
-   node_embeddings = embedding_dict["graph"]
-
-   node_name = adjacency_matrix.columns.index
-   node_embeddings_df = pd.DataFrame(node_embeddings.numpy(), index=node_name)
+   node_names = adjacency_matrix.columns.tolist()
+   embeddings_df = pd.DataFrame(embeddings_tensor.numpy(), index=node_names)
+   print("GNN embeddings generated. Shape:", embeddings_df.shape)
 
    # 4) Subject-level representation:
    graph_embed = GraphEmbedding(

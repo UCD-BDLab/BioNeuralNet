@@ -1,17 +1,13 @@
 import pandas as pd
 from sklearn.decomposition import PCA
+from typing import Optional
 from ..utils.logger import get_logger
 from ..network_embedding import GNNEmbedding
 
 
 class GraphEmbedding:
     """
-    GraphEmbedding Class for Integrating Network Embeddings into Omics Data.
-
-    This class takes already loaded data structures and applies network embeddings
-    to enhance subject representations. It can either use precomputed embeddings or
-    train a new GNN (regression-based or otherwise) through ``GNNEmbedding``.
-
+    GraphEmbedding Class for Integrating Network Embeddings into Omics Data..
     """
 
     def __init__(
@@ -19,41 +15,54 @@ class GraphEmbedding:
         adjacency_matrix: pd.DataFrame,
         omics_data: pd.DataFrame,
         phenotype_data: pd.DataFrame,
-        clinical_data: pd.DataFrame,
-        embeddings: pd.DataFrame = None,
+        clinical_data: Optional[pd.DataFrame] = None,
+        embeddings: Optional[pd.DataFrame] = None,
         reduce_method: str = "PCA",
     ):
         """
-        Parameters
-        ----------
-        adjacency_matrix : pd.DataFrame
-            NxN adjacency matrix for omics features (nodes).
-        omics_data : pd.DataFrame
-            (samples x features) table of omics data.
-        phenotype_data : pd.DataFrame
-            (samples x some_phenotype) table, must contain `phenotype_col`.
-        clinical_data : pd.DataFrame
-            (samples x clinical_vars) table.
-        embeddings : pd.DataFrame, optional
-            Precomputed node embeddings to skip GNN if not None or empty.
+        Initializes the GraphEmbedding instance.
+
+        Parameters:
+            adjacency_matrix : pd.DataFrame
+            omics_data : pd.DataFrame
+            phenotype_data : pd.DataFrame
+            clinical_data : Optional[pd.DataFrame], default=None
+            embeddings : Optional[pd.DataFrame], default=None
+            reduce_method : str, optional
         """
+        self.logger = get_logger(__name__)
+        self.logger.info("Initializing GraphEmbedding with provided data inputs.")
+
         if adjacency_matrix is None or adjacency_matrix.empty:
             raise ValueError("Adjacency matrix is required and cannot be empty.")
         if omics_data is None or omics_data.empty:
             raise ValueError("Omics data must be non-empty.")
-        if clinical_data is None or clinical_data.empty:
-            raise ValueError("Clinical data is required and cannot be empty.")
         if phenotype_data is None or phenotype_data.empty:
             raise ValueError("Phenotype data is required and cannot be empty.")
 
-        if embeddings is None or embeddings.empty:
-            self.logger = get_logger(__name__)
-            self.logger.info(
-                "No precomputed embeddings -> defaulting to GNN-based approach."
+        if clinical_data is not None and clinical_data.empty:
+            self.logger.warning(
+                "Clinical data provided is empty. Node features will be initialized randomly."
             )
+            clinical_data = None
+
+        if embeddings is None or embeddings.empty:
             self.embedding_method = "GNNs"
+            self.logger.info(
+                "No precomputed embeddings provided. Defaulting to GNN-based embedding generation."
+            )
         else:
             self.embedding_method = "precomputed"
+            if not isinstance(embeddings, pd.DataFrame):
+                raise ValueError("Embeddings must be provided as a pandas DataFrame.")
+            missing_nodes = set(adjacency_matrix.index) - set(embeddings.index)
+            if missing_nodes:
+                raise ValueError(
+                    f"Provided embeddings are missing nodes: {missing_nodes}"
+                )
+            self.logger.info(
+                "Precomputed embeddings provided. Skipping GNN-based embedding generation."
+            )
 
         self.adjacency_matrix = adjacency_matrix
         self.omics_data = omics_data
@@ -62,62 +71,56 @@ class GraphEmbedding:
         self.embeddings = embeddings
         self.reduce_method = reduce_method
 
-        self.logger = get_logger(__name__)
-        self.logger.info("Initialized GraphEmbedding with direct data inputs.")
-
     def run(self) -> pd.DataFrame:
         """
         Main pipeline:
-          1) Generate (or load) node embeddings
-          2) Reduce them to 1D with PCA
-          3) Integrate each node's PCA value into the subject-level omics data
+            - Generate (or load) node embeddings.
+            - Reduce them to 1D with the specified reduction method.
+            - Integrate each node's reduced embedding value into the subject-level omics data.
 
-        **Returns**:
+        Returns:
             pd.DataFrame
-                Enhanced omics data, weighted by the node embeddings or PCA of embeddings.
 
-        **Raises**:
-            - **ValueError**: If embeddings are empty or an error occurs in PCA/integration.
-            - **Exception**: For any unforeseen errors encountered.
-
-        **Notes**:
-            - If ``self.embeddings`` is provided, we skip training.
-            - Otherwise, we instantiate a ``GNNEmbedding`` object which trains a node-level
-              regression model if ``model_type`` is one of {"GCN", "GAT", "SAGE", "GIN"}.
+        Raises:
+            ValueError
+            Exception
         """
-        self.logger.info("Running Subject Representation workflow.")
+        self.logger.info("Starting Subject Representation workflow.")
         try:
             embeddings_df = self.generate_embeddings()
             node_embedding_values = self.reduce_embeddings(embeddings_df)
             enhanced_omics_data = self.integrate_embeddings(node_embedding_values)
+
+            self.logger.info("Subject Representation workflow completed successfully.")
             return enhanced_omics_data
 
         except Exception as e:
-            self.logger.error(f"Error in Subject Representation: {e}")
+            self.logger.error(f"Error in Subject Representation workflow: {e}")
             raise
 
     def generate_embeddings(self) -> pd.DataFrame:
         """
         Generate or retrieve node embeddings.
 
-        If embeddings are provided (precomputed), return them directly.
-        Otherwise, create a GNNEmbedding to do correlation-based node feature/label
-        and train the GNN for MSE regression.
-
-        **Returns**:
+        Returns:
             pd.DataFrame
-                Node embeddings of shape [num_nodes, embedding_dim].
+        Raises:
+            ValueError
         """
-        self.logger.info(f"Generating embeddings with method='{self.embedding_method}'")
+        self.logger.info(
+            f"Generating embeddings using method='{self.embedding_method}'."
+        )
 
         if self.embedding_method == "precomputed":
-            if not isinstance(self.embeddings, pd.DataFrame):
-                raise ValueError("Embeddings must be a pandas DataFrame.")
-            if self.embeddings.empty:
-                raise ValueError("Provided embeddings are empty.")
-            return self.embeddings
+            self.logger.info("Using precomputed embeddings.")
+            # making sure embeddings are not None, or precommit will fail
+            if self.embeddings is None:
+                raise ValueError("Embeddings are None.")
+            return self.embeddings.copy()
 
         else:
+            self.logger.info("Generating embeddings using GNNEmbedding.")
+            # for the other parameters it will just use default values
             gnn_embedder = GNNEmbedding(
                 adjacency_matrix=self.adjacency_matrix,
                 omics_data=self.omics_data,
@@ -125,75 +128,94 @@ class GraphEmbedding:
                 clinical_data=self.clinical_data,
             )
 
-        embeddings_dict = gnn_embedder.run()
-        embeddings_tensor = embeddings_dict["graph"]
+            gnn_embedder.fit()
+            embeddings_tensor = gnn_embedder.embed()
 
-        node_names = self.adjacency_matrix.index
-        embeddings_df = pd.DataFrame(embeddings_tensor.numpy(), index=node_names)
-        return embeddings_df
+            node_names = self.adjacency_matrix.index.tolist()
+            embeddings_df = pd.DataFrame(
+                embeddings_tensor.numpy(),
+                index=node_names,
+                columns=[f"Embed_{i+1}" for i in range(embeddings_tensor.shape[1])],
+            )
+            self.logger.info(
+                f"Generated GNN-based embeddings with shape {embeddings_df.shape}."
+            )
+            return embeddings_df
 
     def reduce_embeddings(self, embeddings: pd.DataFrame) -> pd.Series:
         """
-        Reduce embeddings to a single dimension per node using specified method.
+        Reduce embeddings to a single dimension per node using the specified method.
 
-        **Parameters**:
-            embeddings: pd.DataFrame
-                A DataFrame containing the embeddings to be reduced.
-            method: str, optional
-                The dimensionality reduction method to use. Options:
-                - "pca" (default): Reduce using the first principal component via PCA.
-                - "average": Compute the average of all features.
-                - "maximum": Compute the maximum value of all features.
+        Parameters:
+            embeddings : pd.DataFrame
 
-        **Returns**:
+        Returns:
             pd.Series
-                A Series indexed by node, containing the 1D embedding.
 
-        **Raises**:
-            ValueError:
-                If the embeddings DataFrame is empty or if an unsupported method is provided.
+        Raises:
+            ValueError
         """
+        self.logger.info(
+            f"Reducing embeddings to 1D using method='{self.reduce_method}'."
+        )
+
         if embeddings.empty:
             raise ValueError("Embeddings DataFrame is empty.")
 
-        if self.reduce_method == "PCA":
-            self.logger.info("Reducing node embeddings to 1D via PCA.")
-            pca = PCA(n_components=1)
+        if self.reduce_method.upper() == "PCA":
+            self.logger.info("Applying PCA to reduce embeddings to 1D.")
+            pca = PCA(n_components=1, random_state=42)
             principal_components = pca.fit_transform(embeddings)
             reduced_embedding = pd.Series(
                 principal_components.flatten(), index=embeddings.index, name="PC1"
             )
-        elif self.reduce_method == "AVG":
-            self.logger.info("Reducing node embeddings to 1D via averaging.")
+            self.logger.info("PCA reduction completed.")
+        elif self.reduce_method.upper() == "AVG":
+            self.logger.info("Calculating average of embedding dimensions.")
             reduced_embedding = embeddings.mean(axis=1)
-        elif self.reduce_method == "MAX":
-            self.logger.info("Reducing node embeddings to 1D via maximum.")
+            reduced_embedding.name = "Avg_Embed"
+            self.logger.info("Average reduction completed.")
+        elif self.reduce_method.upper() == "MAX":
+            self.logger.info("Calculating maximum of embedding dimensions.")
             reduced_embedding = embeddings.max(axis=1)
+            reduced_embedding.name = "Max_Embed"
+            self.logger.info("Maximum reduction completed.")
         else:
+            self.logger.error(f"Unsupported reduction method: {self.reduce_method}")
             raise ValueError(f"Unsupported reduction method: {self.reduce_method}")
 
         return reduced_embedding
 
     def integrate_embeddings(self, node_embedding_values: pd.Series) -> pd.DataFrame:
         """
-        Multiply each omics feature in self.omics_data by the PCA scalar for that node.
-
-        **Returns**:
-            pd.DataFrame
-                Enhanced omics data with integrated embeddings.
+        Integrate the reduced node embeddings into the subject-level omics data.
         """
-        self.logger.info("Integrating node embeddings into subject-level omics.")
-        modified_omics = self.omics_data.copy()
+        self.logger.info(
+            "Integrating reduced node embeddings into subject-level omics data."
+        )
 
-        feature_cols = modified_omics.columns
-        missing_nodes = set(feature_cols) - set(node_embedding_values.index)
-        if missing_nodes:
-            self.logger.warning(f"Some features have no embeddings: {missing_nodes}")
-
-        for node in feature_cols:
-            if node in node_embedding_values.index:
-                modified_omics[node] = (
-                    modified_omics[node] * node_embedding_values[node]
+        try:
+            feature_cols = self.omics_data.columns
+            missing_nodes = set(feature_cols) - set(node_embedding_values.index)
+            if missing_nodes:
+                self.logger.warning(
+                    f"Some omics features have no corresponding embeddings: {missing_nodes}"
                 )
 
-        return modified_omics
+            enhanced_omics = self.omics_data.copy()
+            for node in feature_cols:
+                if node in node_embedding_values.index:
+                    enhanced_omics[node] = (
+                        enhanced_omics[node] * node_embedding_values[node]
+                    )
+                else:
+                    self.logger.warning(
+                        f"No embedding found for feature '{node}'. Skipping integration for this feature."
+                    )
+
+            self.logger.info("Integration of embeddings completed successfully.")
+            return enhanced_omics
+
+        except Exception as e:
+            self.logger.error(f"Error during integration of embeddings: {e}")
+            raise

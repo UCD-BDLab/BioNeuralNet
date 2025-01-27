@@ -66,17 +66,17 @@ class TestDPMON(unittest.TestCase):
         mock_tune.assert_called_once()
         self.assertTrue(predictions.empty)
 
-    def test_missing_clinical_data(self):
-        with self.assertRaises(ValueError):
-            DPMON(
-                adjacency_matrix=self.adjacency_matrix,
-                omics_list=[self.omics_data1, self.omics_data2],
-                phenotype_data=self.phenotype_data,
-                clinical_data=None,
-                model="SAGE",
-                tune=False,
-                gpu=False,
-            )
+    def test_empty_clinical_data(self):
+        empty_clinical = pd.DataFrame()
+        DPMON(
+            adjacency_matrix=self.adjacency_matrix,
+            omics_list=[self.omics_data1, self.omics_data2],
+            phenotype_data=self.phenotype_data,
+            clinical_data=empty_clinical,
+            model="SAGE",
+            tune=False,
+            gpu=False,
+        )
 
 
 if __name__ == "__main__":
