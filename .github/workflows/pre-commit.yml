@@ -28,14 +28,11 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/requirements-dev.txt') }}
           restore-keys: ${{ runner.os }}-pip-
 
-      - name: Install Python dependencies
+      - name: Install system dependencies
         run: |
-          set -e
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r requirements-dev.txt
-          pip install torch
-          pip install torch_geometric
+          brew update
+          brew install libxml2 qpdf pkgconfig checkbashisms ghostscript
+          brew cleanup
 
       - name: Install R
         uses: r-lib/actions/setup-r@v2
@@ -45,9 +42,9 @@ jobs:
       - name: Install R packages
         run: |
           Rscript -e "if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager', repos='https://cran.r-project.org')"
+          Rscript -e "install.packages('dplyr', repos='https://cran.r-project.org')"
           Rscript -e "BiocManager::install(c('impute', 'preprocessCore', 'GO.db', 'AnnotationDbi'), update=FALSE, ask=FALSE)"
-          Rscript -e "BiocManager::install(c('SmCCNet', 'WGCNA'), update=FALSE, ask=FALSE)"
-        shell: bash
+          Rscript -e "install.packages(c('SmCCNet', 'WGCNA'), repos='https://cran.r-project.org')"
 
       - name: Run Pre-Commit Checks
         run: pre-commit run --all-files --show-diff-on-failure
