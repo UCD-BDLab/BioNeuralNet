@@ -6,6 +6,8 @@
 ![GitHub Contributors](https://img.shields.io/github/contributors/UCD-BDLab/BioNeuralNet)
 ![Downloads](https://static.pepy.tech/badge/bioneuralnet)
 
+[![Documentation](https://img.shields.io/badge/docs-read%20the%20docs-blue.svg)](https://bioneuralnet.readthedocs.io/en/latest/)
+
 
 ## Welcome to [BioNeuralNet Beta 0.1](https://bioneuralnet.readthedocs.io/en/latest/index.html)
 
@@ -247,6 +249,8 @@ BioNeuralNet relies on and interfaces with various open-source libraries. We ext
 - [leidenalg](https://github.com/vtraag/leidenalg) - **GNU LGPL v3**
 - [dtt](https://github.com/BioroboticsLab/dtt) - **MIT License**
 - [pyreadr](https://github.com/ofajardo/pyreadr) - **MIT License**
+- [torch](https://pytorch.org/) - **BSD License**
+- [torch_geometric](https://github.com/pyg-team/pytorch_geometric) - **MIT License**
 
 ### Development Dependencies
 
@@ -266,8 +270,6 @@ These tools are essential for the development and maintenance of BioNeuralNet bu
 - [tox](https://tox.readthedocs.io/) - **MIT License**
 - [setuptools](https://setuptools.pypa.io/) - **MIT License**
 - [twine](https://twine.readthedocs.io/) - **MIT License**
-- [torch](https://pytorch.org/) - **BSD License**
-- [torch_geometric](https://github.com/pyg-team/pytorch_geometric) - **MIT License**
 
 ### External Tools
 

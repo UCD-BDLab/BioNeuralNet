@@ -58,9 +58,9 @@ class SmCCNet:
     def preprocess_data(self) -> Dict[str, Any]:
         """
         Preprocesses (lightly validates) the phenotype and omics data:
-        - Checks that each omics DataFrame has the same number of rows as the phenotype DataFrame.
-        - Checks that the first column (sample IDs) match between phenotype and each omics DataFrame.
-            If they do not match, logs a warning and replaces them with sequential integer IDs.
+        - Includes sample IDs as a separate column.
+        - Checks that each omics DataFrame has the same number of samples as the phenotype DataFrame.
+        - Finds and retains common sample IDs between phenotype and each omics DataFrame.
         - Serializes the phenotype and each omics DataFrame to CSV.
 
         Returns:
@@ -70,45 +70,45 @@ class SmCCNet:
                             "omics_1", "omics_2", ...: CSV strings of each omics DataFrame.
         """
         self.logger.info("Validating phenotype and omics data...")
-
-        pheno_df = self.phenotype_df.copy()
+        pheno_df = (
+            self.phenotype_df.copy().reset_index().rename(columns={"index": "SampleID"})
+        )
         num_samples = len(pheno_df)
-        pheno_id_col = pheno_df.columns[0]
+        pheno_id_col = "SampleID"
         self.logger.info(f"Number of samples in phenotype data: {num_samples}")
+
+        pheno_df[pheno_id_col] = (
+            pheno_df[pheno_id_col].astype(str).str.strip().str.upper()
+        )
+
         serialized_data = {"phenotype": pheno_df.to_csv(index=False)}
 
         for i, omics_df in enumerate(self.omics_dfs, start=1):
             current_key = f"omics_{i}"
-            df = omics_df.copy()
+            df = omics_df.copy().reset_index().rename(columns={"index": "SampleID"})
 
-            if len(df) != num_samples:
+            omics_id_col = "SampleID"
+            df[omics_id_col] = df[omics_id_col].astype(str).str.strip().str.upper()
+
+            common_ids = set(pheno_df[pheno_id_col]).intersection(set(df[omics_id_col]))
+            self.logger.info(
+                f"Number of common samples in {current_key}: {len(common_ids)}"
+            )
+
+            if len(common_ids) == 0:
                 raise ValueError(
-                    f"Mismatch in sample count for {current_key}: phenotype has {num_samples} rows, "
-                    f"but {current_key} has {len(df)} rows. Please align your data."
+                    f"No overlapping sample IDs between phenotype and {current_key}."
                 )
 
-            omics_id_col = df.columns[0]
-
-            if not df[omics_id_col].equals(pheno_df[pheno_id_col]):
-                self.logger.warning(
-                    f"Sample IDs in phenotype '{pheno_id_col}' and {current_key} '{omics_id_col}' do not match. "
-                    "Replacing with sequential IDs."
-                )
-
-                df[omics_id_col] = range(1, num_samples + 1)
-                pheno_df[pheno_id_col] = range(1, num_samples + 1)
-
-            if df.isna().any().any():
-                self.logger.warning(f"NaN values found in {current_key}.")
-            if ((df == float("inf")) | (df == -float("inf"))).any().any():
-                self.logger.warning(f"Inf values found in {current_key}.")
-
+            pheno_df = pheno_df[pheno_df[pheno_id_col].isin(common_ids)]
+            df = df[df[omics_id_col].isin(common_ids)]
+            df = df.set_index(omics_id_col).loc[pheno_df[pheno_id_col]].reset_index()
             serialized_data[current_key] = df.to_csv(index=False)
 
         self.logger.info("Preprocessing checks completed successfully.")
         return serialized_data
 
-    def run_smccnet(self, serialized_data: Dict[str, Any]) -> str:
+    def run_smccnet(self, serialized_data: Dict[str, Any]) -> None:
         """
         Executes the SmCCNet R script by passing serialized data via standard input.
 
@@ -141,23 +141,11 @@ class SmCCNet:
 
             self.logger.debug(f"Executing command: {' '.join(command)}")
 
-            result = subprocess.run(
+            subprocess.run(
                 command, input=json_data, text=True, capture_output=True, check=True
             )
 
             self.logger.info("SmCCNet R script executed successfully.")
-            self.logger.debug(f"Raw R script stdout: {result.stdout}")
-            if result.stderr:
-                self.logger.warning(f"SmCCNet Warnings/Errors:\n{result.stderr}")
-
-            adjacency_json = result.stdout.strip()
-            try:
-                json.loads(adjacency_json)
-            except json.JSONDecodeError:
-                self.logger.error("Invalid JSON output from R script.")
-                raise ValueError("R script did not produce valid JSON output.")
-
-            return adjacency_json
 
         except subprocess.CalledProcessError as e:
             self.logger.error(f"R script execution failed: {e.stderr}")
@@ -206,22 +194,17 @@ class SmCCNet:
         try:
             self.logger.info("Starting SmCCNet Graph Generation Workflow.")
             serialized_data = self.preprocess_data()
-            adjacency_json = self.run_smccnet(serialized_data)
+            self.run_smccnet(serialized_data)
 
-            self.logger.info("SmCCNet JSON output received.")
-            adjacency_dict = json.loads(adjacency_json)
-            self.logger.info("type(adjacency_dict): %s", type(adjacency_dict))
-            self.logger.info("adjacency_dict.keys(): %s", adjacency_dict)
-            adjacency_matrix = pd.DataFrame(
-                data=adjacency_dict["data"],
-                index=adjacency_dict["index"],
-                columns=adjacency_dict["columns"],
+            self.logger.info("Loading adjacency matrix from CSV.")
+            adjacency_df = pd.read_csv(
+                f"{os.getcwd()}\\adjacencyMatrix.csv", index_col=0
             )
             self.logger.info(
-                "Adjacency matrix loaded with shape: %s", adjacency_matrix.shape
+                "Adjacency matrix loaded with shape: %s", adjacency_df.shape
             )
             self.logger.info("SmCCNet Graph Generation completed successfully.")
-            return adjacency_matrix
+            return adjacency_df
         except Exception as e:
             self.logger.error(f"Error in SmCCNet Graph Generation: {e}")
             raise
