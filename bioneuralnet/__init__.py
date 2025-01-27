@@ -26,6 +26,13 @@ __version__: str = "0.1.0"
 from .network_embedding import GNNEmbedding
 from .subject_representation import GraphEmbedding
 from .downstream_task import DPMON
+from .clustering import PageRank
+from .clustering import Louvain
+from .metrics import correlation
+from .metrics import mse
+from .metrics import f1_score
+from .metrics import precision
+from .metrics import recall
 
 from .external_tools import DynamicVisualizer
 from .external_tools import FeatureSelector
@@ -36,14 +43,19 @@ from .external_tools import WGCNA
 from .external_tools import Node2Vec
 
 __all__: list = [
-    "network_embedding",
-    "subject_representation",
-    "utils",
     "__version__",
     "GNNEmbedding",
-    "Node2Vec",
     "GraphEmbedding",
     "DPMON",
+    "PageRank",
+    "Louvain",
+    "correlation",
+    "mse",
+    "f1_score",
+    "precision",
+    "recall",
+    "utils",
+    "Node2Vec",
     "FeatureSelector",
     "StaticVisualizer",
     "DynamicVisualizer",

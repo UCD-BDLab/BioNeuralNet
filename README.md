@@ -6,6 +6,8 @@
 ![GitHub Contributors](https://img.shields.io/github/contributors/UCD-BDLab/BioNeuralNet)
 ![Downloads](https://static.pepy.tech/badge/bioneuralnet)
 
+[![Documentation](https://img.shields.io/badge/docs-read%20the%20docs-blue.svg)](https://bioneuralnet.readthedocs.io/en/latest/)
+
 
 ## Welcome to [BioNeuralNet Beta 0.1](https://bioneuralnet.readthedocs.io/en/latest/index.html)
 
@@ -159,37 +161,46 @@ Below is a quick example demonstrating the following:
 ### Code Example:
 
 ```python
-import pandas as pd
 from bioneuralnet.external_tools import SmCCNet
 from bioneuralnet.downstream_task import DPMON
+import pandas as pd
 
-# Step 1: Data Preparation
-phenotype_data = pd.read_csv('phenotype_data.csv', index_col=0)
-omics_proteins = pd.read_csv('omics_proteins.csv', index_col=0)
-omics_metabolites = pd.read_csv('omics_metabolites.csv', index_col=0)
-clinical_data = pd.read_csv('clinical_data.csv', index_col=0)
+# 1) Prepare data
+omics_data = pd.read_csv("data/omics_data.csv")
+phenotype_data = pd.read_csv("data/phenotype_data.csv")
+clinical_data = pd.read_csv("data/clinical_data.csv")
 
-# Step 2: Network Construction
+# 2) Run SmCCNet to get adjacency
 smccnet = SmCCNet(
-    phenotype_df=phenotype_data,
-    omics_dfs=[omics_proteins, omics_metabolites],
-    data_types=["protein", "metabolite"],
-    kfold=5,
-    summarization="PCA",
-)
+   phenotype_df=phenotype_data,
+   omics_df=omics_data,
+   data_types=["genes, proteins"]
+   kfolds=5,
+   summarization = "NetSHy",
+   seed: 127,
+   )
 adjacency_matrix = smccnet.run()
-print("Adjacency matrix generated.")
 
-# Step 3: Disease Prediction
+# 3) Disease Prediction with DPMON
 dpmon = DPMON(
-    adjacency_matrix=adjacency_matrix,
-    omics_list=[omics_proteins, omics_metabolites],
-    phenotype_data=phenotype_data,
-    clinical_data=clinical_data,
-    model="GAT",
+   adjacency_matrix=adjacency_matrix,
+   omics_list=[omics_data],
+   phenotype_data=phenotype_data,
+   clinical_data=clinical_data,
+   model: "GAT",
+   gnn_hidden_dim: 64,
+   layer_num: 3,
+   nn_hidden_dim1: 2,
+   nn_hidden_dim2: 2,
+   epoch_num: 10,
+   repeat_num: 5,
+   lr: 0.01,
+   weight_decay: 1e-4,
+   tune: True,
+   gpu: False
 )
 predictions = dpmon.run()
-print("Disease phenotype predictions:\n", predictions)
+print("Disease predictions:\n", predictions)
 ```
 
 ### Output
@@ -221,14 +232,57 @@ See [FAQ](https://bioneuralnet.readthedocs.io/en/latest/faq.html) for more.
 
 ## Acknowledgments
 
-BioNeuralNet relies on or interfaces with various open-source libraries:
+BioNeuralNet relies on and interfaces with various open-source libraries. We extend our gratitude to the developers and contributors of these projects for their invaluable tools and resources.
 
-- [PyTorch](https://pytorch.org/) / [PyTorch Geometric](https://github.com/pyg-team/pytorch_geometric)
-- [Node2Vec](https://github.com/aditya-grover/node2vec)
-- [WGCNA](https://cran.r-project.org/package=WGCNA) / [SmCCNet](https://cran.r-project.org/package=SmCCNet)
-- [Pytest](https://pytest.org/), [Sphinx](https://www.sphinx-doc.org), [Black](https://black.readthedocs.io/), [Flake8](https://flake8.pycqa.org/)
+### Core Dependencies
 
-We appreciate the efforts of these communities and all contributors.
+- [PyYAML](https://pyyaml.org/) - **MIT License**
+- [pandas](https://pandas.pydata.org/) - **BSD 3-Clause License**
+- [numpy](https://numpy.org/) - **BSD 3-Clause License**
+- [scikit-learn](https://scikit-learn.org/) - **BSD 3-Clause License**
+- [node2vec](https://github.com/aditya-grover/node2vec) - **MIT License**
+- [matplotlib](https://matplotlib.org/) - **Matplotlib License**
+- [ray](https://github.com/ray-project/ray) - **Apache 2.0 License**
+- [tensorboardX](https://github.com/lanpa/tensorboardX) - **MIT License**
+- [networkx](https://networkx.org/) - **BSD License**
+- [pyvis](https://github.com/WestHealth/pyvis) - **MIT License**
+- [leidenalg](https://github.com/vtraag/leidenalg) - **GNU LGPL v3**
+- [dtt](https://github.com/BioroboticsLab/dtt) - **MIT License**
+- [pyreadr](https://github.com/ofajardo/pyreadr) - **MIT License**
+- [torch](https://pytorch.org/) - **BSD License**
+- [torch_geometric](https://github.com/pyg-team/pytorch_geometric) - **MIT License**
+
+### Development Dependencies
+
+These tools are essential for the development and maintenance of BioNeuralNet but are not required for end-users.
+
+- [pytest](https://pytest.org/) - **MIT License**
+- [pytest-cov](https://pytest-cov.readthedocs.io/) - **MIT License**
+- [pytest-mock](https://github.com/pytest-dev/pytest-mock) - **MIT License**
+- [Sphinx](https://www.sphinx-doc.org/) - **BSD License**
+- [Sphinx RTD Theme](https://sphinx-rtd-theme.readthedocs.io/) - **BSD License**
+- [sphinx-autosummary-accessors](https://github.com/kennethreitz/sphinx-autosummary-accessors) - **MIT License**
+- [sphinxcontrib-napoleon](https://sphinxcontrib-napoleon.readthedocs.io/) - **BSD License**
+- [flake8](https://flake8.pycqa.org/) - **MIT License**
+- [Black](https://black.readthedocs.io/) - **MIT License**
+- [mypy](http://mypy-lang.org/) - **MIT License**
+- [pre-commit](https://pre-commit.com/) - **MIT License**
+- [tox](https://tox.readthedocs.io/) - **MIT License**
+- [setuptools](https://setuptools.pypa.io/) - **MIT License**
+- [twine](https://twine.readthedocs.io/) - **MIT License**
+
+### External Tools
+
+BioNeuralNet integrates with external tools to enhance functionality:
+
+- [WGCNA](https://cran.r-project.org/package=WGCNA) - **GPL-3.0 License**
+- [SmCCNet](https://cran.r-project.org/package=SmCCNet) - **GPL-3.0 License**
+
+### Special Thanks
+
+We appreciate the efforts of these communities and all contributors who make open-source development possible. Your dedication and hard work enable projects like BioNeuralNet to thrive and evolve.
+
+---
 
 ## Testing & CI
 
@@ -250,10 +304,14 @@ We appreciate the efforts of these communities and all contributors.
 For more details, see our [FAQ](https://bioneuralnet.readthedocs.io/en/latest/faq.html)
 or open an [issue](https://github.com/UCD-BDLab/BioNeuralNet/issues).
 
-## License & Contact
+## License
 
-- **License**: [MIT License](https://github.com/UCD-BDLab/BioNeuralNet/blob/main/LICENSE)
-- **Contact**: Questions or feature requests? [Open an issue](https://github.com/UCD-BDLab/BioNeuralNet) or email [vicente.ramos@ucdenver.edu](mailto:vicente.ramos@ucdenver.edu).
+- **License:** [MIT License](https://github.com/UCD-BDLab/BioNeuralNet/blob/main/LICENSE)
+
+## Contact
+
+- **Questions or Feature Requests:** [Open an issue](https://github.com/UCD-BDLab/BioNeuralNet/issues)
+- **Email:** [vicente.ramos@ucdenver.edu](mailto:vicente.ramos@ucdenver.edu)
 
 ---
 

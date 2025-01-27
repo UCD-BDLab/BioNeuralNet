@@ -8,6 +8,8 @@ repos:
         exclude: '\.svg$|docs/source/_autosummary/'
       - id: check-yaml
       - id: check-added-large-files
+        args: ['--maxkb=500']
+        exclude: '^bioneuralnet/datasets/example1/'
 
   - repo: https://github.com/psf/black
     rev: 24.10.0
@@ -38,10 +40,22 @@ repos:
         stages: [pre-commit]
 
       - id: check-forbidden-files
-        name: Prevent adding forbidden file types
-        entry: bash -c "if git diff --cached --name-only | grep -E '\\.csv$|\\.RData$'; then echo 'Forbidden file types detected!'; exit 1; fi"
+        name: Prevent adding forbidden file types except in allowed directory
+        entry: |
+          bash -c '
+          FILES=$(git diff --cached --name-only)
+          if echo "$FILES" | grep -E "\.(RData)$"; then
+            echo "Forbidden file types detected (RData)!"
+            exit 1
+          fi
+          if echo "$FILES" | grep -E "\.csv$" | grep -v "^bioneuralnet/datasets/example1/"; then
+            echo "Forbidden file types detected (CSV outside example1)!"
+            exit 1
+          fi
+          '
         language: system
-        types: [file]
+        stages: [pre-commit]
+
 
       - id: run-tests
         name: Run Tests with Pytest
