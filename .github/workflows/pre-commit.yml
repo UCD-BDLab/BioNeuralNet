@@ -40,8 +40,7 @@ jobs:
       - name: Install system dependencies
         run: |
           brew update
-          brew install qpdf pkgconf ghostscript
-          brew cleanup
+          brew upgrade
 
       - name: Install R
         uses: r-lib/actions/setup-r@v2
@@ -49,13 +48,13 @@ jobs:
           r-version: "latest"
 
       - name: Install R packages
-        env:
-          R_LIBS_USER: ${{ runner.temp }}/Library
         run: |
           Rscript -e "if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager', repos='https://cran.r-project.org')"
-          Rscript -e "install.packages('dplyr', repos='https://cran.r-project.org')"
+          Rscript -e "install.packages(c('dplyr', 'jsonlite'), repos='https://cran.r-project.org')"
           Rscript -e "BiocManager::install(c('impute', 'preprocessCore', 'GO.db', 'AnnotationDbi'), update=FALSE, ask=FALSE)"
-          Rscript -e "install.packages(c('SmCCNet', 'WGCNA'), repos='https://cran.r-project.org')"
+          Rscript -e "install.packages('SmCCNet', repos='https://cran.r-project.org')"
+          Rscript -e "install.packages('WGCNA', repos='https://cran.r-project.org')"
+        shell: bash
 
       - name: Run Pre-Commit Checks
         run: pre-commit run --all-files --show-diff-on-failure
