@@ -173,6 +173,7 @@ BioNeuralNet offers five core steps in a typical workflow:
    gnns
    user_api
    faq
+   clustering
 
 
 Indices and tables

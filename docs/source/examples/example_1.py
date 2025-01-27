@@ -58,12 +58,11 @@ def run_smccnet_workflow(
             lr=1e-3,
             weight_decay=1e-4,
         )
-        embeddings_dict = gnn_embedding.run()
-        embeddings_tensor = embeddings_dict["graph"]
+        gnn_embedding.fit()
+        embeddings_tensor = gnn_embedding.embed()
 
-        embeddings_df = pd.DataFrame(
-            embeddings_tensor.numpy(), index=adjacency_matrix.index
-        )
+        node_names = adjacency_matrix.columns.tolist()
+        embeddings_df = pd.DataFrame(embeddings_tensor.numpy(), index=node_names)
         print("GNN embeddings generated. Shape:", embeddings_df.shape)
 
         graph_embedding = GraphEmbedding(

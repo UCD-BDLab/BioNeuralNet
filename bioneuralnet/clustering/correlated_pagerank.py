@@ -22,7 +22,6 @@ class PageRank:
         tol (float): Tolerance for convergence.
         k (float): Weighting factor for composite correlation-conductance score.
         output_dir (str): Directory to save outputs.
-        logger (logging.Logger): Logger for the class.
     """
 
     def __init__(

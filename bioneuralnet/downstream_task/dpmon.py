@@ -20,7 +20,7 @@ from ray.tune.schedulers import ASHAScheduler
 from ray import train
 from ray.train import Checkpoint
 
-from torch_geometric.nn import GCNConv, GATConv, SAGEConv, GINConv
+from ..network_embedding.gnn_models import GCN, GAT, SAGE, GIN
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -32,7 +32,7 @@ class DPMON:
         adjacency_matrix: pd.DataFrame,
         omics_list: List[pd.DataFrame],
         phenotype_data: pd.DataFrame,
-        clinical_data: pd.DataFrame,
+        clinical_data: Optional[pd.DataFrame] = None,
         model: str = "GAT",
         gnn_hidden_dim: int = 16,
         layer_num: int = 5,
@@ -47,25 +47,18 @@ class DPMON:
         cuda: int = 0,
         output_dir: Optional[str] = None,
     ):
-        if clinical_data is None or clinical_data.empty:
-            raise ValueError(
-                "Clinical data (features_file) is required and cannot be empty."
-            )
 
-        if (
-            phenotype_data is None
-            or phenotype_data.empty
-            or "phenotype" not in phenotype_data.columns
-        ):
-            raise ValueError(
-                "Phenotype data must contain 'phenotype' and cannot be empty."
-            )
-
+        if adjacency_matrix.empty:
+            raise ValueError("Adjacency matrix cannot be empty.")
         if not omics_list or any(df.empty for df in omics_list):
             raise ValueError("All provided omics data files must be non-empty.")
-
-        if adjacency_matrix is None or adjacency_matrix.empty:
-            raise ValueError("Adjacency matrix is required and cannot be empty.")
+        if phenotype_data.empty or "phenotype" not in phenotype_data.columns:
+            raise ValueError(f"Phenotype data must have column a phenotype column.")
+        if clinical_data is not None and clinical_data.empty:
+            logger.warning(
+                "Clinical data provided is empty => treating as None => random features."
+            )
+            clinical_data = None
 
         self.adjacency_matrix = adjacency_matrix
         self.omics_list = omics_list
@@ -500,86 +493,6 @@ def train_model(model, criterion, optimizer, train_data, train_labels, epoch_num
     return accuracy
 
 
-class GCN(nn.Module):
-    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True):
-        super(GCN, self).__init__()
-        self.convs = nn.ModuleList()
-        self.convs.append(GCNConv(input_dim, hidden_dim))
-        for _ in range(layer_num - 1):
-            self.convs.append(GCNConv(hidden_dim, hidden_dim))
-        self.dropout = dropout
-
-    def forward(self, data):
-        x, edge_index = data.x, data.edge_index
-        for conv in self.convs:
-            x = conv(x, edge_index)
-            x = F.relu(x)
-            if self.dropout:
-                x = F.dropout(x, training=self.training)
-        return x
-
-
-class GAT(nn.Module):
-    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, heads=1):
-        super(GAT, self).__init__()
-        self.convs = nn.ModuleList()
-        self.convs.append(GATConv(input_dim, hidden_dim, heads=heads))
-        for _ in range(layer_num - 1):
-            self.convs.append(GATConv(hidden_dim * heads, hidden_dim, heads=heads))
-        self.dropout = dropout
-
-    def forward(self, data):
-        x, edge_index = data.x, data.edge_index
-        for conv in self.convs:
-            x = conv(x, edge_index)
-            x = F.elu(x)
-            if self.dropout:
-                x = F.dropout(x, training=self.training)
-        return x
-
-
-class SAGE(nn.Module):
-    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True):
-        super(SAGE, self).__init__()
-        self.convs = nn.ModuleList()
-        self.convs.append(SAGEConv(input_dim, hidden_dim))
-        for _ in range(layer_num - 1):
-            self.convs.append(SAGEConv(hidden_dim, hidden_dim))
-        self.dropout = dropout
-
-    def forward(self, data):
-        x, edge_index = data.x, data.edge_index
-        for conv in self.convs:
-            x = conv(x, edge_index)
-            x = F.relu(x)
-            if self.dropout:
-                x = F.dropout(x, training=self.training)
-        return x
-
-
-class GIN(nn.Module):
-    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True):
-        super(GIN, self).__init__()
-        self.convs = nn.ModuleList()
-        for i in range(layer_num):
-            nn_module = nn.Sequential(
-                nn.Linear(hidden_dim if i > 0 else input_dim, hidden_dim),
-                nn.ReLU(),
-                nn.Linear(hidden_dim, hidden_dim),
-            )
-            self.convs.append(GINConv(nn_module))
-        self.dropout = dropout
-
-    def forward(self, data):
-        x, edge_index = data.x, data.edge_index
-        for conv in self.convs:
-            x = conv(x, edge_index)
-            x = F.relu(x)
-            if self.dropout:
-                x = F.dropout(x, training=self.training)
-        return x
-
-
 class NeuralNetwork(nn.Module):
     def __init__(
         self,
@@ -600,12 +513,14 @@ class NeuralNetwork(nn.Module):
                 input_dim=gnn_input_dim,
                 hidden_dim=gnn_hidden_dim,
                 layer_num=gnn_layer_num,
+                final_layer="none",
             )
         elif model_type == "GAT":
             self.gnn = GAT(
                 input_dim=gnn_input_dim,
                 hidden_dim=gnn_hidden_dim,
                 layer_num=gnn_layer_num,
+                final_layer="none",
             )
         elif model_type == "SAGE":
             self.gnn = SAGE(
@@ -613,6 +528,7 @@ class NeuralNetwork(nn.Module):
                 hidden_dim=gnn_hidden_dim,
                 output_dim=gnn_hidden_dim,
                 layer_num=gnn_layer_num,
+                final_layer="none",
             )
         elif model_type == "GIN":
             self.gnn = GIN(
@@ -620,6 +536,7 @@ class NeuralNetwork(nn.Module):
                 hidden_dim=gnn_hidden_dim,
                 output_dim=gnn_hidden_dim,
                 layer_num=gnn_layer_num,
+                final_layer="none",
             )
         else:
             raise ValueError(f"Unsupported GNN model type: {model_type}")

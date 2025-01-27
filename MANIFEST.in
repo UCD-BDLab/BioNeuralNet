@@ -11,9 +11,6 @@ recursive-include docs *
 # Include example scripts
 recursive-include examples *.py
 
-# Include scripts installation files
-recursive-include scripts *
-
 # Exclude __pycache__ and compiled Python files
 global-exclude __pycache__ *.pyc *.pyo *.pyd
 

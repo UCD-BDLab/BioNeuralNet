@@ -8,3 +8,4 @@ from .test_pagerank import *
 from .test_feature_selector import *
 from .test_static_visualization import *
 from .test_dynamic_visualization import *
+from .test_dataset_dpmon import *

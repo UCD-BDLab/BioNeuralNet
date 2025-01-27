@@ -16,10 +16,18 @@ bioneuralnet.egg-info
 /docker_files/
 .mypy_cache
 
-# Block sensitive file types globally
+# Blocking sensitive file types globally
 *.csv
 *.RData
+
+# Allowing .csv files in datasets/example1 and its subdirectories
+!bioneuralnet/datasets/
+!bioneuralnet/datasets/example1/
+!bioneuralnet/datasets/example1/**/*.csv
+
 dpmon_output/
+todo.md
+ignore_dir/
 
 
 # Sphinx documentation build
