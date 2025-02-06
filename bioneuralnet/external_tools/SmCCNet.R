@@ -8,7 +8,7 @@ library("dplyr")
 options(stringsAsFactors = FALSE)
 allowWGCNAThreads()
 
-
+# Read JSON input from stdin
 json_input <- readLines(con = "stdin")
 if (length(json_input) == 0) {
   stop("No input data received.")
@@ -26,16 +26,48 @@ if (!("SampleID" %in% colnames(phenotype_df))) {
 rownames(phenotype_df) <- phenotype_df$SampleID
 
 omics_keys <- grep("^omics_", names(input_data), value = TRUE)
-if (length(omics_keys) == 0) {
+if (length(omics_keys) < 1) {
   stop("No omics data found in input.")
 }
-omics_df <- read.csv(text = input_data[[omics_keys[1]]], stringsAsFactors = FALSE)
-if (!("SampleID" %in% colnames(omics_df))) {
-  stop("SampleID column not found in omics data.")
-}
-rownames(omics_df) <- omics_df$SampleID
-omics_values <- as.matrix(omics_df[, -1])
 
+# Initialize list to store each omics matrix
+omics_list <- list()
+
+# Loop over all omics keys
+for (key in omics_keys) {
+  omics_df <- read.csv(text = input_data[[key]], stringsAsFactors = FALSE)
+  if (!("SampleID" %in% colnames(omics_df))) {
+    stop(paste("SampleID column not found in", key))
+  }
+  rownames(omics_df) <- omics_df$SampleID
+  # Convert to matrix: assuming the first column are the feature names
+  omics_values <- as.matrix(omics_df[, -1])
+  # Standardize features
+  omics_values <- scale(omics_values)
+  # Subset to common samples with phenotype
+  common_samples <- intersect(rownames(omics_values), rownames(phenotype_df))
+  if (length(common_samples) == 0) {
+    stop(paste("No matching sample IDs between", key, "and phenotype data."))
+  }
+  omics_values <- omics_values[common_samples, , drop = FALSE]
+  # Store in list
+  omics_list[[length(omics_list) + 1]] <- omics_values
+}
+
+# Also subset phenotype data to common samples across all omics.
+# in here we are assuming that all omics datasets share the same samples.
+common_samples_all <- rownames(phenotype_df)
+for (mat in omics_list) {
+  common_samples_all <- intersect(common_samples_all, rownames(mat))
+}
+if (length(common_samples_all) == 0) {
+  stop("No common samples across all omics datasets and phenotype data.")
+}
+phenotype_df <- phenotype_df[common_samples_all, , drop = FALSE]
+# Also, subset each omics matrix in the list
+omics_list <- lapply(omics_list, function(mat) mat[common_samples_all, , drop = FALSE])
+
+# Parse command-line arguments
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) != 4) {
   stop("Exactly 4 arguments must be supplied: data_types, kfold, summarization, seed")
@@ -53,14 +85,12 @@ if (!(summarization %in% c("PCA", "SVD", "NetSHy"))) {
 }
 set.seed(seed)
 
-
-common_samples <- intersect(rownames(omics_values), rownames(phenotype_df))
-if (length(common_samples) == 0) {
-  stop("No matching sample IDs between omics data and phenotype.")
+# Ensure that the number of data_types matches the number of omics datasets
+if (length(data_types) != length(omics_list)) {
+  stop("Number of omics datasets does not match number of data types provided.")
 }
-omics_values <- omics_values[common_samples, , drop = FALSE]
-phenotype_df <- phenotype_df[common_samples, , drop = FALSE]
 
+# Extract phenotype vector (assume phenotype is in second column) since R is 1-indexed
 Y <- as.numeric(phenotype_df[[2]])
 if (any(is.na(Y))) {
   stop("Phenotype vector contains NA values.")
@@ -87,7 +117,7 @@ tryCatch(
 
     if (!is.null(ncomp_pls)) {
       result <- fastAutoSmCCNet(
-        X = list(omics_values),
+        X = omics_list,
         Y = Y,
         DataType = data_types,
         Kfold = kfold,
@@ -99,7 +129,7 @@ tryCatch(
       )
     } else {
       result <- fastAutoSmCCNet(
-        X = list(omics_values),
+        X = omics_list,
         Y = Y,
         DataType = data_types,
         Kfold = kfold,
@@ -115,8 +145,6 @@ tryCatch(
     quit(status = 1)
   }
 )
-
+# Write output to a csv
 write.csv(result$AdjacencyMatrix, file = "AdjacencyMatrix.csv", row.names = TRUE)
-
-
 quit(status = 0)
