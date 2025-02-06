@@ -21,7 +21,7 @@ from sklearn.metrics import accuracy_score
 
 import os
 
-
+# review
 class GNNEmbedding:
     """
     GNNEmbedding Class for Generating Graph Neural Network (GNN) Based Embeddings.
