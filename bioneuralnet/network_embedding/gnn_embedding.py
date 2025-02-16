@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Optional, Union
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -20,6 +20,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 
 import os
+import json
 
 
 class GNNEmbedding:
@@ -36,13 +37,12 @@ class GNNEmbedding:
         phenotype_col: str = "phenotype",
         model_type: str = "GAT",
         hidden_dim: int = 64,
-        layer_num: int = 2,
+        layer_num: int = 4,
         dropout: bool = True,
         num_epochs: int = 100,
         lr: float = 1e-3,
         weight_decay: float = 1e-4,
         gpu: bool = False,
-        random_feature_dim: int = 16,
         seed: Optional[int] = None,
         tune: Optional[bool] = False,
     ):
@@ -63,7 +63,6 @@ class GNNEmbedding:
             lr : float, optional
             weight_decay : float, optional
             gpu : bool, optional
-            random_feature_dim : int, optional
             seed : Optional[int], default=None
         """
         self.logger = get_logger(__name__)
@@ -80,10 +79,7 @@ class GNNEmbedding:
             raise ValueError(f"Phenotype data must have column '{phenotype_col}'.")
         if clinical_data is not None and clinical_data.empty:
             raise ValueError("Clinical data cannot be empty.")
-            # self.logger.warning(
-            #     "Clinical data provided is empty ... using random features."
-            # )
-            # clinical_data = None
+    
 
         self.adjacency_matrix = adjacency_matrix
         self.omics_data = omics_data
@@ -98,7 +94,6 @@ class GNNEmbedding:
         self.num_epochs = num_epochs
         self.lr = lr
         self.weight_decay = weight_decay
-        self.random_feature_dim = random_feature_dim
 
         self.device = torch.device(
             "cuda" if gpu and torch.cuda.is_available() else "cpu"
@@ -126,39 +121,58 @@ class GNNEmbedding:
             self.logger.error(f"Error during training: {e}")
             raise
 
-    def embed(self) -> torch.Tensor:
-        """
-        Generates and retrieves node embeddings from the trained GNN model.
-
-        Returns:
-            torch.Tensor
-
-        Raises:
-            ValueError
-        """
+    def embed(self, as_df: bool = False) -> Union[torch.Tensor, pd.DataFrame]:
         self.logger.info("Generating node embeddings.")
         if self.tune:
-            self.logger.info(
-                "Tuning is enabled. Running hyperparameter tuning for GNNEmbedding."
-            )
+            self.logger.info("Tuning is enabled. Running hyperparameter tuning.")
             best_config = self.run_gnn_embedding_tuning(num_samples=5)
             self.logger.info(f"Best tuning config: {best_config}")
-
         if self.model is None or self.data is None:
-            self.logger.error(
-                "Model has not been trained. Call 'fit()' before 'embed()'."
-            )
-            raise ValueError(
-                "Model has not been trained. Call 'fit()' before 'embed()'."
-            )
+            self.logger.error("Model has not been trained. Call 'fit()' before 'embed()'.")
+            raise ValueError("Model has not been trained. Call 'fit()' before 'embed()'.")
         try:
             self.embeddings = self._generate_embeddings(self.model, self.data)
             self.logger.info("Node embeddings generated successfully.")
-            return self.embeddings
+            if as_df:
+                embeddings_df = self._tensor_to_df(self.embeddings, self.adjacency_matrix)
+                return embeddings_df
+            else:
+                return self.embeddings
         except Exception as e:
             self.logger.error(f"Error during embedding generation: {e}")
             raise
 
+
+    def _tensor_to_df(self, embeddings_tensor: torch.Tensor, network: pd.DataFrame) -> pd.DataFrame:
+        """
+        Convert embeddings tensor to DataFrame with node (feature) names as the index,
+        and embedding dimension labels as columns.
+        """
+        try:
+            self.logger.info("Converting embeddings tensor to DataFrame.")
+            if embeddings_tensor is None:
+                raise ValueError("Embeddings tensor is empty (None).")
+            if network is None:
+                raise ValueError("Network (adjacency matrix) is empty (None).")
+
+            if embeddings_tensor.shape[0] != len(network.index):
+                raise ValueError(
+                    f"Mismatch: embeddings tensor has {embeddings_tensor.shape[0]} rows, "
+                    f"but network index has {len(network.index)} rows."
+                )
+            self.logger.debug(f"Embeddings tensor shape: {embeddings_tensor.shape}")
+
+            embeddings_df = pd.DataFrame(
+                embeddings_tensor.numpy(),
+                index=network.index,
+                columns=[f"Embed_{i+1}" for i in range(embeddings_tensor.shape[1])]
+            )
+            return embeddings_df
+
+        except Exception as e:
+            self.logger.error(f"Error during conversion: {e}")
+            raise
+        
     def _prepare_node_features(self) -> pd.DataFrame:
         """
         Build node feature vector by computing, for each omics feature (node) in the network,
@@ -181,12 +195,18 @@ class GNNEmbedding:
             raise ValueError(
                 "No common features found between the network and omics data."
             )
+        if len(common_features) != len(network_features):
+            raise ValueError(
+                "Ther are duplicate features in the network or omics data."
+            )
         self.logger.info(
             f"Found {len(common_features)} common features between network and omics data."
         )
 
+        omics_in_network = self.omics_data[self.adjacency_matrix.columns]
+
         self.adjacency_matrix = self.adjacency_matrix.loc[
-            common_features, common_features
+            omics_in_network.columns, omics_in_network.columns
         ]
 
         clinical_cols = (
@@ -220,7 +240,7 @@ class GNNEmbedding:
             f"Preparing node labels by correlating each omics feature with phenotype column '{self.phenotype_col}'."
         )
         common_samples = self.omics_data.index.intersection(self.phenotype_data.index)
-        print(common_samples)
+        self.logger.info(common_samples)
 
         if len(common_samples) == 0:
             raise ValueError("No common samples between omics data and phenotype data.")
@@ -339,6 +359,7 @@ class GNNEmbedding:
         """
         self.logger.info("Generating node embeddings from the trained GNN model.")
         model.eval()
+        
         data = data.to(self.device)
         with torch.no_grad():
             embeddings = model.get_embeddings(data)
@@ -359,7 +380,6 @@ class GNNEmbedding:
             lr=config["lr"],
             weight_decay=config["weight_decay"],
             gpu=(self.device.type == "cuda"),
-            random_feature_dim=self.random_feature_dim,
             seed=None,
             tune=False,
         )
@@ -368,7 +388,6 @@ class GNNEmbedding:
 
         node_labels = self._prepare_node_labels().values
         y = (node_labels > node_labels.mean()).astype(int)
-
         X = node_emb.detach().numpy()
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
@@ -387,15 +406,15 @@ class GNNEmbedding:
         config = {
             "model_type": tune.choice(["GCN", "GAT", "GAT", "SAGE", "GIN"]),
             "hidden_dim": tune.choice([8, 16, 32, 64, 128]),
-            "layer_num": tune.choice([2, 3, 4, 5]),
+            "layer_num": tune.choice([2, 3, 4, 5, 6]),
             "dropout": tune.choice([True, False]),
-            "num_epochs": tune.choice([50, 100, 150, 200]),
+            "num_epochs": tune.choice([16, 64, 256, 512, 1024]),
             "lr": tune.loguniform(1e-4, 1e-1),
             "weight_decay": tune.loguniform(1e-4, 1e-1),
         }
 
         scheduler = ASHAScheduler(
-            metric="accuracy", mode="max", grace_period=10, reduction_factor=2
+            metric="accuracy", mode="max", grace_period=1, reduction_factor=2
         )
         reporter = CLIReporter(metric_columns=["accuracy", "training_iteration"])
 
@@ -407,13 +426,20 @@ class GNNEmbedding:
             config=config,
             num_samples=num_samples,
             scheduler=scheduler,
+            verbose=0,
             progress_reporter=reporter,
-            storage_path=os.path.expanduser("~/r"),
+            storage_path=os.path.expanduser("~/gnn"),
             trial_dirname_creator=short_dirname_creator,
             name="e",
         )
 
         best_trial = result.get_best_trial("accuracy", "max", "last")
-        print("Best trial config:", best_trial.config)
-        print("Best trial final accuracy:", best_trial.last_result["accuracy"])
+        self.logger.info(f"Best trial config: {best_trial.config}")
+        self.logger.info(f"Best trial final accuracy: {best_trial.last_result['accuracy']}")
+        
+        best_params_file = "embeddings_best_params.json"
+        with open(best_params_file, "w") as f:
+            json.dump(best_trial.config, f, indent=4)
+        self.logger.info(f"Best embedding parameters saved to {best_params_file}")
+        
         return best_trial.config

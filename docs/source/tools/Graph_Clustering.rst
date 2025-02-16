@@ -1,14 +1,12 @@
 Graph Clustering
-================
+=================
 
-**Clustering (Hierarchical):**
+**Correlated clustering on complex networks:**
 
-.. literalinclude:: ../examples/hierarchical_example.py
+.. literalinclude:: ../examples/correlated_louvain_example.py
    :language: python
-   :caption: Example of Hierarchical Clustering
+   :caption: Example correlated Louvain clustering workflow
 
-**Clustering (PageRank):**
-
-.. literalinclude:: ../examples/pagerank_example.py
+.. literalinclude:: ../examples/correlated_hybrid_louvain.py
    :language: python
-   :caption: Example of PageRank Clustering
+   :caption: Example correlated hybrid Louvain clustering workflow

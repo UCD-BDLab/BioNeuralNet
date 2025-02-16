@@ -1,57 +1,32 @@
 import pandas as pd
+from bioneuralnet.datasets import DatasetLoader
 from bioneuralnet.external_tools import SmCCNet
 
+# Load example synthetic dataset
+loader = DatasetLoader("example1")
+omics1, omics2, phenotype, clinical = loader.load_data()
 
-def main():
-    try:
-        print("Starting SmCCNet Workflow...")
+# Display dataset dimensions
+print("Dataset Shapes:")
+print(f"Omics1: {omics1.shape}")  # Expected: (358, 500)
+print(f"Omics2: {omics2.shape}")  # Expected: (358, 100)
+print(f"Phenotype: {phenotype.shape}")  # Expected: (358, 1)
+print(f"Clinical: {clinical.shape}")  # Expected: (358, 6)")
 
-        phenotype_df = pd.DataFrame(
-            {
-                "SampleID": ["S1", "S2", "S3", "S4"],
-                "Phenotype": ["Control", "Treatment", "Control", "Treatment"],
-            }
-        )
+# Merge omics and clinical data
+merged_omics = pd.concat([omics1, omics2, clinical, phenotype], axis=1)
 
-        omics_df1 = pd.DataFrame(
-            {
-                "SampleID": ["S1", "S2", "S3", "S4"],
-                "GeneA": [1.2, 2.3, 3.1, 4.0],
-                "GeneB": [2.1, 3.4, 1.2, 3.3],
-                "GeneC": [3.3, 1.5, 2.2, 4.1],
-            }
-        )
+# Initialize and run SmCCNet
+smccnet = SmCCNet(
+    phenotype_df=phenotype,
+    omics_dfs=[omics1, omics2],
+    data_types=["genes", "proteins"],
+    kfold=3,
+    subSampNum=500,
+)
 
-        omics_df2 = pd.DataFrame(
-            {
-                "SampleID": ["S1", "S2", "S3", "S4"],
-                "GeneD": [4.2, 5.3, 6.1, 7.0],
-                "GeneE": [5.1, 6.4, 4.2, 6.3],
-                "GeneF": [6.3, 4.5, 5.2, 7.1],
-            }
-        )
+global_network, smccnet_clusters = smccnet.run()
 
-        omics_dfs = [omics_df1, omics_df2]
-        data_types = ["Transcriptomics", "Proteomics"]
-
-        smccnet = SmCCNet(
-            phenotype_df=phenotype_df,
-            omics_dfs=omics_dfs,
-            data_types=data_types,
-            kfold=5,
-            summarization="PCA",
-            seed=732,
-        )
-
-        adjacency_matrix = smccnet.run()
-
-        print("\nAdjacency Matrix:")
-        print(adjacency_matrix)
-
-    except Exception as e:
-        print(f"An error occurred during execution: {e}")
-        raise e
-
-
-if __name__ == "__main__":
-    main()
+# Display output sizes
+print(f"Global Network Shape: {global_network.shape}")
+print(f"Number of SmCCNet Clusters: {len(smccnet_clusters)}")

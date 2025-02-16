@@ -5,6 +5,7 @@ __pycache__/
 *.pyd
 env/
 venv/
+.test_env/
 ENV/
 env.bak/
 venv.bak/
@@ -16,6 +17,18 @@ bioneuralnet.egg-info
 /docker_files/
 .mypy_cache
 
+# Other example data and tests not needed in the repo.
+TOPMed_testing/
+TOPMed_notes/
+
+todo_slides.md
+test_notes.md
+todo.md
+test_release.md
+test_cuda_issues.md
+dpmon/
+dp/
+
 # Blocking sensitive file types globally
 *.csv
 *.RData
@@ -24,11 +37,6 @@ bioneuralnet.egg-info
 !bioneuralnet/datasets/
 !bioneuralnet/datasets/example1/
 !bioneuralnet/datasets/example1/**/*.csv
-
-dpmon_output/
-todo.md
-ignore_dir/
-
 
 # Sphinx documentation build
 docs/build/

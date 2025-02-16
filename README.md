@@ -8,113 +8,173 @@
 
 [![Documentation](https://img.shields.io/badge/docs-read%20the%20docs-blue.svg)](https://bioneuralnet.readthedocs.io/en/latest/)
 
-
-## Welcome to [BioNeuralNet Beta 0.1](https://bioneuralnet.readthedocs.io/en/latest/index.html)
+## Welcome to [BioNeuralNet Beta 0.2](https://bioneuralnet.readthedocs.io/en/latest/index.html)
 
 ![BioNeuralNet Logo](/assets/LOGO_WB.png)
 
-**Note:** This is a **beta version** of BioNeuralNet. It is under active development, and certain features
-may be incomplete or subject to change. Feedback and bug reports are highly encouraged to help us
-improve the tool.
+**Note:** This is a **beta version** of BioNeuralNet. We are actively developing new features and improving stability.  
+Feedback and bug reports are highly encouraged!
 
-BioNeuralNet is a Python-based software tool designed to streamline the integration of multi-omics
-data with **Graph Neural Network (GNN)** embeddings. It supports **graph clustering**, **subject representation**,
-and **disease prediction**, enabling advanced analyses of complex multi-omics networks.
+BioNeuralNet is a Python framework for integrating **multi-omics data** with **Graph Neural Networks (GNNs)**.  
+It provides tools for **graph construction, clustering, network embedding, subject representation, and disease prediction**.
 
 ![BioNeuralNet Workflow](assets/BioNeuralNet.png)
 
 ---
 
-## Key Features
+## **Key Features**
 
-BioNeuralNet offers five core steps in a typical workflow:
+BioNeuralNet enables **multi-omics analysis** through **five core steps**:
 
-### 1. Graph Construction
-- **Not** performed internally. You provide or build adjacency matrices externally (e.g., via **WGCNA**, **SmCCNet**, or your own scripts).
-- Lightweight wrappers are available in `bioneuralnet.external_tools` (e.g., WGCNA, SmCCNet) for convenience. However, using these wrappers is **optional** and not mandatory for BioNeuralNet’s pipeline.
+### 1. **Graph Construction**
+- Build multi-omics networks using **SmCCNet** or custom adjacency matrices.
 
-### 2. Graph Clustering
-- Identify functional modules or communities using **PageRank**.
-- The `PageRank` module enables finding subnetwork clusters through personalized sweep cuts, capturing local neighborhoods influenced by seed nodes.
+### 2. **Graph Clustering**
+- Identify meaningful communities with **Correlated Louvain**, **Hybrid Louvain**, or **Correlated PageRank**.
 
-### 3. Network Embedding
-- Generate embeddings using methods like **GCN**, **GAT**, **GraphSAGE**, and **GIN**.
-- You can attach numeric labels to nodes or remain “unsupervised,” relying solely on graph structure and node features (e.g., correlation with clinical data).
+### 3. **GNN Embedding**
+- Generate node embeddings using models like **GCN, GAT, GraphSAGE, and GIN**.
 
-### 4. Subject Representation
-- Integrate node embeddings back into omics data, enriching each subject’s feature vector by weighting columns with the learned embedding scalars.
+### 4. **Subject Representation**
+- Integrate GNN-based embeddings into omics data via **GraphEmbedding**.
 
-### 5. Downstream Tasks
-- Perform advanced analyses, such as disease prediction, via **DPMON**, which trains a GNN end-to-end alongside a classifier to incorporate both local and global network information.
+### 5. **Disease Prediction**
+- Use **DPMON**, a GNN-powered classifier, to predict disease phenotypes.
 
 ---
 
-# Installation
+## **Installation**
 
-BioNeuralNet supports Python 3.10 and 3.11 in this beta release. Follow the steps below to set up BioNeuralNet and its dependencies.
+BioNeuralNet supports **Python 3.10 and 3.11**.  
 
-## 1. Install BioNeuralNet via pip
-
-To install the core BioNeuralNet modules for GNN embeddings, subject representation, disease prediction (DPMON), and clustering:
-
+### **1. Install BioNeuralNet**
 ```bash
-pip install bioneuralnet==0.1.0b1
+pip install bioneuralnet
 ```
 
-## 2. Install PyTorch and PyTorch Geometric (Separately)
+### **2. Install PyTorch and PyTorch Geometric**
+BioNeuralNet relies on PyTorch for GNN computations. Install PyTorch **separately**:
 
-BioNeuralNet relies on PyTorch and PyTorch Geometric for GNN operations:
-
-- Install PyTorch:
+- **PyTorch (CPU)**:
   ```bash
   pip install torch torchvision torchaudio
   ```
-- Install PyTorch Geometric:
+
+- **PyTorch Geometric**:
   ```bash
   pip install torch_geometric
   ```
 
-For GPU-accelerated builds or other configurations, visit their official guides:
+For GPU acceleration, visit:
 - [PyTorch Installation Guide](https://pytorch.org/get-started/locally/)
 - [PyTorch Geometric Installation Guide](https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html)
 
-Select the appropriate build for your system (e.g., Stable, Linux, pip, Python, CPU/GPU).
+---
 
-![PyTorch Installation](assets/pytorch.png)
-*PyTorch Installation Guide*
+## **Quick Example: SmCCNet + DPMON for Disease Prediction**
 
-![PyTorch Geometric Installation](assets/geometric.png)
-*PyTorch Geometric Installation Guide*
+```python
+import pandas as pd
+from bioneuralnet.datasets import DatasetLoader
+from bioneuralnet.external_tools import SmCCNet
+from bioneuralnet.downstream_task import DPMON
 
-## 3. (Optional) Install R and External Tools
+# 1) Load dataset
+loader = DatasetLoader("example1")
+omics1, omics2, phenotype, clinical = loader.load_data()
 
-If you plan to use **WGCNA** or **SmCCNet** for network construction:
+# 2) Generate adjacency matrix using SmCCNet
+smccnet = SmCCNet(
+    phenotype_df=phenotype,
+    omics_dfs=[omics1, omics2],
+    data_types=["genes", "proteins"],
+    kfold=3,
+    subSampNum=500,
+)
+global_network, _ = smccnet.run()
 
-- Install R from [The R Project](https://www.r-project.org/).
-- Install the required R packages. Open R and run the following:
-
-```r
-if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
-install.packages(c("dplyr", "jsonlite"))
-BiocManager::install(c("impute", "preprocessCore", "GO.db", "AnnotationDbi"))
-install.packages("SmCCNet")
-install.packages("WGCNA")
+# 3) Run Disease Prediction using DPMON
+dpmon = DPMON(
+    adjacency_matrix=global_network,
+    omics_list=[omics1, omics2],
+    phenotype_data=phenotype,
+    clinical_data=clinical,
+    tune=True,
+)
+dpmon_predictions = dpmon.run()
+print("Disease Predictions:\n", dpmon_predictions.head())
 ```
 
-## 4. Additional Notes for External Tools
+### **Output**
+- **Adjacency Matrix**: The constructed multi-omics network.
+- **Predictions**: Disease phenotype predictions.
 
-For **Node2Vec**, **feature selection**, or **visualization modules**, refer to the external tools documentation in `bioneuralnet.external_tools`. Examples include:
-- **`Node2Vec`**: Node2Vec-based embeddings.
-- **`FeatureSelector`**: Basic feature selection strategies like LassoCV and random forest.
-- **`HierarchicalClustering`**: Agglomerative clustering and silhouette scoring.
-- **`StaticVisualizer` and `DynamicVisualizer`**: Static or interactive network visualization.
-- **`SmCCNet` / `WGCNA`**: Build adjacency matrices using R-based libraries.
+---
 
-These integrations are **optional** and do **not** form part of the core pipeline.
+## **Documentation & Tutorials**
+- Full documentation: [Read the Docs](https://bioneuralnet.readthedocs.io/en/latest/)
+- Tutorials include:
+  - Multi-omics graph construction
+  - GNN embeddings for disease prediction
+  - Subject representation with integrated embeddings
+  - Clustering using Hybrid Louvain & Correlated PageRank
 
-## 5. Development Setup (Optional)
+---
 
-If you plan to contribute to BioNeuralNet:
+## **Frequently Asked Questions (FAQ)**
+
+- Does BioNeuralNet support **GPU acceleration**?  
+   - Yes, install PyTorch with CUDA support.
+
+- Can I use my own **adjacency matrix**?  
+ - yes, you can provide a custom matrix instead of using SmCCNet.
+
+- What clustering methods are supported?  
+   - **Correlated Louvain**, **Hybrid Louvain**, and **Correlated PageRank**.
+
+See the full [FAQ](https://bioneuralnet.readthedocs.io/en/latest/faq.html).
+
+---
+
+## **Acknowledgments**
+
+BioNeuralNet integrates multiple open-source libraries. We acknowledge key dependencies:
+
+- **PyTorch** - GNN computations and deep learning models.  
+- **PyTorch Geometric** - Graph-based learning for multi-omics.  
+- **NetworkX** - Graph data structure and algorithms.  
+- **Scikit-learn** - Feature selection and evaluation utilities.  
+- **pandas & numpy** - Core data processing tools.  
+- **ray[tune]** - Hyperparameter tuning for GNN models.  
+- **matplotlib** - Data visualization.  
+- **cptac** - Dataset handling for clinical proteomics.  
+- **python-louvain** - Community detection algorithms.  
+
+We also acknowledge R-based tools for external network construction:
+- **SmCCNet** - Sparse multiple canonical correlation network.
+- **WGCNA** - Weighted gene co-expression network analysis.
+
+These tools **enhance BioNeuralNet** but are **not required** for core functionality.
+
+---
+
+## **Testing & Continuous Integration**
+
+1. **Run Tests Locally**:
+   ```bash
+   pytest --cov=bioneuralnet --cov-report=html
+   open htmlcov/index.html
+   ```
+
+2. **Continuous Integration**:
+   - GitHub Actions runs automated tests on each commit.
+
+---
+
+## **Contributing**
+
+We welcome contributions!  
+To get started:
 
 ```bash
 git clone https://github.com/UCD-BDLab/BioNeuralNet.git
@@ -124,195 +184,21 @@ pre-commit install
 pytest
 ```
 
----
+### **How to Contribute**
+- **Fork** the repo, create a new branch, implement your changes.
+- **Add tests and documentation** for your new feature.
+- **Submit a pull request** with a clear description.
 
-## Quick Example: Transforming Multi-Omics for Enhanced Disease Prediction
-
-![BioNeuralNet Overview](assets/Overview.png)
-*BioNeuralNet: Transforming Multi-Omics for Enhanced Disease Prediction*
-
-### External Tools
-
-We offer a number of external tools available through the `bioneuralnet.external_tools` module:
-- These tools were implemented to facilitate testing and should not be considered part of the package's core functionality.
-- The classes inside the `external_tools` module are lightweight wrappers around existing tools and libraries offering minimal functionality.
-- We highly encourage users to explore these tools outside of BioNeuralNet to fully leverage their capabilities.
-
-### Steps
-
-Below is a quick example demonstrating the following:
-
-1. **Building or Importing a Network Adjacency Matrix**:
-   - For instance, using external tools like **SmCCNet**.
-
-2. **Using DPMON for Disease Prediction**:
-   - A detailed explanation follows.
-
-#### 1. Data Preparation
-- Input your multi-omics data (e.g., proteomics, metabolomics, genomics) along with phenotype data.
-
-#### 2. Network Construction
-- **Not performed internally**: You need to provide or build adjacency matrices externally (e.g., via WGCNA, SmCCNet, or your own scripts).
-- Lightweight wrappers are available in `bioneuralnet.external_tools` (e.g., WGCNA, SmCCNet) for convenience. However, using these wrappers is **optional** and not mandatory for BioNeuralNet’s pipeline.
-
-#### 3. Disease Prediction
-- **DPMON** integrates GNN-based node embeddings with a downstream neural network to predict disease phenotypes.
-
-### Code Example:
-
-```python
-from bioneuralnet.external_tools import SmCCNet
-from bioneuralnet.downstream_task import DPMON
-import pandas as pd
-
-# 1) Prepare data
-omics_data = pd.read_csv("data/omics_data.csv")
-phenotype_data = pd.read_csv("data/phenotype_data.csv")
-clinical_data = pd.read_csv("data/clinical_data.csv")
-
-# 2) Run SmCCNet to get adjacency
-smccnet = SmCCNet(
-   phenotype_df=phenotype_data,
-   omics_df=omics_data,
-   data_types=["genes, proteins"]
-   kfolds=5,
-   summarization = "NetSHy",
-   seed: 127,
-   )
-adjacency_matrix = smccnet.run()
-
-# 3) Disease Prediction with DPMON
-dpmon = DPMON(
-   adjacency_matrix=adjacency_matrix,
-   omics_list=[omics_data],
-   phenotype_data=phenotype_data,
-   clinical_data=clinical_data,
-   model: "GAT",
-   gnn_hidden_dim: 64,
-   layer_num: 3,
-   nn_hidden_dim1: 2,
-   nn_hidden_dim2: 2,
-   epoch_num: 10,
-   repeat_num: 5,
-   lr: 0.01,
-   weight_decay: 1e-4,
-   tune: True,
-   gpu: False
-)
-predictions = dpmon.run()
-print("Disease predictions:\n", predictions)
-```
-
-### Output
-- **Adjacency Matrix**: The multi-omics network representation.
-- **Predictions**: Disease phenotype predictions for each sample as a DataFrame linking subjects to predicted classes.
+For more details, check our [Contributing Guide](https://github.com/UCD-BDLab/BioNeuralNet/blob/main/CONTRIBUTING.md).
 
 ---
 
-## Documentation & Tutorials
-
-- Extensive documentation at [Read the Docs](https://bioneuralnet.readthedocs.io/en/latest/index.html)
-- Tutorials illustrating:
-  - Unsupervised vs. label-based GNN usage
-  - PageRank clustering and hierarchical clustering
-  - Subject representation
-  - Integrating external tools like WGCNA, SmCCNet
-
-## Frequently Asked Questions (FAQ)
-
-Key topics include:
-- **GPU acceleration** vs. CPU-only
-- **External Tools** usage (R-based adjacency construction, Node2Vec, etc.)
-- **DPMON** for local/global structure-based disease prediction
-- **PageRank or HierarchicalClustering** for subnetwork identification
-
-See [FAQ](https://bioneuralnet.readthedocs.io/en/latest/faq.html) for more.
-
----
-
-## Acknowledgments
-
-BioNeuralNet relies on and interfaces with various open-source libraries. We extend our gratitude to the developers and contributors of these projects for their invaluable tools and resources.
-
-### Core Dependencies
-
-- [PyYAML](https://pyyaml.org/) - **MIT License**
-- [pandas](https://pandas.pydata.org/) - **BSD 3-Clause License**
-- [numpy](https://numpy.org/) - **BSD 3-Clause License**
-- [scikit-learn](https://scikit-learn.org/) - **BSD 3-Clause License**
-- [node2vec](https://github.com/aditya-grover/node2vec) - **MIT License**
-- [matplotlib](https://matplotlib.org/) - **Matplotlib License**
-- [ray](https://github.com/ray-project/ray) - **Apache 2.0 License**
-- [tensorboardX](https://github.com/lanpa/tensorboardX) - **MIT License**
-- [networkx](https://networkx.org/) - **BSD License**
-- [pyvis](https://github.com/WestHealth/pyvis) - **MIT License**
-- [leidenalg](https://github.com/vtraag/leidenalg) - **GNU LGPL v3**
-- [dtt](https://github.com/BioroboticsLab/dtt) - **MIT License**
-- [pyreadr](https://github.com/ofajardo/pyreadr) - **MIT License**
-- [torch](https://pytorch.org/) - **BSD License**
-- [torch_geometric](https://github.com/pyg-team/pytorch_geometric) - **MIT License**
-
-### Development Dependencies
-
-These tools are essential for the development and maintenance of BioNeuralNet but are not required for end-users.
-
-- [pytest](https://pytest.org/) - **MIT License**
-- [pytest-cov](https://pytest-cov.readthedocs.io/) - **MIT License**
-- [pytest-mock](https://github.com/pytest-dev/pytest-mock) - **MIT License**
-- [Sphinx](https://www.sphinx-doc.org/) - **BSD License**
-- [Sphinx RTD Theme](https://sphinx-rtd-theme.readthedocs.io/) - **BSD License**
-- [sphinx-autosummary-accessors](https://github.com/kennethreitz/sphinx-autosummary-accessors) - **MIT License**
-- [sphinxcontrib-napoleon](https://sphinxcontrib-napoleon.readthedocs.io/) - **BSD License**
-- [flake8](https://flake8.pycqa.org/) - **MIT License**
-- [Black](https://black.readthedocs.io/) - **MIT License**
-- [mypy](http://mypy-lang.org/) - **MIT License**
-- [pre-commit](https://pre-commit.com/) - **MIT License**
-- [tox](https://tox.readthedocs.io/) - **MIT License**
-- [setuptools](https://setuptools.pypa.io/) - **MIT License**
-- [twine](https://twine.readthedocs.io/) - **MIT License**
-
-### External Tools
-
-BioNeuralNet integrates with external tools to enhance functionality:
-
-- [WGCNA](https://cran.r-project.org/package=WGCNA) - **GPL-3.0 License**
-- [SmCCNet](https://cran.r-project.org/package=SmCCNet) - **GPL-3.0 License**
-
-### Special Thanks
-
-We appreciate the efforts of these communities and all contributors who make open-source development possible. Your dedication and hard work enable projects like BioNeuralNet to thrive and evolve.
-
----
-
-## Testing & CI
-
-1. **Local Testing**:
-   ```bash
-   pytest --cov=bioneuralnet --cov-report=html
-   open htmlcov/index.html
-   ```
-
-2. **Continuous Integration**:
-   - GitHub Actions run our test suite and code checks on each commit and PR.
-
-## Contributing
-
-- **Fork** the repository, create a new branch, implement your changes.
-- **Add/Update** tests, docstrings, and examples if appropriate.
-- **Open** a pull request describing your modifications.
-
-For more details, see our [FAQ](https://bioneuralnet.readthedocs.io/en/latest/faq.html)
-or open an [issue](https://github.com/UCD-BDLab/BioNeuralNet/issues).
-
-## License
-
+## **License**
 - **License:** [MIT License](https://github.com/UCD-BDLab/BioNeuralNet/blob/main/LICENSE)
 
-## Contact
-
-- **Questions or Feature Requests:** [Open an issue](https://github.com/UCD-BDLab/BioNeuralNet/issues)
-- **Email:** [vicente.ramos@ucdenver.edu](mailto:vicente.ramos@ucdenver.edu)
-
 ---
 
-BioNeuralNet aims to **streamline** multi-omics network analysis by providing **graph clustering**, **GNN embedding**, **subject representation**, and **disease prediction** tools. We hope it helps uncover new insights in multi-omics research.
+## **Contact**
+- **Issues & Feature Requests:** [Open an Issue](https://github.com/UCD-BDLab/BioNeuralNet/issues)
+- **Email:** [vicente.ramos@ucdenver.edu](mailto:vicente.ramos@ucdenver.edu)
+

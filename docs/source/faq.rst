@@ -3,80 +3,72 @@ Frequently Asked Questions (FAQ)
 
 **Q1: What is BioNeuralNet?**
 
-A1: BioNeuralNet is a Python-based framework that integrates **multi-omics** data with **Graph Neural Networks (GNNs)**
-for clustering, embedding, and disease prediction. It converts high-dimensional omics networks into lower-dimensional
-representations, enabling downstream tasks like subject representation, subnetwork discovery, and phenotype prediction.
+A1: BioNeuralNet is a Python framework for integrating **multi-omics data** with **Graph Neural Networks (GNNs)**.  
+It provides tools for **graph construction, clustering, network embedding, subject representation, and disease prediction**.
 
-**Q2: What are the key components of BioNeuralNet?**
+**Q2: What are the key features of BioNeuralNet?**
 
-A2: BioNeuralNet covers five main steps:
+A2: BioNeuralNet includes the following components:
 
-1. **Graph Construction**: (External) Build adjacency matrices using WGCNA, SmCCNet, or your own methods.
-2. **Graph Clustering**: Identify modules via hierarchical clustering, PageRank, or Louvain.
-3. **Network Embedding**: Generate embeddings with GNNs or Node2Vec.
-4. **Subject Representation**: Integrate node embeddings into omics data for enhanced feature sets.
-5. **Downstream Tasks**: E.g., disease prediction using **DPMON**, an end-to-end pipeline that trains GNN + NN.
+- **Graph Construction**: Build multi-omics networks using **SmCCNet** or custom adjacency matrices.
+- **Graph Clustering**: Identify meaningful communities with **Louvain, Hybrid Louvain, or PageRank-based methods**.
+- **GNN Embedding**: Learn **node embeddings** from biological graphs with `GNNEmbedding`.
+- **Subject Representation**: Integrate embeddings into omics data via `GraphEmbedding` for enhanced feature learning.
+- **Disease Prediction**: Use **DPMON**, an end-to-end pipeline that trains a GNN-based classifier.
 
-**Q3: How do I install BioNeuralNet and dependencies?**
+**Q3: How do I install BioNeuralNet?**
 
-A3: Simply do:
+A3: Install BioNeuralNet with:
 
 .. code-block:: bash
 
-   pip install bioneuralnet==0.1.0b1
+   pip install bioneuralnet
 
-Then install PyTorch separately from [PyTorch.org](https://pytorch.org/get-started/locally/).
-Optionally install R-based packages (WGCNA, SmCCNet) if you want to construct adjacency matrices with them.
-See :doc:`installation` for more details.
+For GPU support, install PyTorch with CUDA from [PyTorch.org](https://pytorch.org/get-started/locally/).  
+See :doc:`installation` for full setup details.
 
 **Q4: Does BioNeuralNet support GPU acceleration?**
 
-A4: Yes. Install a GPU-compatible version of PyTorch (with CUDA) from the PyTorch site.
-BioNeuralNet will automatically detect and use CUDA if `torch.cuda.is_available()` returns True.
+A4: Yes. If you have a **CUDA-compatible GPU**, BioNeuralNet will automatically use it if `torch.cuda.is_available()` is `True`.
 
-**Q5: Can I contribute custom components (e.g., new GNN architectures)?**
+**Q5: Can I use my own adjacency matrix instead of SmCCNet?**
 
-A5: Definitely! We welcome contributions. Fork the repository, add your module or architecture,
-and submit a pull request. Check the `README <https://github.com/UCD-BDLab/BioNeuralNet/blob/main/README.md>`_
-and see instructions on code style, testing, and docstrings.
+A5: Yes! If you have a **precomputed adjacency matrix**, you can pass it directly to `GNNEmbedding` or `DPMON`.  
+SmCCNet is an optional tool for generating adjacency matrices.
 
-**Q6: How does DPMON differ from a standard GNN approach?**
+**Q6: How is DPMON different from other GNN models?**
 
-A6: **DPMON** is an end-to-end pipeline that trains both a GNN (for node embeddings) and a neural
-network classifier jointly, focusing on **local + global** structure for disease phenotypes. It does
-*not* rely on correlation-based node labeling; rather, it fuses multi-omics data with the adjacency
-matrix to learn disease-predictive embeddings in a single integrated model.
+A6: **DPMON** is designed for **multi-omics disease prediction**. Unlike standard GNNs, it:  
+   - Jointly learns **node embeddings and a classifier**.  
+   - Leverages both **local and global graph structures**.  
+   - Integrates **phenotype and clinical data** alongside omics features.
 
-**Q7: Can BioNeuralNet work with unsupervised GNN embeddings?**
+**Q7: Can I run GNNEmbedding without labeled data (unsupervised learning)?**
 
-A7: Yes. If you do not provide a numeric label for each node, the GNN can run unsupervised (via
-basic adjacency-based features). For truly self-supervised tasks (e.g., contrastive learning),
-you might adapt code or rely on external libraries. But you can definitely skip explicit labels
-and still get a structural embedding.
+A7: Yes! If you don’t provide labels, **GNNEmbedding** will still generate embeddings based on graph structure.  
+For **self-supervised learning** (e.g., contrastive learning), you may need additional adaptation.
 
-**Q8: Where are the advanced clustering or visualization methods found?**
+**Q8: What clustering methods does BioNeuralNet support?**
 
-A8: We provide classes like `PageRank`, `HierarchicalClustering`, `StaticVisualizer`,
-and `DynamicVisualizer` under `bioneuralnet.external_tools` or within the pipeline’s
-tool suite. These methods are separate from the core embedding logic but integrate seamlessly
-once you have adjacency matrices or embedded data.
+A8: BioNeuralNet provides:  
+   - **Correlated Louvain**: Clusters nodes based on omics similarity and phenotype correlation.  
+   - **Hybrid Louvain**: Iteratively refines clusters using **PageRank expansion**.  
+   - **Correlated PageRank**: Detects communities based on personalized PageRank scores.
 
-**Q9: I have existing adjacency matrices. Do I need WGCNA or SmCCNet?**
+**Q9: Can I contribute new features or models?**
 
-A9: Not necessarily. If your adjacency matrix is already built, you can pass it directly to
-GNNEmbedding or DPMON. The external tool wrappers (WGCNA, SmCCNet) are optional conveniences
-for generating adjacency matrices in R.
+A9: Yes! We welcome contributions. Fork the repository, add your module, and submit a pull request.  
+Check our `contribution guide <https://github.com/UCD-BDLab/BioNeuralNet/blob/main/README.md>`_.
 
-**Q10: What license is BioNeuralNet released under?**
+**Q10: What license is BioNeuralNet under?**
 
-A10: BioNeuralNet is under the `MIT License <https://github.com/UCD-BDLab/BioNeuralNet/blob/main/LICENSE>`_.
+A10: BioNeuralNet is released under the `MIT License <https://github.com/UCD-BDLab/BioNeuralNet/blob/main/LICENSE>`_.
 
 **Q11: How do I report issues or request features?**
 
-A11: Please open an Issue on our GitHub repository `UCD-BDLab/BioNeuralNet <https://github.com/UCD-BDLab/BioNeuralNet/issues>`_.
-We track bugs, enhancements, and feature requests there.
+A11: Open an issue on our GitHub repository:  
+`UCD-BDLab/BioNeuralNet <https://github.com/UCD-BDLab/BioNeuralNet/issues>`_.
 
-**Q12: Where can I find more examples or tutorials?**
+**Q12: Where can I find tutorials or example scripts?**
 
-A12: Check out :doc:`tutorials/index` for step-by-step workflows demonstrating
-graph construction, embedding generation, subject representation, and disease prediction.
+A12: See :doc:`tutorials/index` for **step-by-step guides** on graph construction, embeddings, subject representation, and disease prediction.

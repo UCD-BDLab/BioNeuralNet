@@ -3,7 +3,7 @@
 
 .. automodule:: bioneuralnet.network_embedding
 
-
+   
 .. rubric:: Modules
 
 .. autosummary::

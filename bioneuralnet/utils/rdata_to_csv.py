@@ -1,15 +1,14 @@
 import subprocess
 import shutil
 from pathlib import Path
-from logger import get_logger
+from .logger import get_logger
 
-
-def convert_rdata_to_csv(rdata_file: Path, csv_file: Path) -> None:
+def rdata_to_csv_file(rdata_file: Path, csv_file: Path) -> None:
     """
-    Convert an .Rdata file to CSV by invoking the convert_Rdata_to_csv.R script using Rscript.
+    Convert an .Rdata file to CSV by invoking the rdata_to_csv.R script using Rscript.
 
     This function assumes that:
-      - The R script 'convert_Rdata_to_csv.R' is in the same directory as this module.
+      - The R script '=data_to_csv.R' is in the same directory as this module.
       - R is installed and Rscript is available in the system PATH.
       - The RData file contains an object named either "AdjacencyMatrix" or "M".
 
@@ -27,7 +26,7 @@ def convert_rdata_to_csv(rdata_file: Path, csv_file: Path) -> None:
     if rscript_path is None:
         raise EnvironmentError("Rscript not found in system PATH.")
 
-    script_path = Path(__file__).parent / "convert_Rdata_to_csv.R"
+    script_path = Path(__file__).parent / "rdata_to_csv.R"
     if not script_path.exists():
         raise FileNotFoundError(f"R script not found: {script_path}")
 
@@ -43,12 +42,3 @@ def convert_rdata_to_csv(rdata_file: Path, csv_file: Path) -> None:
     else:
         logger.info(result.stdout)
         logger.info(f"CSV file saved to: {csv_file}")
-
-
-# Example usage:
-if __name__ == "__main__":
-    # Replace with your actual paths
-    rdata_path = Path("path/to/your_file.Rdata")
-    csv_output_path = Path("path/to/your_file.csv")
-
-    convert_rdata_to_csv(rdata_path, csv_output_path)

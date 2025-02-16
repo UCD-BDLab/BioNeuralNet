@@ -4,7 +4,6 @@ import networkx as nx
 from node2vec import Node2Vec
 from ..utils.logger import get_logger
 
-
 class node2vec:
     """
     Node2VecEmbedding Class for Generating Node2Vec-Based Embeddings.
@@ -93,7 +92,7 @@ class node2vec:
                     if self.weight_key in data:
                         data["weight"] = data.pop(self.weight_key)
                     else:
-                        data["weight"] = 1.0  # Assign default weight if not present
+                        data["weight"] = 1.0 
 
             self.logger.info(
                 f"Converted adjacency matrix to NetworkX graph with {G.number_of_nodes()} nodes and {G.number_of_edges()} edges."

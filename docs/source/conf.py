@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.abspath("../../"))
 try:
     release = metadata.version("bioneuralnet")
 except metadata.PackageNotFoundError:
-    release = "0.1.0b1"
+    release = "0.2.0b2"
 
 project = "BioNeuralNet"
 version = release
@@ -18,6 +18,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
+    "nbsphinx",
 ]
 
 autosummary_generate = True

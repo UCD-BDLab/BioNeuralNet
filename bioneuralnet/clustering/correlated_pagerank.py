@@ -427,6 +427,7 @@ class CorrelatedPageRank:
         analysis = tune.run(
             tune.with_parameters(self._tune_helper),
             config=search_config,
+            verbose=0,
             num_samples=num_samples,
             scheduler=scheduler,
             progress_reporter=reporter,

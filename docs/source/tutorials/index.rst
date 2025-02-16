@@ -4,7 +4,7 @@ Tutorials
 These tutorials illustrate how to combine BioNeuralNet components for a cohesive multi-omics analysis.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    example_1
    example_2

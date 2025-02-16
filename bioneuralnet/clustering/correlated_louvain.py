@@ -1,6 +1,7 @@
 import numpy as np
 import networkx as nx
 import pandas as pd
+from typing import Union
 from community.community_louvain import (
     modularity as original_modularity,
     best_partition,
@@ -126,19 +127,78 @@ class CorrelatedLouvain:
         )
         return quality
 
-    def run(self) -> dict:
-        if self.tune:
+    def run(self, as_dfs: bool = False) -> Union[dict, list]:
+        """
+        Run correlated Louvain clustering.
+
+        If as_dfs is True, returns a list of adjacency matrices (DataFrames),
+        where each adjacency matrix represents a cluster with more than 2 nodes.
+        Otherwise, returns the partition dictionary.
+
+        If tune is True and as_dfs is False, hyperparameter tuning is performed and the best parameters are returned.
+        If tune is True and as_dfs is True, tuning is performed, and then standard detection is run using the tuned parameters.
+        """
+        if self.tune and not as_dfs:
             self.logger.info("Tuning enabled. Running hyperparameter tuning...")
-            best_config = self.run_tuning(num_samples=5)
+            best_config = self.run_tuning(num_samples=10)
             self.logger.info("Tuning completed successfully.")
             return {"best_config": best_config}
+
+        elif self.tune and as_dfs:
+            self.logger.info("Tuning enabled and adjacency matrices output requested.")
+            best_config = self.run_tuning(num_samples=10)
+            tuned_k4 = best_config.get("k4", 0.8)
+            tuned_k3 = 1.0 - tuned_k4
+            tuned_instance = CorrelatedLouvain(
+                G=self.G,
+                B=self.B,
+                Y=self.Y,
+                k3=tuned_k3,
+                k4=tuned_k4,
+                weight=self.weight,
+                tune=False
+            )
+            return tuned_instance.run(as_dfs=True)
+
         else:
             self.logger.info("Running standard community detection...")
             partition = best_partition(self.G, weight=self.weight)
             quality = self._quality_correlated(partition)
             self.logger.info(f"Final quality: {quality:.4f}")
             self.partition = partition
+
+        if as_dfs:
+            self.logger.info("Raw partition output:", self.partition)
+            clusters_dfs = self.partition_to_adjacency(self.partition)
+            print(f"Returning {len(clusters_dfs)} clusters after filtering")
+            return clusters_dfs
+
+        else:
             return partition
+
+    def partition_to_adjacency(self, partition: dict) -> list:
+        """
+        Convert the partition dictionary into a list of adjacency matrices (DataFrames),
+        where each adjacency matrix represents a cluster with more than 2 nodes.
+        """
+        clusters = {}
+        for node, cl in partition.items():
+            clusters.setdefault(cl, []).append(node)
+
+        self.logger.debug(f"Total detected clusters: {len(clusters)}")
+
+        adjacency_matrices = []
+        for cl, nodes in clusters.items():
+            self.logger.debug(f"Cluster {cl} size: {len(nodes)}")  
+            if len(nodes) > 2: 
+                valid_nodes = list(set(nodes).intersection(set(self.B.columns)))  
+                if valid_nodes:
+                    adjacency_matrix = self.B.loc[:, valid_nodes].fillna(0)
+                    adjacency_matrices.append(adjacency_matrix)
+
+        print(f"Clusters with >2 nodes: {len(adjacency_matrices)}")
+        
+        return adjacency_matrices
 
     def get_quality(self) -> float:
         if not hasattr(self, "partition"):
@@ -177,6 +237,7 @@ class CorrelatedLouvain:
         analysis = tune.run(
             tune.with_parameters(self._tune_helper),
             config=search_config,
+            verbose=0,
             num_samples=num_samples,
             scheduler=scheduler,
             progress_reporter=reporter,
