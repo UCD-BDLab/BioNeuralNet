@@ -78,6 +78,7 @@ import pandas as pd
 from bioneuralnet.datasets import DatasetLoader
 from bioneuralnet.external_tools import SmCCNet
 from bioneuralnet.downstream_task import DPMON
+import pandas as pd
 
 # 1) Load dataset
 loader = DatasetLoader("example1")

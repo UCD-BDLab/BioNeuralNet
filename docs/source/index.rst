@@ -9,6 +9,10 @@ Welcome to BioNeuralNet Beta 0.2
 
 .. image:: https://img.shields.io/pypi/pyversions/bioneuralnet
    :target: https://pypi.org/project/bioneuralnet/
+.. image:: https://static.pepy.tech/badge/bioneuralnet
+   :target: https://pepy.tech/project/bioneuralnet
+.. image:: https://img.shields.io/badge/GitHub-View%20Code-blue
+   :target: https://github.com/UCD-BDLab/BioNeuralNet
 
 .. image:: https://static.pepy.tech/badge/bioneuralnet
    :target: https://pepy.tech/project/bioneuralnet
@@ -184,6 +188,7 @@ BioNeuralNet offers five core steps in a typical workflow:
    future
    user_api
    faq
+   clustering
 
 
 Indices and References

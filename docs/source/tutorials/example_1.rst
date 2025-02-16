@@ -1,5 +1,6 @@
 Example 1: SmCCNet + GNN Embeddings + Subject Representation
 ============================================================
+This tutorial illustrates how to:
 
 This tutorial illustrates how to:
 
