@@ -94,6 +94,7 @@ class GNNEmbedding:
         self.num_epochs = num_epochs
         self.lr = lr
         self.weight_decay = weight_decay
+        self.random_feature_dim = random_feature_dim
 
         self.device = torch.device(
             "cuda" if gpu and torch.cuda.is_available() else "cpu"
@@ -348,6 +349,8 @@ class GNNEmbedding:
                 self.logger.info(
                     f"Epoch [{epoch}/{self.num_epochs}], MSE Loss: {loss.item():.4f}"
                 )
+        self.logger.info("GNN training process completed.")
+
         self.logger.info("GNN training process completed.")
 
     def _generate_embeddings(self, model: nn.Module, data: Data) -> torch.Tensor:

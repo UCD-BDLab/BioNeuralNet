@@ -47,6 +47,8 @@ for (key in omics_keys) {
   omics_values <- omics_values[common_samples, , drop=FALSE]
   omics_list[[length(omics_list)+1]] <- omics_values
 }
+rownames(omics_df) <- omics_df$SampleID
+omics_values <- as.matrix(omics_df[, -1])
 
 common_samples_all <- rownames(phenotype_df)
 for (mat in omics_list) {
@@ -78,7 +80,6 @@ if (ncomp_pls_arg == "") {
 } else {
   ncomp_pls <- as.numeric(ncomp_pls_arg)
 }
-
 set.seed(seed)
 
 if (length(data_types) != length(omics_list)) {
