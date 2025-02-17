@@ -1,7 +1,7 @@
 User API
 ========
 
-The **User API** lists BioNeuralNet’s key classes, methods, and utilities.
+The **User API** lists BioNeuralNet's key classes, methods, and utilities.
 
 .. autosummary::
    :toctree: _autosummary
@@ -44,7 +44,6 @@ Example:
        clinical_data=clinical_data,
        model='GAT'
    )
-
    predictions = dpmon_obj.run()
 
 **Methods**:
@@ -58,9 +57,6 @@ Below are references to the ``run()`` methods:
    :no-index:
 
 .. automethod:: bioneuralnet.clustering.CorrelatedLouvain.run
-   :no-index:
-
-.. automethod:: bioneuralnet.clustering.HybridLouvain.run
    :no-index:
 
 .. automethod:: bioneuralnet.downstream_task.DPMON.run

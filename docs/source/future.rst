@@ -9,7 +9,7 @@ In this example, we will use the **CPTAC data repository**:
 [https://github.com/PayneLab/cptac](https://github.com/PayneLab/cptac)  
 to quickly show an example.
 
-The **CPTAC Data** module is a Python interface developed by the Payne Lab that provides fast access to the National Cancer Institute’s Clinical Proteomic Tumor Analysis Consortium (CPTAC) data. This package delivers comprehensive multi‐omics and clinical data (e.g. proteomics, genomics, transcriptomics, and clinical attributes) as native Python *pandas* DataFrames. The tool allows you to rapidly download, inspect, and export data from various cancer types—including clear cell renal cell carcinoma (CCRCC), breast, colon, ovarian, and more—without manual parsing or reformatting.
+The **CPTAC Data** module is a Python interface developed by the Payne Lab that provides fast access to the National Cancer Institute's Clinical Proteomic Tumor Analysis Consortium (CPTAC) data. This package delivers comprehensive multi‐omics and clinical data (e.g. proteomics, genomics, transcriptomics, and clinical attributes) as native Python *pandas* DataFrames. The tool allows you to rapidly download, inspect, and export data from various cancer types—including clear cell renal cell carcinoma (CCRCC), breast, colon, ovarian, and more—without manual parsing or reformatting.
 
 .. note::
 
@@ -46,21 +46,19 @@ load the CCRCC dataset, and extract multiple data types.
 
 Output Examples
 ---------------
-Exporting the data to CSV to take a closer look.
+Exporting the data to CSV to take a closer look at the **CCRCC Data format**
 
-- **CCRCC Data format**
+.. figure:: _static/cptac_clinical.png
+   :align: center
+   :alt: CPTAC Clinical Data
 
-  .. figure:: _static/cptac_clinical.png
-     :align: center
-     :alt: CPTAC Clinical Data
+.. figure:: _static/cptac_genomics.png
+   :align: center
+   :alt: CPTAC Genomics Data
 
-  .. figure:: _static/cptac_genomics.png
-     :align: center
-     :alt: CPTAC Genomics Data
-
-  .. figure:: _static/cptac_proteomics.png
-     :align: center
-     :alt: CPTAC Proteomics Data
+.. figure:: _static/cptac_proteomics.png
+   :align: center
+   :alt: CPTAC Proteomics Data
 
 Integration with BioNeuralNet
 -----------------------------
@@ -104,15 +102,12 @@ We can then retrieve the respective images for the patients.
    :align: center
    :alt: Image Download Process
 
-If you are working with another cancer type, there are many other opportunities.
+
+**If you are working with another cancer type, there are many available.**
 
 .. figure:: _static/cptac_search.png
    :align: center
    :alt: CPTAC Data Search
-
-Conclusion
-----------
-BioNeuralNet aims to assist researchers in their work and guide future development.
 
 References
 ----------

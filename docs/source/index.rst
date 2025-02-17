@@ -7,18 +7,12 @@ Welcome to BioNeuralNet Beta 0.2
 .. image:: https://img.shields.io/pypi/v/bioneuralnet
    :target: https://pypi.org/project/bioneuralnet/
 
-.. image:: https://img.shields.io/pypi/pyversions/bioneuralnet
-   :target: https://pypi.org/project/bioneuralnet/
-.. image:: https://static.pepy.tech/badge/bioneuralnet
-   :target: https://pepy.tech/project/bioneuralnet
-.. image:: https://img.shields.io/badge/GitHub-View%20Code-blue
-   :target: https://github.com/UCD-BDLab/BioNeuralNet
-
 .. image:: https://static.pepy.tech/badge/bioneuralnet
    :target: https://pepy.tech/project/bioneuralnet
 
 .. image:: https://img.shields.io/badge/GitHub-View%20Code-blue
    :target: https://github.com/UCD-BDLab/BioNeuralNet
+
 
 .. figure:: _static/LOGO_WB.png
    :align: center
@@ -47,29 +41,18 @@ What is BioNeuralNet?
 ---------------------
 BioNeuralNet is a **Python-based** framework designed to bridge the gap between **multi-omics data analysis** and **Graph Neural Networks (GNNs)**. By leveraging advanced techniques, it enables:
 
-- **Graph Clustering** – Identify biologically meaningful communities within omics networks.  
-- **GNN Embeddings** – Learn network-based feature representations from biological graphs.  
-- **Subject Representation** – Generate high-quality embeddings for individuals based on multi-omics profiles.  
-- **Disease Prediction** – Build predictive models using integrated multi-layer biological networks.
+- **Graph Clustering**: Identify biologically meaningful communities within omics networks.  
+- **GNN Embeddings**: Learn network-based feature representations from biological graphs.  
+- **Subject Representation**: Generate high-quality embeddings for individuals based on multi-omics profiles.  
+- **Disease Prediction**: Build predictive models using integrated multi-layer biological networks.
 
 Seamless Data Integration
 -------------------------
-One of BioNeuralNet’s core strengths is **interoperability**:
+One of BioNeuralNet's core strengths is **interoperability**:
 
 - Outputs are structured as **pandas DataFrames**, allowing easy downstream analysis.  
 - Supports integration with external tools, making it adaptable to various research workflows.  
 - Works effortlessly with network-based and machine learning pipelines.
-
-Designed for Researchers. Built for Innovation.
------------------------------------------------
-Start exploring BioNeuralNet today and push the boundaries of **multi-omics analysis**!
-
-
-   .. code-block:: bash
-
-      pip install bioneuralnet
-
-For additional installation details, including GPU usage for GNNs, see :doc:`installation`.
 
 .. note::
    **External Tools**:
