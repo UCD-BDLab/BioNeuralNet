@@ -1,5 +1,5 @@
-Coming Soon: Multi-Modal Support 
-================================
+Coming Soon: Multi-Modal Integration 
+====================================
 
 Overview
 --------
@@ -9,7 +9,7 @@ In this example, we will use the **CPTAC data repository**:
 [https://github.com/PayneLab/cptac](https://github.com/PayneLab/cptac)  
 to quickly show an example.
 
-The **CPTAC Data** module is a Python interface developed by the Payne Lab that provides fast access to the National Cancer Institute's Clinical Proteomic Tumor Analysis Consortium (CPTAC) data. This package delivers comprehensive multi‐omics and clinical data (e.g. proteomics, genomics, transcriptomics, and clinical attributes) as native Python *pandas* DataFrames. The tool allows you to rapidly download, inspect, and export data from various cancer types—including clear cell renal cell carcinoma (CCRCC), breast, colon, ovarian, and more—without manual parsing or reformatting.
+The **CPTAC Data** module is a Python interface developed by the Payne Lab that provides fast access to the National Cancer Institute's Clinical Proteomic Tumor Analysis Consortium (CPTAC) data. This package delivers comprehensive multi-omics and clinical data (e.g. proteomics, genomics, transcriptomics, and clinical attributes) as native Python *pandas* DataFrames. The tool allows you to rapidly download, inspect, and export data from various cancer types-including clear cell renal cell carcinoma (CCRCC), breast, colon, ovarian, and more-without manual parsing or reformatting.
 
 .. note::
 
@@ -87,11 +87,11 @@ Since the `get_data()` functions from `ccrcc` return a pandas DataFrame, integra
 
 Integration with Other Data Sources
 -----------------------------------
-Beyond omics data, the CPTAC Data module serves as an excellent entry point for multimodal research. For example, researchers can combine omics data obtained via this module with imaging data available from the **Cancer Imaging Archive**. This enables studies that integrate molecular and imaging information—vital for the development of comprehensive cancer diagnostics and treatment strategies.
+Beyond omics data, the CPTAC Data module serves as an excellent entry point for multimodal research. For example, researchers can combine omics data obtained via this module with imaging data available from the **Cancer Imaging Archive**. This enables studies that integrate molecular and imaging information-vital for the development of comprehensive cancer diagnostics and treatment strategies.
 
 For example, we can look at the **NCI Cancer Imaging Archive** to get additional modalities.  
 Since we are analyzing **Clear Cell Renal Cell Carcinoma (CCRCC)**, we can search for `ccrcc` in the collection:  
-[NCI Cancer Imaging Archive – CCRCC Collection](https://www.cancerimagingarchive.net/collection/cptac-ccrcc/)  
+[NCI Cancer Imaging Archive - CCRCC Collection](https://www.cancerimagingarchive.net/collection/cptac-ccrcc/)  
 We can then retrieve the respective images for the patients.
 
 .. figure:: _static/ccrcc_search.png
@@ -114,10 +114,10 @@ References
 - **PayneLab/cptac GitHub Repository:**  
   [https://github.com/PayneLab/cptac](https://github.com/PayneLab/cptac)
 
-- **Cancer Imaging Archive – Imaging-Omics:**  
+- **Cancer Imaging Archive - Imaging-Omics:**  
   [https://www.cancerimagingarchive.net/imaging-omics/](https://www.cancerimagingarchive.net/imaging-omics/)
 
-- **NCI Clinical Proteomic Tumor Analysis Consortium (CPTAC) – CCRCC Collection (Version 13):**  
+- **NCI Clinical Proteomic Tumor Analysis Consortium (CPTAC) - CCRCC Collection (Version 13):**  
   National Cancer Institute, The Cancer Imaging Archive.  
   [https://doi.org/10.7937/k9/tcia.2018.oblamn27](https://doi.org/10.7937/k9/tcia.2018.oblamn27)
 

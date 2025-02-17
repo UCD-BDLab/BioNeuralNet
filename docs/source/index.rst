@@ -1,5 +1,5 @@
-Welcome to BioNeuralNet Beta 0.2
-================================
+BioNeuralNet - Advanced Multi-Omics Integration with GNNs
+==========================================================
 
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://github.com/UCD-BDLab/BioNeuralNet/blob/main/LICENSE
@@ -18,14 +18,14 @@ Welcome to BioNeuralNet Beta 0.2
    :align: center
    :alt: BioNeuralNet Logo
 
-BioNeuralNet – Advanced Multi-Omics Integration with GNNs
-==========================================================
-
 .. note::
 
-   **This is a BETA version of BioNeuralNet.**  
-   It is under active development, and certain features may be incomplete or subject to change.  
-   Your feedback and bug reports are highly encouraged to help us refine and improve the tool.
+   **BioNeuralNet is in BETA.**:  
+
+   - The core functionality is stable, but we encourage users to test it further.  
+   - Your feedback and bug reports help refine and improve the tool.  
+   - Report any issues here: `BioNeuralNet Issues <https://github.com/UCD-BDLab/BioNeuralNet/issues>`_
+
 
 Installation
 ------------
@@ -35,31 +35,44 @@ To install BioNeuralNet, simply run:
 
    pip install bioneuralnet
 
-For additional installation details, including **GPU acceleration for GNNs**, see :doc:`installation`.
+For additional installation details, see :doc:`installation`.
 
 What is BioNeuralNet?
 ---------------------
 BioNeuralNet is a **Python-based** framework designed to bridge the gap between **multi-omics data analysis** and **Graph Neural Networks (GNNs)**. By leveraging advanced techniques, it enables:
 
-- **Graph Clustering**: Identify biologically meaningful communities within omics networks.  
-- **GNN Embeddings**: Learn network-based feature representations from biological graphs.  
-- **Subject Representation**: Generate high-quality embeddings for individuals based on multi-omics profiles.  
-- **Disease Prediction**: Build predictive models using integrated multi-layer biological networks.
+- **Graph Clustering**: Identifies biologically meaningful communities within omics networks.  
+- **GNN Embeddings**: Learns network-based feature representations from biological graphs, capturing both **biological structure** and **feature correlations** for enhanced analysis.  
+- **Subject Representation**: Generates high-quality embeddings for individuals based on multi-omics profiles.  
+- **Disease Prediction**: Builds predictive models using integrated multi-layer biological networks.
+
+Why GNNs?
+---------
+Traditional methods often struggle to model complex multi-omics relationships due to their inability to capture **biological interactions and dependencies**. BioNeuralNet addresses this challenge by utilizing **GNN-powered embeddings**, incorporating models such as:
+
+- **Graph Convolutional Networks (GCN)**: Aggregates features from neighboring nodes to capture local structure.  
+- **Graph Attention Networks (GAT)**: Applies attention mechanisms to prioritize important interactions between biomolecules.  
+- **GraphSAGE**: Enables inductive learning, making it applicable to unseen omics data.  
+- **Graph Isomorphism Networks (GIN)**: Improves expressiveness in graph-based learning tasks.  
+
+By integrating omics features within a **network-aware framework**, BioNeuralNet preserves biological interactions, leading to **more accurate and interpretable predictions**.
+
+For a deeper dive into how BioNeuralNet applies GNN embeddings, see :doc:`gnns`.
 
 Seamless Data Integration
 -------------------------
 One of BioNeuralNet's core strengths is **interoperability**:
 
-- Outputs are structured as **pandas DataFrames**, allowing easy downstream analysis.  
-- Supports integration with external tools, making it adaptable to various research workflows.  
-- Works effortlessly with network-based and machine learning pipelines.
+- Outputs are structured as **pandas DataFrames**, ensuring easy downstream analysis.  
+- Supports integration with **external tools and machine learning frameworks**, making it adaptable to various research workflows.  
+- Works seamlessly with network-based and graph-learning pipelines.
 
 .. note::
    **External Tools**:
 
-   - BioNeuralNet offers external tools available through the `bioneuralnet.external_tools` module.
-   - These lightweight wrappers (e.g., for WGCNA, SmCCNet, Node2Vec) facilitate testing and integration, but they are not mandatory to use the core functionality.
-   - We highly encourage users to explore these tools to fully leverage their capabilities.
+   - BioNeuralNet provides additional tools in the `bioneuralnet.external_tools` module.
+   - These lightweight wrappers (e.g., for WGCNA, SmCCNet, Node2Vec) facilitate testing and integration.
+   - While optional, these tools enhance BioNeuralNet's capabilities and are recommended for comprehensive analysis.
 
 **Example: Transforming Multi-Omics for Enhanced Disease Prediction**
 ---------------------------------------------------------------------
@@ -97,10 +110,10 @@ Below is a quick example demonstrating the following steps:
    from bioneuralnet.downstream_task import DPMON
 
    # Step 1: Data Preparation
-   phenotype_data = pd.read_csv('phenotype_data.csv', index_col=0)
-   omics_proteins = pd.read_csv('omics_proteins.csv', index_col=0)
-   omics_metabolites = pd.read_csv('omics_metabolites.csv', index_col=0)
-   clinical_data = pd.read_csv('clinical_data.csv', index_col=0)
+   phenotype_data = pd.read_csv('phenotype_data.csv')
+   omics_proteins = pd.read_csv('omics_proteins.csv')
+   omics_metabolites = pd.read_csv('omics_metabolites.csv')
+   clinical_dt = pd.read_csv('clinical_data.csv')
 
    # Step 2: Network Construction
    smccnet = SmCCNet(
@@ -110,15 +123,15 @@ Below is a quick example demonstrating the following steps:
        kfold=5,
        summarization="PCA",
    )
-   adjacency_matrix = smccnet.run()
+   global_network, clusters = smccnet.run()
    print("Adjacency matrix generated.")
 
    # Step 3: Disease Prediction (DPMON)
    dpmon = DPMON(
-       adjacency_matrix=adjacency_matrix,
+       adjacency_matrix=global_network,
        omics_list=[omics_proteins, omics_metabolites],
        phenotype_data=phenotype_data,
-       clinical_data=clinical_data,
+       clinical_data=clinical_dt,
        model="GCN",
    )
    predictions = dpmon.run()
@@ -133,7 +146,7 @@ BioNeuralNet offers five core steps in a typical workflow:
 1. **Graph Construction**:
 
    - **Not** performed internally. You provide or build adjacency matrices externally (e.g., via WGCNA, SmCCNet, or your own scripts).
-   - All modules are designed to integrate seamlessly with pandas—most functions offer options to return results as pandas DataFrames, enabling you to incorporate BioNeuralNet outputs directly into your existing workflows.
+   - All modules are designed to integrate seamlessly with pandas-most functions offer options to return results as pandas DataFrames, enabling you to incorporate BioNeuralNet outputs directly into your existing workflows.
 
 2. **Graph Clustering**:
 
@@ -153,7 +166,7 @@ BioNeuralNet offers five core steps in a typical workflow:
 5. **Downstream Tasks**:
 
    - Execute end-to-end pipelines for disease prediction using **DPMON** [2]_.
-   - DPMON supports hyperparameter tuning—when enabled, it finds the best configuration and then performs standard training to produce final predictions as a pandas DataFrame.
+   - DPMON supports hyperparameter tuning-when enabled, it finds the best configuration and then performs standard training to produce final predictions as a pandas DataFrame.
    - This approach, along with the native pandas integration across modules, ensures that BioNeuralNet can be easily incorporated into your analysis workflows.
 
 
@@ -168,10 +181,10 @@ BioNeuralNet offers five core steps in a typical workflow:
    tutorials/index
    tools/index
    external_tools/index
-   future
    user_api
    faq
-   clustering
+   future
+
 
 
 Indices and References
