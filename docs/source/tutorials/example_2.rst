@@ -17,6 +17,8 @@ This tutorial illustrates how to:
 3. **Disease Prediction**:
    - `DPMON` integrates the adjacency matrix, omics data, and phenotype data to train a GNN-based classifier.
 
+4. **Diagram of the workflow**: The figure below illustrates the process.
+
 .. figure:: ../_static/DPMON.png
    :align: center
    :alt: Disease Prediction (DPMON)
@@ -39,9 +41,6 @@ This tutorial illustrates how to:
 
 Below is a **complete** Python implementation:
 
-4. **Diagram of the workflow**: The figure below illustrates the process.
-
-`View full-size image: Disease Prediction (DPMON) <https://bioneuralnet.readthedocs.io/en/latest/_images/DPMON.png>`_
 
 .. figure:: _static/DPMON.png
    :align: center

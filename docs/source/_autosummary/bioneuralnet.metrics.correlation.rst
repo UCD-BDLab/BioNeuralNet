@@ -1,4 +1,4 @@
-﻿bioneuralnet.metrics.correlation
+bioneuralnet.metrics.correlation
 ================================
 
 .. automodule:: bioneuralnet.metrics.correlation
