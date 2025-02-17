@@ -45,7 +45,7 @@ A6: **DPMON** is designed for **multi-omics disease prediction**. Unlike standar
 
 **Q7: Can I run GNNEmbedding without labeled data (unsupervised learning)?**
 
-A7: Yes! If you don’t provide labels, **GNNEmbedding** will still generate embeddings based on graph structure.  
+A7: Yes! If you don't provide labels, **GNNEmbedding** will still generate embeddings based on graph structure.  
 For **self-supervised learning** (e.g., contrastive learning), you may need additional adaptation.
 
 **Q8: What clustering methods does BioNeuralNet support?**

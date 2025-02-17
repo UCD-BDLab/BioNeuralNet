@@ -11,7 +11,7 @@ These wrappers facilitate calling **R-based** adjacency-building approaches:
    :caption: Using SmCCNet to build an adjacency matrix from omics + phenotype data.
 
 **WGCNA**:
-  - Weighted Gene Co-expression Network Analysis wrapper for R’s WGCNA package.
+  - Weighted Gene Co-expression Network Analysis wrapper for R's WGCNA package.
 
 .. literalinclude:: ../examples/wgcna_example.py
    :language: python
