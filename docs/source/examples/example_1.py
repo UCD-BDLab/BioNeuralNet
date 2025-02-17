@@ -3,74 +3,79 @@ Example 1: Sparse Multiple Canonical Correlation Network (SmCCNet) Workflow with
 ======================================================================================================================
 
 Steps:
-1. Generate an adjacency matrix using SmCCNet based on multi-omics and phenotype data.
-2. Generate GNN node embeddings (GNNEmbedding) using the adjacency, omics, phenotype, and clinical data.
-3. Pass these precomputed embeddings into GraphEmbedding to integrate into omics data.
+1. Load synthetic multi-omics and phenotype data using DatasetLoader.
+2. Generate an adjacency matrix using SmCCNet based on multi-omics and phenotype data.
+3. Generate GNN node embeddings (GNNEmbedding) using the adjacency, omics, phenotype, and clinical data.
+4. Integrate the embeddings into omics data using GraphEmbedding to enhance feature representation.
 """
 
 import pandas as pd
+from bioneuralnet.datasets import DatasetLoader
 from bioneuralnet.external_tools import SmCCNet
 from bioneuralnet.network_embedding import GNNEmbedding
 from bioneuralnet.subject_representation import GraphEmbedding
 
-
-def run_smccnet_workflow(
-    omics_data: pd.DataFrame, phenotype_data: pd.DataFrame, clinical_data: pd.DataFrame
-) -> pd.DataFrame:
+def run_smccnet_workflow() -> pd.DataFrame:
     """
-    Executes the SmCCNet-based workflow for generating enhanced omics data.
+    Executes the full SmCCNet-based workflow for generating enhanced omics data.
 
-    1) Instantiates SmCCNet, GNNEmbedding, and GraphEmbedding.
-    2) Generates an <ulti-Omics Network (adjacency matrix) via SmCCNet.
+    Steps:
+    1) Loads synthetic omics and phenotype data.
+    2) Generates a Multi-Omics Network (adjacency matrix) using SmCCNet.
     3) Runs GNNEmbedding to produce node embeddings.
-    4) Integrates the embeddings into omics data using GraphEmbedding.
-
-    Args:
-        omics_data (pd.DataFrame): Omics features (e.g., proteins, metabolites).
-        phenotype_data (pd.Series): Phenotype info (numeric/binary).
-        clinical_data (pd.DataFrame): Clinical info.
+    4) Integrates embeddings into omics data using GraphEmbedding.
 
     Returns:
         pd.DataFrame: Enhanced omics data integrated with GNN embeddings.
     """
     try:
-        smccnet_instance = SmCCNet(
-            phenotype_df=phenotype_data,
-            omics_dfs=omics_data,
-            data_types=["protein", "metabolite"],
-            kfold=5,
-            summarization="PCA",
-            seed=732,
+        # Load synthetic dataset
+        print("Loading dataset...")
+        loader = DatasetLoader("example1")
+        omics1, omics2, phenotype, clinical = loader.load_data()
+
+        # Display dataset dimensions
+        print("Dataset Shapes:")
+        print(f"Omics1: {omics1.shape}")
+        print(f"Omics2: {omics2.shape}")
+        print(f"Phenotype: {phenotype.shape}")
+        print(f"Clinical: {clinical.shape}")
+
+        # Merge omics data for processing
+        merged_omics = pd.concat([omics1, omics2], axis=1)
+
+        # Generate adjacency matrix using SmCCNet
+        print("Running SmCCNet...")
+        smccnet = SmCCNet(
+            phenotype_df=phenotype,
+            omics_dfs=[omics1, omics2],
+            data_types=["genes", "proteins"],
+            kfold=3,
+            subSampNum=500,
         )
-        adjacency_matrix = smccnet_instance.run()
+        global_network, smccnet_clusters = smccnet.run()
         print("Adjacency matrix generated using SmCCNet.")
 
+        # Generate node embeddings using GNNEmbedding
+        print("Running GNNEmbedding...")
         gnn_embedding = GNNEmbedding(
-            adjacency_matrix=adjacency_matrix,
-            omics_data=omics_data,
-            phenotype_data=phenotype_data,
-            clinical_data=clinical_data,
-            model_type="GCN",
-            hidden_dim=64,
-            layer_num=2,
-            dropout=True,
-            num_epochs=50,
-            lr=1e-3,
-            weight_decay=1e-4,
+            adjacency_matrix=global_network,
+            omics_data=merged_omics,
+            phenotype_data=phenotype,
+            clinical_data=clinical,
+            tune=True,
         )
         gnn_embedding.fit()
-        embeddings_tensor = gnn_embedding.embed()
+        embeddings_output = gnn_embedding.embed(as_df=True)
+        print(f"GNN embeddings generated. Shape: {embeddings_output.shape}")
 
-        node_names = adjacency_matrix.columns.tolist()
-        embeddings_df = pd.DataFrame(embeddings_tensor.numpy(), index=node_names)
-        print("GNN embeddings generated. Shape:", embeddings_df.shape)
-
+        # Integrate embeddings into omics data using GraphEmbedding
+        print("Running GraphEmbedding...")
         graph_embedding = GraphEmbedding(
-            adjacency_matrix=adjacency_matrix,
-            omics_data=omics_data,
-            phenotype_data=phenotype_data,
-            clinical_data=clinical_data,
-            embeddings=embeddings_df,
+            omics_data=merged_omics,
+            embeddings=embeddings_output,
+            phenotype_data=phenotype,
+            tune=True,
         )
         enhanced_omics_data = graph_embedding.run()
         print("Embeddings integrated into omics data.")
@@ -86,32 +91,13 @@ if __name__ == "__main__":
     try:
         print("Starting SmCCNet + GNNEmbedding + GraphEmbedding Workflow...")
 
-        omics_data = pd.DataFrame(
-            {
-                "protein_feature1": [0.1, 0.2],
-                "protein_feature2": [0.3, 0.4],
-                "metabolite_feature1": [0.5, 0.6],
-                "metabolite_feature2": [0.7, 0.8],
-            },
-            index=["Sample1", "Sample2"],
-        )
-
-        phenotype_data = pd.Series([1, 0], index=["Sample1", "Sample2"])
-
-        clinical_data = pd.DataFrame(
-            {"clinical_feature1": [5, 3], "clinical_feature2": [7, 2]},
-            index=["Sample1", "Sample2"],
-        )
-        enhanced_omics = run_smccnet_workflow(
-            omics_data=omics_data,
-            phenotype_data=phenotype_data,
-            clinical_data=clinical_data,
-        )
+        enhanced_omics = run_smccnet_workflow()
 
         print("\nEnhanced Omics Data:")
-        print(enhanced_omics)
+        print(enhanced_omics.head())
 
-        print("SmCCNet workflow completed successfully.\n")
+        print("\nSmCCNet workflow completed successfully.")
+
     except Exception as e:
-        print(f"An error occurred during the execution: {e}")
+        print(f"An error occurred during execution: {e}")
         raise e

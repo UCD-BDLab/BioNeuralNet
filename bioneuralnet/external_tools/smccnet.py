@@ -1,10 +1,12 @@
 import os
 import subprocess
 import pandas as pd
+from pathlib import Path
+import json
+import tempfile
 from typing import List, Dict, Any
 from ..utils.logger import get_logger
-import json
-from pathlib import Path
+import shutil
 
 
 class SmCCNet:
@@ -12,7 +14,7 @@ class SmCCNet:
     SmCCNet Class for Graph Generation using Sparse Multiple Canonical Correlation Networks (SmCCNet).
 
     This class handles the preprocessing of omics data, execution of the SmCCNet R script,
-    and retrieval of the resulting adjacency matrix, all using in-memory data structures.
+    and retrieval of the resulting adjacency matrix from a designated output directory.
     """
 
     def __init__(
@@ -21,196 +23,200 @@ class SmCCNet:
         omics_dfs: List[pd.DataFrame],
         data_types: List[str],
         kfold: int = 5,
-        summarization: str = "PCA",
-        seed: int = 732,
+        eval_method: str = "",        
+        subSampNum: int = 1000,
+        summarization: str = "NetSHy",
+        seed: int = 723,
+        ncomp_pls: int = 0,              
+        between_shrinkage: float = 5.0, 
+        output_dir: str = None
     ):
         """
         Initializes the SmCCNet instance.
 
         Args:
-            phenotype_df (pd.DataFrame): DataFrame containing phenotype data. The first column should be sample IDs.
-            omics_dfs (List[pd.DataFrame]): List of DataFrames, each representing an omics dataset. Each DataFrame should have sample IDs as the first column.
-            data_types (List[str]): List of omics data types (e.g., ["protein", "metabolite"]).
-            kfold (int, optional): Number of folds for cross-validation. Defaults to 5.
-            summarization (str, optional): Summarization method. Defaults to "PCA".
-            seed (int, optional): Random seed for reproducibility. Defaults to 732.
+            phenotype_df (pd.DataFrame): DataFrame containing phenotype data, shape [samples x 1 or more].
+            omics_dfs (List[pd.DataFrame]): List of omics DataFrames.
+            data_types (List[str]): List of omics data type strings (e.g. ["Genes", "miRNA"]).
+            kfold (int): Number of folds for cross-validation. Default=5.
+            eval_method (str): e.g. 'accuracy', 'auc', 'f1', or 'Rsquared' (if you patch SmCCNet).
+            subSampNum (int): # of subsamplings. Default=50.
+            summarization (str): 'NetSHy', 'PCA', or 'SVD'. Default='NetSHy'.
+            seed (int): Random seed. Default=123.
+            ncomp_pls (int): # of components for PLS. 0 => no PLS. Default=0.
+            between_shrinkage (float): Shrink factor for multi-omics correlation. Default=5.0.
+            output_dir (str): Folder to write temp files. If None, uses a temporary directory.
         """
         self.phenotype_df = phenotype_df
         self.omics_dfs = omics_dfs
         self.data_types = data_types
         self.kfold = kfold
+        self.eval_method = eval_method
+        self.subSampNum = subSampNum
         self.summarization = summarization
         self.seed = seed
+        self.ncomp_pls = ncomp_pls
+        self.between_shrinkage = between_shrinkage
 
         self.logger = get_logger(__name__)
-        self.logger.info("Initialized SmCCNet with the following parameters:")
+        self.logger.info("Initialized SmCCNet with parameters:")
         self.logger.info(f"K-Fold: {self.kfold}")
         self.logger.info(f"Summarization: {self.summarization}")
+        self.logger.info(f"Evaluation method: {self.eval_method}")
+        self.logger.info(f"ncomp_pls: {self.ncomp_pls}")
+        self.logger.info(f"subSampNum: {self.subSampNum}")
+        self.logger.info(f"BetweenShrinkage: {self.between_shrinkage}")
         self.logger.info(f"Seed: {self.seed}")
 
         if len(self.omics_dfs) != len(self.data_types):
-            self.logger.error(
-                "Number of omics dataframes does not match number of data types."
-            )
-            raise ValueError(
-                "Number of omics dataframes does not match number of data types."
-            )
+            self.logger.error("Number of omics DataFrames does not match number of data types.")
+            raise ValueError("Mismatch between omics dataframes and data types.")
+        
+        if eval_method in ("auc","accuracy","f1"):
+            uniques = set(phenotype_df.iloc[:, 0].unique())
+            if not uniques.issubset({0,1}):
+                raise ValueError("eval_method=classification, but phenotype is not strictly 0/1.")
+        
+        if eval_method == "Rsquared" and ncomp_pls>0:
+            raise ValueError("Continuous eval can't use PLS. Set ncomp_pls=0 for CCA.")
+
+        # output directory
+        if output_dir is None:
+            self.temp_dir_obj = tempfile.TemporaryDirectory()
+            self.output_dir = self.temp_dir_obj.name
+            self.logger.info(f"No output_dir provided; using temporary directory: {self.output_dir}")
+        else:
+            self.output_dir = output_dir
+            os.makedirs(self.output_dir, exist_ok=True)
 
     def preprocess_data(self) -> Dict[str, Any]:
         """
-        Preprocesses (lightly validates) the phenotype and omics data:
-        - Includes sample IDs as a separate column.
-        - Checks that each omics DataFrame has the same number of samples as the phenotype DataFrame.
-        - Finds and retains common sample IDs between phenotype and each omics DataFrame.
-        - Serializes the phenotype and each omics DataFrame to CSV.
+        Preprocess the phenotype and omics data:
+         - Reset indexes, standardize sample IDs, and serialize to CSV.
 
         Returns:
-            Dict[str, Any]: Dictionary containing serialized phenotype and omics data.
-                            Keys:
-                            "phenotype" : CSV string of the phenotype DataFrame.
-                            "omics_1", "omics_2", ...: CSV strings of each omics DataFrame.
+            Dict[str, Any]: A dictionary with keys 'phenotype', 'omics_1', etc.
         """
-        self.logger.info("Validating phenotype and omics data...")
+        self.logger.info("Validating and serializing input data for SmCCNet...")
         pheno_df = (
             self.phenotype_df.copy().reset_index().rename(columns={"index": "SampleID"})
         )
-        num_samples = len(pheno_df)
-        pheno_id_col = "SampleID"
-        self.logger.info(f"Number of samples in phenotype data: {num_samples}")
-
-        pheno_df[pheno_id_col] = (
-            pheno_df[pheno_id_col].astype(str).str.strip().str.upper()
-        )
-
+        pheno_df["SampleID"] = pheno_df["SampleID"].astype(str).str.strip().str.upper()
         serialized_data = {"phenotype": pheno_df.to_csv(index=False)}
 
         for i, omics_df in enumerate(self.omics_dfs, start=1):
-            current_key = f"omics_{i}"
+            key = f"omics_{i}"
             df = omics_df.copy().reset_index().rename(columns={"index": "SampleID"})
+            df["SampleID"] = df["SampleID"].astype(str).str.strip().str.upper()
 
-            omics_id_col = "SampleID"
-            df[omics_id_col] = df[omics_id_col].astype(str).str.strip().str.upper()
+            common_ids = set(pheno_df["SampleID"]).intersection(set(df["SampleID"]))
+            if not common_ids:
+                raise ValueError(f"No overlapping sample IDs between phenotype and {key}.")
 
-            common_ids = set(pheno_df[pheno_id_col]).intersection(set(df[omics_id_col]))
-            self.logger.info(
-                f"Number of common samples in {current_key}: {len(common_ids)}"
-            )
+            df = df[df["SampleID"].isin(common_ids)]
+            df = df.set_index("SampleID").loc[pheno_df["SampleID"]].reset_index()
 
-            if len(common_ids) == 0:
-                raise ValueError(
-                    f"No overlapping sample IDs between phenotype and {current_key}."
-                )
+            serialized_data[key] = df.to_csv(index=False)
+            self.logger.info(f"Serialized {key} with {len(df)} samples.")
 
-            pheno_df = pheno_df[pheno_df[pheno_id_col].isin(common_ids)]
-            df = df[df[omics_id_col].isin(common_ids)]
-            df = df.set_index(omics_id_col).loc[pheno_df[pheno_id_col]].reset_index()
-            serialized_data[current_key] = df.to_csv(index=False)
-
-        self.logger.info("Preprocessing checks completed successfully.")
         return serialized_data
 
     def run_smccnet(self, serialized_data: Dict[str, Any]) -> None:
         """
-        Executes the SmCCNet R script by passing serialized data via standard input.
+        Executes the SmCCNet R script in the specified output directory.
 
         Args:
-            serialized_data (Dict[str, Any]): Dictionary containing serialized phenotype and omics data.
-
-        Returns:
-            str: Serialized adjacency matrix JSON string from R script.
+            serialized_data (Dict[str, Any]): Serialized CSV strings for phenotype and omics data.
         """
-
         try:
-            self.logger.info("Preparing data for SmCCNet R script.")
+            self.logger.info("Executing SmCCNet R script...")
             json_data = json.dumps(serialized_data) + "\n"
-
             script_dir = os.path.dirname(os.path.abspath(__file__))
-            r_script = os.path.join(script_dir, "SmCCNet.R")
 
+            r_script = os.path.join(script_dir, "SmCCNet.R")
             if not os.path.isfile(r_script):
                 self.logger.error(f"R script not found: {r_script}")
                 raise FileNotFoundError(f"R script not found: {r_script}")
 
+            rscript_path = shutil.which("Rscript")
+            if rscript_path is None:
+                raise EnvironmentError("Rscript not found in system PATH.")
+            
+            ncomp_pls_arg = str(self.ncomp_pls) if self.ncomp_pls != 0 else ""
+
             command = [
-                "Rscript",
+                rscript_path,
                 r_script,
                 ",".join(self.data_types),
                 str(self.kfold),
                 self.summarization,
                 str(self.seed),
+                self.eval_method,
+                ncomp_pls_arg,
+                str(self.subSampNum),
+                str(self.between_shrinkage),
             ]
+            self.logger.debug(f"Running command: {' '.join(command)} in cwd={self.output_dir}")
 
-            self.logger.debug(f"Executing command: {' '.join(command)}")
-
-            subprocess.run(
-                command, input=json_data, text=True, capture_output=True, check=True
+            result = subprocess.run(
+                command,
+                input=json_data,
+                text=True,
+                capture_output=True,
+                check=True,
+                cwd=self.output_dir,
             )
-
-            self.logger.info("SmCCNet R script executed successfully.")
-
+            self.logger.info(f"SMCCNET R script output:\n{result.stdout}")
+            if result.stderr:
+                self.logger.warning(f"SMCCNET R script warnings/errors:\n{result.stderr}")
         except subprocess.CalledProcessError as e:
             self.logger.error(f"R script execution failed: {e.stderr}")
             raise
         except Exception as e:
-            self.logger.error(f"Error during SmCCNet execution: {e}")
+            self.logger.error(f"Error during SmCCNet execution: {e}\n")
+            raise
+
+    def get_clusters(self) -> list[pd.DataFrame, Any]:
+        """
+        Retrieves the subnetwork clusters generated by SmCCNet.
+
+        Returns:
+            list[pd.DataFrame, Any]: A list containing the cluster DataFrame and the cluster summary.
+        """
+        try:
+            clusters_path = Path(self.output_dir)
+            clusters_names = list(clusters_path.glob("size_*.csv"))
+            clusters = []
+            for cluster in clusters_names:
+                cluster_path = Path(self.output_dir / cluster)
+                cluster_df = pd.read_csv(cluster_path, index_col=0)
+                clusters.append(cluster_df)
+
+            self.logger.info(f"Found {len(clusters)} clusters in {self.output_dir}.")
+            return clusters[::-1]
+        except Exception as e:
+            self.logger.error(f"Error reading cluster summary: {e}")
             raise
 
     def run(self) -> pd.DataFrame:
         """
-        Executes the entire Sparse Multiple Canonical Correlation Network (SmCCNet) workflow.
+        Runs the full SmCCNet workflow and returns the generated adjacency matrix.
 
-        **Steps:**
-
-        1. **Preprocessing Data**:
-           - Formats and serializes the input omics and phenotype data for SmCCNet analysis.
-
-        2. **Graph Generation**:
-           - Constructs a global network by generating an adjacency matrix through SmCCNet.
-
-        3. **Postprocessing Results**:
-           - Deserializes the adjacency matrix (output of SmCCNet) into a Pandas DataFrame.
-
-        **Returns**: pd.DataFrame
-
-            - A DataFrame containing the adjacency matrix, where each entry represents the strength of the correlation between features.
-
-        **Raises**:
-
-            - **ValueError**: If the input data is improperly formatted or missing.
-            - **Exception**: For any unforeseen errors encountered during preprocessing, graph generation, or postprocessing.
-
-        **Notes**:
-
-            - SmCCNet is designed for multi-omics data and requires a well-preprocessed and normalized dataset.
-            - Ensure that omics and phenotype data are properly aligned to avoid errors in graph construction.
-
-        **Example**:
-
-        .. code-block:: python
-
-            smccnet = SmCCNet(omics_data, phenotype_data)
-            adjacency_matrix = smccnet.run()
-            print(adjacency_matrix.head())
+        Returns:
+            pd.DataFrame: The adjacency matrix.
         """
         try:
-            self.logger.info("Starting SmCCNet Graph Generation Workflow.")
+            self.logger.info("Starting SmCCNet workflow.")
             serialized_data = self.preprocess_data()
             self.run_smccnet(serialized_data)
-
-            self.logger.info("Loading adjacency matrix from CSV.")
-            adjacency_path = Path.cwd() / "adjacencyMatrix.csv"
-            self.logger.debug(f"Adjacency matrix path: {adjacency_path}")
-
+            adjacency_path = Path(self.output_dir) / "GlobalNetwork.csv"
+            self.logger.info(f"Reading Global Network from: {adjacency_path}")
             adjacency_df = pd.read_csv(adjacency_path, index_col=0)
-            self.logger.info(
-                "Adjacency matrix loaded with shape: %s", adjacency_df.shape
-            )
-
-            self.logger.info(
-                "Adjacency matrix loaded with shape: %s", adjacency_df.shape
-            )
-            self.logger.info("SmCCNet Graph Generation completed successfully.")
-            return adjacency_df
+            self.logger.info(f"Global Network shape: {adjacency_df.shape}")
+            clusters = self.get_clusters()
+            self.logger.info("GlobalNetwork stored at index 0 and clusters stored as a list of dataframes at index 1.")
+            self.logger.info("SmCCNet workflow completed successfully.")
+            return adjacency_df, clusters
         except Exception as e:
-            self.logger.error(f"Error in SmCCNet Graph Generation: {e}")
+            self.logger.error(f"Error in SmCCNet workflow: {e}")
             raise

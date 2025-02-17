@@ -9,9 +9,12 @@ The **User API** lists BioNeuralNet’s key classes, methods, and utilities.
 
    bioneuralnet.external_tools
    bioneuralnet.network_embedding
-   bioneuralnet.downstream_task
+   bioneuralnet.clustering
    bioneuralnet.subject_representation
+   bioneuralnet.downstream_task
    bioneuralnet.utils
+   bioneuralnet.datasets
+   bioneuralnet.metrics
 
 Executables
 -----------
@@ -19,8 +22,8 @@ Executables
 Certain classes expose a high-level ``run()`` method to perform end-to-end workflows:
 
 - **SmCCNet** or **WGCNA** (from `bioneuralnet.external_tools`) for adjacency generation
-- **GNNEmbedding** or **Node2Vec** for embeddings
 - **GraphEmbedding** for integrating embeddings into subject-level data
+- **CorrelatedLouvain** or **HybridLouvain** for clustering
 - **DPMON** for disease prediction
 
 **Usage Pattern**:
@@ -43,7 +46,6 @@ Example:
    )
 
    predictions = dpmon_obj.run()
-   print(predictions.head())
 
 **Methods**:
 
@@ -52,10 +54,13 @@ Below are references to the ``run()`` methods:
 .. automethod:: bioneuralnet.external_tools.smccnet.SmCCNet.run
    :no-index:
 
-.. automethod:: bioneuralnet.network_embedding.gnn_embedding.GNNEmbedding.run
+.. automethod:: bioneuralnet.subject_representation.GraphEmbedding.run
    :no-index:
 
-.. automethod:: bioneuralnet.subject_representation.GraphEmbedding.run
+.. automethod:: bioneuralnet.clustering.CorrelatedLouvain.run
+   :no-index:
+
+.. automethod:: bioneuralnet.clustering.HybridLouvain.run
    :no-index:
 
 .. automethod:: bioneuralnet.downstream_task.DPMON.run

@@ -1,6 +1,4 @@
-import os
-from typing import List, Tuple, Dict, Any, Optional
-from datetime import datetime
+from typing import List, Tuple, Dict, Any
 import pandas as pd
 import networkx as nx
 from sklearn.preprocessing import StandardScaler
@@ -8,8 +6,13 @@ from sklearn.decomposition import PCA
 from scipy.stats import pearsonr
 from ..utils.logger import get_logger
 
+from ray import tune
+from ray.tune import CLIReporter
+from ray.air import session
+from ray.tune.schedulers import ASHAScheduler
 
-class PageRank:
+
+class CorrelatedPageRank:
     """
     PageRank Class for Clustering Nodes Based on Personalized PageRank.
 
@@ -28,12 +31,12 @@ class PageRank:
         self,
         graph: nx.Graph,
         omics_data: pd.DataFrame,
-        phenotype_data: pd.Series,
+        phenotype_data: pd.DataFrame,
         alpha: float = 0.9,
         max_iter: int = 100,
         tol: float = 1e-6,
-        k: float = 0.9,
-        output_dir: Optional[str] = None,
+        k: float = 0.5,
+        tune: bool = False,
     ):
         """
         Initializes the PageRank instance with direct data structures.
@@ -41,21 +44,20 @@ class PageRank:
         Args:
             graph (nx.Graph): NetworkX graph object representing the network.
             omics_data (pd.DataFrame): Omics data DataFrame.
-            phenotype_data (pd.Series): Phenotype data Series.
+            phenotype_data (pd.DataFrame): Phenotype data Series.
             alpha (float, optional): Damping factor for PageRank. Defaults to 0.9.
             max_iter (int, optional): Maximum iterations for PageRank. Defaults to 100.
             tol (float, optional): Tolerance for convergence. Defaults to 1e-6.
             k (float, optional): Weighting factor for composite score. Defaults to 0.9.
-            output_dir (str, optional): Directory to save outputs. If None, creates a unique directory.
         """
         self.G = graph
         self.B = omics_data
-        self.Y = phenotype_data
+        self.Y = phenotype_data.squeeze()
         self.alpha = alpha
         self.max_iter = max_iter
         self.tol = tol
         self.k = k
-        self.output_dir = output_dir  # if output_dir else self._create_output_dir()
+        self.tune = tune
 
         self.logger = get_logger(__name__)
         self.logger.info("Initialized PageRank with the following parameters:")
@@ -68,8 +70,6 @@ class PageRank:
         self.logger.info(f"Max Iterations: {self.max_iter}")
         self.logger.info(f"Tolerance: {self.tol}")
         self.logger.info(f"K (Composite Score Weight): {self.k}")
-        self.logger.info(f"Output Directory: {self.output_dir}")
-
         self._validate_inputs()
 
     def _validate_inputs(self):
@@ -97,20 +97,6 @@ class PageRank:
         except Exception as e:
             self.logger.error(f"Input validation error: {e}")
             raise
-
-    def _create_output_dir(self) -> str:
-        """
-        Creates a unique output directory for the current PageRank run.
-
-        Returns:
-            str: Path to the created output directory.
-        """
-        base_dir = "pagerank_output"
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
-        output_dir = f"{base_dir}_{timestamp}"
-        os.makedirs(output_dir, exist_ok=True)
-        self.logger.info(f"Created output directory: {output_dir}")
-        return output_dir
 
     def phen_omics_corr(self, nodes: List[Any]) -> Tuple[float, str]:
         """
@@ -145,28 +131,14 @@ class PageRank:
     def sweep_cut(
         self, p: Dict[Any, float]
     ) -> Tuple[List[Any], int, float, float, float, str]:
-        """
-        Performs sweep cut based on the PageRank scores.
-
-        Args:
-            p (Dict[Any, float]): Dictionary of PageRank scores.
-
-        Returns:
-            Tuple containing:
-                - List of node identifiers in the cluster.
-                - Cluster size.
-                - Conductance.
-                - Correlation.
-                - Composite score.
-                - Correlation with p-value.
-        """
         try:
-            cond_res = []
-            corr_res = []
-            cond_corr_res = []
-            cluster = set()
-            min_cut, min_cond_corr = len(p), float("inf")
-            len_clus, cond, corr, cor_pval = 0, 1, 0.0, ""
+            best_cluster = set()
+            min_comp_score = float("inf")
+            best_len = 0
+            best_cond = 1.0
+            best_corr = 0.0
+            best_corr_pval = ""
+
             degrees = dict(self.G.degree(weight="weight"))
             vec = sorted(
                 [
@@ -176,42 +148,65 @@ class PageRank:
                 reverse=True,
             )
 
+            current_cluster = set()
             for i, (val, node) in enumerate(vec):
+                self.logger.debug(
+                    f"Iteration {i}: Adding node {node} with norm value {val:.3f}"
+                )
                 if val == 0:
-                    break
-                else:
-                    cluster.add(node)
+                    continue
 
-                if len(self.G.nodes()) > len(cluster):
-                    cluster_cond = nx.conductance(self.G, cluster, weight="weight")
-                    cond_res.append(round(cluster_cond, 3))
+                current_cluster.add(node)
 
-                    Nodes = list(cluster)
-                    cluster_corr, corr_pvalue = self.phen_omics_corr(Nodes)
-                    corr_res.append(round(cluster_corr, 3))
-                    cluster_corr_neg = -abs(round(cluster_corr, 3))
-
-                    cond_corr = round(
-                        (1 - self.k) * cluster_cond + self.k * cluster_corr_neg, 3
+                if len(current_cluster) < len(self.G.nodes()):
+                    vol_S = sum(
+                        d for n, d in self.G.degree(current_cluster, weight="weight")
                     )
-                    cond_corr_res.append(cond_corr)
+                    vol_T = sum(
+                        d
+                        for n, d in self.G.degree(
+                            set(self.G.nodes()) - current_cluster, weight="weight"
+                        )
+                    )
 
-                    if cond_corr < min_cond_corr:
-                        min_cond_corr, min_cut = cond_corr, i
-                        len_clus = len(cluster)
-                        cond = cluster_cond
-                        corr = cluster_corr
-                        cor_pval = corr_pvalue
+                    if min(vol_S, vol_T) == 0:
+                        self.logger.warning(
+                            f"Skipping iteration {i} due to zero volume (vol_S={vol_S}, vol_T={vol_T})."
+                        )
+                        continue
 
-            if min_cut < len(vec):
-                nodes_in_cluster = [vec[i][1] for i in range(min_cut + 1)]
+                    cluster_cond = nx.conductance(
+                        self.G, current_cluster, weight="weight"
+                    )
+                    cluster_corr, corr_pvalue = self.phen_omics_corr(
+                        list(current_cluster)
+                    )
+                    composite_score = (1 - self.k) * cluster_cond + self.k * (
+                        -abs(cluster_corr)
+                    )
+
+                    self.logger.debug(
+                        f"Cluster size={len(current_cluster)}, cond={cluster_cond:.3f}, "
+                        f"corr={cluster_corr:.3f}, composite={composite_score:.3f}"
+                    )
+
+                    # cluster must be larger than 10 nodes
+                    if len(current_cluster) >= 5 and composite_score < min_comp_score:
+                        min_comp_score = composite_score
+                        best_cluster = set(current_cluster)
+                        best_len = len(current_cluster)
+                        best_cond = cluster_cond
+                        best_corr = cluster_corr
+                        best_corr_pval = corr_pvalue
+
+            if best_cluster:
                 return (
-                    nodes_in_cluster,
-                    len_clus,
-                    cond,
-                    corr,
-                    round(min_cond_corr, 3),
-                    cor_pval,
+                    list(best_cluster),
+                    best_len,
+                    round(best_cond, 3),
+                    round(best_corr, 3),
+                    round(min_comp_score, 3),
+                    best_corr_pval,
                 )
             else:
                 self.logger.warning(
@@ -314,8 +309,6 @@ class PageRank:
                 "correlation_pvalue": pval,
             }
 
-            if self.output_dir is not None:
-                self.save_results(results)
             return results
 
         except Exception as e:
@@ -326,46 +319,9 @@ class PageRank:
             self.logger.error(f"Error in run_pagerank_clustering: {e}")
             raise
 
-    def save_results(self, results: Dict[str, Any]) -> None:
-        """
-        Saves the clustering results to a CSV file.
-
-        Args:
-            results (Dict[str, Any]): Clustering results dictionary.
-        """
-        try:
-            timestamp = datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
-            filename = os.path.join(
-                self.output_dir if self.output_dir is not None else "",
-                f"pagerank_results_{timestamp}.csv",
-            )
-
-            df = pd.DataFrame(
-                {
-                    "Node": results["cluster_nodes"],
-                    "Cluster Size": [results["cluster_size"]]
-                    * len(results["cluster_nodes"]),
-                    "Conductance": [results["conductance"]]
-                    * len(results["cluster_nodes"]),
-                    "Correlation": [results["correlation"]]
-                    * len(results["cluster_nodes"]),
-                    "Composite Score": [results["composite_score"]]
-                    * len(results["cluster_nodes"]),
-                    "Correlation P-Value": [results["correlation_pvalue"]]
-                    * len(results["cluster_nodes"]),
-                }
-            )
-
-            df.to_csv(filename, index=False)
-            self.logger.info(f"Clustering results saved to {filename}")
-
-        except Exception as e:
-            self.logger.error(f"Error in save_results: {e}")
-            raise
-
     def run(self, seed_nodes: List[Any]) -> Dict[str, Any]:
         """
-        Executes the PageRank-based clustering pipeline.
+        Executes the correlated PageRank clustering pipeline.
 
         **Steps:**
 
@@ -404,30 +360,81 @@ class PageRank:
             - The PageRank algorithm requires a well-defined and connected graph to produce meaningful results.
             - Results are sensitive to the alpha (damping factor) and other hyperparameters.
 
-        Example:
-
-        .. code-block:: python
-
-            from bioneuralnet.clustering import PageRank
-
-            # Initialize the PageRank clustering instance
-            pagerank_clustering = PageRank(graph=my_graph, alpha=0.9, max_iter=100, tol=1e-6)
-
-            # Define seed nodes for personalization
-            seed_nodes = ['node1', 'node2', 'node3']
-
-            # Run the clustering pipeline
-            results = pagerank_clustering.run(seed_nodes=seed_nodes)
-
-            # Output the results
-            print("Clusters:", results['clusters'])
-            print("Scores:", results['scores'])
         """
+        if self.tune:
+            best_config = self.run_tuning(num_samples=10)
+            self.logger.info("Tuning completed successfully.")
+            return {"best_config": best_config}
         try:
             results = self.run_pagerank_clustering(seed_nodes)
             self.logger.info("PageRank clustering completed successfully.")
             return results
-
         except Exception as e:
             self.logger.error(f"Error in run method: {e}")
             raise
+
+    def get_quality(self) -> float:
+        """
+        Returns the composite score (or correlation) from the latest clustering run.
+        """
+        if hasattr(self, "results"):
+            #  return the composite score
+            return self.results.get("composite_score", 0.0)
+        else:
+            # run clustering on all nodes and then return the score.
+            self.results = self.run_pagerank_clustering(seed_nodes=list(self.G.nodes()))
+            return self.results.get("composite_score", 0.0)
+
+    def _tune_helper(self, config):
+        alpha = config["alpha"]
+        max_iter = config["max_iter"]
+        tol = config["tol"]
+        k = config["k"]
+
+        tuned_instance = CorrelatedPageRank(
+            graph=self.G,
+            omics_data=self.B,
+            phenotype_data=self.Y,
+            alpha=alpha,
+            max_iter=max_iter,
+            tol=tol,
+            k=k,
+            tune=False,
+        )
+        #  tuning uses all nodes as seed nodes.
+        tuned_instance.run_pagerank_clustering(seed_nodes=list(self.G.nodes()))
+        quality = tuned_instance.get_quality()
+        session.report({"quality": quality})
+
+    def run_tuning(self, num_samples: int = 10) -> Dict[str, Any]:
+        search_config = {
+            "alpha": tune.grid_search([0.8, 0.85, 0.9, 0.95]),
+            "k": tune.grid_search([0.5, 0.6, 0.7, 0.8]),
+            "max_iter": tune.choice([100, 500, 1000]),
+            "tol": tune.loguniform(1e-3, 1e-5),
+        }
+        scheduler = ASHAScheduler(
+            metric="quality",
+            mode="max",
+            grace_period=1,
+            reduction_factor=2,
+        )
+        reporter = CLIReporter(metric_columns=["quality", "training_iteration"])
+
+        def short_dirname_creator(trial):
+            return f"_{trial.trial_id}"
+
+        analysis = tune.run(
+            tune.with_parameters(self._tune_helper),
+            config=search_config,
+            verbose=0,
+            num_samples=num_samples,
+            scheduler=scheduler,
+            progress_reporter=reporter,
+            trial_dirname_creator=short_dirname_creator,
+            name="l",
+        )
+
+        best_config = analysis.get_best_config(metric="quality", mode="max")
+        self.logger.info(f"Best hyperparameters found: {best_config}")
+        return best_config

@@ -7,7 +7,7 @@ BioNeuralNet supports Python 3.10 and 3.11 in this beta release. Follow the step
 
    .. code-block:: bash
 
-      pip install bioneuralnet==0.1.0b1
+      pip install bioneuralnet
 
    This installs the core BioNeuralNet modules for GNN embeddings, subject representation,
    disease prediction (DPMON), and clustering.
@@ -41,6 +41,7 @@ BioNeuralNet supports Python 3.10 and 3.11 in this beta release. Follow the step
    If you plan to use **WGCNA** or **SmCCNet** for network construction:
 
    - Install R from `The R Project <https://www.r-project.org/>`_.
+      - Version 4.4.2 or higher is recommended.
    - Install the required R packages. Open R and run:
 
      .. code-block:: r
@@ -53,7 +54,7 @@ BioNeuralNet supports Python 3.10 and 3.11 in this beta release. Follow the step
 
 4. **Additional Notes for External Tools**:
 
-   For **Node2Vec**, **feature selection**, or **visualization modules**, refer to the :doc:`external_tools/index`.
+   Refer to the :doc:`external_tools/index`.
 
 5. **Next Steps**:
 
