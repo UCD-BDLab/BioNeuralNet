@@ -3,7 +3,7 @@
 
 .. automodule:: bioneuralnet.utils
 
-
+   
 .. rubric:: Modules
 
 .. autosummary::
@@ -11,4 +11,6 @@
    :recursive:
 
    logger
+   notebook_example
    path_utils
+   rdata_to_csv

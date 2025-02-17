@@ -1,30 +1,27 @@
 import os
 import re
-import logging
 import statistics
 import tempfile
 from typing import Optional, List
-
+import shutil
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torch.nn.functional as F
 import pandas as pd
-import numpy as np
 import networkx as nx
 from torch_geometric.data import Data
 from torch_geometric.transforms import RandomNodeSplit
+from ray import train
 from ray import tune
+from ray.tune import Checkpoint
 from ray.tune import CLIReporter
 from ray.tune.schedulers import ASHAScheduler
-from ray import train
-from ray.train import Checkpoint
+from bioneuralnet.utils import get_logger
+from pathlib import Path
 
-from ..network_embedding.gnn_models import GCN, GAT, SAGE, GIN
+from bioneuralnet.network_embedding.gnn_models import GCN, GAT, SAGE, GIN
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
+logger= get_logger(__name__)
 
 class DPMON:
     def __init__(
@@ -38,9 +35,9 @@ class DPMON:
         layer_num: int = 5,
         nn_hidden_dim1: int = 8,
         nn_hidden_dim2: int = 8,
-        epoch_num: int = 5,
+        num_epochs: int = 100,
         repeat_num: int = 5,
-        lr: float = 0.01,
+        lr: float = 1e-1,
         weight_decay: float = 1e-4,
         tune: bool = False,
         gpu: bool = False,
@@ -69,16 +66,23 @@ class DPMON:
         self.layer_num = layer_num
         self.nn_hidden_dim1 = nn_hidden_dim1
         self.nn_hidden_dim2 = nn_hidden_dim2
-        self.epoch_num = epoch_num
+        self.num_epochs = num_epochs
         self.repeat_num = repeat_num
         self.lr = lr
         self.weight_decay = weight_decay
         self.tune = tune
         self.gpu = gpu
         self.cuda = cuda
-        self.output_dir = output_dir if output_dir else f"dpmon_output"
 
-        os.makedirs(self.output_dir, exist_ok=True)
+        if output_dir is None:
+            self.output_dir = Path(os.getcwd()) / "dpmon"  
+        else:
+            self.output_dir = Path(output_dir)
+
+        self.output_dir.mkdir(parents=True, exist_ok=True)  
+        logger.info(f"Output directory set to: {self.output_dir}")
+
+
         logger.info("Initialized DPMON with the provided parameters.")
 
     def run(self) -> pd.DataFrame:
@@ -128,7 +132,7 @@ class DPMON:
             "layer_num": self.layer_num,
             "nn_hidden_dim1": self.nn_hidden_dim1,
             "nn_hidden_dim2": self.nn_hidden_dim2,
-            "epoch_num": self.epoch_num,
+            "num_epochs": self.num_epochs,
             "repeat_num": self.repeat_num,
             "lr": self.lr,
             "weight_decay": self.weight_decay,
@@ -139,6 +143,8 @@ class DPMON:
 
         # Combine omics datasets
         combined_omics = pd.concat(self.omics_list, axis=1)
+        combined_omics = combined_omics[self.adjacency_matrix.columns]
+        
         if "phenotype" not in combined_omics.columns:
             combined_omics = combined_omics.merge(
                 self.phenotype_data[["phenotype"]],
@@ -148,22 +154,42 @@ class DPMON:
 
         if self.tune:
             logger.info("Running hyperparameter tuning for DPMON.")
-            run_hyperparameter_tuning(
+            best_config_df = run_hyperparameter_tuning(
                 dpmon_params, self.adjacency_matrix, combined_omics, self.clinical_data
             )
-            return pd.DataFrame()
+            logger.info(best_config_df)
+            best_config = best_config_df.iloc[0].to_dict()
+            best_config["gnn_hidden_dim"] = int(best_config["gnn_hidden_dim"])
+            best_config["gnn_layer_num"] = int(best_config["gnn_layer_num"])
+            best_config["nn_hidden_dim1"] = int(best_config["nn_hidden_dim1"])
+            best_config["nn_hidden_dim2"] = int(best_config["nn_hidden_dim2"])
+            best_config["num_epochs"] = int(best_config["num_epochs"])
+            logger.info(f"Best tuned parameters: {best_config}")
+            
+            logger.info(f"Best tuned parameters: {best_config}")
+            dpmon_params.update(best_config)
+            logger.info("Running standard training with tuned parameters.")
+            predictions = run_standard_training(
+                dpmon_params,
+                self.adjacency_matrix,
+                combined_omics,
+                self.clinical_data,
+                output_dir=self.output_dir,
+            )
+            return predictions
+        
+        else:
+            logger.info("Running standard training for DPMON.")
+            predictions = run_standard_training(
+                dpmon_params,
+                self.adjacency_matrix,
+                combined_omics,
+                self.clinical_data,
+                output_dir=self.output_dir,
+            )
 
-        logger.info("Running standard training for DPMON.")
-        predictions = run_standard_training(
-            dpmon_params,
-            self.adjacency_matrix,
-            combined_omics,
-            self.clinical_data,
-            output_dir=self.output_dir,
-        )
-
-        logger.info("DPMON run completed.")
-        return predictions
+            logger.info("DPMON run completed.")
+            return predictions
 
 
 def setup_device(gpu, cuda):
@@ -260,21 +286,19 @@ def build_omics_networks_tg(
     return [data]
 
 
-def run_standard_training(
-    dpmon_params, adjacency_matrix, combined_omics, clinical_data, output_dir
-):
+def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinical_data, output_dir):
     device = setup_device(dpmon_params["gpu"], dpmon_params["cuda"])
     omics_dataset = slice_omics_datasets(combined_omics, adjacency_matrix)
-    omics_networks_tg = build_omics_networks_tg(
-        adjacency_matrix, omics_dataset, clinical_data
-    )
+    omics_networks_tg = build_omics_networks_tg(adjacency_matrix, omics_dataset, clinical_data)
 
     accuracies = []
-    last_predictions_df = pd.DataFrame()
+    best_accuracy = 0
+    best_predictions_df = None
 
     for omics_data, omics_network in zip(omics_dataset, omics_networks_tg):
         for i in range(dpmon_params["repeat_num"]):
             logger.info(f"Training iteration {i+1}/{dpmon_params['repeat_num']}")
+
             model = NeuralNetwork(
                 model_type=dpmon_params["model"],
                 gnn_input_dim=omics_network.x.shape[1],
@@ -294,55 +318,41 @@ def run_standard_training(
                 weight_decay=dpmon_params["weight_decay"],
             )
 
-            train_features = torch.FloatTensor(
-                omics_data.drop(["phenotype"], axis=1).values
-            ).to(device)
+            train_features = torch.FloatTensor(omics_data.drop(["phenotype"], axis=1).values).to(device)
             train_labels = {
-                "labels": torch.LongTensor(omics_data["phenotype"].values.copy()).to(
-                    device
-                ),
+                "labels": torch.LongTensor(omics_data["phenotype"].values.copy()).to(device),
                 "omics_network": omics_network.to(device),
             }
 
-            accuracy = train_model(
-                model,
-                criterion,
-                optimizer,
-                train_features,
-                train_labels,
-                dpmon_params["epoch_num"],
-            )
+            accuracy = train_model(model, criterion, optimizer, train_features, train_labels, dpmon_params["num_epochs"])
             accuracies.append(accuracy)
+
+            # Save model
             model_path = os.path.join(output_dir, f"dpm_model_iter_{i+1}.pth")
             torch.save(model.state_dict(), model_path)
             logger.info(f"Model saved to {model_path}")
 
+            # Evaluate model
             model.eval()
             with torch.no_grad():
                 predictions, _ = model(train_features, omics_network.to(device))
                 _, predicted = torch.max(predictions, 1)
-                predictions_path = os.path.join(
-                    output_dir, f"predictions_iter_{i+1}.csv"
-                )
                 predictions_df = pd.DataFrame(
-                    {
-                        "Actual": omics_data["phenotype"].values,
-                        "Predicted": predicted.cpu().numpy(),
-                    }
+                    {"Actual": omics_data["phenotype"].values, "Predicted": predicted.cpu().numpy()}
                 )
-                predictions_df.to_csv(predictions_path, index=False)
-                logger.info(f"Predictions saved to {predictions_path}")
-                last_predictions_df = predictions_df
+
+            if accuracy > best_accuracy:
+                best_accuracy = accuracy
+                best_predictions_df = predictions_df
 
     if accuracies:
-        max_accuracy = max(accuracies)
         avg_accuracy = sum(accuracies) / len(accuracies)
         std_accuracy = statistics.stdev(accuracies) if len(accuracies) > 1 else 0.0
-        logger.info(f"Best Accuracy: {max_accuracy:.4f}")
+        logger.info(f"Best Accuracy: {best_accuracy:.4f}")
         logger.info(f"Average Accuracy: {avg_accuracy:.4f}")
         logger.info(f"Standard Deviation of Accuracy: {std_accuracy:.4f}")
 
-    return last_predictions_df
+    return best_predictions_df, avg_accuracy
 
 
 def run_hyperparameter_tuning(
@@ -367,12 +377,13 @@ def run_hyperparameter_tuning(
 
     reporter = CLIReporter(metric_columns=["loss", "accuracy", "training_iteration"])
     scheduler = ASHAScheduler(
-        metric="loss", mode="min", grace_period=10, reduction_factor=2
+        metric="loss", mode="min", grace_period=1, reduction_factor=2
     )
     gpu_resources = 1 if dpmon_params["gpu"] else 0
 
+    best_configs = []
+    
     for omics_data, omics_network_tg in zip(omics_dataset, omics_networks_tg):
-        os.environ["TUNE_DISABLE_STRICT_METRIC_CHECKING"] = "1"
         logger.info(
             f"Starting hyperparameter tuning for dataset shape: {omics_data.shape}"
         )
@@ -449,15 +460,19 @@ def run_hyperparameter_tuning(
                         metrics=metrics, checkpoint=Checkpoint.from_directory(tempdir)
                     )
 
+        def short_dirname_creator(trial):
+            return f"T{trial.trial_id}"
+
         result = tune.run(
             tune_train_n,
             resources_per_trial={"cpu": 2, "gpu": gpu_resources},
             config=pipeline_configs,
             num_samples=10,
+            verbose=0,
             scheduler=scheduler,
-            name="Hyperparameter_Tuning",
+            name="tune_dp",
             progress_reporter=reporter,
-            keep_checkpoints_num=1,
+            trial_dirname_creator=short_dirname_creator,
             checkpoint_score_attr="min-loss",
         )
 
@@ -467,6 +482,10 @@ def run_hyperparameter_tuning(
         logger.info(
             "Best trial final accuracy: {}".format(best_trial.last_result["accuracy"])
         )
+        best_configs.append(best_trial.config)
+
+    best_configs_df = pd.DataFrame(best_configs)
+    return best_configs_df
 
 
 def train_model(model, criterion, optimizer, train_data, train_labels, epoch_num):

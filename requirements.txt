@@ -1,18 +1,21 @@
-# requirements.in
 wheel
 setuptools
 PyYAML
 pandas
 numpy
+scipy
 scikit-learn
 node2vec
 matplotlib
 ray[tune]
 tensorboardX
 networkx
-pyvis
-leidenalg
 dtt
-pyreadr
+cptac
+python-louvain
+debugpy
+seaborn
+umap-learn
+ipywidgets 
 # torch
 # torch_geometric

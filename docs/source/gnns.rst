@@ -1,9 +1,7 @@
-.. _gnns:
+GNN Embeddings for Multi-Omics
+==============================
 
-GNNs for Multi-Omics
-====================
-
-This section provides an overview of **Graph Neural Networks (GNNs)** in BioNeuralNet for multi-omics data. We support four GNN architectures (GCN, GAT, GraphSAGE, GIN), each of which can be **task-driven** (using numeric values or other labels per node) or **unsupervised** (using intrinsic objectives) to produce node embeddings.
+This section provides an overview of **Graph Neural Networks (GNNs)** in BioNeuralNet for multi-omics data—focusing on task-driven, supervised or semi-supervised approaches. In our framework, each node (representing an omics feature such as a gene or protein) is assigned a numeric label computed as the Pearson correlation between its expression values and the phenotype (or clinical variable) of interest. This supervision guides the training of our GNNs (GCN, GAT, GraphSAGE, and GIN) to learn embeddings that capture biologically meaningful signals for downstream tasks such as disease prediction.
 
 .. contents::
    :local:
@@ -11,8 +9,7 @@ This section provides an overview of **Graph Neural Networks (GNNs)** in BioNeur
 
 Graph Convolutional Network (GCN)
 ---------------------------------
-
-GCN layers apply a spectral-based convolution operator to aggregate neighbor information. The core update equation for a single GCN layer is:
+GCN layers apply a spectral-based convolution operator to aggregate information from a node’s neighbors. The core update equation for a single GCN layer is:
 
 .. math::
 
@@ -22,16 +19,14 @@ GCN layers apply a spectral-based convolution operator to aggregate neighbor inf
 where
 
 - :math:`X^{(l)}` is the node feature matrix at layer :math:`l`.
-- :math:`\widehat{A} = A + I` is the adjacency matrix with inserted self-loops.
+- :math:`\widehat{A} = A + I` is the adjacency matrix with self-loops.
 - :math:`\widehat{D}` is the diagonal degree matrix of :math:`\widehat{A}`.
 - :math:`W^{(l)}` denotes the trainable parameters at layer :math:`l`.
-- :math:`\mathrm{ReLU}` is the rectified linear unit activation function.
-
+- :math:`\mathrm{ReLU}` is the activation function.
 
 Graph Attention Network (GAT)
 -----------------------------
-
-GAT layers incorporate attention coefficients to weight the contribution of neighbors:
+GAT layers incorporate learned attention coefficients to weight the contributions of neighboring nodes:
 
 .. math::
 
@@ -43,13 +38,11 @@ where
 - :math:`\alpha_{ij}^{(l)}` is the learned attention coefficient for the edge between nodes :math:`i` and :math:`j`.
 - :math:`W^{(l)}` is a trainable linear transformation.
 - :math:`\mathrm{ELU}` is the exponential linear unit activation.
-- :math:`\mathcal{N}(i)` is the set of neighbors of node :math:`i`.
-
+- :math:`\mathcal{N}(i)` denotes the neighbors of node :math:`i`.
 
 GraphSAGE
 ---------
-
-GraphSAGE (SAmple and aggreGatE) updates each node by concatenating its own features with an aggregated summary of its neighbors. In a mean-aggregator setting:
+GraphSAGE (SAmple and aggreGatE) computes node embeddings by concatenating a node’s own features with an aggregated summary (e.g., mean) of its neighbors’ features:
 
 .. math::
 
@@ -61,17 +54,13 @@ GraphSAGE (SAmple and aggreGatE) updates each node by concatenating its own feat
 
 where
 
-- :math:`\mathcal{N}(i)` are neighbors of node :math:`i`.
 - :math:`\|` denotes vector concatenation.
-- :math:`W^{(l)}` is a trainable weight matrix at layer :math:`l`.
-- :math:`\sigma` is a nonlinear activation function, e.g. ReLU.
-
+- :math:`W^{(l)}` is a trainable weight matrix.
+- :math:`\sigma` is a nonlinear activation function (e.g., ReLU).
 
 Graph Isomorphism Network (GIN)
 -------------------------------
-
-GIN uses a sum-aggregator combined with a learnable :math:`\epsilon` parameter
-and an MLP to update node representations:
+GIN employs a sum-aggregator combined with a learnable :math:`\epsilon` parameter and a multi-layer perceptron (MLP) to update node representations:
 
 .. math::
 
@@ -80,86 +69,66 @@ and an MLP to update node representations:
 
 where
 
-- :math:`\epsilon^{(l)}` is a (learnable or fixed) parameter for each layer :math:`l`.
-- :math:`\mathrm{MLP}^{(l)}` is a multi-layer perceptron at layer :math:`l`.
+- :math:`\epsilon^{(l)}` is a learnable (or fixed) parameter.
+- :math:`\mathrm{MLP}^{(l)}` denotes a multi-layer perceptron.
 
+Task-Driven (Supervised/Semi-Supervised) GNNs
+---------------------------------------------
+In our work, the GNNs are primarily **task-driven**:
 
-Task-Driven vs. Unsupervised GNNs
----------------------------------
+- **Node Labeling via Phenotype Correlation:**  
+  For each node, we compute the Pearson correlation between the omics data and phenotype (or clinical) data. This correlation serves as the target label during training.
 
-1. **Task-Driven**:
+- **Supervised Training Objective:**  
+  The GNN is trained to predict these correlation values using a Mean Squared Error (MSE) loss. This strategy aligns node embeddings with biological signals relevant to the disease phenotype.
 
-   If each node (e.g., a gene or protein) has a **numeric value** (e.g., correlation with a disease phenotype), you can train a GNN to predict this value (with MSE loss). This aligns node embeddings with the target measure, grouping nodes that have similar relationships.
-
-   **Pre-Computed or Random Node Features**:
-
-      - You can correlate each node with clinical variables to build a rich feature vector, **or** simply initialize node features randomly.
-      - Even with random features, the GNN can still learn **the label** drives training via MSE on each node’s predicted value vs. its real label.
-
-2. **Unsupervised**:
-
-   If no explicit node label is provided, the GNN can learn from the **graph structure itself**:
-
-      - **Intrinsic Objectives**:
-
-         e.g., graph autoencoders or contrastive losses.
-
-      - **Random Features**:
-
-         Possibly leaving node features random or minimal.
-
-      - **Structure as Signal**:
-
-         Even in the absence of external labels, adjacency patterns guide the GNN to produce embeddings capturing local/global relationships.
-
-      - **Practical Implementation**:
-
-         - In some quick explorations, you might skip external labeling entirely.
-         - The GNN produces a representation that captures the topology.
-
-Overall, both approaches yield node embeddings that can be integrated into **subject-level** datasets or used for clustering or further analysis.
+- **Downstream Integration:**  
+  The learned node embeddings can be integrated into patient-level datasets for sample-level classification tasks. For example, **DPMON** (Disease Prediction using Multi-Omics Networks) leverages these embeddings in an end-to-end pipeline where the final objective is to classify disease outcomes.
 
 Key Insights into GNN Parameters and Outputs
 --------------------------------------------
+1. **Input Parameters:**
 
-1. **Input Parameters**:
+   - **Node Features Matrix:** Built by correlating omics data with clinical variables.
+   - **Edge Index:** Derived from the network’s adjacency matrix.
+   - **Target Labels:** Numeric values representing the correlation between omics features and phenotype data.
 
-   - **Node Features Matrix**: :math:`(N \times F)` shape. You can use pre-computed correlations or random initialization.
-   - **Edge Index**: :math:`(2 \times E)` shape, specifying edges.
-   - **Edge Attributes (Optional)**: Weighted edges, etc.
-   - **Target Labels (Optional)**: If **task-driven** (MSE regression or classification), each node has a numeric or categorical label.
+2. **Output Embeddings:**
 
-2. **Output Embeddings**:
+   - The penultimate layer of the GNN produces dense node embeddings that capture both local connectivity and supervised signals.
+   - These embeddings can be further reduced (e.g., via PCA or an Autoencoder) for visualization or integrated into subject-level data.
 
-   - Each node is represented as a dense vector in the hidden layers.
-   - Typically, a final linear may reduce to 1D if you do node-level MSE, but the **penultimate** layer is multi-dimensional.
-   - After training, you retrieve the multi-dimensional “node embeddings” if needed.
+Dimensionality Reduction: PCA vs. Autoencoders
+------------------------------------------------
+After training a GNN, the resulting node embeddings are typically high-dimensional. To integrate these embeddings into the original omics data—by reweighting each feature—a further reduction step is performed to obtain a single summary value per feature. BioNeuralNet supports two primary approaches for this reduction:
 
-3. **Dimensionality Reduction**:
+**Principal Component Analysis (PCA)**  
+PCA is a linear dimensionality reduction technique that computes orthogonal components capturing the maximum variance in the data. The first principal component (PC1) is often used as a concise summary of each feature's variation. PCA is:
 
-   - After generating embeddings, techniques like PCA can reduce dimensionality for simpler usage and improved interpretability.
+- **Deterministic and Fast:** A closed-form solution is computed from the covariance matrix.
+- **Simple and Interpretable:** The linear combination of the original variables is straightforward to understand.
+- **Limited to Linear Relationships:** It may not capture more complex, nonlinear structures in the data.
+
+**Autoencoders (AE)**  
+Autoencoders are neural network models designed to learn a compressed representation (latent code) through a bottleneck architecture. They use nonlinear activations (e.g., ReLU) to model complex relationships:
+
+- **Nonlinear Transformation:** The encoder learns to capture intricate patterns that a linear method might miss.
+- **Learned Representations:** The latent code is obtained by minimizing a reconstruction loss, making it adaptive to the data.
+- **Flexible and Tunable:** Being neural network–based, autoencoders allow tuning of architecture parameters (e.g., number of layers, hidden dimensions, epochs, learning rate) to better capture the signal. In our framework, we highly recommend using autoencoders (i.e., setting `tune=True`) to leverage their enhanced expressivity for complex multi-omics data.
+
+In practice, PCA offers simplicity and interpretability, whereas autoencoders may yield superior performance by capturing more nuanced nonlinear relationships. The choice depends on the complexity of your data and the computational resources available. Our recommendation is to enable tuning (using `tune=True`) to optimize the autoencoder parameters for your specific dataset.
 
 How DPMON Uses GNNs Differently
 -------------------------------
+**DPMON** (Disease Prediction using Multi-Omics Networks) reuses the same GNN architectures but with a different objective:
 
-**DPMON** (Disease Prediction using Multi-Omics Networks) is an **end-to-end** pipeline
-that uses GNN layers for **sample-level classification**, rather than node-level MSE:
-
-1. **Local + Global Structure**:
-   - DPMON’s GNN still aggregates information per node. However, it doesn’t use numeric per-node labels in MSE.
-   - Instead, it extracts node embeddings to feed into an autoencoder/dimension-averaging pipeline.
-
-2. **Classification Head**:
-   - Ultimately, DPMON’s GNN embeddings are combined with patient-level omics data.
-   - A downstream neural network (e.g., a softmax layer) predicts the patient’s disease phenotype.
-   - This is a **sample-level** classification objective (e.g., CrossEntropyLoss on patient classes).
-
-Hence, DPMON’s approach reuses the **same** GNN architectures (GCN, GAT, etc.) but with a **different final objective** (classification at sample level, instead of node-level MSE).
+- Instead of node-level MSE regression, DPMON aggregates node embeddings with patient-level omics data.
+- A downstream classification head (e.g., softmax layer with CrossEntropyLoss) is applied for sample-level disease prediction.
+- This end-to-end approach leverages both local (node-level) and global (patient-level) network information.
 
 Example Usage
 -------------
-
-Below is a **simplified** snippet showing a **task-driven** node-level approach, where each node is assigned a numeric correlation with disease severity. The GNN (choose GCN, GAT, SAGE, or GIN) tries to predict that correlation, producing a trained embedding:
+Below is a simplified example that demonstrates the task-driven approach—where node labels are derived from phenotype correlations and used to train the GNN:
 
 .. code-block:: python
 
@@ -177,9 +146,5 @@ Below is a **simplified** snippet showing a **task-driven** node-level approach,
    )
    gnn.fit()
    node_embeds = gnn.embed()
-
-If **no** numeric label is used, you can rely on an **unsupervised** or random feature initialization. Even when we skip correlation-based features and MSE training, the GNN still provides embeddings reflecting the graph structure.
-
-For sample-level classification, see :ref:`dpmon`. DPMON integrates node embeddings into an end-to-end disease prediction pipeline, focusing on **patient** labels rather than node-level numeric regression.
 
 Return to :doc:`../index`
