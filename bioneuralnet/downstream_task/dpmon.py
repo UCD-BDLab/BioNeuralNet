@@ -2,28 +2,56 @@ import os
 import re
 import statistics
 import tempfile
+import pandas as pd
+import networkx as nx
 from typing import Optional, List
-import shutil
+from pathlib import Path
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import pandas as pd
-import networkx as nx
 from torch_geometric.data import Data
 from torch_geometric.transforms import RandomNodeSplit
+
 from ray import train
 from ray import tune
 from ray.tune import Checkpoint
 from ray.tune import CLIReporter
 from ray.tune.schedulers import ASHAScheduler
-from bioneuralnet.utils import get_logger
-from pathlib import Path
 
+from bioneuralnet.utils import get_logger
 from bioneuralnet.network_embedding.gnn_models import GCN, GAT, SAGE, GIN
 
 logger= get_logger(__name__)
 
 class DPMON:
+    """
+    DPMON (Disease Prediction using Multi-Omics Networks): An end-to-end pipeline for disease prediction using multi-omics networks.
+
+        Instead of node-level MSE regression, DPMON aggregates node embeddings with patient-level omics data.
+        A downstream classification head (e.g., softmax layer with CrossEntropyLoss) is applied for sample-level disease prediction.
+        This end-to-end approach leverages both local (node-level) and global (patient-level) network information
+    
+    Attributes:
+    
+        adjacency_matrix (pd.DataFrame): The adjacency matrix of the network.
+        omics_list (List[pd.DataFrame]): A list of omics datasets.
+        phenotype_data (pd.DataFrame): A DataFrame containing the disease phenotype.
+        clinical_data (Optional[pd.DataFrame]): A DataFrame containing clinical data.
+        model (str): The GNN model to use (GCN, GAT, SAGE, GIN). Default='GAT'.
+        gnn_hidden_dim (int): The hidden dimension of the GNN. Default=16.
+        layer_num (int): The number of GNN layers. Default=5.
+        nn_hidden_dim1 (int): The hidden dimension of the first NN layer. Default=8.
+        nn_hidden_dim2 (int): The hidden dimension of the second NN layer. Default=8.
+        num_epochs (int): The number of training epochs. Default=100.
+        repeat_num (int): The number of training repeats. Default=5.
+        lr (float): The learning rate. Default=1e-1.
+        weight_decay (float): The weight decay. Default=1e-4.
+        tune (bool): Whether to perform hyperparameter tuning. Default=False.
+        gpu (bool): Whether to use GPU. Default=False.
+        cuda (int): The CUDA device ID. Default=0.
+        output_dir (Optional[str]): The output directory. Default=None.        
+    """
     def __init__(
         self,
         adjacency_matrix: pd.DataFrame,

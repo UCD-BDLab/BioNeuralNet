@@ -1,5 +1,5 @@
-Correlated Clustering Methods
-=============================
+Correlated Clustering
+=====================
 
 BioNeuralNet includes internal modules for performing **correlated clustering** on complex networks.
 These methods extend traditional community detection by integrating **phenotype correlation**, allowing users to extract **biologically relevant, phenotype-associated modules** from any network.

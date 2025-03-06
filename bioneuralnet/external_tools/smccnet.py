@@ -8,15 +8,27 @@ from typing import List, Dict, Any
 from ..utils.logger import get_logger
 import shutil
 
-
 class SmCCNet:
     """
     SmCCNet Class for Graph Generation using Sparse Multiple Canonical Correlation Networks (SmCCNet).
 
     This class handles the preprocessing of omics data, execution of the SmCCNet R script,
     and retrieval of the resulting adjacency matrix from a designated output directory.
-    """
+    
+    Attributes:
 
+        phenotype_df (pd.DataFrame): DataFrame containing phenotype data, shape [samples x 1 or more].
+        omics_dfs (List[pd.DataFrame]): List of omics DataFrames.
+        data_types (List[str]): List of omics data type strings (e.g. ["Genes", "miRNA"]).
+        kfold (int): Number of folds for cross-validation. Default=5.
+        eval_method (str): e.g. 'accuracy', 'auc', 'f1', or 'Rsquared' (if you patch SmCCNet).
+        subSampNum (int): # of subsamplings. Default=50.
+        summarization (str): 'NetSHy', 'PCA', or 'SVD'. Default='NetSHy'.
+        seed (int): Random seed. Default=123.
+        ncomp_pls (int): # of components for PLS. 0 => no PLS. Default=0.
+        between_shrinkage (float): Shrink factor for multi-omics correlation. Default=5.0.
+        output_dir (str): Folder to write temp files. If None, uses a temporary directory.
+    """
     def __init__(
         self,
         phenotype_df: pd.DataFrame,
@@ -47,6 +59,10 @@ class SmCCNet:
             between_shrinkage (float): Shrink factor for multi-omics correlation. Default=5.0.
             output_dir (str): Folder to write temp files. If None, uses a temporary directory.
         """
+        rscript_path = shutil.which("Rscript")
+        if rscript_path is None:
+            raise EnvironmentError("Rscript not found in system PATH. R is required to run SmCCNet.")
+            
         self.phenotype_df = phenotype_df
         self.omics_dfs = omics_dfs
         self.data_types = data_types
@@ -140,7 +156,7 @@ class SmCCNet:
 
             rscript_path = shutil.which("Rscript")
             if rscript_path is None:
-                raise EnvironmentError("Rscript not found in system PATH.")
+                raise EnvironmentError("Rscript not found in system PATH. R is required to run SmCCNet.")
             
             ncomp_pls_arg = str(self.ncomp_pls) if self.ncomp_pls != 0 else ""
 

@@ -1,16 +1,17 @@
 from typing import List, Tuple, Dict, Any
 import pandas as pd
 import networkx as nx
+
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from scipy.stats import pearsonr
-from ..utils.logger import get_logger
 
 from ray import tune
 from ray.tune import CLIReporter
 from ray.air import session
 from ray.tune.schedulers import ASHAScheduler
 
+from ..utils.logger import get_logger
 
 class CorrelatedPageRank:
     """
@@ -20,6 +21,7 @@ class CorrelatedPageRank:
     and identification of clusters based on sweep cuts.
 
     Attributes:
+
         alpha (float): Damping factor for PageRank.
         max_iter (int): Maximum number of iterations for PageRank convergence.
         tol (float): Tolerance for convergence.
@@ -42,6 +44,7 @@ class CorrelatedPageRank:
         Initializes the PageRank instance with direct data structures.
 
         Args:
+        
             graph (nx.Graph): NetworkX graph object representing the network.
             omics_data (pd.DataFrame): Omics data DataFrame.
             phenotype_data (pd.DataFrame): Phenotype data Series.

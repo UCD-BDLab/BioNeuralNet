@@ -8,6 +8,7 @@ sphinx
 sphinx_rtd_theme
 sphinx-autosummary-accessors
 sphinxcontrib-napoleon
+sphinx-viewcode
 nbsphinx
 pandoc
 nbconvert
@@ -26,3 +27,13 @@ tox
 # build dependencies
 setuptools>=42
 twine
+
+#others
+ipywidgets
+cptac
+dtt
+tensorboardX
+debugpy
+PyYAML
+node2vec
+wheel

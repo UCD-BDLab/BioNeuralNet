@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.abspath("../../"))
 try:
     release = metadata.version("bioneuralnet")
 except metadata.PackageNotFoundError:
-    release = "0.2.0b2"
+    release = "1.0"
 
 project = "BioNeuralNet"
 version = release
@@ -20,6 +20,15 @@ extensions = [
     "sphinx.ext.intersphinx",
     "nbsphinx",
 ]
+
+autosummary_imported_members = True
+
+autodoc_default_options = {
+    "members": True,
+    "undoc-members": True,
+    "inherited-members": True,
+    "show-inheritance": True,
+}
 
 autosummary_generate = True
 napoleon_google_docstring = True

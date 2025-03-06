@@ -9,6 +9,7 @@ bioneuralnet.downstream\_task.dpmon
    .. autosummary::
    
       build_omics_networks_tg
+      get_logger
       run_hyperparameter_tuning
       run_standard_training
       setup_device
@@ -19,9 +20,17 @@ bioneuralnet.downstream\_task.dpmon
 
    .. autosummary::
    
+      ASHAScheduler
       Autoencoder
+      CLIReporter
+      Checkpoint
       DPMON
       DimensionAveraging
       DownstreamTaskNN
+      GAT
+      GCN
+      GIN
       NeuralNetwork
+      Path
+      SAGE
    

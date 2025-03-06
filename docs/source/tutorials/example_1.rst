@@ -2,8 +2,6 @@ Example 1: SmCCNet + GNN Embeddings + Subject Representation
 ============================================================
 This tutorial illustrates how to:
 
-This tutorial illustrates how to:
-
 1. **Build**: an adjacency matrix with SmCCNet.
 2. **Enhance Representation**: Generate node embeddings using GNNEmbedding.
 3. **Integrate**: Incorporate these embeddings into subject-level omics data using GraphEmbedding.
@@ -40,8 +38,6 @@ This tutorial illustrates how to:
 4. **Subject Representation**:
    - Integrate these embeddings into omics data via `GraphEmbedding`.
 
-.. note::
-   For a **complete** script, see `examples/example_1.py` in the repository.
 
 Below is a **complete** Python implementation:
 

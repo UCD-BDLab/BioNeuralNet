@@ -41,13 +41,6 @@ This tutorial illustrates how to:
 
 Below is a **complete** Python implementation:
 
-
-.. figure:: _static/DPMON.png
-   :align: center
-   :alt: Disease Prediction (DPMON)
-
-   Embedding-enhanced subject data using DPMON for improved disease prediction.
-
 .. code-block:: python
 
    import pandas as pd
