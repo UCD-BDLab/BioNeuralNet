@@ -1,5 +1,5 @@
-GNN Embeddings for Multi-Omics
-==============================
+GNN Embeddings
+==============
 
 BioNeuralNet leverages Graph Neural Networks (GNNs) to generate rich, low-dimensional embeddings that capture the complex relationships inherent in multi-omics data. These embeddings not only preserve the network topology but also integrate biological signals, providing a robust foundation for downstream tasks such as disease prediction.
 
@@ -13,8 +13,7 @@ Key Contributions:
 
 GNN Model Overviews
 -------------------
-**Graph Convolutional Network (GCN)**:
-- GCN layers aggregate information from neighboring nodes via a spectral-based convolution:
+**Graph Convolutional Network (GCN)**: GCN layers aggregate information from neighboring nodes via a spectral-based convolution:
 
 .. math::
 
@@ -23,8 +22,7 @@ GNN Model Overviews
 
 where :math:`\widehat{A}` adds self-loops to the adjacency matrix, ensuring that each node also considers its own features.
 
-**Graph Attention Network (GAT)**:
-- GAT layers learn attention weights to prioritize the most informative neighbors:
+**Graph Attention Network (GAT)**: GAT layers learn attention weights to prioritize the most informative neighbors:
 
 .. math::
 
@@ -32,8 +30,7 @@ where :math:`\widehat{A}` adds self-loops to the adjacency matrix, ensuring that
 
 with :math:`\alpha_{ij}^{(l)}` representing the attention coefficient for node :math:`j`'s contribution to node :math:`i`.
 
-**GraphSAGE**:
-- GraphSAGE computes embeddings by concatenating a node's own features with an aggregated summary of its neighbors:
+**GraphSAGE**: GraphSAGE computes embeddings by concatenating a node's own features with an aggregated summary of its neighbors:
 
 .. math::
 
@@ -43,8 +40,7 @@ with :math:`\alpha_{ij}^{(l)}` representing the attention coefficient for node :
 
 where the mean aggregator provides a simple yet effective way to summarize local neighborhood information.
 
-**Graph Isomorphism Network (GIN)**:
-- GIN uses a sum-aggregator combined with a learnable parameter and an MLP to capture subtle differences in network structure:
+**Graph Isomorphism Network (GIN)**: GIN uses a sum-aggregator combined with a learnable parameter and an MLP to capture subtle differences in network structure:
 
 .. math::
 
@@ -55,21 +51,20 @@ where :math:`\epsilon^{(l)}` is either learnable or fixed.
 
 Dimensionality Reduction and Downstream Integration
 ---------------------------------------------------
-- After obtaining high-dimensional node embeddings from the penultimate GNN layer, BioNeuralNet applies dimensionality reduction (using PCA or autoencoders) to summarize each node with a single value. These reduced embeddings are then integrated into subject-level omics data, yielding enhanced feature representations that boost the performance of predictive models (e.g., via DPMON for disease prediction).
-- By using GNNs to capture both structural and biological signals, BioNeuralNet delivers embeddings that truly reflect the complexity of multi-omics networks.
+
+After obtaining high-dimensional node embeddings from the penultimate GNN layer, BioNeuralNet applies dimensionality reduction (using PCA or autoencoders) to summarize each node with a single value. These reduced embeddings are then integrated into subject-level omics data, yielding enhanced feature representations that boost the performance of predictive models (e.g., via DPMON for disease prediction).
+
+By using GNNs to capture both structural and biological signals, BioNeuralNet delivers embeddings that truly reflect the complexity of multi-omics networks.
 
 Task-Driven (Supervised/Semi-Supervised) GNNs
 ---------------------------------------------
 In our work, the GNNs are primarily **task-driven**:
 
-- **Node Labeling via Phenotype Correlation:**  
-  For each node, we compute the Pearson correlation between the omics data and phenotype (or clinical) data. This correlation serves as the target label during training.
+- **Node Labeling via Phenotype Correlation:** For each node, we compute the Pearson correlation between the omics data and phenotype (or clinical) data. This correlation serves as the target label during training.
 
-- **Supervised Training Objective:**  
-  The GNN is trained to predict these correlation values using a Mean Squared Error (MSE) loss. This strategy aligns node embeddings with biological signals relevant to the disease phenotype.
+- **Supervised Training Objective:** The GNN is trained to predict these correlation values using a Mean Squared Error (MSE) loss. This strategy aligns node embeddings with biological signals relevant to the disease phenotype.
 
-- **Downstream Integration:**  
-  The learned node embeddings can be integrated into patient-level datasets for sample-level classification tasks. For example, **DPMON** (Disease Prediction using Multi-Omics Networks) leverages these embeddings in an end-to-end pipeline where the final objective is to classify disease outcomes.
+- **Downstream Integration:** The learned node embeddings can be integrated into patient-level datasets for sample-level classification tasks. For example, **DPMON** (Disease Prediction using Multi-Omics Networks) leverages these embeddings in an end-to-end pipeline where the final objective is to classify disease outcomes.
 
 Generating Low-Dimensional Embeddings for Multi-Omics
 -----------------------------------------------------
@@ -101,6 +96,7 @@ Key Insights into GNN Parameters and Outputs
 
 Dimensionality Reduction: PCA vs. Autoencoders
 ----------------------------------------------
+
 After training a GNN, the resulting node embeddings are typically high-dimensional. To integrate these embeddings into the original omics data-by reweighting each feature-a further reduction step is performed to obtain a single summary value per feature. BioNeuralNet supports two primary approaches for this reduction:
 
 **Principal Component Analysis (PCA):**

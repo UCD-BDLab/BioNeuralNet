@@ -7,7 +7,6 @@ The **User API** lists BioNeuralNet's key classes, methods, and utilities.
    :toctree: _autosummary
    :recursive:
 
-   bioneuralnet.external_tools
    bioneuralnet.network_embedding
    bioneuralnet.clustering
    bioneuralnet.subject_representation
@@ -15,6 +14,7 @@ The **User API** lists BioNeuralNet's key classes, methods, and utilities.
    bioneuralnet.utils
    bioneuralnet.datasets
    bioneuralnet.metrics
+   bioneuralnet.external_tools
 
 Executables
 -----------

@@ -4,6 +4,14 @@
 .. automodule:: bioneuralnet.external_tools
 
    
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Node2Vec
+      SmCCNet
+      WGCNA
+   
 .. rubric:: Modules
 
 .. autosummary::

@@ -1,6 +1,7 @@
 args <- commandArgs(trailingOnly = TRUE)
 input_file <- args[1]
 csv_file <- args[2]
+object_name <- args[3]
 
 orig_input <- input_file
 orig_csv <- csv_file
@@ -17,8 +18,11 @@ success <- tryCatch({
     mat <- AdjacencyMatrix
   } else if (exists("M")) {
     mat <- M
-  } else {
-    stop("Error: Neither 'AdjacencyMatrix' nor 'M' was found in the RData file.")
+  } else if(exists(object_name)) {
+    mat <- get(object_name)
+  }
+  else {
+    stop("Error: Neither 'Object','AdjacencyMatrix' or 'M' was found in the RData file.")
   }
   
     message("Attempting to write CSV to: ", orig_csv)

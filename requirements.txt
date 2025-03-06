@@ -1,21 +1,10 @@
-wheel
-setuptools
-PyYAML
 pandas
 numpy
 scipy
-scikit-learn
-node2vec
 matplotlib
-ray[tune]
-tensorboardX
+scikit-learn
 networkx
-dtt
-cptac
 python-louvain
-debugpy
-seaborn
-umap-learn
-ipywidgets 
+ray[tune]
 # torch
 # torch_geometric

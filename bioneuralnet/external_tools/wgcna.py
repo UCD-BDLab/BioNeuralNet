@@ -4,8 +4,8 @@ import pandas as pd
 from typing import List, Dict, Any
 from ..utils.logger import get_logger
 import json
+import shutil
 from io import StringIO
-
 
 class WGCNA:
     """
@@ -35,6 +35,10 @@ class WGCNA:
             min_module_size (int, optional): Minimum module size. Defaults to 30.
             merge_cut_height (float, optional): Merge cut height. Defaults to 0.25.
         """
+        rscript_path = shutil.which("Rscript")
+        if rscript_path is None:
+            raise EnvironmentError("Rscript not found in system PATH. R is required to use WGCNA.")
+
         self.phenotype_df = phenotype_df
         self.omics_dfs = omics_dfs
         self.data_types = data_types

@@ -1,4 +1,5 @@
-from .check_variance import CheckVariance, network_remove_low_variance, network_remove_high_zero_fraction
-from .correlation import compute_correlation, compute_cluster_correlation_from_df,convert_louvain_to_adjacency
+from .correlation import omics_correlation, cluster_correlation, louvain_to_adjacency
+from .evaluation import evaluate_rf
+from .plot import plot_variance_distribution,plot_variance_by_feature, plot_performance,plot_embeddings,plot_network,compare_clusters
 
-__all__ = ["CheckVariance", "compute_correlation", "compute_cluster_correlation_from_df", "network_remove_low_variance", "network_remove_high_zero_fraction", "convert_louvain_to_adjacency"]
+__all__ = ["evaluate_rf", "omics_correlation", "cluster_correlation", "louvain_to_adjacency", "plot_variance_distribution", "plot_variance_by_feature", "plot_performance", "plot_embeddings", "plot_network", "compare_clusters"]
