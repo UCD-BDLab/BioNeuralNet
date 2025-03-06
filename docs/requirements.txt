@@ -2,6 +2,5 @@ sphinx
 sphinx_rtd_theme
 sphinx-autosummary-accessors
 sphinxcontrib-napoleon
-sphinx-viewcode
 pandoc
 nbsphinx
