@@ -9,8 +9,8 @@ The **User API** lists BioNeuralNet's key classes, methods, and utilities.
 
    bioneuralnet.network_embedding
    bioneuralnet.clustering
-   bioneuralnet.subject_representation
    bioneuralnet.downstream_task
+   bioneuralnet.subject_representation
    bioneuralnet.utils
    bioneuralnet.datasets
    bioneuralnet.metrics
@@ -53,7 +53,7 @@ Below are references to the ``run()`` methods:
 .. automethod:: bioneuralnet.external_tools.smccnet.SmCCNet.run
    :no-index:
 
-.. automethod:: bioneuralnet.subject_representation.GraphEmbedding.run
+.. automethod:: bioneuralnet.downstream_task.GraphEmbedding.run
    :no-index:
 
 .. automethod:: bioneuralnet.clustering.CorrelatedLouvain.run

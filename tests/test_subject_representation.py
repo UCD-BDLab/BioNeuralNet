@@ -1,6 +1,6 @@
 import unittest
 import pandas as pd
-from bioneuralnet.downstream_task import GraphEmbedding
+from bioneuralnet.subject_representation import GraphEmbedding
 
 class TestGraphEmbedding(unittest.TestCase):
 
