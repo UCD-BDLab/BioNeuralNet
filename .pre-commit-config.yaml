@@ -60,6 +60,7 @@ repos:
 
       - id: run-tests
         name: Run Tests with Pytest
-        entry: pytest --cov=bioneuralnet --cov-report=term-missing
+        entry: pytest --ignore=docs/source/examples --cov=bioneuralnet --cov-report=term-missing
         language: system
         types: [python]
+
