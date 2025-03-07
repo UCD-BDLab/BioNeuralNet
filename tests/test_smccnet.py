@@ -4,7 +4,6 @@ import pandas as pd
 from bioneuralnet.external_tools import SmCCNet
 import subprocess
 
-
 class TestSmCCNet(unittest.TestCase):
 
     def setUp(self):
@@ -63,7 +62,9 @@ class TestSmCCNet(unittest.TestCase):
             summarization="PCA",
             seed=732,
         )
-        adjacency_matrix = smccnet.run()
+        result = smccnet.run()
+        adjacency_matrix = result[0]
+        self.assertIsInstance(adjacency_matrix, pd.DataFrame)
         self.assertIsInstance(adjacency_matrix, pd.DataFrame)
         self.assertFalse(adjacency_matrix.isnull().values.any())
         self.assertEqual(adjacency_matrix.shape, (6, 6))
@@ -131,48 +132,6 @@ class TestSmCCNet(unittest.TestCase):
 
         with self.assertRaises(subprocess.CalledProcessError):
             smccnet.run()
-
-    # NOT sure how to effectively test single omics data yet
-
-    # @patch("bioneuralnet.external_tools.smccnet.subprocess.run")
-    # def test_smccnet_single_omics(self, mock_run):
-    #     """
-    #     Test SmCCNet with single-omics data. Simulates single-omics mode by
-    #     verifying the adjacency matrix returned by the R script's JSON output.
-    #     """
-    #     mock_completed_process = MagicMock()
-    #     mock_completed_process.returncode = 0
-    #     mock_run.return_value = mock_completed_process
-
-    #     single_omics_df = pd.DataFrame(
-    #         {
-    #             "ID": ["S1", "S2", "S3", "S4"],
-    #             "GeneA": [1.2, 2.3, 3.1, 4.0],
-    #             "GeneB": [2.1, 3.4, 1.2, 3.3],
-    #             "GeneC": [3.3, 1.5, 2.2, 4.1],
-    #         }
-    #     )
-
-    #     smccnet = SmCCNet(
-    #         phenotype_df=self.phenotype_df,
-    #         omics_dfs=[single_omics_df],
-    #         data_types=["Transcriptomics"],
-    #         kfold=5,
-    #         summarization="PCA",
-    #         seed=732,
-    #     )
-
-    #     adjacency_matrix = smccnet.run()
-
-    #     self.assertIsInstance(adjacency_matrix, pd.DataFrame)
-
-    #     self.assertEqual(adjacency_matrix.shape, (3, 3))
-
-    #     self.assertListEqual(
-    #         list(adjacency_matrix.columns), ["GeneA", "GeneB", "GeneC"]
-    #     )
-    #     self.assertListEqual(list(adjacency_matrix.index), ["GeneA", "GeneB", "GeneC"])
-
 
 if __name__ == "__main__":
     unittest.main()

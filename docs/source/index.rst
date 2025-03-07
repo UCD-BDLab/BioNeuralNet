@@ -1,5 +1,5 @@
-BioNeuralNet - Advanced Multi-Omics Integration with GNNs
-==========================================================
+BioNeuralNet - Multi-Omics Integration with Graph Neural Networks
+=================================================================
 
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://github.com/UCD-BDLab/BioNeuralNet/blob/main/LICENSE
@@ -18,17 +18,10 @@ BioNeuralNet - Advanced Multi-Omics Integration with GNNs
    :align: center
    :alt: BioNeuralNet Logo
 
-.. note::
-
-   **BioNeuralNet is in BETA.**:  
-
-   - The core functionality is stable, but we encourage users to test it further.  
-   - Your feedback and bug reports help refine and improve the tool.  
-   - Report any issues here: `BioNeuralNet Issues <https://github.com/UCD-BDLab/BioNeuralNet/issues>`_
-
 
 Installation
 ------------
+
 To install BioNeuralNet, simply run:
 
 .. code-block:: bash
@@ -36,6 +29,62 @@ To install BioNeuralNet, simply run:
    pip install bioneuralnet
 
 For additional installation details, see :doc:`installation`.
+
+
+**BioNeuralNet Overview**
+-------------------------
+.. figure:: _static/BioNeuralNet.png
+   :align: center
+   :alt: BioNeuralNet Logo
+
+   Embeddings form the core of BioNeuralNet, enabling a number of downstream applications.
+
+
+**BioNeuralNet Core Features**
+------------------------------
+
+For an End-to-End example example of BioNeuralNet, see :doc:`BioNeuralNet`.
+
+**Network Embedding**: :doc:`gnns`
+   - Given a multi-omics network as input, BioNeuralNet can generate embeddings using Graph Neural Networks (GNNs).
+   - Generate embeddings using methods such as **GCN**, **GAT**, **GraphSAGE**, and **GIN**.
+   - Outputs can be obtained as native tensors or converted to pandas DataFrames for easy analysis and visualization.
+   - Embeddings unlock numerous downstream applications, including disease prediction, enhanced subject representation, clustering, and more.
+
+**Graph Clustering**: :doc:`clustering`
+   - Identify functional modules or communities using **correlated clustering methods** (e.g., CorrelatedPageRank, CorrelatedLouvain, HybridLouvain) that integrate phenotype correlation to extract biologically relevant modules [1]_.
+   - Clustering methods can be applied to any network represented allowing flexible analysis across different domains.
+   - All clustering components return either raw partitions dictionaries or induced subnetwork adjacency matrices (as DataFrames) for visualization.
+   - Use cases include, feature selection, biomarker discovery, and network-based analysis.
+
+**Downstream Tasks**: :doc:`downstream_tasks`
+   - **Subject Representation**:
+      - Integrate node embeddings back into omics data to enrich subject-level profiles by weighting features with learned embedding.
+      - This embedding-enriched data can be used for downstream tasks such as disease prediction or biomarker discovery.
+      - The result can be returned as a DataFrame or a PyTorch tensor, fitting naturally into downstream analyses.
+
+   - **Disease Prediction for Multi-Omics Network DPMON** [2]_:
+      - Classification End-to-End pipeline for disease prediction using Graph Neural Network embeddings.
+      - DPMON supports hyperparameter tuning-when enabled, it finds the best for the given data.
+      - This approach, along with the native pandas integration across modules, ensures that BioNeuralNet can be easily incorporated into your analysis workflows.
+
+**Metrics**: :doc:`metrics`
+   - Several plotting funcctions to visualize networks, emebddings, variance distribution, cluster comparison, and more.
+   - Correlation based functions to compare clustersand omics data with the phenotype.
+
+**Utilities**: :doc:`utils`
+   - **Filtering Functions**:
+      - Network filtering allows users to select variance or zero-fraction filtering to an omics network.
+      - Reducing noise, and removing outliers.
+   
+   - **Data Conversion**:
+      - Convert RData files both CSV and to Pandas DataFrame. For ease of integration for R-based workflows.
+
+**External Tools**: :doc:`external_tools/index`
+   - **Graph Construction**:
+      - BioNeuralNet provides additional tools in the `bioneuralnet.external_tools` module.
+      - Allowing users to generate networks using R-based tools like WGCNA and SmCCNet.
+      - While optional, these tools enhance BioNeuralNet's capabilities and are recommended for comprehensive analysis.
 
 What is BioNeuralNet?
 ---------------------
@@ -56,7 +105,6 @@ Traditional methods often struggle to model complex multi-omics relationships du
 - **Graph Isomorphism Networks (GIN)**: Improves expressiveness in graph-based learning tasks.  
 
 By integrating omics features within a **network-aware framework**, BioNeuralNet preserves biological interactions, leading to **more accurate and interpretable predictions**.
-
 For a deeper dive into how BioNeuralNet applies GNN embeddings, see :doc:`gnns`.
 
 Seamless Data Integration
@@ -66,13 +114,8 @@ One of BioNeuralNet's core strengths is **interoperability**:
 - Outputs are structured as **pandas DataFrames**, ensuring easy downstream analysis.  
 - Supports integration with **external tools and machine learning frameworks**, making it adaptable to various research workflows.  
 - Works seamlessly with network-based and graph-learning pipelines.
+- Our :doc:`user_api` provides detailed information on how to use BioNeuralNet's modules and functions.
 
-.. note::
-   **External Tools**:
-
-   - BioNeuralNet provides additional tools in the `bioneuralnet.external_tools` module.
-   - These lightweight wrappers (e.g., for WGCNA, SmCCNet, Node2Vec) facilitate testing and integration.
-   - While optional, these tools enhance BioNeuralNet's capabilities and are recommended for comprehensive analysis.
 
 **Example: Transforming Multi-Omics for Enhanced Disease Prediction**
 ---------------------------------------------------------------------
@@ -138,53 +181,23 @@ Below is a quick example demonstrating the following steps:
    print("Disease phenotype predictions:\n", predictions)
 
 
-**BioNeuralNet Overview: Multi-Omics Integration with Graph Neural Networks**
------------------------------------------------------------------------------
-
-BioNeuralNet offers five core steps in a typical workflow:
-
-1. **Graph Construction**:
-
-   - **Not** performed internally. You provide or build adjacency matrices externally (e.g., via WGCNA, SmCCNet, or your own scripts).
-   - All modules are designed to integrate seamlessly with pandas-most functions offer options to return results as pandas DataFrames, enabling you to incorporate BioNeuralNet outputs directly into your existing workflows.
-
-2. **Graph Clustering**:
-
-   - Identify functional modules or communities using **correlated clustering methods** (e.g., CorrelatedPageRank, CorrelatedLouvain, HybridLouvain) that integrate phenotype correlation to extract biologically relevant modules [1]_.
-   - Clustering modules can return either raw partitions or induced subnetwork adjacency matrices (as DataFrames) for visualization.
-
-3. **Network Embedding**:
-
-   - Generate embeddings using methods such as **GCN**, **GAT**, **GraphSAGE**, and **GIN**.
-   - Outputs can be obtained as native tensors or converted to pandas DataFrames for easy analysis and visualization.
-
-4. **Subject Representation**:
-
-   - Integrate node embeddings back into omics data to enrich subject-level profiles by weighting features with learned embedding scalars.
-   - The result can be returned as a DataFrame or a tensor, fitting naturally into downstream analyses.
-
-5. **Downstream Tasks**:
-
-   - Execute end-to-end pipelines for disease prediction using **DPMON** [2]_.
-   - DPMON supports hyperparameter tuning-when enabled, it finds the best configuration and then performs standard training to produce final predictions as a pandas DataFrame.
-   - This approach, along with the native pandas integration across modules, ensures that BioNeuralNet can be easily incorporated into your analysis workflows.
-
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    installation
-   TOPMED.ipynb
    gnns
    clustering
+   metrics
+   utils
+   downstream_tasks
+   BioNeuralNet.ipynb
+   TOPMED.ipynb
    tutorials/index
-   tools/index
    external_tools/index
    user_api
    faq
    future
-
 
 
 Indices and References

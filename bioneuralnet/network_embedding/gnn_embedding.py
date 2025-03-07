@@ -1,31 +1,49 @@
-from typing import Optional, Union
-import torch
-import torch.nn as nn
-import torch.optim as optim
+
+import os
+import json
 import pandas as pd
 import networkx as nx
 import numpy as np
+from typing import Optional, Union
+
+import torch
+import torch.nn as nn
+import torch.optim as optim
 from torch_geometric.data import Data
 from torch_geometric.utils import from_networkx
-from .gnn_models import GCN, GAT, SAGE, GIN
-from ..utils.logger import get_logger
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
 
 from ray import tune
 from ray.tune import CLIReporter
 from ray.air import session
 from ray.tune.schedulers import ASHAScheduler
 
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
-
-import os
-import json
-
+from .gnn_models import GCN, GAT, SAGE, GIN
+from ..utils.logger import get_logger
 
 class GNNEmbedding:
     """
     GNNEmbedding Class for Generating Graph Neural Network (GNN) Based Embeddings.
+    
+    Attributes:
+
+        adjacency_matrix : pd.DataFrame
+        omics_data : pd.DataFrame
+        phenotype_data : pd.DataFrame
+        clinical_data : Optional[pd.DataFrame]
+        phenotype_col : str
+        model_type : str
+        hidden_dim : int
+        layer_num : int
+        dropout : bool
+        num_epochs : int
+        lr : float
+        weight_decay : float
+        gpu : bool
+        seed : Optional[int]
+        tune : Optional[bool]
     """
 
     def __init__(
@@ -50,6 +68,7 @@ class GNNEmbedding:
         Initializes the GNNEmbedding instance.
 
         Parameters:
+
             adjacency_matrix : pd.DataFrame
             omics_data : pd.DataFrame
             phenotype_data : pd.DataFrame
@@ -66,6 +85,7 @@ class GNNEmbedding:
             seed : Optional[int], default=None
         """
         self.logger = get_logger(__name__)
+        
         if seed is not None:
             torch.manual_seed(seed)
             np.random.seed(seed)
@@ -185,6 +205,7 @@ class GNNEmbedding:
         omics_data, phenotype_data, and clinical_data are assumed to be aligned.
 
         Returns:
+
             pd.DataFrame: A node feature matrix where rows are features (nodes) and columns are clinical variables.
         """
         self.logger.info("Preparing node features.")
@@ -235,6 +256,7 @@ class GNNEmbedding:
         Build node labels by correlating each omics feature with the specified phenotype column.
 
         Returns:
+
             pd.Series
         """
         self.logger.info(
@@ -263,9 +285,10 @@ class GNNEmbedding:
     ) -> Data:
         """
         Construct a PyTorch Geometric Data object:
-          - data.x = node_features
-          - data.y = node_labels
-          - data.edge_index from adjacency
+
+            data.x = node_features
+            data.y = node_labels
+            data.edge_index from adjacency
 
         Returns:
             PyG Data object with x, y, edge_index.
@@ -286,6 +309,7 @@ class GNNEmbedding:
         Initialize the GNN model based on the specified type.
 
         Returns:
+
             nn.Module
         """
         self.logger.info(
@@ -358,6 +382,7 @@ class GNNEmbedding:
         Retrieve node embeddings from the penultimate layer of the trained GNN model.
 
         Returns:
+
             torch.Tensor
         """
         self.logger.info("Generating node embeddings from the trained GNN model.")

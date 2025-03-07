@@ -5,7 +5,7 @@ from bioneuralnet.external_tools import SmCCNet
 from bioneuralnet.network_embedding import GNNEmbedding
 from bioneuralnet.subject_representation import GraphEmbedding
 from bioneuralnet.downstream_task import DPMON
-from bioneuralnet.utils import evaluate_rf_classifier, plot_performance
+from bioneuralnet.metrics import evaluate_rf, plot_performance
 
 # Load example synthetic dataset
 loader = DatasetLoader("example1")
@@ -78,7 +78,7 @@ print(f"DPMON Predictions:\n{dpmon_predictions[0]}")
 # Evaluate Classifier Performance
 X_raw = merged_omics.values
 y_global = phenotype.values
-raw_rf_acc = evaluate_rf_classifier(X_raw, y_global)
+raw_rf_acc = evaluate_rf(X_raw, y_global, mode='classification')
 
 print("Global Results:")
 plot_performance(dpmon_predictions[1], raw_rf_acc, "Raw Omics vs. DPMON Omics")

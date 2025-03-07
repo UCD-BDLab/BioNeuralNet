@@ -4,6 +4,14 @@
 .. automodule:: bioneuralnet.clustering
 
    
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      CorrelatedLouvain
+      CorrelatedPageRank
+      HybridLouvain
+   
 .. rubric:: Modules
 
 .. autosummary::

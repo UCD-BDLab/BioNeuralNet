@@ -4,6 +4,12 @@
 .. automodule:: bioneuralnet.datasets
 
    
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      DatasetLoader
+   
 .. rubric:: Modules
 
 .. autosummary::
