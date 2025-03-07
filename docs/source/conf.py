@@ -48,4 +48,9 @@ intersphinx_mapping = {
     "networkx": ("https://networkx.org/documentation/stable/", None),
 }
 
-autodoc_mock_imports = ["torch", "torch_geometric"]
+autodoc_mock_imports = [
+    "torch",
+    "torch_geometric",
+    "bioneuralnet.external_tools",
+    "bioneuralnet.external_tools.node2vec",
+]
