@@ -33,7 +33,6 @@ __version__ = "1.0"
 
 from .network_embedding import GNNEmbedding
 from .subject_representation import GraphEmbedding
-from .downstream_task import GraphEmbedding
 from .downstream_task import DPMON
 from .clustering import CorrelatedPageRank
 from .clustering import CorrelatedLouvain
@@ -65,7 +64,6 @@ __all__: list = [
     "GNNEmbedding",
     "GraphEmbedding",
     "DPMON",
-    "GraphEmbedding",
     "CorrelatedPageRank",
     "CorrelatedLouvain",
     "HybridLouvain",
