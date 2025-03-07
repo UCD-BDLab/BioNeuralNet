@@ -21,8 +21,11 @@ extensions = [
     "nbsphinx",
 ]
 
-autosummary_imported_members = True
+pygments_style = "sphinx"
+highlight_language = "python"
+nbsphinx_codecell_lexer = "ipython3"
 
+autosummary_imported_members = True
 autodoc_default_options = {
     "members": True,
     "undoc-members": True,
