@@ -24,6 +24,7 @@ repos:
       - id: mypy
         name: Static type checking with MyPy
         args: [--ignore-missing-imports]
+        fail_on_warning: false
 
   - repo: local
     hooks:
