@@ -2,7 +2,7 @@ import pandas as pd
 from bioneuralnet.datasets import DatasetLoader
 from bioneuralnet.network_embedding import GNNEmbedding
 from bioneuralnet.external_tools import SmCCNet
-from bioneuralnet.utils import plot_embeddings
+from bioneuralnet.metrics import plot_embeddings
 
 # Load example synthetic dataset
 loader = DatasetLoader("example1")
@@ -46,4 +46,4 @@ print(f"GNN Embeddings Shape: {embeddings_output.shape}")
 
 global_node_labels = embeddings._prepare_node_labels()
 embeddings_array = embeddings_output.values  
-fig1 = plot_embeddings(embeddings_array, global_node_labels.to_frame(name="phenotype"), method="tsne")
+fig1 = plot_embeddings(embeddings_array, global_node_labels)
