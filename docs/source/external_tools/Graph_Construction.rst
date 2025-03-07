@@ -18,5 +18,6 @@ These wrappers facilitate calling **R-based** adjacency-building approaches:
    :caption: Demonstration of WGCNA adjacency generation from expression data.
 
 **Note**:
-1. You must have R installed, plus the respective CRAN packages (e.g. “WGCNA” or “SmCCNet”), for these wrappers to work.
-2. The adjacency matrices generated here can then be passed to GNNEmbedding, DPMON, or other BioNeuralNet modules.
+  
+  - You must have R installed, plus the respective CRAN packages (e.g. “WGCNA” or “SmCCNet”), for these wrappers to work.
+  - The adjacency matrices generated here can then be passed to GNNEmbedding, DPMON, or other BioNeuralNet modules.

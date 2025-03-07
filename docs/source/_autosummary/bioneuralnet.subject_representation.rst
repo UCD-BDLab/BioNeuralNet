@@ -4,6 +4,12 @@
 .. automodule:: bioneuralnet.subject_representation
 
    
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      GraphEmbedding
+   
 .. rubric:: Modules
 
 .. autosummary::

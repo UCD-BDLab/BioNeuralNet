@@ -35,3 +35,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## **[Unreleased]**
 - Multi-Modal Integration
+
+## [1.0] - 2025-03-06
+
+### **Added**
+- **Simplified requirements**: Requirements.txt was severely simplified. Addtionally removed unnecessary imports from core package
+- **New Metrics**: New correlation, evaluations and plot python files
+  - **Plotting Functions**:
+    - plot_variance_distribution
+    - plot_variance_by_feature
+    - plot_performance
+    - plot_embeddings
+    - plot_network
+    - compare_clusters
+  - **Correlation Functions**
+    - omics_correlation
+    - cluster_correlation
+    - louvain_to_adjacency
+  - **Evaluation**
+    - evaluate_rf
+- **New Utilities**: Added files to convert RData (Networks as adjency matrix) files to Pandas Dataframes Adjancy matrix.
+  - **Variance Functions**:
+    - remove_variance
+    - remove_fraction
+    - network_remove_low_variance
+    - network_remove_high_zero_fraction
+    - network_filter
+    - omics_data_filter
+
+- **Updated Tutorials and Documentation**: New end to end jupiter notebook example.
+- **Updated Test**: All test have been updated and new ones have been added.

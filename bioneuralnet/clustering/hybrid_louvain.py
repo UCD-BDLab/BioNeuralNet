@@ -8,8 +8,21 @@ from ..utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-
 class HybridLouvain:
+    """
+    HybridLouvain Class that combines Correlated Louvain and Correlated PageRank for community detection.
+
+    Attributes:
+    
+        G (nx.Graph): NetworkX graph object.
+        B (pd.DataFrame): Omics data.
+        Y (pd.DataFrame): Phenotype data.
+        k3 (float): Weight for Correlated Louvain.
+        k4 (float): Weight for Correlated Louvain.
+        max_iter (int): Maximum number of iterations.
+        weight (str): Edge weight parameter name.
+        tune (bool): Flag to enable tuning of parameters
+    """
     def __init__(
         self,
         G: nx.Graph,

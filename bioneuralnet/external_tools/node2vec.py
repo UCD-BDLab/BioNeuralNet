@@ -1,8 +1,14 @@
 from typing import Optional
 import pandas as pd
 import networkx as nx
-from node2vec import Node2Vec
+
 from ..utils.logger import get_logger
+
+try:
+    from node2vec import Node2Vec
+
+except ImportError:
+    raise ImportError("Please install external module: pip install Node2Vec")
 
 class node2vec:
     """
@@ -12,6 +18,8 @@ class node2vec:
     and returns the resulting node embeddings.
 
     Attributes:
+    
+        adjacency_matrix (pd.DataFrame): Adjacency matrix representing the graph.
         embedding_dim (int): Dimension of the embeddings.
         walk_length (int): Length of each walk.
         num_walks (int): Number of walks per node.

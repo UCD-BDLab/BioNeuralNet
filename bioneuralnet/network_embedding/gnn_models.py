@@ -2,12 +2,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv, GATConv, SAGEConv, GINConv
 
-
 class GCN(nn.Module):
     """
     GCN with optional final regression layer.
     """
-
     def __init__(
         self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression"
     ):
@@ -44,7 +42,6 @@ class GCN(nn.Module):
             if self.dropout:
                 x = F.dropout(x, p=0.5, training=self.training)
         return x
-
 
 class GAT(nn.Module):
     """
@@ -95,7 +92,6 @@ class GAT(nn.Module):
                 x = F.dropout(x, p=0.5, training=self.training)
         return x
 
-
 class SAGE(nn.Module):
     """
     GraphSAGE with optional final regression layer.
@@ -137,7 +133,6 @@ class SAGE(nn.Module):
             if self.dropout:
                 x = F.dropout(x, p=0.5, training=self.training)
         return x
-
 
 class GIN(nn.Module):
     """

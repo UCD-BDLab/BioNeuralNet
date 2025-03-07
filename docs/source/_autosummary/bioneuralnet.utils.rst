@@ -4,6 +4,15 @@
 .. automodule:: bioneuralnet.utils
 
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_logger
+      network_filter
+      omics_data_filter
+      rdata_to_df
+   
 .. rubric:: Modules
 
 .. autosummary::
@@ -11,6 +20,5 @@
    :recursive:
 
    logger
-   notebook_example
-   path_utils
-   rdata_to_csv
+   rdata_convert
+   variance

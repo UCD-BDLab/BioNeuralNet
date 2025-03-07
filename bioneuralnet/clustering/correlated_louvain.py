@@ -1,6 +1,7 @@
 import numpy as np
 import networkx as nx
 import pandas as pd
+
 from typing import Union
 from community.community_louvain import (
     modularity as original_modularity,
@@ -11,7 +12,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from ..utils.logger import get_logger
 
-
 from ray import tune
 from ray.tune import CLIReporter
 from ray.air import session
@@ -21,6 +21,18 @@ logger = get_logger(__name__)
 
 
 class CorrelatedLouvain:
+    """
+    CorrelatedLouvain Class for Community Detection with Correlated Omics Data.
+    Attributes:
+    
+        G (nx.Graph): NetworkX graph object.
+        B (pd.DataFrame): Omics data.
+        Y (pd.DataFrame): Phenotype data.
+        k3 (float): Weight for Correlated Louvain.
+        k4 (float): Weight for Correlated Louvain.
+        weight (str): Edge weight parameter name.
+        tune (bool): Flag to enable tuning of parameters
+    """
     def __init__(
         self,
         G: nx.Graph,

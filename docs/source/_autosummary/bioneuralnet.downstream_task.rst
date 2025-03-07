@@ -4,6 +4,13 @@
 .. automodule:: bioneuralnet.downstream_task
 
    
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      DPMON
+      GraphEmbedding
+   
 .. rubric:: Modules
 
 .. autosummary::
@@ -11,3 +18,4 @@
    :recursive:
 
    dpmon
+   subject_representation

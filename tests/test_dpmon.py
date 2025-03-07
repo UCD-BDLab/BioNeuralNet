@@ -3,7 +3,6 @@ from unittest.mock import patch
 import pandas as pd
 from bioneuralnet.downstream_task import DPMON
 
-
 class TestDPMON(unittest.TestCase):
 
     def setUp(self):
@@ -13,19 +12,10 @@ class TestDPMON(unittest.TestCase):
             columns=["gene1", "gene2", "gene3"],
         )
 
-        self.omics_data1 = pd.DataFrame(
-            {"gene1": [1, 2], "gene2": [3, 4]}, index=["sample1", "sample2"]
-        )
-
+        self.omics_data1 = pd.DataFrame( {"gene1": [1, 2], "gene2": [3, 4]}, index=["sample1", "sample2"])
         self.omics_data2 = pd.DataFrame({"gene3": [5, 6]}, index=["sample1", "sample2"])
-
-        self.phenotype_data = pd.DataFrame(
-            {"phenotype": [2, 3]}, index=["sample1", "sample2"]
-        )
-
-        self.features_data = pd.DataFrame(
-            {"age": [30, 45], "bmi": [22.5, 28.0]}, index=["sample1", "sample2"]
-        )
+        self.phenotype_data = pd.DataFrame({"phenotype": [0, 1]}, index=["sample1", "sample2"])
+        self.features_data = pd.DataFrame( {"age": [30, 45], "bmi": [22.5, 28.0]}, index=["sample1", "sample2"])
 
     @patch("bioneuralnet.downstream_task.dpmon.run_standard_training")
     def test_run_without_tune(self, mock_standard):
@@ -61,10 +51,11 @@ class TestDPMON(unittest.TestCase):
             tune=True,
             gpu=False,
         )
-
         predictions = dpmon.run()
         mock_tune.assert_called_once()
-        self.assertTrue(predictions.empty)
+        self.assertIsInstance(predictions, tuple)
+        self.assertIsInstance(predictions[0], pd.DataFrame)
+        self.assertIsInstance(predictions[1], float)
 
     def test_empty_clinical_data(self):
         empty_clinical = pd.DataFrame()

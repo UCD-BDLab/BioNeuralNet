@@ -58,7 +58,4 @@ BioNeuralNet supports Python 3.10 and 3.11 in this beta release. Follow the step
 
 5. **Next Steps**:
 
-   - Explore :doc:`tutorials/index` for end-to-end workflows
-   - See :doc:`tools/index` for embedding, clustering, and subject representation methods
-   - Check :doc:`external_tools/index` if you want to use WGCNA, SmCCNet, Node2Vec, or
-     other external utilities
+   - Explore :doc:`tutorials/index` and :doc:`BioNeuralNet` for end-to-end workflows and examples.

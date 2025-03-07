@@ -1,37 +1,80 @@
 import numpy as np
 import pandas as pd
-import networkx as nx
-import seaborn as sns
-from umap import UMAP
-import matplotlib.pyplot as plt
-from sklearn.manifold import TSNE
-from sklearn.decomposition import PCA
-
-from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
-from sklearn.metrics import r2_score, accuracy_score
-from sklearn.model_selection import train_test_split
-from bioneuralnet.metrics.correlation import compute_cluster_correlation_from_df
+from bioneuralnet.metrics.correlation import cluster_correlation
 from bioneuralnet.utils import get_logger
+
+try:
+    import networkx as nx
+    import matplotlib.pyplot as plt
+    from sklearn.manifold import TSNE
+
+except ImportError:
+    raise ImportError("Please install the required packages for plotting: pip install matplotlib")
 
 logger = get_logger(__name__)
 
-def evaluate_rf_regressor(X, y):
-    X_train, X_test, y_train, y_test = train_test_split(X, y)
-    rf = RandomForestRegressor(n_estimators=100)
-    rf.fit(X_train, y_train)
-    y_pred = rf.predict(X_test)
-    r2 = r2_score(y_test, y_pred)
-    return r2
+def plot_variance_distribution(df: pd.DataFrame, bins: int = 50):
+    """
+    Compute the variance for each feature (column) in the DataFrame and plot
+    a histogram of these variances.
 
-def evaluate_rf_classifier(X, y):
-    X_train, X_test, y_train, y_test = train_test_split(X, y)
-    rf = RandomForestClassifier(n_estimators=100)
-    rf.fit(X_train, y_train)
-    y_pred = rf.predict(X_test)
-    acc = accuracy_score(y_test, y_pred)
-    return acc
+    Parameters:
+
+        df (pd.DataFrame): Input data.
+        bins (int): Number of bins for the histogram.
+    
+    Returns:
+    
+        matplotlib.figure.Figure: Generated figure.
+    """
+    variances = df.var()
+    logger.info("Computed variances for each feature.")
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.hist(variances, bins=bins, edgecolor='black')
+    ax.set_title("Distribution of Feature Variances")
+    ax.set_xlabel("Variance")
+    ax.set_ylabel("Frequency")
+    
+    logger.info("Variance distribution plot generated.")
+    return fig
+
+def plot_variance_by_feature(df: pd.DataFrame):
+    """
+    Plot the variance for each feature against its index or name.
+    
+    Parameters:
+
+        df (pd.DataFrame): Input data.
+
+    Returns:
+
+        matplotlib.figure.Figure: Generated figure.
+    """
+    variances = df.var()
+    logger.info("Computed variances for each feature for index plot.")
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(variances.index, variances.values, 'o', markersize=4)
+    ax.set_title("Variance per Feature")
+    ax.set_xlabel("Feature")
+    ax.set_ylabel("Variance")
+    ax.tick_params(axis='x', rotation=90)
+    
+    logger.info("Variance vs. feature index plot generated.")
+    return fig
 
 def plot_performance(embedding_result, raw_rf_acc, title=""):
+    """
+    Plot the performance of the raw omics data and the enhanced omics data.
+    
+    Parameters:
+
+        embedding_result (pd.DataFrame): Predictions from the enhanced omics data.
+        raw_rf_acc (float): Accuracy from the raw omics data.
+        title (str): Title for the plot.
+
+    """
     if isinstance(embedding_result, pd.DataFrame):
         ench_acc = (embedding_result["Actual"] == embedding_result["Predicted"]).mean()
     else:
@@ -39,22 +82,17 @@ def plot_performance(embedding_result, raw_rf_acc, title=""):
         
     enhanced_accuracies = [ench_acc]
     raw_accuracies = [raw_rf_acc]
-    x_labels = "Predictions on Global Network"
-    
     x = np.arange(len(raw_accuracies))
     width = 0.35
-
     fig, ax = plt.subplots(figsize=(8, 6))
     
     bars_raw = ax.bar(x - width/2, raw_accuracies, width, label="Raw Omics", color="blue", alpha=0.7)
     bars_enh = ax.bar(x + width/2, enhanced_accuracies, width, label="Enriched Omics", color="orange", alpha=0.7)
 
-    ax.set_xlabel(x_labels)
     ax.set_ylabel("Accuracy")
     ax.set_title(title)
     ax.legend()
     ax.grid(True, axis="y", linestyle="--", alpha=0.7)
-    
     ax.set_xticks([])
     
     for bar in bars_raw:
@@ -70,29 +108,34 @@ def plot_performance(embedding_result, raw_rf_acc, title=""):
     plt.show()
 
 
-def plot_embeddings(embeddings, node_labels=None, method="tsne"):
+def plot_embeddings(embeddings, node_labels=None):
+    """
+    Plot the embeddings in 2D space using t-SNE.
+    
+    Parameters:
+
+        embeddings (array-like): High-dimensional embedding data.
+        node_labels (array-like or DataFrame, optional): Labels for the nodes to color the points.
+    
+    """
     X = np.array(embeddings)
-    if method.lower() == "pca":
-        reducer = PCA(n_components=2)
-    elif method.lower() == "umap":
-        reducer = UMAP(n_components=2)
-    else:
-        perplexity = min(30, X.shape[0] - 1)
-        if perplexity < 1:
-            logger.info(f"Skipping plot: not enough samples ({X.shape[0]}) for TSNE.")
-            return
-        reducer = TSNE(n_components=2, init="pca", perplexity=perplexity)
+
+    perplexity = min(30, X.shape[0] - 1)
+    if perplexity < 1:
+        logger.info(f"Skipping plot: not enough samples ({X.shape[0]}) for TSNE.")
+        return
+    reducer = TSNE(n_components=2, init="pca", perplexity=perplexity)
     
     X_reduced = reducer.fit_transform(X)
     
     if node_labels is None:
         c_values = np.zeros(X.shape[0])
     elif hasattr(node_labels, "iloc"):
+        node_labels= node_labels.to_frame(name="phenotype")
         c_values = np.array(node_labels.iloc[:, 0], dtype=float).flatten()
     else:
         c_values = np.array(node_labels, dtype=float).flatten()
     
-    sns.set_theme(style="whitegrid", context="talk")
     fig, ax = plt.subplots(figsize=(10, 8))
     
     scatter = ax.scatter(
@@ -105,15 +148,11 @@ def plot_embeddings(embeddings, node_labels=None, method="tsne"):
     )
     
     ax.invert_yaxis()
-    ax.set_xlabel("Principal Component 1")
-    ax.set_ylabel("Principal Component 2")
-    ax.set_title(f"Node Embeddings in 2D space from {embeddings.shape[1]}D")
-    
-    cbar = fig.colorbar(scatter, ax=ax)
-    cbar.set_label("Node Attribute")
-    
+    ax.set_title(f"Embeddings in 2D space from {embeddings.shape[1]}D")
+
     fig.tight_layout()
     plt.show()
+
 
 def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show_edge_weights=False):
     """
@@ -121,10 +160,15 @@ def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show
     Also adds a summary table mapping node indexes to actual gene names.
 
     Parameters:
+
         adjacency_matrix (pd.DataFrame): The adjacency matrix of the network.
         weight_threshold (float): Minimum weight to keep an edge (default: 0.0).
         show_labels (bool): Whether to show node labels.
         show_edge_weights (bool): Whether to show edge weights.
+    
+    Returns:
+    
+        pd.DataFrame: Mapping of node indexes to actual gene names.
     """
     full_G = nx.from_pandas_adjacency(adjacency_matrix)
     total_nodes = full_G.number_of_nodes()
@@ -221,9 +265,6 @@ def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show
 
     return mapping_df
 
-import pandas as pd
-import matplotlib.pyplot as plt
-
 def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.DataFrame, 
                      omics_merged: pd.DataFrame, label1: str = "Louvain", label2: str = "SmCCNet"):
     """
@@ -232,6 +273,7 @@ def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.D
     only the first min(n, m) clusters are compared.
     
     Parameters:
+
         louvain_clusters: list of pd.DataFrame
             Each DataFrame represents an induced subnetwork (from Louvain).
         smccnet_clusters: list of pd.DataFrame
@@ -239,11 +281,15 @@ def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.D
         pheno: pd.DataFrame
             Phenotype data (the first column is used).
         omics_merged: pd.DataFrame
-            Full omics data used to map SMCCNET clusters to sample-based data.
+            Full omics data
         label1: str
             Label for the first method.
         label2: str
             Label for the second method.
+    
+    Returns:
+
+        pd.DataFrame: Results table with cluster indices, sizes, and correlations
     """
     smccnet_clusters_fixed = []
 
@@ -265,8 +311,8 @@ def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.D
     results = []
     
     for i, (df_louvain, df_smccnet) in enumerate(zip(louvain_clusters, smccnet_clusters_fixed), start=1):
-        size_louvain, corr_louvain = compute_cluster_correlation_from_df(df_louvain, pheno)
-        size_smccnet, corr_smccnet = compute_cluster_correlation_from_df(df_smccnet, pheno)
+        size_louvain, corr_louvain = cluster_correlation(df_louvain, pheno)
+        size_smccnet, corr_smccnet = cluster_correlation(df_smccnet, pheno)
 
         if corr_louvain is not None and corr_smccnet is not None:
             results.append((f"Cluster_{i}", size_louvain, corr_louvain, size_smccnet, corr_smccnet))
@@ -275,6 +321,7 @@ def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.D
                                                 "SMCCNET Size", "SMCCNET Correlation"])
     
     fig, ax = plt.subplots(figsize=(10, 5))
+    
     ax.plot(df_results.index + 1, df_results["Louvain Correlation"], marker="o", linestyle="-", 
             label=label1, color="blue")
     ax.plot(df_results.index + 1, df_results["SMCCNET Correlation"], marker="s", linestyle="--", 

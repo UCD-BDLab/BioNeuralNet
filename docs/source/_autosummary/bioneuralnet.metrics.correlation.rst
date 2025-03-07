@@ -8,7 +8,16 @@ bioneuralnet.metrics.correlation
 
    .. autosummary::
    
-      compute_cluster_correlation_from_df
-      compute_correlation
-      convert_louvain_to_adjacency
+      cluster_correlation
+      get_logger
+      louvain_to_adjacency
+      omics_correlation
+      pearsonr
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      PCA
+      StandardScaler
    
