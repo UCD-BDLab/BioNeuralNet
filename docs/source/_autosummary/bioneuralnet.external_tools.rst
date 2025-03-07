@@ -8,7 +8,6 @@
 
    .. autosummary::
    
-      Node2Vec
       SmCCNet
       WGCNA
    
@@ -18,6 +17,5 @@
    :toctree:
    :recursive:
 
-   node2vec
    smccnet
    wgcna
