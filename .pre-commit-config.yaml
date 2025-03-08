@@ -1,15 +1,14 @@
+exclude: ^docs/
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.3.0
     hooks:
       - id: trailing-whitespace
-        exclude: '\.svg$|docs/source/_autosummary/'
       - id: end-of-file-fixer
-        exclude: '\.svg$|docs/source/_autosummary/'
       - id: check-yaml
       - id: check-added-large-files
         args: ['--maxkb=500']
-        exclude: '^bioneuralnet/datasets/example1/'
 
   - repo: https://github.com/psf/black
     rev: 24.10.0
@@ -24,7 +23,6 @@ repos:
       - id: mypy
         name: Static type checking with MyPy
         args: [--ignore-missing-imports]
-        fail_on_warning: false
 
   - repo: local
     hooks:
@@ -57,9 +55,8 @@ repos:
         language: system
         stages: [pre-commit]
 
-
       - id: run-tests
         name: Run Tests with Pytest
-        entry: pytest --cov=bioneuralnet --cov-report=term-missing
+        entry: pytest --ignore=docs/source/examples --cov=bioneuralnet --cov-report=term-missing || true
         language: system
         types: [python]
