@@ -44,7 +44,7 @@ class CorrelatedPageRank:
         Initializes the PageRank instance with direct data structures.
 
         Args:
-        
+
             graph (nx.Graph): NetworkX graph object representing the network.
             omics_data (pd.DataFrame): Omics data DataFrame.
             phenotype_data (pd.DataFrame): Phenotype data Series.
@@ -285,14 +285,29 @@ class CorrelatedPageRank:
                 f"Generated personalization vector for seed nodes: {seed_nodes}"
             )
 
-            p = nx.pagerank(
-                self.G,
-                alpha=self.alpha,
-                personalization=personalization,
-                max_iter=self.max_iter,
-                tol=self.tol,
-                weight="weight",
-            )
+            try:
+                p = nx.pagerank(
+                    self.G,
+                    alpha=self.alpha,
+                    personalization=personalization,
+                    max_iter=self.max_iter,
+                    tol=self.tol,
+                    weight="weight",
+                )
+            except nx.exception.PowerIterationFailedConvergence as e:
+                self.logger.warning(
+                    f"PageRank did not converge in {self.max_iter} iterations. Retrying with increased max_iter."
+                )
+                # retry with doubled iterations
+                p = nx.pagerank(
+                    self.G,
+                    alpha=self.alpha,
+                    personalization=personalization,
+                    max_iter=self.max_iter * 2,
+                    tol=self.tol,
+                    weight="weight",
+                )
+
             self.logger.info("PageRank computation completed.")
 
             nodes, n, cond, corr, min_corr, pval = self.sweep_cut(p)
@@ -318,9 +333,6 @@ class CorrelatedPageRank:
             self.logger.error(f"Error in run_pagerank_clustering: {e}")
             raise
 
-        except Exception as e:
-            self.logger.error(f"Error in run_pagerank_clustering: {e}")
-            raise
 
     def run(self, seed_nodes: List[Any]) -> Dict[str, Any]:
         """
