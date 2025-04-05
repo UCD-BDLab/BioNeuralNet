@@ -103,36 +103,66 @@ class SmCCNet:
             self.logger.info(f"No output_dir provided; using temporary directory: {self.output_dir}")
         else:
             self.output_dir = output_dir
-            os.makedirs(self.output_dir, exist_ok=True)
+            self.logger.info(f"Output directory set to: {self.output_dir}")
+            # create the directory with pathlib
+            Path(self.output_dir).mkdir(parents=True, exist_ok=True)
+
 
     def preprocess_data(self) -> Dict[str, Any]:
         """
-        Preprocess the phenotype and omics data:
-         - Reset indexes, standardize sample IDs, and serialize to CSV.
+        Preprocess the phenotype and omics data so they either:
+        - All share the exact same named index already, OR
+        - We rename them all to a single, consistent index name (e.g. 'SampleID').
+
+        Then we standardize the IDs (strip + uppercase), intersect them to ensure
+        overlapping samples, and serialize each DataFrame to CSV.
 
         Returns:
             Dict[str, Any]: A dictionary with keys 'phenotype', 'omics_1', etc.
         """
         self.logger.info("Validating and serializing input data for SmCCNet...")
-        pheno_df = (
-            self.phenotype_df.copy().reset_index().rename(columns={"index": "SampleID"})
+
+        all_index_names = {self.phenotype_df.index.name}
+        for df in self.omics_dfs:
+            all_index_names.add(df.index.name)
+
+        if len(all_index_names) > 1 or None in all_index_names:
+            new_index_name = "SampleID"
+            self.logger.info(
+                f"Indexes differ or are unnamed. Renaming all indexes to '{new_index_name}'."
+            )
+            self.phenotype_df.index.name = new_index_name
+            for df in self.omics_dfs:
+                df.index.name = new_index_name
+        else:
+            self.logger.info("All DataFrames already share the same named index. No rename needed.")
+
+        self.phenotype_df.index = (
+            self.phenotype_df.index.astype(str).str.strip().str.upper()
         )
-        pheno_df["SampleID"] = pheno_df["SampleID"].astype(str).str.strip().str.upper()
-        serialized_data = {"phenotype": pheno_df.to_csv(index=False)}
+        for df in self.omics_dfs:
+            df.index = df.index.astype(str).str.strip().str.upper()
 
-        for i, omics_df in enumerate(self.omics_dfs, start=1):
+        common_ids = set(self.phenotype_df.index)
+        for df in self.omics_dfs:
+            common_ids &= set(df.index)
+
+        if not common_ids:
+            raise ValueError(
+                "No overlapping sample IDs found among phenotype and omics data."
+            )
+
+        common_ids_ordered = [idx for idx in self.phenotype_df.index if idx in common_ids]
+        pheno_df = self.phenotype_df.loc[common_ids_ordered]
+        omics_dfs_processed = [
+            df.loc[common_ids_ordered] for df in self.omics_dfs
+        ]
+
+        serialized_data = {}
+        serialized_data["phenotype"] = pheno_df.to_csv(index=True)
+        for i, df in enumerate(omics_dfs_processed, start=1):
             key = f"omics_{i}"
-            df = omics_df.copy().reset_index().rename(columns={"index": "SampleID"})
-            df["SampleID"] = df["SampleID"].astype(str).str.strip().str.upper()
-
-            common_ids = set(pheno_df["SampleID"]).intersection(set(df["SampleID"]))
-            if not common_ids:
-                raise ValueError(f"No overlapping sample IDs between phenotype and {key}.")
-
-            df = df[df["SampleID"].isin(common_ids)]
-            df = df.set_index("SampleID").loc[pheno_df["SampleID"]].reset_index()
-
-            serialized_data[key] = df.to_csv(index=False)
+            serialized_data[key] = df.to_csv(index=True)
             self.logger.info(f"Serialized {key} with {len(df)} samples.")
 
         return serialized_data
@@ -204,8 +234,8 @@ class SmCCNet:
             clusters_names = list(clusters_path.glob("size_*.csv"))
             clusters = []
             for cluster in clusters_names:
-                cluster_path = Path(self.output_dir / cluster)
-                cluster_df = pd.read_csv(cluster_path, index_col=0)
+                #cluster_path = Path(self.output_dir / cluster)
+                cluster_df = pd.read_csv(cluster, index_col=0)
                 clusters.append(cluster_df)
 
             self.logger.info(f"Found {len(clusters)} clusters in {self.output_dir}.")

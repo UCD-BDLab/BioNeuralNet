@@ -47,6 +47,4 @@ class DatasetLoader:
             pheno  = pd.read_csv(y_file, index_col=0)
             clinical = pd.read_csv(clinical_file, index_col=0)  
             return omics1, omics2, pheno, clinical
-        
-        else:
-            raise ValueError("Dataset name must be example1")
+    

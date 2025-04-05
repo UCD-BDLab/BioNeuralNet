@@ -19,9 +19,6 @@ if (!("phenotype" %in% names(input_data))) {
 }
 
 phenotype_df <- read.csv(text = input_data$phenotype, stringsAsFactors = FALSE)
-if (!("SampleID" %in% colnames(phenotype_df))) {
-  stop("SampleID column not found in phenotype data.")
-}
 rownames(phenotype_df) <- phenotype_df$SampleID
 
 omics_keys <- grep("^omics_", names(input_data), value = TRUE)
@@ -32,34 +29,10 @@ if (length(omics_keys) < 1) {
 omics_list <- list()
 for (key in omics_keys) {
   omics_df <- read.csv(text = input_data[[key]], stringsAsFactors = FALSE)
-  if (!("SampleID" %in% colnames(omics_df))) {
-    stop(paste("SampleID column not found in", key))
-  }
   rownames(omics_df) <- omics_df$SampleID
-  
   omics_values <- as.matrix(omics_df[, -1])
-
-  common_samples <- intersect(rownames(omics_values), rownames(phenotype_df))
-  if (length(common_samples) == 0) {
-    stop(paste("No matching sample IDs between", key, "and phenotype data."))
-  }
-  
-  omics_values <- omics_values[common_samples, , drop=FALSE]
-  omics_list[[length(omics_list)+1]] <- omics_values
+  omics_list[[length(omics_list) + 1]] <- omics_values
 }
-rownames(omics_df) <- omics_df$SampleID
-omics_values <- as.matrix(omics_df[, -1])
-
-common_samples_all <- rownames(phenotype_df)
-for (mat in omics_list) {
-  common_samples_all <- intersect(common_samples_all, rownames(mat))
-}
-if (length(common_samples_all) == 0) {
-  stop("No common samples across all omics datasets and phenotype.")
-}
-phenotype_df <- phenotype_df[common_samples_all, , drop=FALSE]
-omics_list   <- lapply(omics_list, function(m) m[common_samples_all, , drop=FALSE])
-
 
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) < 8) {

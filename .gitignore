@@ -21,6 +21,9 @@ bioneuralnet.egg-info
 TOPMed_testing/
 TOPMed_notes/
 
+KG_testing/
+KG_Python/
+bioneuralnet/utils/kg_apis/
 todo_slides.md
 test_notes.md
 todo.md
@@ -28,6 +31,7 @@ test_release.md
 test_cuda_issues.md
 dpmon/
 dp/
+dpmon_output/
 
 # Blocking sensitive file types globally
 *.csv
@@ -37,7 +41,8 @@ dp/
 !bioneuralnet/datasets/
 !bioneuralnet/datasets/example1/
 !bioneuralnet/datasets/example1/**/*.csv
-
+!cancer_output_1/**/*.csv
+!cancer_output_2/**/*.csv
 # Sphinx documentation build
 docs/build/
 
