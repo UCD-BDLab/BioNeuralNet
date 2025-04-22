@@ -1,45 +1,100 @@
 import pandas as pd
+import numpy as np
 from .logger import get_logger
 
 logger = get_logger(__name__)
 
-def remove_variance(df: pd.DataFrame, variance_threshold: float = 1e-6) -> pd.DataFrame:
+def variance_summary(df: pd.DataFrame, low_var_threshold: float = None) -> dict:
     """
-    Remove columns from the DataFrame with variance below the specified threshold.
-    
-    Parameters:
-
-        df (pd.DataFrame): Input data.
-        variance_threshold (float): Variance threshold.
-        
-    Returns:
-
-        pd.DataFrame: DataFrame with only columns having variance above the threshold.
+    Compute summary statistics for column variances in the DataFrame
     """
-    logger.info(f"Removing columns with variance below {variance_threshold}.")
+
     variances = df.var()
-    filtered_df = df.loc[:, variances > variance_threshold]
-    logger.info(f"Original shape: {df.shape}, Filtered shape: {filtered_df.shape}")
-    return filtered_df
-
-def remove_fraction(df: pd.DataFrame, zero_frac_threshold: float = 0.95) -> pd.DataFrame:
-    """
-    Remove columns from the DataFrame where the fraction of zeros is higher than the threshold.
+    summary = {
+        "variance_mean": variances.mean(),
+        "variance_median": variances.median(),
+        "variance_min": variances.min(),
+        "variance_max": variances.max(),
+        "variance_std": variances.std()
+    }
+    if low_var_threshold is not None:
+        summary["num_low_variance_features"] = (variances < low_var_threshold).sum()
     
-    Parameters:
+    return summary
 
-        df (pd.DataFrame): Input data.
-        zero_frac_threshold (float): Maximum allowed fraction of zero entries.
-        
-    Returns:
-
-        pd.DataFrame: DataFrame with only columns having a lower zero fraction.
+def zero_fraction_summary(df: pd.DataFrame, high_zero_threshold: float = None) -> dict:
     """
-    logger.info(f"Removing columns with zero fraction >= {zero_frac_threshold}.")
+    Compute summary statistics for the fraction of zeros in each column
+    """
+
     zero_fraction = (df == 0).sum(axis=0) / df.shape[0]
-    filtered_df = df.loc[:, zero_fraction < zero_frac_threshold]
-    logger.info(f"Original shape: {df.shape}, Filtered shape: {filtered_df.shape}")
-    return filtered_df
+    summary = {
+        "zero_fraction_mean": zero_fraction.mean(),
+        "zero_fraction_median": zero_fraction.median(),
+        "zero_fraction_min": zero_fraction.min(),
+        "zero_fraction_max": zero_fraction.max(),
+        "zero_fraction_std": zero_fraction.std()
+    }
+    if high_zero_threshold is not None:
+        summary["num_high_zero_features"] = (zero_fraction > high_zero_threshold).sum()
+    
+    return summary
+
+def expression_summary(df: pd.DataFrame) -> dict:
+    """
+    Compute summary statistics for the mean expression of features
+    """
+
+    mean_expression = df.mean()
+
+    summary = {
+        "expression_mean": mean_expression.mean(),
+        "expression_median": mean_expression.median(),
+        "expression_min": mean_expression.min(),
+        "expression_max": mean_expression.max(),
+        "expression_std": mean_expression.std()
+    }
+
+    return summary
+
+def correlation_summary(df: pd.DataFrame) -> dict:
+    """
+    Compute summary statistics of the maximum pairwise correlation
+    """
+    corr_matrix = df.corr().abs()
+    np.fill_diagonal(corr_matrix.values, 0)
+    max_corr = corr_matrix.max()
+
+    summary = {
+        "max_corr_mean": max_corr.mean(),
+        "max_corr_median": max_corr.median(),
+        "max_corr_min": max_corr.min(),
+        "max_corr_max": max_corr.max(),
+        "max_corr_std": max_corr.std()
+    }
+    return summary
+
+def explore_data_stats(omics_df: pd.DataFrame, name: str = "Data") -> None:
+    """
+    Print key statistics for an omics DataFrame including variance, zero fraction,
+    """
+    print(f"Statistics for {name}:")
+    var_stats = variance_summary(omics_df, low_var_threshold=1e-4)
+    print(f"Variance Summary: {var_stats}")
+    
+    zero_stats = zero_fraction_summary(omics_df, high_zero_threshold=0.50)
+    print(f"Zero Fraction Summary: {zero_stats}")
+    
+    expr_stats = expression_summary(omics_df)
+    print(f"Expression Summary: {expr_stats}")
+    
+    try:
+        corr_stats = correlation_summary(omics_df)
+        print(f"Correlation Summary: {corr_stats}")
+    except Exception as e:
+        print(f"Correlation Summary: Could not compute due to: {e}")
+    print("\n")
+
 
 def network_remove_low_variance(network: pd.DataFrame, threshold: float = 1e-6) -> pd.DataFrame:
     """
@@ -108,26 +163,3 @@ def network_filter(network: pd.DataFrame, threshold: float, filter_type: str = '
         return network_remove_high_zero_fraction(network, threshold)
     else:
         raise ValueError(f"Invalid filter type: {filter_type}. Must be 'variance' or 'zero_fraction'.")
-
-def omics_data_filter(omics: pd.DataFrame, variance_threshold: float = 1e-6, zero_frac_threshold: float = 0.95) -> pd.DataFrame:
-    """
-    Filter omics data by removing columns with low variance and high zero fraction.
-    
-    Parameters:
-
-        omics (pd.DataFrame): Omics data.
-        variance_threshold (float): Variance threshold.
-        zero_frac_threshold (float): Zero fraction threshold.
-        
-    Returns:
-    
-        pd.DataFrame: Filtered omics data.
-    """
-    logger.info("Filtering omics data.")
-    logger.info(f"Original omics shape: {omics.shape}")
-    
-    filtered_omics = remove_variance(omics, variance_threshold)
-    filtered_omics = remove_fraction(filtered_omics, zero_frac_threshold)
-    
-    logger.info(f"Final omics shape: {filtered_omics.shape}")
-    return filtered_omics

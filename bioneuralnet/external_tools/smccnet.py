@@ -8,6 +8,16 @@ from typing import List, Dict, Any
 from ..utils.logger import get_logger
 import shutil
 
+import os
+import sys
+import json
+import time
+import threading
+import itertools
+import shutil
+import subprocess
+from pathlib import Path
+
 class SmCCNet:
     """
     SmCCNet Class for Graph Generation using Sparse Multiple Canonical Correlation Networks (SmCCNet).
@@ -36,11 +46,13 @@ class SmCCNet:
         data_types: List[str],
         kfold: int = 5,
         eval_method: str = "",        
-        subSampNum: int = 1000,
+        subSampNum: int = 500,
         summarization: str = "NetSHy",
-        seed: int = 723,
+        seed: int = 119,
         ncomp_pls: int = 0,              
-        between_shrinkage: float = 5.0, 
+        between_shrinkage: float = 5.0,
+        cut_height: float = (1.0 - 0.1**10.0),
+        preprocess: int = 0,
         output_dir: str = None
     ):
         """
@@ -63,8 +75,12 @@ class SmCCNet:
         if rscript_path is None:
             raise EnvironmentError("Rscript not found in system PATH. R is required to run SmCCNet.")
             
-        self.phenotype_df = phenotype_df
-        self.omics_dfs = omics_dfs
+        self.phenotype_df = phenotype_df.copy(deep=True)
+
+        self.omics_dfs = []
+        for df in omics_dfs:
+            self.omics_dfs.append(df.copy(deep=True))
+
         self.data_types = data_types
         self.kfold = kfold
         self.eval_method = eval_method
@@ -73,6 +89,9 @@ class SmCCNet:
         self.seed = seed
         self.ncomp_pls = ncomp_pls
         self.between_shrinkage = between_shrinkage
+        self.cut_height = cut_height
+        self.preprocess = preprocess
+
 
         self.logger = get_logger(__name__)
         self.logger.info("Initialized SmCCNet with parameters:")
@@ -83,6 +102,7 @@ class SmCCNet:
         self.logger.info(f"subSampNum: {self.subSampNum}")
         self.logger.info(f"BetweenShrinkage: {self.between_shrinkage}")
         self.logger.info(f"Seed: {self.seed}")
+        self.logger.info(f"Cut height: {self.cut_height}")
 
         if len(self.omics_dfs) != len(self.data_types):
             self.logger.error("Number of omics DataFrames does not match number of data types.")
@@ -120,22 +140,39 @@ class SmCCNet:
         Returns:
             Dict[str, Any]: A dictionary with keys 'phenotype', 'omics_1', etc.
         """
-        self.logger.info("Validating and serializing input data for SmCCNet...")
+        base_index = self.phenotype_df.index.astype(str).str.strip().str.upper()
 
+        for i, df in enumerate(self.omics_dfs, start=1):
+            index_match = False
+            other_index = df.index.astype(str).str.strip().str.upper()
+            if not base_index.equals(other_index):
+                self.logger.warning(f"Index mismatch: phenotype vs {i}.")
+            else:
+                index_match = True
+                self.logger.info(f"Index match: phenotype & {i}.")
+
+        self.logger.info("Validating and serializing input data for SmCCNet...")
+        if self.phenotype_df.columns[0] != "phenotype":
+            self.logger.warning("Renaming target column to 'phenotype' for consistency.") 
+            self.phenotype_df.columns = ["phenotype"] 
+
+
+        # if index_match == True:
+        #     self.logger.info("All DataFrames already share the same named index. No rename needed.")
+        # else:
+        self.logger.info("Renaming indexes to a consistent name.")
         all_index_names = {self.phenotype_df.index.name}
         for df in self.omics_dfs:
             all_index_names.add(df.index.name)
 
         if len(all_index_names) > 1 or None in all_index_names:
             new_index_name = "SampleID"
-            self.logger.info(
-                f"Indexes differ or are unnamed. Renaming all indexes to '{new_index_name}'."
-            )
+            # self.logger.info(
+            #     f"Indexes differ or are unnamed. Renaming all indexes to '{new_index_name}'."
+            # )
             self.phenotype_df.index.name = new_index_name
             for df in self.omics_dfs:
                 df.index.name = new_index_name
-        else:
-            self.logger.info("All DataFrames already share the same named index. No rename needed.")
 
         self.phenotype_df.index = (
             self.phenotype_df.index.astype(str).str.strip().str.upper()
@@ -164,15 +201,14 @@ class SmCCNet:
             key = f"omics_{i}"
             serialized_data[key] = df.to_csv(index=True)
             self.logger.info(f"Serialized {key} with {len(df)} samples.")
+        self.logger.info(f"Serialized phenotype with {len(pheno_df)} samples.")
 
         return serialized_data
 
     def run_smccnet(self, serialized_data: Dict[str, Any]) -> None:
         """
-        Executes the SmCCNet R script in the specified output directory.
-
-        Args:
-            serialized_data (Dict[str, Any]): Serialized CSV strings for phenotype and omics data.
+        Executes the SmCCNet R script in the specified output directory,
+        printing a simple spinner while it runs.
         """
         try:
             self.logger.info("Executing SmCCNet R script...")
@@ -181,16 +217,13 @@ class SmCCNet:
 
             r_script = os.path.join(script_dir, "SmCCNet.R")
             if not os.path.isfile(r_script):
-                self.logger.error(f"R script not found: {r_script}")
                 raise FileNotFoundError(f"R script not found: {r_script}")
 
             rscript_path = shutil.which("Rscript")
             if rscript_path is None:
-                raise EnvironmentError("Rscript not found in system PATH. R is required to run SmCCNet.")
-            
-            ncomp_pls_arg = str(self.ncomp_pls) if self.ncomp_pls != 0 else ""
+                raise EnvironmentError("Rscript not found in system PATH.")
 
-            command = [
+            cmd = [
                 rscript_path,
                 r_script,
                 ",".join(self.data_types),
@@ -198,28 +231,57 @@ class SmCCNet:
                 self.summarization,
                 str(self.seed),
                 self.eval_method,
-                ncomp_pls_arg,
+                str(self.ncomp_pls),
                 str(self.subSampNum),
                 str(self.between_shrinkage),
+                str(self.cut_height),
+                str(self.preprocess),
             ]
-            self.logger.debug(f"Running command: {' '.join(command)} in cwd={self.output_dir}")
+            self.logger.debug("Running command: " + " ".join(cmd))
 
+            # fire off spinner thread
+            stop_spinner = threading.Event()
+            def spinner():
+                for ch in itertools.cycle("|/-\\"):
+                    if stop_spinner.is_set():
+                        break
+                    sys.stdout.write(f"\rRunning SmCCNet… {ch}")
+                    sys.stdout.flush()
+                    time.sleep(0.1)
+                sys.stdout.write("\rSmCCNet finished.    \n")
+
+            spin_thread = threading.Thread(target=spinner)
+            spin_thread.start()
+
+            # run
             result = subprocess.run(
-                command,
+                cmd,
                 input=json_data,
                 text=True,
                 capture_output=True,
                 check=True,
                 cwd=self.output_dir,
             )
-            self.logger.info(f"SMCCNET R script output:\n{result.stdout}")
-            if result.stderr:
+
+            # stop spinner
+            stop_spinner.set()
+            spin_thread.join()
+
+            # log R output
+            if result.stdout.strip():
+                self.logger.info(f"SMCCNET R script output:\n{result.stdout}")
+            if result.stderr.strip():
                 self.logger.warning(f"SMCCNET R script warnings/errors:\n{result.stderr}")
+
         except subprocess.CalledProcessError as e:
+            stop_spinner.set()
+            spin_thread.join()
             self.logger.error(f"R script execution failed: {e.stderr}")
             raise
         except Exception as e:
-            self.logger.error(f"Error during SmCCNet execution: {e}\n")
+            stop_spinner.set()
+            spin_thread.join()
+            self.logger.error(f"Error during SmCCNet execution: {e}")
             raise
 
     def get_clusters(self) -> list[pd.DataFrame, Any]:

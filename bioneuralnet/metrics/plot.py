@@ -64,47 +64,86 @@ def plot_variance_by_feature(df: pd.DataFrame):
     logger.info("Variance vs. feature index plot generated.")
     return fig
 
-def plot_performance(embedding_result, raw_rf_acc, title=""):
+def plot_performance_three(raw_score, gnn_score, other_score, labels=["Raw","GNN","Other"], title="Performance Comparison", filename=None):
     """
-    Plot the performance of the raw omics data and the enhanced omics data.
-    
-    Parameters:
-
-        embedding_result (pd.DataFrame): Predictions from the enhanced omics data.
-        raw_rf_acc (float): Accuracy from the raw omics data.
-        title (str): Title for the plot.
-
+    Bar plot comparing performance for raw omics, GNN-enriched omics, and one other method.
     """
-    if isinstance(embedding_result, pd.DataFrame):
-        ench_acc = (embedding_result["Actual"] == embedding_result["Predicted"]).mean()
-    else:
-        ench_acc = float(embedding_result)
+    if len(raw_score) != 2 or len(gnn_score) != 2 or len(other_score) != 2:
+        raise ValueError("Scores must be tuples of (mean, std)")
+    scores = [raw_score[0], gnn_score[0], other_score[0]]
+    errors = [raw_score[1], gnn_score[1], other_score[1]]
+    x = np.arange(len(scores))
+    width = 0.23
+
+    fig, ax = plt.subplots(figsize=(4.0, 4))
+    bars = ax.bar(x, scores, width, yerr=errors, capsize=2,
+                  color=["#4E79A7", "#F28E2B", "#76B7B2"], alpha=0.95, linewidth=0)
+
+    ax.set_ylabel("Accuracy", fontsize=11)
+    ax.set_title(title, fontsize=12, pad=10)
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels, fontsize=10)
+    ax.set_ylim(0, 1)
+    ax.grid(True, axis="y", linestyle="--", alpha=0.4)
+
+    for i, bar in enumerate(bars):
+        height = bar.get_height()
+        err = errors[i]
+        ax.text(bar.get_x() + bar.get_width() / 2, height + err + 0.015,
+                f"{height:.3f}", ha="center", va="bottom", fontsize=10, fontweight="bold")
+
+    plt.subplots_adjust(left=0.18, right=0.95, bottom=0.15, top=0.88)
+
+    if filename:
+        plt.savefig(str(filename), dpi=300, bbox_inches="tight")
+        print(f"Saved plot to {filename}")
+
+    plt.show()
+
+def plot_performance(embedding_result, raw_rf_acc, title="Performance Comparison", filename=None):
+    """
+    Clean and minimal bar plot comparing raw vs embeddings-based performance.
+    """
+    def parse_score(x):
+        if isinstance(x, dict):
+            return x.get("accuracy", 0), x.get("std", 0)
+        elif isinstance(x, tuple) and len(x) == 2:
+            return x
+        else:
+            return float(x), 0
+
+    embed_acc, embed_std = parse_score(embedding_result)
+    raw_acc, raw_std = parse_score(raw_rf_acc)
+
+    labels = ["Raw Omics", "Omics + Embeddings"]
+    scores = [raw_acc, embed_acc]
+    errors = [raw_std, embed_std]
+    x = np.arange(len(scores))
+    width = 0.23
+
+    fig, ax = plt.subplots(figsize=(3.2, 4))
+    bars = ax.bar(x, scores, width, yerr=errors, capsize=2,
+                  color=["#4E79A7", "#F28E2B"], alpha=0.95, linewidth=0)
+
+    ax.set_ylabel("Accuracy", fontsize=11)
+    ax.set_title(title, fontsize=12, pad=10)
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels, fontsize=10)
+    ax.set_ylim(0, 1)
+    ax.grid(True, axis="y", linestyle="--", alpha=0.4)
+
+    for i in range(len(bars)):
+        height = bars[i].get_height()
+        err = errors[i]
+        ax.text(bars[i].get_x() + bars[i].get_width() / 2, height + err + 0.015,
+                f"{height:.3f}", ha="center", va="bottom", fontsize=10, fontweight="bold")
+
+    plt.subplots_adjust(left=0.18, right=0.95, bottom=0.15, top=0.88)
+
+    if filename:
+        plt.savefig(str(filename), dpi=300, bbox_inches="tight")
+        print(f"Saved plot to {filename}")
         
-    enhanced_accuracies = [ench_acc]
-    raw_accuracies = [raw_rf_acc]
-    x = np.arange(len(raw_accuracies))
-    width = 0.35
-    fig, ax = plt.subplots(figsize=(8, 6))
-    
-    bars_raw = ax.bar(x - width/2, raw_accuracies, width, label="Raw Omics", color="blue", alpha=0.7)
-    bars_enh = ax.bar(x + width/2, enhanced_accuracies, width, label="Enriched Omics", color="orange", alpha=0.7)
-
-    ax.set_ylabel("Accuracy")
-    ax.set_title(title)
-    ax.legend()
-    ax.grid(True, axis="y", linestyle="--", alpha=0.7)
-    ax.set_xticks([])
-    
-    for bar in bars_raw:
-        height = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width()/2, height, f"{height*100:.1f}%", 
-                ha='center', va='bottom', fontsize=10, fontweight='bold')
-    for bar in bars_enh:
-        height = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width()/2, height, f"{height*100:.1f}%", 
-                ha='center', va='bottom', fontsize=10, fontweight='bold')
-    
-    fig.tight_layout()
     plt.show()
 
 

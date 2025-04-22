@@ -6,7 +6,15 @@ library("jsonlite")
 library("dplyr") 
 
 options(stringsAsFactors = FALSE)
-allowWGCNAThreads()
+allowWGCNAThreads(nThreads = 4)
+
+#allowWGCNAThreads(nThreads = 1)
+#library(future); plan(sequential)
+#options(future.globals.maxSize = 8000e6)
+
+library(future)
+plan(multisession, workers = 8)
+options(future.globals.maxSize = 8000e6)
 
 json_input <- readLines(con = "stdin")
 if (length(json_input) == 0) {
@@ -34,24 +42,76 @@ for (key in omics_keys) {
   omics_list[[length(omics_list) + 1]] <- omics_values
 }
 
+clean_matrix <- function(mat){
+  storage.mode(mat) <- "numeric"
+  mat[is.infinite(mat)] <- NA
+
+  for (j in seq_len(ncol(mat))) {
+    if (anyNA(mat[, j])) {
+      med <- median(mat[, j], na.rm = TRUE)
+      mat[is.na(mat[, j]), j] <- med
+    }
+  }
+
+  ok1 <- apply(mat, 2, function(col) all(is.finite(col)))
+  mat  <- mat[, ok1, drop = FALSE]
+
+  vars <- apply(mat, 2, var)
+  mat  <- mat[, vars > 0, drop = FALSE]
+
+  mat
+}
+omics_list <- lapply(omics_list, clean_matrix)
+
+ids <- Reduce(intersect, lapply(omics_list, rownames))
+ids <- intersect(ids, rownames(phenotype_df))
+omics_list   <- lapply(omics_list, function(m) m[ids, , drop = FALSE])
+phenotype_df <- phenotype_df[ids, , drop = FALSE]
+
+Y <- as.numeric(phenotype_df$phenotype)
+Yfactor <- factor(Y) 
+
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) < 8) {
-  stop("Expected 8 arguments: data_types, kfold, summarization, seed, eval_method, ncomp_pls, subSampNum, between_shrinkage")
+if (length(args) < 10) {
+  stop("Expected 10 arguments: data_types, kfold, summarization, seed, eval_method, ncomp_pls, subSampNum, between_shrinkage, CutHeight, preprocess")
 }
 
-data_types    <- strsplit(args[1], ",")[[1]]
-kfold         <- as.numeric(args[2])
+data_types <- strsplit(args[1], ",")[[1]]
+kfold <- as.numeric(args[2])
 summarization <- args[3]
-seed          <- as.numeric(args[4])
-eval_method   <- args[5]
-ncomp_pls_arg <- args[6]
-subSampNum    <- as.numeric(args[7])
-bShrink       <- as.numeric(args[8])
+seed <- as.numeric(args[4])
+eval_method <- args[5]
+ncomp_pls_arg <- as.numeric(args[6])
+subSampNum <- as.numeric(args[7])
+bShrink <- as.numeric(args[8])
+CutHeight <- as.numeric(args[9])
+preprocess_int <- as.numeric(args[10])
 
-if (ncomp_pls_arg == "") {
+# cmd = [
+#     rscript_path,
+#     r_script,
+#     ",".join(self.data_types),
+#     str(self.kfold),
+#     self.summarization,
+#     str(self.seed),
+#     self.eval_method,
+#     str(self.ncomp_pls),
+#     str(self.subSampNum),
+#     str(self.between_shrinkage),
+#     str(self.cut_height),
+#     str(self.preprocess),
+# ]
+
+if (preprocess_int == 1) {
+  preprocess <- TRUE
+}else {
+  preprocess <- FALSE
+}
+
+if (is.na(ncomp_pls_arg) || ncomp_pls_arg <= 0) {
   ncomp_pls <- NULL
 } else {
-  ncomp_pls <- as.numeric(ncomp_pls_arg)
+  ncomp_pls <- ncomp_pls_arg
 }
 set.seed(seed)
 
@@ -59,7 +119,6 @@ if (length(data_types) != length(omics_list)) {
   stop("data_types length doesn't match number of omics datasets.")
 }
 
-Y <- as.numeric(phenotype_df[[2]])
 if (any(is.na(Y))) {
   stop("Phenotype contains NA.")
 }
@@ -70,43 +129,43 @@ for (i in seq_along(omics_list)) {
   message("  Omics ", i, ": ", nrow(omics_list[[i]]), " x ", ncol(omics_list[[i]]))
 }
 
-foldIndices <- split.default(seq_len(nrow(omics_list[[1]])), sample(seq_len(nrow(omics_list[[1]])), kfold))
-for (f in seq_along(foldIndices)) {
-  idx <- foldIndices[[f]]
-  message("Debug fold #", f, " => size: ", length(idx))
-  for (om in seq_along(omics_list)) {
-    subset_omics <- omics_list[[om]][idx, , drop=FALSE]
-    var_ <- apply(subset_omics, 2, var, na.rm=TRUE)
-
-    bad_cols <- which(is.na(var_) | is.nan(var_) | var_ == 0)
-    if (length(bad_cols) > 0) {
-      subset_omics <- subset_omics[, -bad_cols, drop=FALSE]
-      message("Fold ", f, ", omics #", om, " => removing ", length(bad_cols), 
-              " zero/NA-variance cols.")
-    }
+for (i in seq_along(omics_list)) {
+  mat <- omics_list[[i]]
+  cat(sprintf("Post-clean Omics %d: dim = [%d x %d], NAs = %d, Infs = %d\n",
+      i, nrow(mat), ncol(mat),
+      sum(is.na(mat)), sum(is.infinite(mat))))
+  if (nrow(mat) == 0 || ncol(mat) == 0) {
+    stop(paste("ERROR: Omics", i, "is empty!"))
+  }
+  if (any(!is.finite(mat))) {
+    stop(paste("ERROR: Non-finite values remain in Omics", i))
   }
 }
 
-Y_binary <- ifelse(Y > median(Y), 1, 0) 
+if (any(is.na(Y)) || any(is.infinite(Y))) {
+  stop("ERROR: Phenotype vector Y contains NA or Inf")
+}
+
+#Y_binary <- ifelse(Y > median(Y), 1, 0) 
 
 if (length(data_types) == 1 && !is.null(ncomp_pls)) {
   message("Single-omics PLS scenario")
   result <- fastAutoSmCCNet(
     X = omics_list,
-    Y = as.factor(Y_binary),
+    Y = Yfactor,
     DataType = data_types,
+    EvalMethod = "auc",
     Kfold = kfold,
     subSampNum = subSampNum,
-    CutHeight = 1 - 0.1^10,
-    EvalMethod = "auc",
     summarization = summarization,
+    CutHeight = CutHeight,
     ncomp_pls = ncomp_pls,
+    preprocess = preprocess,
     seed = seed
   )
-  
+
 } else if (length(data_types) == 1) {
   message("Single-omics CCA scenario")
-
   result <- fastAutoSmCCNet(
     X = omics_list,
     Y = Y,
@@ -114,26 +173,28 @@ if (length(data_types) == 1 && !is.null(ncomp_pls)) {
     Kfold = kfold,
     subSampNum = subSampNum,
     summarization = summarization,
-    CutHeight = 1 - 0.1^10,
+    CutHeight = CutHeight,
+    preprocess = preprocess,
     seed = seed
   )
-  
+
 } else if (length(data_types) > 1 && !is.null(ncomp_pls)) {
   message("Multi-omics PLS scenario")
   result <- fastAutoSmCCNet(
     X = omics_list,
-    Y = as.factor(Y),
+    Y = Yfactor,
     DataType = data_types,
     EvalMethod = "auc",
     Kfold = kfold,
     subSampNum = subSampNum,
     summarization = summarization,
-    CutHeight = 1 - 0.1^10,
+    CutHeight = CutHeight,
+    BetweenShrinkage = bShrink,
     ncomp_pls = ncomp_pls,
-    seed = seed,
-    BetweenShrinkage = bShrink
+    preprocess = preprocess,
+    seed = seed
   )
-  
+
 } else {
   message("Multi-omics CCA scenario")
   result <- fastAutoSmCCNet(
@@ -143,9 +204,10 @@ if (length(data_types) == 1 && !is.null(ncomp_pls)) {
     Kfold = kfold,
     subSampNum = subSampNum,
     summarization = summarization,
-    CutHeight = 1 - 0.1^10,
-    seed = seed,
-    BetweenShrinkage = bShrink
+    CutHeight = CutHeight,
+    BetweenShrinkage = bShrink,
+    preprocess = preprocess,
+    seed = seed
   )
 }
 

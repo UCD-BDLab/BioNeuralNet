@@ -1,42 +1,35 @@
-
-from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
-from sklearn.metrics import r2_score, accuracy_score
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, r2_score
 
-def evaluate_rf(X, y, n=50, mode="regression", seed=119):
+def evaluate_rf(X, y, n=150, mode="classification", runs=100, seed=119, return_all=False):
     """
-    Evaluate a random forest model on the given data.
-
-    Parameters:
-
-        X: feature matrix
-        y: target vector
-        n: number of trees in the forest
-    
-
-    returns:
-
-        r2: R-squared for regression
-        acc: accuracy for classification
-        
+    Evaluate Random Forest performance over multiple runs.
     """
-
-    if mode == "regression":
-        X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=seed)
-        rf = RandomForestRegressor(n_estimators=n)
-        rf.fit(X_train, y_train)
-        y_pred = rf.predict(X_test)
-        r2 = r2_score(y_test, y_pred)
-        return r2
-    
-    elif mode == "classification":
-        X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=seed)
-        rf = RandomForestClassifier(n_estimators=n)
-        rf.fit(X_train, y_train)
-        y_pred = rf.predict(X_test)
-        acc = accuracy_score(y_test, y_pred)
-        return acc
-    
+    X = X.copy()
+    y = y.copy()
+    scores = []
+    for run in range(runs):
+        stratify = y if mode == "classification" else None
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.3, random_state=seed + run, stratify=stratify
+        )
+        if mode == "regression":
+            model = RandomForestRegressor(n_estimators=n, random_state=seed + run)
+            model.fit(X_train, y_train)
+            y_pred = model.predict(X_test)
+            score = r2_score(y_test, y_pred)
+        elif mode == "classification":
+            model = RandomForestClassifier(n_estimators=n, random_state=seed + run)
+            model.fit(X_train, y_train)
+            y_pred = model.predict(X_test)
+            score = accuracy_score(y_test, y_pred)
+        else:
+            raise ValueError("Mode must be 'regression' or 'classification'.")
+        scores.append(score)
+    if return_all:
+        return scores
     else:
-        raise ValueError("Invalid mode: please set mode for `regression` or `classification`.")
-
+        return np.mean(scores), np.std(scores)
+    

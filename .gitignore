@@ -20,6 +20,18 @@ bioneuralnet.egg-info
 # Other example data and tests not needed in the repo.
 TOPMed_testing/
 TOPMed_notes/
+Output**
+
+./MOGONET/
+MOGONET/
+.BRCA_cleaned
+
+s_embedding_testing**
+**.ipynb
+
+/bioneuralnet/external_tools/cptac_wrapper.py
+TCGA_BRCA_DATA
+Smccnet_output/
 
 KG_testing/
 KG_Python/
@@ -32,6 +44,11 @@ test_cuda_issues.md
 dpmon/
 dp/
 dpmon_output/
+smokers/
+Testing_all/
+TCGA_DATA_ALL_FOLDERS/
+MOGONET/
+.testing
 
 # Blocking sensitive file types globally
 *.csv

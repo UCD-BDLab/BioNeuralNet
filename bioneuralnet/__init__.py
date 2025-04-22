@@ -49,7 +49,6 @@ from .metrics import plot_embeddings
 from .metrics import plot_network
 from .metrics import compare_clusters
 
-from .utils import omics_data_filter
 from .utils import network_filter
 from .utils import rdata_to_df
 from .utils import get_logger
@@ -71,7 +70,6 @@ __all__: list = [
     "cluster_correlation",
     "louvain_to_adjacency",
     "evaluate_rf",
-    "omics_data_filter",
     "network_filter",
     "rdata_to_df",
     "get_logger",
