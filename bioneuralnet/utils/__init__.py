@@ -1,7 +1,7 @@
 from .logger import get_logger
 from .rdata_convert import rdata_to_df
 from .variance import variance_summary,explore_data_stats,network_remove_low_variance,zero_fraction_summary,expression_summary,correlation_summary, network_filter,explore_data_stats
-from .preprocess import clean_inf_nan,preprocess_clinical, prune_network, prune_network_by_quantile, select_top_k_variance, top_anova_f_features, top_features_autoencoder
+from .preprocess import select_top_randomforest, clean_inf_nan,preprocess_clinical, prune_network, prune_network_by_quantile, select_top_k_variance, top_anova_f_features, top_features_autoencoder
 
 __all__ = ["get_logger",
            "clean_inf_nan",
@@ -19,4 +19,5 @@ __all__ = ["get_logger",
            "expression_summary",
            "correlation_summary",
            "explore_data_stats",
-           "preprocess_clinical"]
+           "preprocess_clinical",
+           "select_top_randomforest",]

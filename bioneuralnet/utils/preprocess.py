@@ -104,6 +104,47 @@ def select_top_k_variance(df: pd.DataFrame, k: int = 1000, ddof: int = 0) -> pd.
 
     return num[top_cols]
 
+def select_top_randomforest(X: pd.DataFrame, y: pd.Series, top_k: int = 1000, seed: int = 119) -> pd.DataFrame:
+    """
+    Select the top k features using RandomForest feature importances:
+        - Require all columns to be numeric (else ValueError)
+        - Clean numeric with clean_inf_nan
+        - Select top_k features with RandomForest importances
+    """
+    if isinstance(y, pd.DataFrame):
+        if y.shape[1] != 1:
+            raise ValueError("y must be a Series or a single-column DataFrame")
+        y = y.iloc[:, 0]
+    elif not isinstance(y, pd.Series):
+        raise ValueError("y must be a pandas Series or DataFrame")
+
+    non_numeric = []
+    for col, dt in X.dtypes.items():
+        if not pd.api.types.is_numeric_dtype(dt):
+            non_numeric.append(col)
+
+    if non_numeric:
+        raise ValueError(f"Non-numeric columns detected: {non_numeric}")
+
+    df_num = clean_inf_nan(X)
+    df_clean = df_num.loc[:, df_num.std(axis=0, ddof=0) > 0]
+
+    is_classif = (y.nunique() <= 10)
+
+    if is_classif:
+        Model = RandomForestClassifier
+    else:
+        Model = RandomForestRegressor
+
+    model = Model(n_estimators=100, random_state=seed)
+
+    model.fit(df_clean, y)
+    importances = pd.Series(model.feature_importances_, index=df_clean.columns)
+    top_feats = importances.nlargest(min(top_k, len(importances))).index
+
+    return df_clean[top_feats]
+
+
 def top_anova_f_features(X: pd.DataFrame, y: pd.Series,max_features: int, alpha: float = 0.05) -> pd.DataFrame:
     """
     Select top features based on ANOVA F-test

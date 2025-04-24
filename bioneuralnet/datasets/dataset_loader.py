@@ -2,34 +2,26 @@ from pathlib import Path
 import pandas as pd
 
 class DatasetLoader:
-    def __init__(self, dataset_name: str):
+    def __init__(self, dataset_name: str, feature_method: str = "var"):
         """
         Args:
             dataset_name (str): "example1", "monet", or "tcga_brca"
+            feature_method (str): for "tcga_brca" only, one of:
+                - "var" (variance filter, default)
+                - "ae" (autoencoder selection)
+                - "anova" (ANOVA F-test selection)
+                - "rf" (RandomForest importance selection)
         """
         self.dataset_name = dataset_name.strip().lower()
+        self.feature_method = feature_method.strip().lower()
         self.base_dir = Path(__file__).parent
         self.data: dict[str, pd.DataFrame] = {}
         
         self._load_data()
 
-    def _load_and_concat(self, folder: Path, stem: str) -> pd.DataFrame:
-        p1 = folder / f"{stem}_part1.csv"
-        p2 = folder / f"{stem}_part2.csv"
-        if p1.exists() and p2.exists():
-            df1 = pd.read_csv(p1, index_col=0)
-            df2 = pd.read_csv(p2, index_col=0)
-            return pd.concat([df1, df2], axis=0)
-
-        single = folder / f"{stem}.csv"
-        if not single.exists():
-            raise FileNotFoundError(f"File '{single.name}' not found in '{folder}'.")
-        
-        return pd.read_csv(single, index_col=0)
-
     def _load_data(self):
         """
-        Internal loader that fills self.data immediately.
+        Internal loader for the dataset.
         """
         folder = self.base_dir / self.dataset_name
         if not folder.is_dir():
@@ -37,9 +29,9 @@ class DatasetLoader:
 
         if self.dataset_name == "example1":
             self.data = {
-                "X1": pd.read_csv(folder / "X1.csv",            index_col=0),
-                "X2": pd.read_csv(folder / "X2.csv",            index_col=0),
-                "Y": pd.read_csv(folder / "Y.csv",             index_col=0),
+                "X1": pd.read_csv(folder / "X1.csv", index_col=0),
+                "X2": pd.read_csv(folder / "X2.csv", index_col=0),
+                "Y": pd.read_csv(folder / "Y.csv", index_col=0),
                 "clinical_data": pd.read_csv(folder / "clinical_data.csv", index_col=0),
             }
 
@@ -53,25 +45,27 @@ class DatasetLoader:
             }
 
         elif self.dataset_name == "tcga_brca":
-            self.data = {
-                "BRCA_miRNA": pd.read_csv(folder / "BRCA_miRNA.csv",    index_col=0),
-                "BRCA_Meth": self._load_and_concat(folder, "BRCA_Meth"),
-                "BRCA_RNA": self._load_and_concat(folder, "BRCA_RNA"),
-                "BRCA_PAM50": pd.read_csv(folder / "BRCA_PAM50.csv",    index_col=0),
-                "BRCA_Clinical": pd.read_csv(folder / "BRCA_Clinical.csv", index_col=0),
-            }
+            valid = {"var", "ae", "anova", "rf"}
+            if self.feature_method not in valid:
+                raise ValueError(f"For tcga_brca, feature_method must be one of {valid}, but got {self.feature_method}")
 
+            self.data["brca_mirna"]   = pd.read_csv(folder / "brca_mirna.csv",   index_col=0)
+            self.data["brca_pam50"]   = pd.read_csv(folder / "brca_pam50.csv",   index_col=0)
+            self.data["brca_clinical"] = pd.read_csv(folder / "brca_clinical.csv", index_col=0)
+
+            meth_file = f"brca_meth_{self.feature_method}.csv"
+            rna_file  = f"brca_rna_{self.feature_method}.csv"
+            self.data["brca_meth"] = pd.read_csv(folder / meth_file, index_col=0)
+            self.data["brca_rna"]  = pd.read_csv(folder / rna_file,  index_col=0)
         else:
             raise ValueError(f"Dataset '{self.dataset_name}' is not recognized.")
 
     @property
-    def shape(self) -> dict[str, tuple[int,int]]:
+    def shape(self) -> dict[str, tuple[int, int]]:
         """
-        dict of table_name to (n_rows, n_cols), already loaded in __init__.
+        dict of table_name to (n_rows, n_cols)
         """
         result = {}
         for name, df in self.data.items():
             result[name] = df.shape
-
         return result
-

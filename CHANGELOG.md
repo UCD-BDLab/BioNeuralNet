@@ -66,7 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **Updated Tutorials and Documentation**: New end to end jupiter notebook example.
 - **Updated Test**: All test have been updated and new ones have been added.
 
-## [1.0.3] - 2025-04-24
+## [1.0.1] to [1.0.4] - 2025-04-24
 
 - **BUG**: A bug related to rdata files missing
-- **New realease**: A new release will include documentation for the other updates. (1.0.3 or 1.0.3)
+- **New realease**: A new release will include documentation for the other updates. (1.1.0)
