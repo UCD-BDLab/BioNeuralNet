@@ -1,37 +1,79 @@
 args <- commandArgs(trailingOnly = TRUE)
-input_file <- args[1]
-csv_file <- args[2]
-object_name <- args[3]
+input_file  <- args[1]
+csv_file    <- args[2]
 
 orig_input <- input_file
-orig_csv <- csv_file
+orig_csv   <- csv_file
 
 rm(list = setdiff(ls(), c("orig_input", "orig_csv")))
 
 success <- tryCatch({
   load(orig_input)
   loaded_objs <- ls()
-  
-  if (length(loaded_objs) == 1) {
-    mat <- get(loaded_objs[1])
-  } else if (exists("AdjacencyMatrix")) {
-    mat <- AdjacencyMatrix
-  } else if (exists("M")) {
-    mat <- M
-  } else if(exists(object_name)) {
-    mat <- get(object_name)
-  }
-  else {
-    stop("Error: Neither 'Object','AdjacencyMatrix' or 'M' was found in the RData file.")
-  }
-  
-    message("Attempting to write CSV to: ", orig_csv)
-    write.csv(mat, file = orig_csv, row.names = TRUE)
-    if (file.exists(orig_csv)) {
-    message("CSV file successfully written to: ", orig_csv)
-    } else {
-    message("CSV file was NOT created at: ", orig_csv)
+  message("Loaded objects: ", paste(loaded_objs, collapse = ", "))
+
+  mat <- NULL
+  for (nm in loaded_objs) {
+    obj <- get(nm)
+    cls <- class(obj)
+    message("Object '", nm, "' has class: ", paste(cls, collapse = "/"))
+
+    if (inherits(obj, "list")) {
+      for (subnm in names(obj)) {
+        candidate <- obj[[subnm]]
+        if (is.matrix(candidate) || is.data.frame(candidate) ||
+            inherits(candidate, "Matrix") ||
+            inherits(candidate, "igraph")) {
+
+          if (inherits(candidate, "igraph")) {
+            if (!"igraph" %in% loadedNamespaces()) library(igraph)
+            candidate <- as_adjacency_matrix(candidate, attr = "weight", sparse = FALSE)
+          }
+
+          if (inherits(candidate, "Matrix")) {
+            if (!"Matrix" %in% loadedNamespaces()) library(Matrix)
+            candidate <- as.matrix(candidate)
+          }
+
+          mat <- as.matrix(candidate)
+          message("Using list element '", subnm, "' from '", nm, "' as adjacency")
+          break
+        }
+      }
+      if (!is.null(mat)) break
     }
+
+    if (is.matrix(obj) || is.data.frame(obj)) {
+      mat <- as.matrix(obj)
+      message("Using top-level object '", nm, "' as matrix/data.frame")
+      break
+    }
+
+    if (inherits(obj, "Matrix")) {
+      if (!"Matrix" %in% loadedNamespaces()) library(Matrix)
+      mat <- as.matrix(obj)
+      message("Coerced sparse '", nm, "' to dense matrix")
+      break
+    }
+
+    if (inherits(obj, "igraph")) {
+      if (!"igraph" %in% loadedNamespaces()) library(igraph)
+      mat <- as.matrix(as_adjacency_matrix(obj, attr = "weight", sparse = FALSE))
+      message("Converted igraph '", nm, "' to adjacency matrix")
+      break
+    }
+  }
+
+  if (is.null(mat)) {
+    stop("Error: No suitable matrix/data.frame/Matrix/igraph object found in RData")
+  }
+
+  out_dir <- dirname(orig_csv)
+  if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+
+  message("Writing CSV to: ", orig_csv)
+  write.csv(mat, file = orig_csv, row.names = TRUE)
+  message("CSV written successfully to: ", orig_csv)
 
   TRUE
 }, error = function(e) {

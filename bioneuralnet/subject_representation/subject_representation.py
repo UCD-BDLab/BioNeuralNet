@@ -1,28 +1,30 @@
 import pandas as pd
-import numpy as np
+import os
 import json
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
+from pathlib import Path
+from datetime import datetime
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
 
 from ray import tune
+from ray.tune import TuneError
 from ray.air import session
 from ray.tune import CLIReporter
 from ray.tune.schedulers import ASHAScheduler
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.metrics import accuracy_score, r2_score
+import tempfile
 
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
-from ray.air import session
-
 from ..utils.logger import get_logger
 
 class GraphEmbedding:
     """
-    GraphEmbedding Class for Integrating Network Embeddings into Omics Data..
+    GraphEmbedding Class for Integrating Network Embeddings into Omics Data.
     """
 
     def __init__(
@@ -31,16 +33,21 @@ class GraphEmbedding:
         embeddings: pd.DataFrame,
         phenotype_data: Optional[pd.DataFrame] = None,
         phenotype_col: str = "phenotype",
-        reduce_method: str = "PCA",
+        reduce_method: str = "AE",
+        seed: Optional[int] = None,
         tune: Optional[bool] = False,
+        output_dir: Optional[str] = None,
     ):
         """
         Initializes the GraphEmbedding instance.
 
         Parameters:
-            omics_data : pd.DataFrame
-            embeddings : Optional[pd.DataFrame], default=None
-            reduce_method : str, optional
+            omics_data : pd.DataFrame of omics features (columns).
+            embeddings : pd.DataFrame with embeddings (indexed by feature names).
+            phenotype_data : Optional[pd.DataFrame] with phenotype labels.
+            phenotype_col : str name of the phenotype column.
+            reduce_method : Default reduction method (e.g., "AE").
+            tune : Whether to run hyperparameter tuning.
         """
         self.logger = get_logger(__name__)
         self.logger.info("Initializing GraphEmbedding with provided data inputs.")
@@ -52,48 +59,73 @@ class GraphEmbedding:
             self.logger.info(
                 "No embeddings provided, please review documentation to see how to generate embeddings."
             )
+            raise ValueError("Embeddings must be non-empty.")
         if not isinstance(embeddings, pd.DataFrame):
             raise ValueError("Embeddings must be provided as a pandas DataFrame.")
         
-        if tune == True and phenotype_data is None:
-            raise ValueError(
-                "Phenotype data must be provided for classification-based tuning."
-            )
+        if tune and phenotype_data is None:
+            raise ValueError("Phenotype data must be provided for classification-based tuning.")
         
-        self.omics_data = omics_data
-        self.embeddings = embeddings if embeddings is not None else pd.DataFrame()
-        self.phenotype_data = phenotype_data
+        if seed is not None:
+            torch.manual_seed(seed)
+            if torch.cuda.is_available():
+                torch.cuda.manual_seed(seed)
+                torch.backends.cudnn.deterministic = True
+                torch.backends.cudnn.benchmark = False
+
+        self.seed = seed
+        self.logger.info(f"Seed set to {self.seed}.")
+
+        self.omics_data = omics_data.copy(deep=True)
+        self.embeddings = embeddings.copy(deep=True) 
+        self.phenotype_data = phenotype_data.copy(deep=True)
         self.phenotype_col = phenotype_col
         self.reduce_method = reduce_method.upper()
         self.tune = tune
 
+        # match the embedding index
         embeddings_features = set(self.embeddings.index)
         omics_features = set(self.omics_data.columns)
+
         if len(embeddings_features) != len(omics_features):
             raise ValueError(
                 f"Number of features in embeddings and omics data do not match.\n"
                 f"Embeddings: {self.embeddings.shape} and Omics: {self.omics_data.shape}"
             )
         common_features = embeddings_features.intersection(omics_features)
+
         if len(common_features) == 0:
             raise ValueError(
                 f"No common features found between the embeddings and omics data.\n"
                 f"Embeddings: {self.embeddings.shape} and Omics: {self.omics_data.shape}"
             )
-        self.logger.info(
-            f"Found {len(common_features)} common features between network and omics data."
-        )
+        self.logger.info(f"Found {len(common_features)} common features between network and omics data.")
+        
+        # output directory
+        if output_dir is None:
+            self.temp_dir_obj = tempfile.TemporaryDirectory()
+            self.output_dir = self.temp_dir_obj.name
+            
+            self.logger.info(f"No output_dir provided; using temporary directory: {self.output_dir}")
+        else:
+            self.output_dir = Path(output_dir)
+            self.logger.info(f"Output directory set to: {self.output_dir}")
+            # create the directory with pathlib
+            Path(self.output_dir).mkdir(parents=True, exist_ok=True)
 
     def run(self) -> pd.DataFrame:
         """
-        If tune=True, perform classification-based tuning (if phenotype_data provided),
-        else fallback to a default embedding reduction method.
+        Executes the Subject Representation workflow.
+        If tuning is enabled, runs hyperparameter tuning and uses the best config to reduce embeddings.
+        Otherwise, uses the default reduction method.
+        Returns:
+            Enhanced omics data as a DataFrame.
         """
         self.logger.info("Starting Subject Representation workflow.")
 
         if self.embeddings.empty:
             self.logger.warning(
-                "No embeddings provided. Please generate emebeddings using GNNEmbeddings class.\nReturning original omics_data."
+                "No embeddings provided. Please generate embeddings using GNNEmbeddings class.\nReturning original omics_data."
             )
             return self.omics_data
 
@@ -101,247 +133,355 @@ class GraphEmbedding:
             if self.tune:
                 best_config = self._run_tuning()
                 self.logger.info(f"Best tuning config selected: {best_config}")
-
-                reduced = self._reduce_embeddings(
-                    method=best_config["method"],
-                    pca_dim=best_config.get("pca_dim", 1),
-                    ae_params=best_config.get(
-                        "ae_params", {"epochs": 16, "hidden_dim": 8}
-                    ),
-                )
+                ae_params = best_config.get("ae_params", {"epochs": 16, "hidden_dim": 8, "lr": 1e-3, "dropout": 0.2, "activation": "relu"})
+                reduced = self._reduce_embeddings(method=best_config["method"], ae_params=ae_params, compressed_dim=best_config["compressed_dim"])
+                enhanced_omics_data = self._integrate_embeddings(reduced=reduced, method=best_config["integration_method"], alpha=best_config["alpha"], beta=best_config["beta"])
+            
             else:
-                reduced = self._reduce_embeddings(
-                    method=self.reduce_method,
-                    pca_dim=2,
-                )
+                method = self.reduce_method.upper()
+                ae_params_def = {"epochs": 16, "hidden_dim": 8, "lr": 1e-3, "dropout": 0.2, "activation": "relu"}
+                reduced = self._reduce_embeddings(method=method, ae_params=ae_params_def, compressed_dim=2)
+                enhanced_omics_data = self._integrate_embeddings(reduced, method="multiply", alpha=1.0, beta=0.8)
 
-            if reduced.empty:
-                self.logger.warning(
-                    "Reduced embeddings are empty. Returning original omics_data."
-                )
+            if enhanced_omics_data.empty:
+                self.logger.warning("Enhanced omics data is empty. Returning original omics_data.")
                 return self.omics_data
 
-            enhanced_omics_data = self._integrate_embeddings(reduced)
-            self.logger.info(
-                f"Subject Representation completed successfully. Final shape: {enhanced_omics_data.shape}"
-            )
+            self.logger.info(f"Subject Representation completed successfully. Final shape: {enhanced_omics_data.shape}")
             return enhanced_omics_data
 
         except Exception as e:
             self.logger.error(f"Error in Subject Representation workflow: {e}")
             raise
 
-    def _reduce_embeddings(
-        self, method: str, pca_dim: int = 2, ae_params: Dict[str, Any] = None
-    ) -> pd.Series:
-        
-        self.logger.info(f"Reducing embeddings to {pca_dim} using method='{method}'.")
-        
+    def _reduce_embeddings(self, method: str, ae_params: dict = None, compressed_dim: int = 2) -> pd.DataFrame:
+        """
+        Reduces the dimensionality of the embeddings.
+        Returns a DataFrame with `compressed_dim` columns.
+        Parameters:
+            method: Reduction method ("PCA", "AE").
+            ae_params: Parameters for AutoEncoder.
+            compressed_dim: Number of dimensions to reduce to.
+        Returns:
+            Reduced embeddings as a DataFrame.
+        """
+        self.logger.info(f"Reducing embeddings using method='{method}' with compressed_dim={compressed_dim}.")
+
         if self.embeddings.empty:
             raise ValueError("Embeddings DataFrame is empty.")
-        
-        if method == "PCA":
-            self.logger.info(f"Applying PCA with n_components={pca_dim}.")
-            pca = PCA(n_components=pca_dim)
-            pcs = pca.fit_transform(self.embeddings)
-            
-            if pca_dim == 1:
-                reduced_embedding = pd.Series(
-                    pcs.flatten(), index=self.embeddings.index, name="PC1"
-                )
-            else:
-                reduced_embedding = pd.Series(
-                    pcs.mean(axis=1), index=self.embeddings.index, name="PC_mean"
-                )
-            self.logger.info(
-                "Captured variance ratio: %.2f" % pca.explained_variance_ratio_[0]
-            )
-            self.logger.info("PCA reduction completed.")
 
-        elif method == "AE":
-            self.logger.info("Using Autoencoder for reduction.")
-            if ae_params is None:
-                ae_params = {"epochs": 16, "hidden_dim": 8, "lr": 1e-3}
-            input_dim = self.embeddings.shape[1]
+        method = method.lower()
+        if method == "pca":
+            pca = PCA(n_components=compressed_dim)
+            pcs = pca.fit_transform(self.embeddings)
+            reduced_df = pd.DataFrame(pcs, index=self.embeddings.index,
+                                    columns=[f"PC{i+1}" for i in range(compressed_dim)])
+            self.logger.info(f"PCA reduction completed. Variance explained: {pca.explained_variance_ratio_.sum():.4f}")
+
+        elif method in ["ae"]:
+            self.logger.info("Using autoencoder for reduction.")
+            ae_params = ae_params or {
+                "epochs": 64, 
+                "hidden_dim": 8, 
+                "lr": 1e-3, 
+                "dropout": 0.2, 
+                "activation": "relu", 
+            }
             X = torch.tensor(self.embeddings.values, dtype=torch.float)
-            model = SimpleAE(
-                input_dim=input_dim,
-                hidden_dim=ae_params.get("hidden_dim", 8),
-                compressed_dim=1,
+
+            model = AutoEncoder(
+                input_dim=self.embeddings.shape[1],
+                hidden_dims=ae_params["hidden_dim"],
+                compressed_dim=compressed_dim,
+                dropout=ae_params["dropout"],
+                activation=ae_params["activation"]
             )
-            optimizer = optim.Adam(model.parameters(), lr=ae_params.get("lr", 1e-3))
+            optimizer = optim.Adam(model.parameters(), lr=ae_params["lr"])
             loss_fn = nn.MSELoss()
+
             model.train()
-            epochs = ae_params.get("epochs", 16)
-            for epoch in range(epochs):
+            for epoch in range(ae_params["epochs"]):
                 optimizer.zero_grad()
                 z, recon = model(X)
                 loss = loss_fn(recon, X)
                 loss.backward()
                 optimizer.step()
-                if (epoch + 1) % max(1, epochs // 5) == 0:
-                    self.logger.info(f"AE Epoch {epoch+1}/{epochs} - Loss: {loss.item():.4f}")
+                if (epoch + 1) % max(1, ae_params["epochs"] // 5) == 0:
+                    self.logger.info(f"AE Epoch {epoch+1}/{ae_params['epochs']} - Loss: {loss.item():.4f}")
+
             model.eval()
             with torch.no_grad():
                 z, _ = model(X)
-            reduced_embedding = pd.Series(
-                z.squeeze().numpy(), index=self.embeddings.index, name="AE"
-            )
-            self.logger.info("Autoencoder reduction completed.")
+   
+            z_np = z.detach().cpu().numpy()
+            if z_np.ndim == 1:
+                z_np = z_np.reshape(-1, 1)
+            reduced_df = pd.DataFrame(z_np, index=self.embeddings.index,
+                                    columns=[f"AE_{i+1}" for i in range(compressed_dim)])
+
+            self.logger.info("Autoencoder reduction completed")
+
         else:
-            self.logger.error(f"Unsupported reduction method: {method}")
-            raise ValueError(f"Unsupported reduction method: {method}")
+            raise ValueError(f"Unsupported reduction method:{method}")
 
-        reduced_embedding = (reduced_embedding - reduced_embedding.mean()) / (
-            reduced_embedding.std() + 1e-8
-        )
-        self.logger.info("Reduced embedding normalized.")
-        return reduced_embedding
+        return reduced_df
 
-    def _integrate_embeddings(
-        self, reduced: pd.Series, method="multiply"
-    ) -> pd.DataFrame:
-        self.logger.info(f"Integrating embeddings using method='{method}'.")
+    def _integrate_embeddings(self, reduced: pd.DataFrame, method="multiply", alpha=2.0, beta=0.5) -> pd.DataFrame:
+        """
+        Integrates the reduced embeddings with the omics data using a multiplicative approach.
+        
+        With the default parameters (alpha = 2.0, beta = 0.5), each feature is updated as:
+        
+            enhanced = beta * raw + (1 - beta) * (alpha * normalized_weight * raw)
+        
+        For example, with alpha = 2.0 and beta = 0.5:
 
-        common = list(set(self.omics_data.columns).intersection(set(reduced.index)))
-        if not common:
-            raise ValueError("No common features between omics data and embeddings.")
-
-        enhanced_omics = self.omics_data.copy()
+            - If a features normalized weight is 1.0:
+                enhanced = 0.5xraw + 0.5x(2.0x1.0xraw) = 0.5xraw + raw = 1.5xraw
+            - If a features normalized weight is 0.5:
+                enhanced = 0.5xraw + 0.5x(2.0x0.5xraw) = 0.5xraw + 0.5xraw = raw
+        
+        This is so at least 50% of the final output is influenced by the computed weight
+        """
+        missing_features = set(self.omics_data.columns) - set(reduced.index)
+        if missing_features:
+            self.logger.warning(f"Missing {len(missing_features)} features in reduced embeddings: {list(missing_features)[:5]}")
 
         if method == "multiply":
-            for feature in common:
-                enhanced_omics[feature] = enhanced_omics[feature] * reduced[feature]
-            enhanced_omics = enhanced_omics[common]
-            self.logger.info(
-                "Integration using multiplication completed. (Columns overwritten)"
-            )
-        elif method == "concatenate":
-            enhanced_features = pd.DataFrame(
-                np.tile(reduced.values, (self.omics_data.shape[0], 1)),
-                index=self.omics_data.index,
-                columns=[f"{feat}_embed" for feat in reduced.index],
-            )
-            enhanced_omics = pd.concat([enhanced_omics, enhanced_features], axis=1)
-            self.logger.info("Integration using concatenation completed.")
+            # the reduced embeddings to match the omics data columns.
+            if not reduced.index.equals(self.omics_data.columns):
+                self.logger.info("Aligning reduced embeddings index with omics_data columns.")
+                reduced = reduced.reindex(self.omics_data.columns)
+            
+            # normalize the embeddings and compute a weight series
+            if isinstance(reduced, pd.DataFrame):
+                for col in reduced.columns:
+                    reduced[col] = (reduced[col] - reduced[col].min()) / (reduced[col].max() - reduced[col].min())
+                weight_series = reduced.mean(axis=1)
+            elif isinstance(reduced, pd.Series):
+                weight_series = (reduced - reduced.min()) / (reduced.max() - reduced.min())
+            else:
+                raise ValueError("Reduced embeddings must be a pandas DataFrame or Series.")
+            
+            weight_series = weight_series.fillna(0)
+            ranks = weight_series.rank(method="average")
+            scaled_ranks = 2 * (ranks - ranks.min()) / (ranks.max() - ranks.min()) - 1
 
-        elif method == "weighted":
-            weights = np.abs(reduced.values) / (np.sum(np.abs(reduced.values)) + 1e-8)
-            for feature, weight in zip(common, weights):
-                enhanced_omics[f"{feature}_embed"] = (
-                    enhanced_omics[feature] + weight * reduced[feature]
-                )
-            self.logger.info("Integration using weighted sum completed.")
+            # look for duplicate feature names.
+            if not scaled_ranks.index.is_unique:
+                self.logger.error("Duplicate feature names detected in the reduced embeddings index.")
+
+            # re-index to ensure we have a weight per omics_data feature.
+            feature_weights = scaled_ranks.reindex(self.omics_data.columns)
+
+            enhanced = self.omics_data.copy()
+            for feature in self.omics_data.columns:
+                weight_val = feature_weights.get(feature)
+                # checking weight_val is series or scalar
+                if isinstance(weight_val, pd.Series):
+                    weight_val = weight_val.iloc[0]
+                if pd.notnull(weight_val):
+                    enhanced[feature] = beta * enhanced[feature] + (1 - beta) * (alpha * weight_val * enhanced[feature])
+                else:
+                    self.logger.warning(f"Feature {feature} not found in the reduced weights.")
         else:
-            raise ValueError(f"Unknown integration method: {method}")
+            #Curently only supoort one method but left the parameter in case we supp0ort more in the future.
+            raise ValueError(f"Unknown integration method: {method}.")
 
-        self.logger.info(f"Final Enhanced Omics Shape: {enhanced_omics.shape}")
-        return enhanced_omics
-
+        self.logger.info(f"Final Enhanced Omics Shape: {enhanced.shape}")
+        return enhanced
+    
     def _run_tuning(self) -> Dict[str, Any]:
         """
-        Classification-based tuning
+        Runs tuning for GraphEmbedding.
         """
-
-        self.logger.info("Running classification-based tuning for GraphEmbedding.")
+        self.logger.info("Running tuning for GraphEmbedding.")
         return self._run_classification_tuning()
 
     def _run_classification_tuning(self) -> Dict[str, Any]:
+        """
+        Performs hyperparameter tuning using Ray Tune.
+        The search space includes:
+        - PCA
+        - AutoEncoder (AE) parameters: epochs, hidden_dim, dropout, lr, activation.
+
+        Uses RandomForest for classification or regression depending on phenotype.
+        """
         search_config = {
             "method": tune.choice(["PCA", "AE"]),
-            "pca_dim": tune.choice([1, 2, 3]),
-            "ae_params": tune.choice(
-                [
-                    {"epochs": 64, "hidden_dim": 128},
-                    {"epochs": 128, "hidden_dim": 16},
-                    {"epochs": 256, "hidden_dim": 8},
-                    {"epochs": 128, "hidden_dim": 16},
-                    {"epochs": 256, "hidden_dim": 4},
-                    {"epochs": 512, "hidden_dim": 4},
-                ]
-            ),
+            "compressed_dim": tune.choice([1, 2, 3, 4]),  
+            "ae_params": {
+                "epochs": tune.choice([64, 128, 256, 512, 1024]),
+                "hidden_dim": tune.choice([16, 32, 64, 128, 256, 512]),
+                "dropout": tune.choice([0.1, 0.2, 0.3, 0.4, 0.5]),
+                "lr": tune.choice([1e-3, 5e-4, 1e-4, 1e-5]),
+                "activation": tune.choice(["relu", "tanh", "sigmoid"]),
+            },
             "integration_method": tune.choice(["multiply"]),
+            "alpha": tune.choice([1.5, 2.0, 2.5, 3.0]),  
+            "beta": tune.choice([0.1, 0.3, 0.5, 0.7]),
         }
 
         def tune_helper(config):
-            reduced = self._reduce_embeddings(
-                config["method"], config["pca_dim"], config["ae_params"]
-            )
-            if config["integration_method"] == "multiply":
-                enhanced = self._integrate_embeddings(reduced, method="multiply")
-            else:
-                raise ValueError("Unknown integration method")
+            try:
+                method = config["method"].upper()
+                ae_params = config.get("ae_params", {
+                    "epochs": 64, 
+                    "hidden_dim": 4, 
+                    "dropout": 0.2, 
+                    "lr": 1e-3, 
+                    "activation": "relu", 
+                })
+                alpha = config.get("alpha", 2.0)
+                beta = config.get("beta", 0.5)
+                compressed_dim = config.get("compressed_dim", 2)
 
-            common_samples = enhanced.index.intersection(self.phenotype_data.index)
-            X = enhanced.loc[common_samples].values
-            y = self.phenotype_data.loc[common_samples, self.phenotype_col].astype(int).values
+                reduced = self._reduce_embeddings(method=method, compressed_dim=compressed_dim,ae_params=ae_params)
+                enhanced = self._integrate_embeddings(reduced, method="multiply", alpha=alpha, beta=beta)
+                common_samples = enhanced.index.intersection(self.phenotype_data.index)
+                common_index = enhanced.index.intersection(self.phenotype_data.index)
 
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-            clf = RandomForestClassifier(n_estimators=100)
-            clf.fit(X_train, y_train)
-            y_pred = clf.predict(X_test)
-            acc = accuracy_score(y_test, y_pred)
-            session.report({"accuracy": acc})
+                X = enhanced.loc[common_index].values
+                y = self.phenotype_data.loc[common_index, self.phenotype_col]
 
-        scheduler = ASHAScheduler(metric="accuracy", mode="max", grace_period=1, reduction_factor=2)
-        reporter = CLIReporter(metric_columns=["accuracy", "training_iteration"])
+                is_classification = y.dtype != float and y.nunique() <= 20
+
+                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=self.seed)
+
+                if is_classification:
+                    model = RandomForestClassifier(n_estimators=150, random_state=self.seed)
+                    model.fit(X_train, y_train.astype(int))
+                    y_pred = model.predict(X_test)
+                    score = accuracy_score(y_test, y_pred)
+                else:
+                    model = RandomForestRegressor(n_estimators=150, random_state=self.seed)
+                    model.fit(X_train, y_train)
+                    y_pred = model.predict(X_test)
+                    score = r2_score(y_test, y_pred)
+
+                tune.report({"score": score})
+
+            except Exception as e:
+                self.logger.error(f"Tuning trial failed: {e}")
+                import traceback
+                traceback.print_exc()
+                tune.report({"score": 0.0})
+
+        scheduler = ASHAScheduler(metric="score", mode="max", grace_period=1, reduction_factor=2)
+        reporter = CLIReporter(metric_columns=["score", "training_iteration"])
 
         def short_dirname_creator(trial):
             return f"_{trial.trial_id}"
 
-        analysis = tune.run(
-            tune_helper,
-            config=search_config,
-            num_samples=10,
-            verbose=0,
-            scheduler=scheduler,
-            progress_reporter=reporter,
-            trial_dirname_creator=short_dirname_creator,
-            name="tune",
-        )
+        resources = {"cpu": 1, "gpu": 1} if torch.cuda.is_available() else {"cpu": 1, "gpu": 0}
 
-        best_trial = analysis.get_best_trial("accuracy", "max", "last")
-        self.logger.info(f"Best trial config: {best_trial.config}")
-        self.logger.info(f"Best trial final accuracy: {best_trial.last_result['accuracy']}")
+        try:
+            analysis = tune.run(
+                tune_helper,
+                config=search_config,
+                num_samples=15,
+                scheduler=scheduler,
+                progress_reporter=reporter,
+                storage_path=os.path.expanduser("~/gnn"),
+                trial_dirname_creator=short_dirname_creator,
+                resources_per_trial=resources,
+                name="tune",
+                verbose=1,
+            )
+        except TuneError as e:
+            self.logger.warning(f"Tuning completed with failures: {e}")
+            analysis = e.args[1] if len(e.args) > 1 and hasattr(e.args[1], "get_best_trial") else None
 
-        best_params_file = "Graph_embedding_best_params.json"
-        with open(best_params_file, "w") as f:
-            json.dump(best_trial.config, f, indent=4)
-        self.logger.info(f"Best Graph Embedding parameters saved to {best_params_file}")
+        best_trial = None
+        best_score = 0.0  
+
+        if analysis and hasattr(analysis, "get_best_trial"):
+            try:
+                best_trial = analysis.get_best_trial("score", "max", "last")
+                best_score = best_trial.last_result.get("score", 0.0)
+            except Exception as e:
+                self.logger.error(f"Could not retrieve best trial details: {e}")
+        else:
+            self.logger.error("Analysis object is invalid or missing get_best_trial().")
+
+        self.logger.info(f"Best trial final score: {best_score}")
+
+        if best_trial:
+            timestamp = datetime.now().strftime("%m%d_%H_%M_%S")
+            best_params_file = Path(self.output_dir) / f"Subjects_tune_{timestamp}.json"
+
+            with open(best_params_file, "w") as f:
+                json.dump(best_trial.config, f, indent=4)
+            self.logger.info(f"Best Graph Embedding parameters saved to {best_params_file}")
+        else:
+            self.logger.info("No valid best trial config found; skipping save.")
+            
+        return best_trial.config if best_trial else {}
+
+def get_activation(activation: str):
+    """Maps a string to a PyTorch activation module."""
+    activation = activation.lower()
+    if activation == "relu":
+        return nn.ReLU()
+    elif activation == "tanh":
+        return nn.Tanh()
+    elif activation == "sigmoid":
+        return nn.Sigmoid()
+    else:
+        raise ValueError(f"Unsupported activation function: {activation}")
+
+def generate_hidden_dims(init_dim: int, min_dim: int = 2) -> List[int]:
+    """
+    Generates a list of hidden dimensions by halving the initial dimension until the minimum is reached.
+    For example, if init_dim is 64, this returns [64, 32, 16, 8, 4, 2].
+    """
+    dims = []
+    current = init_dim
+    while current >= min_dim:
+        dims.append(current)
+        current = current // 2
+    return dims
+
+class AutoEncoder(nn.Module):
+    """
+    Generic Autoencoder for configurable reduction.
+    Builds encoder and decoder layers based on a list of hidden dimensions.
+    Allows tuning of dropout, activation, and network architecture.
+    """
+    def __init__(self, input_dim: int, hidden_dims: int = 64, compressed_dim: int = 1, 
+                 dropout: float = 0.0, activation: str = "relu"):
+        super(AutoEncoder, self).__init__()
+        self.activation = get_activation(activation)
         
-        return best_trial.config
-
-
-class SimpleAE(nn.Module):
-    def __init__(self, input_dim, hidden_dim: int = 8, compressed_dim: int = 1):
-        """
-        Taking reference from DPMON, I modified SimpleAE class to deepen the network architecture.
+        if isinstance(hidden_dims, (int, float)):
+            hidden_dims = generate_hidden_dims(int(hidden_dims))
+        elif not isinstance(hidden_dims, list):
+            raise ValueError("hidden_dims must be an int, float, or a list of ints.")
         
-        Parameters:
-            input_dim (int): Dimensionality of the input.
-            hidden_dim (int): Size of the first hidden layer. The second hidden layer is set to half this size.
-            compressed_dim (int): Dimensionality of the latent representation.
-        """
-        super(SimpleAE, self).__init__()
-        hidden1 = hidden_dim
-        hidden2 = max(1, hidden_dim // 2)
-        self.encoder = nn.Sequential(
-            nn.Linear(input_dim, hidden1),
-            nn.ReLU(),
-            nn.Linear(hidden1, hidden2),
-            nn.ReLU(),
-            nn.Linear(hidden2, compressed_dim),
-        )
-        self.decoder = nn.Sequential(
-            nn.Linear(compressed_dim, hidden2),
-            nn.ReLU(),
-            nn.Linear(hidden2, hidden1),
-            nn.ReLU(),
-            nn.Linear(hidden1, input_dim),
-        )
-
+        # encoder:
+        encoder_layers = []
+        current_dim = input_dim
+        for h_dim in hidden_dims:
+            encoder_layers.append(nn.Linear(current_dim, h_dim))
+            encoder_layers.append(self.activation)
+            encoder_layers.append(nn.Dropout(dropout))
+            current_dim = h_dim
+        encoder_layers.append(nn.Linear(current_dim, compressed_dim))
+        # the * operator unpacks the list into separate arguments
+        self.encoder = nn.Sequential(*encoder_layers)
+        
+        # decoder:
+        decoder_layers = []
+        current_dim = compressed_dim
+        for h_dim in reversed(hidden_dims):
+            decoder_layers.append(nn.Linear(current_dim, h_dim))
+            decoder_layers.append(self.activation)
+            decoder_layers.append(nn.Dropout(dropout))
+            current_dim = h_dim
+        decoder_layers.append(nn.Linear(current_dim, input_dim))
+        self.decoder = nn.Sequential(*decoder_layers)
+        
     def forward(self, x):
         z = self.encoder(x)
         recon = self.decoder(z)
         return z, recon
-

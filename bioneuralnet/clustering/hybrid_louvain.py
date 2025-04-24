@@ -1,5 +1,8 @@
 import networkx as nx
 import pandas as pd
+import numpy as np
+from typing import Union, Optional
+import torch
 
 from bioneuralnet.clustering.correlated_pagerank import CorrelatedPageRank
 from bioneuralnet.clustering.correlated_louvain import CorrelatedLouvain
@@ -27,27 +30,70 @@ class HybridLouvain:
         self,
         G: nx.Graph,
         B: pd.DataFrame,
-        Y,
+        Y: pd.DataFrame,
         k3: float = 0.2,
         k4: float = 0.8,
         max_iter: int = 10,
         weight: str = "weight",
-        tune: bool = False,
+        gpu: bool = False,
+        seed: Optional[int] = None,
+        tune: Optional[bool] = False,
+
     ):
         self.logger = get_logger(__name__)
+                
+        if seed is not None:
+            torch.manual_seed(seed)
+            np.random.seed(seed)
+            if torch.cuda.is_available():
+                torch.cuda.manual_seed(seed)
+                torch.backends.cudnn.deterministic = True
+                torch.backends.cudnn.benchmark = False
+        
+        self.gpu = gpu
+        self.seed = seed
+        self.logger.info("Initializing HybridLouvain...")
+
         self.G = G
-        self.B = B
-        self.Y = Y
+        graph_nodes = set(map(str, G.nodes()))
+
+        omics_cols = set(B.columns.astype(str))
+        keep_omics = B.columns[B.columns.astype(str).isin(graph_nodes)]
+        dropped_omics = sorted(omics_cols - graph_nodes)
+        if dropped_omics:
+            self.logger.info(
+                f"Dropping {len(dropped_omics)} omics columns not in graph: "
+                f"{dropped_omics[:5]}{'…' if len(dropped_omics) > 5 else ''}"
+            )
+        self.B = B.loc[:, keep_omics]
+
+        # pheno_idx = set(Y.index.astype(str))
+        # isin_mask = Y.index.astype(str).isin(graph_nodes)
+        # keep_pheno = Y.index[isin_mask]
+        # dropped_pheno = sorted(pheno_idx - graph_nodes)
+        # if dropped_pheno:
+        #     self.logger.info(
+        #         f"Dropping {len(dropped_pheno)} phenotype rows not in graph: "
+        #         f"{dropped_pheno[:5]}{'…' if len(dropped_pheno) > 5 else ''}"
+        #     )
+        if isinstance(Y, pd.DataFrame):
+            self.Y = Y.squeeze()
+        elif isinstance(Y, pd.Series):
+            self.Y = Y
+
         self.k3 = k3
         self.k4 = k4
         self.weight = weight
         self.max_iter = max_iter
         self.tune = tune
+
         self.logger.info(
-            f"Initialized HybridLouvain with max_iter={max_iter}, k3={k3}, k4={k4}, tune={tune}"
+            f"Initialized HybridLouvain with {len(self.G)} graph nodes, "
+            f"{self.B.shape[1]} omics columns, {self.Y.shape[0]} phenotype rows; "
+            f"max_iter={max_iter}, k3={k3}, k4={k4}, tune={tune}"
         )
 
-    def run(self) -> dict:
+    def run(self, as_dfs: bool = False) -> Union[dict, list]:
         iteration = 0
         prev_size = len(self.G.nodes())
         current_partition = None
@@ -67,7 +113,9 @@ class HybridLouvain:
                     k3=self.k3,
                     k4=self.k4,
                     weight=self.weight,
+                    seed=self.seed,
                     tune=True,
+                    gpu=self.gpu,
                 )
                 best_config_louvain = louvain_tuner.run_tuning(num_samples=5)
 
@@ -84,6 +132,8 @@ class HybridLouvain:
                     k4=tuned_k4,
                     weight=self.weight,
                     tune=False,
+                    gpu=self.gpu,
+                    seed=self.seed,
                 )
             else:
                 louvain = CorrelatedLouvain(
@@ -94,6 +144,8 @@ class HybridLouvain:
                     k4=self.k4,
                     weight=self.weight,
                     tune=False,
+                    gpu=self.gpu,
+                    seed=self.seed,
                 )
 
             partition = louvain.run()
@@ -135,6 +187,8 @@ class HybridLouvain:
                     max_iter=100,
                     tol=1e-6,
                     k=0.5,
+                    seed=self.seed,
+                    gpu=self.gpu,
                     tune=True,
                 )
                 best_config_pr = pagerank_tuner.run_tuning(num_samples=5)
@@ -154,10 +208,12 @@ class HybridLouvain:
                     tol=tuned_tol,
                     k=tuned_k,
                     tune=False,
+                    gpu=self.gpu,
+                    seed=self.seed,
                 )
             else:
                 pagerank_instance = CorrelatedPageRank(
-                    graph=self.G, omics_data=self.B, phenotype_data=self.Y, tune=False
+                    graph=self.G, omics_data=self.B, phenotype_data=self.Y, tune=False, seed=self.seed, gpu=self.gpu,
                 )
 
             pagerank_results = pagerank_instance.run(best_seed)
@@ -175,5 +231,14 @@ class HybridLouvain:
             iteration += 1
 
         self.logger.info(f"Hybrid Louvain completed after {iteration+1} iterations.")
-        return {"curr": current_partition, "clus": all_clusters}
 
+        if as_dfs:
+            dfs = []
+            for nodes in all_clusters.values():
+                if len(nodes) > 2:
+
+                    dfs.append(self.B.loc[:, nodes].copy())
+            return dfs
+        else:
+            return {"curr": current_partition, "clus": all_clusters}
+        

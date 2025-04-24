@@ -1,6 +1,8 @@
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Dict, Any,Optional
 import pandas as pd
 import networkx as nx
+import numpy as np
+import os
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
@@ -10,6 +12,7 @@ from ray import tune
 from ray.tune import CLIReporter
 from ray.air import session
 from ray.tune.schedulers import ASHAScheduler
+import torch
 
 from ..utils.logger import get_logger
 
@@ -39,6 +42,8 @@ class CorrelatedPageRank:
         tol: float = 1e-6,
         k: float = 0.5,
         tune: bool = False,
+        gpu: bool = False,
+        seed: Optional[int] = None,
     ):
         """
         Initializes the PageRank instance with direct data structures.
@@ -74,6 +79,21 @@ class CorrelatedPageRank:
         self.logger.info(f"Tolerance: {self.tol}")
         self.logger.info(f"K (Composite Score Weight): {self.k}")
         self._validate_inputs()
+
+        if seed is not None:
+            torch.manual_seed(seed)
+            np.random.seed(seed)
+            if torch.cuda.is_available():
+                torch.cuda.manual_seed(seed)
+                torch.backends.cudnn.deterministic = True
+                torch.backends.cudnn.benchmark = False
+
+        self.seed = seed
+        self.gpu = gpu
+
+        self.device = torch.device("cuda" if gpu and torch.cuda.is_available() else "cpu")
+        self.logger.info(f"Initialized Correlated Louvain. device={self.device}")
+
 
     def _validate_inputs(self):
         """
@@ -244,9 +264,7 @@ class CorrelatedPageRank:
                     contribution = abs(corr_excl) - abs(total_corr)
                 corr_contribution.append(contribution)
 
-            max_contribution = (
-                max(corr_contribution, key=lambda x: abs(x)) if corr_contribution else 1
-            )
+            max_contribution = max(corr_contribution, key=abs) if corr_contribution else 1
             if max_contribution == 0:
                 max_contribution = 1
 
@@ -259,6 +277,7 @@ class CorrelatedPageRank:
         except Exception as e:
             self.logger.error(f"Error in generate_weighted_personalization: {e}")
             raise
+
 
     def run_pagerank_clustering(self, seed_nodes: List[Any]) -> Dict[str, Any]:
         """
@@ -414,6 +433,8 @@ class CorrelatedPageRank:
             max_iter=max_iter,
             tol=tol,
             k=k,
+            gpu=(self.device.type == "cuda"),
+            seed=self.seed,
             tune=False,
         )
         #  tuning uses all nodes as seed nodes.
@@ -438,6 +459,8 @@ class CorrelatedPageRank:
 
         def short_dirname_creator(trial):
             return f"_{trial.trial_id}"
+        
+        resources = {"cpu": 1, "gpu": 1} if self.device.type == "cuda" else {"cpu": 1, "gpu": 0}
 
         analysis = tune.run(
             tune.with_parameters(self._tune_helper),
@@ -446,7 +469,9 @@ class CorrelatedPageRank:
             num_samples=num_samples,
             scheduler=scheduler,
             progress_reporter=reporter,
+            storage_path=os.path.expanduser("~/pr"),
             trial_dirname_creator=short_dirname_creator,
+            resources_per_trial=resources,
             name="l",
         )
 

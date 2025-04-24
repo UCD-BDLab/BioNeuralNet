@@ -1,8 +1,10 @@
 import numpy as np
 import networkx as nx
 import pandas as pd
+import torch
+import os
+from typing import Optional, Union
 
-from typing import Union
 from community.community_louvain import (
     modularity as original_modularity,
     best_partition,
@@ -42,6 +44,8 @@ class CorrelatedLouvain:
         k4: float = 0.8,
         weight: str = "weight",
         tune: bool = False,
+        gpu: bool = False,
+        seed: Optional[int] = None,
     ):
         self.logger = get_logger(__name__)
         self.G = G.copy()
@@ -65,6 +69,20 @@ class CorrelatedLouvain:
         self.logger.info(
             f"Graph has {self.G.number_of_nodes()} nodes and {self.G.number_of_edges()} edges."
         )
+
+        if seed is not None:
+            torch.manual_seed(seed)
+            np.random.seed(seed)
+            if torch.cuda.is_available():
+                torch.cuda.manual_seed(seed)
+                torch.backends.cudnn.deterministic = True
+                torch.backends.cudnn.benchmark = False
+        self.seed = seed
+        self.gpu = gpu
+
+        self.device = torch.device("cuda" if gpu and torch.cuda.is_available() else "cpu")
+        self.logger.info(f"Initialized Correlated Louvain. device={self.device}")
+
 
     def _compute_community_correlation(self, nodes) -> tuple:
         """
@@ -168,7 +186,9 @@ class CorrelatedLouvain:
                 k3=tuned_k3,
                 k4=tuned_k4,
                 weight=self.weight,
-                tune=False
+                tune=False,
+                gpu=self.gpu,
+                seed=self.seed,
             )
             return tuned_instance.run(as_dfs=True)
 
@@ -227,6 +247,8 @@ class CorrelatedLouvain:
             k3=k3,
             k4=k4,
             weight=self.weight,
+            gpu=self.gpu,
+            seed=self.seed,
             tune=False,
         )
         tuned_instance.run()
@@ -246,6 +268,9 @@ class CorrelatedLouvain:
         def short_dirname_creator(trial):
             return f"_{trial.trial_id}"
 
+        resources = {"cpu": 1, "gpu": 1} if self.device.type == "cuda" else {"cpu": 1, "gpu": 0}
+
+        self.logger.info("Starting hyperparameter tuning...")
         analysis = tune.run(
             tune.with_parameters(self._tune_helper),
             config=search_config,
@@ -253,7 +278,9 @@ class CorrelatedLouvain:
             num_samples=num_samples,
             scheduler=scheduler,
             progress_reporter=reporter,
+            storage_path=os.path.expanduser("~/cl"),
             trial_dirname_creator=short_dirname_creator,
+            resources_per_trial=resources,
             name="l",
         )
 
