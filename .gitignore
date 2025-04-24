@@ -25,9 +25,11 @@ Output**
 ./MOGONET/
 MOGONET/
 .BRCA_cleaned
-
+tcga_brca-temp
 s_embedding_testing**
 **.ipynb
+tcga_brca
+FireHose_data
 
 /bioneuralnet/external_tools/cptac_wrapper.py
 TCGA_BRCA_DATA
@@ -54,12 +56,25 @@ MOGONET/
 *.csv
 *.RData
 
+!bioneuralnet/external_tools/
+!bioneuralnet/external_tools/SmCCNet.R
+!bioneuralnet/external_tools/WGCNA.R
+!bioneuralnet/utils/
+!bioneuralnet/utils/rdata_to_df.R
+
 # Allowing .csv files in datasets/example1 and its subdirectories
 !bioneuralnet/datasets/
 !bioneuralnet/datasets/example1/
 !bioneuralnet/datasets/example1/**/*.csv
-!cancer_output_1/**/*.csv
-!cancer_output_2/**/*.csv
+
+!bioneuralnet/datasets/
+!bioneuralnet/datasets/monet/
+!bioneuralnet/datasets/monet/**/*.csv
+
+!bioneuralnet/datasets/
+!bioneuralnet/datasets/tcga_brca/
+!bioneuralnet/datasets/tcga_brca/**/*.csv
+
 # Sphinx documentation build
 docs/build/
 

@@ -5,6 +5,12 @@ include LICENSE
 # Include assets and images
 recursive-include assets *.png *.jpg *.svg
 
+# Include R files
+recursive-include R *.R
+recursive-include R *.r
+recursive-include bioneuralnet/external_tools *.R *.r
+recursive-include bioneuralnet/utils *.R *.r
+
 # Include documentation source files
 recursive-include docs *
 
