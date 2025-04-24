@@ -72,6 +72,7 @@ class SmCCNet:
             between_shrinkage (float): Shrink factor for multi-omics correlation. Default=5.0.
             output_dir (str): Folder to write temp files. If None, uses a temporary directory.
         """
+        self.logger = get_logger(__name__)
         self.rscript_path = shutil.which("Rscript")
         if self.rscript_path is None:
             raise EnvironmentError("Rscript not found in system PATH. R is required to run SmCCNet.")
