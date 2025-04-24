@@ -29,7 +29,7 @@ Modules:
     - `datasets`: Contains example (synthetic) datasets for testing and demonstration purposes.
 """
 
-__version__ = "1.0.1"
+__version__ = "1.0.4"
 
 from .network_embedding import GNNEmbedding
 from .subject_representation import GraphEmbedding
@@ -68,6 +68,7 @@ from .utils import rdata_to_df
 from .utils import get_logger
 
 from .datasets import DatasetLoader
+from .datasets import NetworkLoader
 from .external_tools import SmCCNet
 from .external_tools import WGCNA
 from .external_tools import Node2Vec
@@ -83,6 +84,7 @@ __all__: list = [
     "omics_correlation",
     "cluster_correlation",
     "louvain_to_adjacency",
+    "NetworkLoader",
     "evaluate_rf",
     "network_filter",
     "rdata_to_df",

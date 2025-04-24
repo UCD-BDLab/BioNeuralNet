@@ -31,6 +31,7 @@ s_embedding_testing**
 tcga_brca
 FireHose_data
 
+
 /bioneuralnet/external_tools/cptac_wrapper.py
 TCGA_BRCA_DATA
 Smccnet_output/
@@ -75,6 +76,10 @@ MOGONET/
 !bioneuralnet/datasets/tcga_brca/
 !bioneuralnet/datasets/tcga_brca/**/*.csv
 
+!bioneuralnet/datasets/networks/
+!bioneuralnet/datasets/networks/**/*.csv
+feature_testing
+
 # Sphinx documentation build
 docs/build/
 
@@ -99,7 +104,8 @@ bioneuralnet-env/
 # OS generated files
 .DS_Store
 Thumbs.db
-
+bioneuralnet/utils/kg_apis/
+bioneuralnet/datasets/temp/
 # Coverage reports
 htmlcov/
 .coverage

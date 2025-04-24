@@ -72,6 +72,7 @@ class SmCCNet:
             between_shrinkage (float): Shrink factor for multi-omics correlation. Default=5.0.
             output_dir (str): Folder to write temp files. If None, uses a temporary directory.
         """
+        self.logger = get_logger(__name__)
         self.rscript_path = shutil.which("Rscript")
         if self.rscript_path is None:
             raise EnvironmentError("Rscript not found in system PATH. R is required to run SmCCNet.")
@@ -93,6 +94,17 @@ class SmCCNet:
 
             self.r_script = r_script_path
             self.logger.warning(f"Using fallback R script path: {self.r_script}")
+        
+        if isinstance(phenotype_df, pd.Series):
+            phenotype_df = phenotype_df.to_frame(name="phenotype")
+            
+        if isinstance(phenotype_df, pd.DataFrame) and phenotype_df.shape[1] > 1:
+            self.logger.warning("Phenotype DataFrame has more than one column. Renaming to phenotype and keeping only the first column")
+            phenotype_df = phenotype_df.iloc[:, :1]
+            phenotype_df.columns = ["phenotype"]
+
+        if not isinstance(phenotype_df, pd.DataFrame):
+            raise ValueError("phenotype_df must be a pandas DataFrame or Series.")
             
         self.phenotype_df = phenotype_df.copy(deep=True)
 
