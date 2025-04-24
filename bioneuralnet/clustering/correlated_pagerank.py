@@ -264,9 +264,7 @@ class CorrelatedPageRank:
                     contribution = abs(corr_excl) - abs(total_corr)
                 corr_contribution.append(contribution)
 
-            max_contribution = (
-                max(corr_contribution, key=lambda x: abs(x)) if corr_contribution else 1
-            )
+            max_contribution = max(corr_contribution, key=abs) if corr_contribution else 1
             if max_contribution == 0:
                 max_contribution = 1
 
@@ -279,6 +277,7 @@ class CorrelatedPageRank:
         except Exception as e:
             self.logger.error(f"Error in generate_weighted_personalization: {e}")
             raise
+
 
     def run_pagerank_clustering(self, seed_nodes: List[Any]) -> Dict[str, Any]:
         """

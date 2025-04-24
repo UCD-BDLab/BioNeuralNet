@@ -8,7 +8,7 @@ try:
     from node2vec import Node2Vec
 
 except ImportError:
-    raise ImportError("Please install external module: pip install Node2Vec")
+    raise ImportError("Please install external module: pip install Node2Vec=0.4.3")
 
 class node2vec:
     """

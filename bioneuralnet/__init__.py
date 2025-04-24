@@ -29,7 +29,7 @@ Modules:
     - `datasets`: Contains example (synthetic) datasets for testing and demonstration purposes.
 """
 
-__version__ = "1.0"
+__version__ = "1.0.1"
 
 from .network_embedding import GNNEmbedding
 from .subject_representation import GraphEmbedding
@@ -42,6 +42,7 @@ from .metrics import omics_correlation
 from .metrics import cluster_correlation
 from .metrics import louvain_to_adjacency
 from .metrics import evaluate_rf
+from .metrics import plot_performance_three
 from .metrics import plot_variance_distribution
 from .metrics import plot_variance_by_feature
 from .metrics import plot_performance
@@ -49,7 +50,20 @@ from .metrics import plot_embeddings
 from .metrics import plot_network
 from .metrics import compare_clusters
 
+from .utils import clean_inf_nan
+from .utils import preprocess_clinical
+from .utils import prune_network
+from .utils import prune_network_by_quantile
+from .utils import select_top_k_variance
+from .utils import top_anova_f_features
+from .utils import top_features_autoencoder
+from .utils import zero_fraction_summary
+from .utils import correlation_summary
+from .utils import network_remove_low_variance
 from .utils import network_filter
+from .utils import variance_summary
+from .utils import explore_data_stats
+from .utils import expression_summary
 from .utils import rdata_to_df
 from .utils import get_logger
 
@@ -72,8 +86,22 @@ __all__: list = [
     "evaluate_rf",
     "network_filter",
     "rdata_to_df",
+    "variance_summary",
+    "explore_data_stats",
+    "network_remove_low_variance",
+    "zero_fraction_summary",
+    "expression_summary",
+    "correlation_summary",
+    "clean_inf_nan",
+    "preprocess_clinical",
+    "prune_network",
+    "prune_network_by_quantile",
+    "select_top_k_variance",
+    "top_anova_f_features",
+    "top_features_autoencoder",
     "get_logger",
     "plot_performance",
+    "plot_performance_three",
     "plot_variance_distribution",
     "plot_variance_by_feature",
     "plot_embeddings",

@@ -211,7 +211,7 @@ def top_features_autoencoder(
 
 def top_k_cov_tgt(df: pd.DataFrame, target: pd.Series, k: int = 100) -> pd.DataFrame:
     """
-    Keep top k features by covariance with target
+    Keep top k features by covariance with target.
     """
     df = df.copy()
     df = clean_inf_nan(df)
@@ -219,7 +219,10 @@ def top_k_cov_tgt(df: pd.DataFrame, target: pd.Series, k: int = 100) -> pd.DataF
     tgt = target.loc[df.index].astype(float)
     num = df.select_dtypes(include="number")
 
-    cov = num.apply(lambda col: col.cov(tgt)).abs()
+    def compute_cov(col: pd.Series) -> float:
+        return col.cov(tgt)
+
+    cov = num.apply(compute_cov).abs()
     k = min(k, len(cov))
     top = cov.nlargest(k).index.tolist()
     logger.info(f"Top {k} features selected by covariance with target")

@@ -17,6 +17,7 @@ import itertools
 import shutil
 import subprocess
 from pathlib import Path
+from importlib.resources import files
 
 class SmCCNet:
     """
@@ -71,9 +72,27 @@ class SmCCNet:
             between_shrinkage (float): Shrink factor for multi-omics correlation. Default=5.0.
             output_dir (str): Folder to write temp files. If None, uses a temporary directory.
         """
-        rscript_path = shutil.which("Rscript")
-        if rscript_path is None:
+        self.rscript_path = shutil.which("Rscript")
+        if self.rscript_path is None:
             raise EnvironmentError("Rscript not found in system PATH. R is required to run SmCCNet.")
+
+        try:
+            r_script_path = files("bioneuralnet.external_tools").joinpath("SmCCNet.R")
+            if not r_script_path.is_file():
+                raise FileNotFoundError
+
+            self.r_script = str(r_script_path)
+            self.logger.info(f"Using R script via importlib: {self.r_script}")
+
+        except Exception:
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            r_script_path = os.path.join(script_dir, "SmCCNet.R")
+
+            if not os.path.isfile(r_script_path):
+                raise FileNotFoundError(f"SmCCNet.R script not found via importlib or local path: {r_script_path}")
+
+            self.r_script = r_script_path
+            self.logger.warning(f"Using fallback R script path: {self.r_script}")
             
         self.phenotype_df = phenotype_df.copy(deep=True)
 
@@ -167,9 +186,7 @@ class SmCCNet:
 
         if len(all_index_names) > 1 or None in all_index_names:
             new_index_name = "SampleID"
-            # self.logger.info(
-            #     f"Indexes differ or are unnamed. Renaming all indexes to '{new_index_name}'."
-            # )
+
             self.phenotype_df.index.name = new_index_name
             for df in self.omics_dfs:
                 df.index.name = new_index_name
@@ -204,6 +221,7 @@ class SmCCNet:
         self.logger.info(f"Serialized phenotype with {len(pheno_df)} samples.")
 
         return serialized_data
+    
 
     def run_smccnet(self, serialized_data: Dict[str, Any]) -> None:
         """
@@ -213,19 +231,20 @@ class SmCCNet:
         try:
             self.logger.info("Executing SmCCNet R script...")
             json_data = json.dumps(serialized_data) + "\n"
-            script_dir = os.path.dirname(os.path.abspath(__file__))
+            
+            # script_dir = os.path.dirname(os.path.abspath(__file__))
 
-            r_script = os.path.join(script_dir, "SmCCNet.R")
-            if not os.path.isfile(r_script):
-                raise FileNotFoundError(f"R script not found: {r_script}")
+            # r_script = os.path.join(script_dir, "SmCCNet.R")
+            # if not os.path.isfile(r_script):
+            #     raise FileNotFoundError(f"R script not found: {r_script}")
 
-            rscript_path = shutil.which("Rscript")
-            if rscript_path is None:
-                raise EnvironmentError("Rscript not found in system PATH.")
+            # rscript_path = shutil.which("Rscript")
+            # if rscript_path is None:
+            #     raise EnvironmentError("Rscript not found in system PATH.")
 
             cmd = [
-                rscript_path,
-                r_script,
+                self.rscript_path,
+                self.r_script,
                 ",".join(self.data_types),
                 str(self.kfold),
                 self.summarization,
@@ -253,7 +272,7 @@ class SmCCNet:
             spin_thread = threading.Thread(target=spinner)
             spin_thread.start()
 
-            # run
+            # run Rscript (blocks until done)
             result = subprocess.run(
                 cmd,
                 input=json_data,
@@ -283,6 +302,7 @@ class SmCCNet:
             spin_thread.join()
             self.logger.error(f"Error during SmCCNet execution: {e}")
             raise
+
 
     def get_clusters(self) -> list[pd.DataFrame, Any]:
         """

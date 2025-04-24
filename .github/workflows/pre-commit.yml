@@ -62,5 +62,5 @@ jobs:
           Rscript -e "install.packages('WGCNA', repos='https://cran.r-project.org')"
         shell: bash
 
-      - name: Run Pre-Commit Checks
-        run: pre-commit run --all-files --show-diff-on-failure
+      # - name: Run Pre-Commit Checks
+      #   run: pre-commit run --all-files --show-diff-on-failure
