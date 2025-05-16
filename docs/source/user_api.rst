@@ -10,7 +10,6 @@ The **User API** lists BioNeuralNet's key classes, methods, and utilities.
    bioneuralnet.network_embedding
    bioneuralnet.clustering
    bioneuralnet.downstream_task
-   bioneuralnet.subject_representation
    bioneuralnet.utils
    bioneuralnet.datasets
    bioneuralnet.metrics
@@ -21,8 +20,7 @@ Executables
 
 Certain classes expose a high-level ``run()`` method to perform end-to-end workflows:
 
-- **SmCCNet** or **WGCNA** (from `bioneuralnet.external_tools`) for adjacency generation
-- **GraphEmbedding** for integrating embeddings into subject-level data
+- **SubjectRepresentation** for integrating embeddings into subject-level data
 - **CorrelatedLouvain** or **HybridLouvain** for clustering
 - **DPMON** for disease prediction
 
@@ -50,14 +48,17 @@ Example:
 
 Below are references to the ``run()`` methods:
 
-.. automethod:: bioneuralnet.external_tools.smccnet.SmCCNet.run
+.. automethod:: bioneuralnet.external_tools.SmCCNet.run
    :no-index:
 
-.. automethod:: bioneuralnet.downstream_task.GraphEmbedding.run
+.. automethod:: bioneuralnet.downstream_task.SubjectRepresentation.run
+   :no-index:
+
+.. automethod:: bioneuralnet.downstream_task.DPMON.run
    :no-index:
 
 .. automethod:: bioneuralnet.clustering.CorrelatedLouvain.run
    :no-index:
 
-.. automethod:: bioneuralnet.downstream_task.DPMON.run
+.. automethod:: bioneuralnet.clustering.HybridLouvain.run
    :no-index:

@@ -1,7 +1,7 @@
 Subject Representation
 ======================
 
-**SubjectRepresentation** (GraphEmbedding) enriches omics data by incorporating node embeddings:
+**SubjectRepresentation** (SubjectRepresentation) enriches omics data by incorporating node embeddings:
 
 .. literalinclude:: ../examples/subject_representation_example.py
    :language: python

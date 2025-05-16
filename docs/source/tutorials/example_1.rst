@@ -4,7 +4,7 @@ This tutorial illustrates how to:
 
 1. **Build**: an adjacency matrix with SmCCNet.
 2. **Enhance Representation**: Generate node embeddings using GNNEmbedding.
-3. **Integrate**: Incorporate these embeddings into subject-level omics data using GraphEmbedding.
+3. **Integrate**: Incorporate these embeddings into subject-level omics data using SubjectRepresentation.
 
 **Workflow**:
 
@@ -36,7 +36,7 @@ This tutorial illustrates how to:
    - Use `.fit()` and `.embed()` to generate node embeddings.
 
 4. **Subject Representation**:
-   - Integrate these embeddings into omics data via `GraphEmbedding`.
+   - Integrate these embeddings into omics data via `SubjectRepresentation`.
 
 
 Below is a **complete** Python implementation:
@@ -47,7 +47,7 @@ Below is a **complete** Python implementation:
    from bioneuralnet.datasets import DatasetLoader
    from bioneuralnet.external_tools import SmCCNet
    from bioneuralnet.network_embedding import GNNEmbedding
-   from bioneuralnet.subject_representation import GraphEmbedding
+   from bioneuralnet.downstream_task import SubjectRepresentation
 
    # 1) Load dataset
    loader = DatasetLoader("example1")
@@ -79,8 +79,8 @@ Below is a **complete** Python implementation:
 
    print(f"GNN embeddings generated. Shape: {embeddings_output.shape}")
 
-   # 5) Perform subject representation using GraphEmbedding
-   graph_embedding = GraphEmbedding(
+   # 5) Perform subject representation using SubjectRepresentation
+   graph_embedding = SubjectRepresentation(
        omics_data=merged_omics,
        embeddings=embeddings_output,
        phenotype_data=phenotype,

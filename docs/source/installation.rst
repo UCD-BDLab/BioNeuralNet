@@ -38,7 +38,7 @@ BioNeuralNet supports Python 3.10 and 3.11 in this beta release. Follow the step
 
 3. **(Optional) Install R and External Tools**:
 
-   If you plan to use **WGCNA** or **SmCCNet** for network construction:
+   If you plan to use **SmCCNet** for network construction:
 
    - Install R from `The R Project <https://www.r-project.org/>`_.
       - Version 4.4.2 or higher is recommended.
@@ -58,4 +58,4 @@ BioNeuralNet supports Python 3.10 and 3.11 in this beta release. Follow the step
 
 5. **Next Steps**:
 
-   - Explore :doc:`tutorials/index` and :doc:`BioNeuralNet` for end-to-end workflows and examples.
+   - Explore :doc:`tutorials/index` and :doc:`Quick_Start` or :doc:`TCGA-BRCA_Dataset` for end-to-end workflows and examples.

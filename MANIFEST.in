@@ -13,6 +13,7 @@ recursive-include bioneuralnet/utils *.R *.r
 
 recursive-include bioneuralnet/datasets/monet *.csv
 recursive-include bioneuralnet/datasets/example1 *.csv
+recursive-include bioneuralnet/datasets/brca *.csv
 
 # Include documentation source files
 recursive-include docs *

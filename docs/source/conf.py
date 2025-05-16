@@ -55,5 +55,5 @@ autodoc_mock_imports = [
     "torch",
     "torch_geometric",
     "bioneuralnet.external_tools",
-    "bioneuralnet.external_tools.node2vec",
+    "sklearn",
 ]

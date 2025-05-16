@@ -30,26 +30,26 @@ The **DPMON** module provides a seamless, end-to-end workflow for disease predic
 Example Usage:
 
 .. code-block:: python
-
+   
    from bioneuralnet.downstream_task import DPMON
    import pandas as pd
 
    # Prepare data
    phenotype_data = pd.read_csv("phenotype_data.csv")
    omics_list = [
-       pd.read_csv("omics_data1.csv"),
-       pd.read_csv("omics_data2.csv")
+      pd.read_csv("omics_data1.csv"),
+      pd.read_csv("omics_data2.csv")
    ]
    clinical_data = pd.read_csv("clinical_data.csv")
    network = pd.read_csv("network.csv")
 
    # Initialize DPMON for disease prediction
    dpmon = DPMON(
-       adjacency_matrix=network,
-       omics_list=omics_list,
-       phenotype_data=phenotype_data,
-       clinical_data=clinical_data,
-       model="GAT"
+      adjacency_matrix=network,
+      omics_list=omics_list,
+      phenotype_data=phenotype_data,
+      clinical_data=clinical_data,
+      model="GAT"
    )
 
    # Run the pipeline

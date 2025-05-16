@@ -7,6 +7,7 @@ from typing import Optional,Union
 from datetime import datetime
 from pathlib import Path
 import networkx as nx
+import ray
 
 import torch
 import torch.nn as nn
@@ -108,7 +109,7 @@ class GNNEmbedding:
             torch.manual_seed(seed)
             np.random.seed(seed)
             if torch.cuda.is_available():
-                torch.cuda.manual_seed(seed)
+                torch.cuda.manual_seed_all(seed)
                 torch.backends.cudnn.deterministic = True
                 torch.backends.cudnn.benchmark = False
 
@@ -259,14 +260,30 @@ class GNNEmbedding:
         network_filtered = self.adjacency_matrix.loc[nodes, nodes]
 
         G = nx.from_pandas_adjacency(network_filtered)
-        pagerank = nx.pagerank(G, alpha=0.85, weight='weight', max_iter=1000)
-        eigenvector = nx.eigenvector_centrality_numpy(G, max_iter=1000)
-        katz = nx.katz_centrality_numpy(G, alpha=0.005, beta=1.0, weight='weight')
 
+        pagerank = nx.pagerank(G, alpha=0.85, weight="weight", max_iter=1000)
+        katz = nx.katz_centrality_numpy(G, alpha=0.005, beta=1.0, weight="weight")
+
+        eigenvector = {}
+        for comp in nx.connected_components(G):
+            sub = G.subgraph(comp)
+            try:
+                ec = nx.eigenvector_centrality(sub, max_iter=1000, tol=1e-6, weight="weight")
+            except nx.PowerIterationFailedConvergence:
+                ec = {}
+                self.logger.warning(
+                    f"Eigenvector centrality failed for component size {len(sub)}; defaulting to 0."
+                )
+                for node in sub.nodes():
+                    ec[node] = 0.0
+
+            eigenvector.update(ec)
+
+        nodes = list(network_filtered.index)
         centralities_df = pd.DataFrame({
-            "pagerank": pagerank,
+            "pagerank":   pagerank,
             "eigenvector": eigenvector,
-            "katz": katz
+            "katz":       katz
         }).reindex(nodes)
 
         if self.clinical_data is not None and not self.clinical_data.empty:
@@ -401,9 +418,12 @@ class GNNEmbedding:
             # no edge_attr
             data.edge_weight = torch.ones(data.edge_index.size(1))
 
-        data.edge_index, data.edge_weight = add_self_loops(
-            data.edge_index, data.edge_weight, fill_value=1.0, num_nodes=len(nodes)
-        )
+        # data.edge_index, data.edge_weight = add_self_loops(
+        #     data.edge_index, data.edge_weight, fill_value=1.0, num_nodes=len(nodes)
+        # )
+        # if isinstance(conv, (SAGEConv, GINConv)):
+        #     data.edge_index, data.edge_weight = add_self_loops(
+        #     data.edge_index, data.edge_weight, fill_value=1.0, num_nodes=data.num_nodes)
 
         data.x = torch.tensor(node_features.loc[nodes].values, dtype=torch.float)
         data.y = torch.tensor(node_labels.loc[nodes].values,   dtype=torch.float)
@@ -490,11 +510,12 @@ class GNNEmbedding:
         self.logger.info("Generating node embeddings from the trained GNN model.")
         model.eval()
         data = data.to(self.device)
+
         with torch.no_grad():
             embeddings = model.get_embeddings(data)
+
         return embeddings.cpu()
-
-
+    
     def _tune_helper(self, config):
         """
         The function that each Ray Tune trial calls.
@@ -564,7 +585,7 @@ class GNNEmbedding:
                 "mse": mse,
                 "composite_score": composite_score,
                 "mean_dim_std": mean_dim_std,
-                # debugging info
+
                 "dims_original": len(dim_stds),
                 "dims_dropped": int(len(dim_stds) - num_dims_kept)
             })
@@ -575,7 +596,6 @@ class GNNEmbedding:
             import traceback
             traceback.print_exc()
             tune.report({"mse": 1e8, "composite_score": 1e8, "mean_dim_std": 0.0})
-
 
 
     def run_gnn_embedding_tuning(self, num_samples=15):
@@ -651,30 +671,5 @@ class GNNEmbedding:
             json.dump(best_trial.config, f, indent=4)
 
         self.logger.info(f"Best embedding parameters saved to {best_params_file}")
+        
         return best_trial.config
-
-        # Uncomment the following block to enable size-based tuning
-        # if num_nodes <= 20:
-        #     self.logger.info("Graph size: Very Small (≤30 nodes)")
-        #     config.update({
-        #         "hidden_dim": tune.choice([8, 16, 32]),
-        #         "layer_num": tune.choice([2, 3, 4]),
-        #         "dropout": tune.choice([0.0, 0.1, 0.2]),
-        #         "num_epochs": tune.choice([64, 128, 256])
-        #     })
-        # elif num_nodes <= 50:
-        #     self.logger.info("Graph size: Small (31-100 nodes) ]]")
-        #     config.update({
-        #         "hidden_dim": tune.choice([16, 32, 64, 128]),
-        #         "layer_num": tune.choice([2, 3, 4, 5]),
-        #         "dropout": tune.choice([0.1, 0.2, 0.3, 0.4]),
-        #         "num_epochs": tune.choice([128, 256, 512, 1024])
-        #     })
-        # elif num_nodes <= 100:
-        #     self.logger.info("Graph size: Medium (101 nodes)")
-        #     config.update({
-        #         "hidden_dim": tune.choice([32, 64, 128, 256]),
-        #         "layer_num": tune.choice([3, 4, 5, 6]),
-        #         "dropout": tune.choice([0.2, 0.3, 0.4, 0.5]),
-        #         "num_epochs": tune.choice([256, 512, 1024])
-        #     })

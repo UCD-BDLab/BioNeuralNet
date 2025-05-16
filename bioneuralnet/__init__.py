@@ -29,10 +29,10 @@ Modules:
     - `datasets`: Contains example (synthetic) datasets for testing and demonstration purposes.
 """
 
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 
 from .network_embedding import GNNEmbedding
-from .subject_representation import GraphEmbedding
+from .downstream_task import SubjectRepresentation
 from .downstream_task import DPMON
 from .clustering import CorrelatedPageRank
 from .clustering import CorrelatedLouvain
@@ -50,33 +50,38 @@ from .metrics import plot_embeddings
 from .metrics import plot_network
 from .metrics import compare_clusters
 
-from .utils import clean_inf_nan
+from .utils import get_logger
+from .utils import rdata_to_df
+from .utils import variance_summary
+from .utils import zero_fraction_summary
+from .utils import expression_summary
+from .utils import correlation_summary
+from .utils import explore_data_stats
 from .utils import preprocess_clinical
+from .utils import clean_inf_nan
+from .utils import select_top_k_variance
+from .utils import select_top_k_correlation
+from .utils import select_top_randomforest
+from .utils import top_anova_f_features
 from .utils import prune_network
 from .utils import prune_network_by_quantile
-from .utils import select_top_k_variance
-from .utils import top_anova_f_features
-from .utils import top_features_autoencoder
-from .utils import zero_fraction_summary
-from .utils import correlation_summary
 from .utils import network_remove_low_variance
-from .utils import network_filter
-from .utils import variance_summary
-from .utils import explore_data_stats
-from .utils import expression_summary
-from .utils import rdata_to_df
-from .utils import get_logger
+from .utils import network_remove_high_zero_fraction
+from .utils import gen_similarity_graph
+from .utils import gen_correlation_graph
+from .utils import gen_threshold_graph
+from .utils import gen_gaussian_knn_graph
+from .utils import gen_lasso_graph
+from .utils import gen_mst_graph
+from .utils import gen_snn_graph
 
 from .datasets import DatasetLoader
-from .datasets import NetworkLoader
 from .external_tools import SmCCNet
-from .external_tools import WGCNA
-from .external_tools import Node2Vec
 
 __all__: list = [
     "__version__",
     "GNNEmbedding",
-    "GraphEmbedding",
+    "SubjectRepresentation",
     "DPMON",
     "CorrelatedPageRank",
     "CorrelatedLouvain",
@@ -84,33 +89,42 @@ __all__: list = [
     "omics_correlation",
     "cluster_correlation",
     "louvain_to_adjacency",
-    "NetworkLoader",
     "evaluate_rf",
-    "network_filter",
-    "rdata_to_df",
-    "variance_summary",
-    "explore_data_stats",
-    "network_remove_low_variance",
-    "zero_fraction_summary",
-    "expression_summary",
-    "correlation_summary",
-    "clean_inf_nan",
-    "preprocess_clinical",
-    "prune_network",
-    "prune_network_by_quantile",
-    "select_top_k_variance",
-    "top_anova_f_features",
-    "top_features_autoencoder",
-    "get_logger",
-    "plot_performance",
     "plot_performance_three",
     "plot_variance_distribution",
     "plot_variance_by_feature",
+    "plot_performance",
     "plot_embeddings",
     "plot_network",
     "compare_clusters",
+    "get_logger",
+    "rdata_to_df",
+    "variance_summary",
+    "zero_fraction_summary",
+    "expression_summary",
+    "correlation_summary",
+    "explore_data_stats",
+    "preprocess_clinical",
+    "clean_inf_nan",
+    "select_top_k_variance",
+    "select_top_k_correlation",
+    "select_top_randomforest",
+    "top_anova_f_features",
+    "prune_network",
+    "prune_network_by_quantile",
+    "network_remove_low_variance",
+    "network_remove_high_zero_fraction",
+    "gen_similarity_graph",
+    "gen_correlation_graph",
+    "gen_threshold_graph",
+    "gen_gaussian_knn_graph",
+    "gen_lasso_graph",
+    "gen_mst_graph",
+    "gen_snn_graph",
     "DatasetLoader",
+    "NetworkLoader",
     "SmCCNet",
     "WGCNA",
-    "Node2Vec",
+    "Node2Vec"
+    "evaluate_model",
 ]

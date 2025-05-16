@@ -4,9 +4,6 @@ Correlated Clustering
 BioNeuralNet includes internal modules for performing **correlated clustering** on complex networks.
 These methods extend traditional community detection by integrating **phenotype correlation**, allowing users to extract **biologically relevant, phenotype-associated modules** from any network.
 
-paper link: https://doi.org/10.3389/fdata.2022.894632 
-
-
 Overview
 --------
 
@@ -155,5 +152,7 @@ Conclusion
 
 The **correlated clustering methods** implemented in BioNeuralNet provide a **powerful, flexible framework** for extracting **highly structured, phenotype-associated modules** from any network.
 By integrating **phenotype correlation directly into the clustering process**, these methods enable **more biologically relevant and disease-informative network analysis**.
+
+paper link: https://doi.org/10.3389/fdata.2022.894632 
 
 Return to :doc:`../index`

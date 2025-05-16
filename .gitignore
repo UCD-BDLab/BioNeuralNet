@@ -16,42 +16,25 @@ bioneuralnet.egg-info
 /build/
 /docker_files/
 .mypy_cache
+Quick Start.ipynb
+TCGA-BRCA_Dataset.ipynb
 
 # Other example data and tests not needed in the repo.
-TOPMed_testing/
-TOPMed_notes/
+
 Output**
-
-./MOGONET/
-MOGONET/
-.BRCA_cleaned
-tcga_brca-temp
-s_embedding_testing**
-**.ipynb
-tcga_brca
-FireHose_data
-
-
-/bioneuralnet/external_tools/cptac_wrapper.py
-TCGA_BRCA_DATA
-Smccnet_output/
-
-KG_testing/
-KG_Python/
+All_Recent_Testing/
 bioneuralnet/utils/kg_apis/
-todo_slides.md
-test_notes.md
-todo.md
-test_release.md
-test_cuda_issues.md
-dpmon/
-dp/
-dpmon_output/
-smokers/
-Testing_all/
-TCGA_DATA_ALL_FOLDERS/
-MOGONET/
+KG_Python/
 .testing
+bioneuralnet/subject_representation_old/
+bioneuralnet/downstream_task/subject_representation_old.py
+bioneuralnet/external_tools/cptac_wrapper_old.py
+node2vec_old.py
+wgcna_old.py
+WGCNA_old.R
+TCGA_BRCA/
+CNN/
+TCGA_BRCA_DATA/
 
 # Blocking sensitive file types globally
 *.csv
@@ -73,8 +56,8 @@ MOGONET/
 !bioneuralnet/datasets/monet/**/*.csv
 
 !bioneuralnet/datasets/
-!bioneuralnet/datasets/tcga_brca/
-!bioneuralnet/datasets/tcga_brca/**/*.csv
+!bioneuralnet/datasets/brca/
+!bioneuralnet/datasets/brca/**/*.csv
 
 !bioneuralnet/datasets/networks/
 !bioneuralnet/datasets/networks/**/*.csv
