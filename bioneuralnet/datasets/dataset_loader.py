@@ -59,16 +59,12 @@ class DatasetLoader:
 
             meth_part1 = pd.read_csv(folder / "meth_1.csv", index_col=0)
             meth_part2= pd.read_csv(folder / "meth_2.csv", index_col=0)
-            meth_part3 = pd.read_csv(folder / "meth_3.csv", index_col=0)
-            meth_part4= pd.read_csv(folder / "meth_4.csv", index_col=0)
 
             rna_part1 = pd.read_csv(folder / "rna_1.csv", index_col=0)
             rna_part2 = pd.read_csv(folder / "rna_2.csv", index_col=0)
-            rna_part3 = pd.read_csv(folder / "rna_1.csv", index_col=0)
-            rna_part4 = pd.read_csv(folder / "rna_2.csv", index_col=0)
 
-            self.data["meth"] = pd.concat([meth_part1, meth_part2, meth_part3, meth_part4], axis=0)
-            self.data["rna"] = pd.concat([rna_part1, rna_part2, rna_part3, rna_part4], axis=0)
+            self.data["meth"] = pd.concat([meth_part1, meth_part2], axis=0)
+            self.data["rna"] = pd.concat([rna_part1, rna_part2], axis=0)
 
         else:
             raise ValueError(f"Dataset '{self.dataset_name}' is not recognized.")
