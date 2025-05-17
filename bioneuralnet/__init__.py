@@ -29,7 +29,7 @@ Modules:
     - `datasets`: Contains example (synthetic) datasets for testing and demonstration purposes.
 """
 
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 
 from .network_embedding import GNNEmbedding
 from .downstream_task import SubjectRepresentation
