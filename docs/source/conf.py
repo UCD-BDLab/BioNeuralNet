@@ -21,9 +21,12 @@ extensions = [
     "nbsphinx",
 ]
 
-pygments_style = "sphinx"
+pygments_style = "friendly"
+pygments_dark_style = "native"
 highlight_language = "python"
 nbsphinx_codecell_lexer = "ipython3"
+nbsphinx_execute = "never"
+nbsphinx_prompt_width = "0em"
 
 autosummary_imported_members = True
 autodoc_default_options = {
@@ -49,6 +52,7 @@ intersphinx_mapping = {
     "scikit-learn": ("https://scikit-learn.org/stable/", None),
     "matplotlib": ("https://matplotlib.org/stable/", None),
     "networkx": ("https://networkx.org/documentation/stable/", None),
+    "statsmodels": ("https://www.statsmodels.org/stable/", None),
 }
 
 autodoc_mock_imports = [
@@ -56,4 +60,5 @@ autodoc_mock_imports = [
     "torch_geometric",
     "bioneuralnet.external_tools",
     "sklearn",
+    "statsmodels",
 ]

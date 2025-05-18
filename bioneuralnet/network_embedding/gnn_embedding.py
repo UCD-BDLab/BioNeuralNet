@@ -7,19 +7,28 @@ from typing import Optional,Union
 from datetime import datetime
 from pathlib import Path
 import networkx as nx
-import ray
+import tempfile
 
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch_geometric.data import Data
-from torch_geometric.utils import from_networkx
+
+try:
+    import torch
+    import torch.nn as nn
+    import torch.optim as optim
+    from torch_geometric.data import Data
+    from torch_geometric.utils import from_networkx
+    from torch_geometric.utils import add_self_loops
+except ModuleNotFoundError:
+    raise ImportError(
+        "GNNEmbedding requires PyTorch Geometric. "
+        "Please install it by following the instructions at: "
+        "https://bioneuralnet.readthedocs.io/en/latest/installation.html"
+    )
+
 from sklearn.model_selection import train_test_split
-
 from sklearn.metrics import mean_squared_error
 from sklearn.ensemble import RandomForestRegressor
 
-import tempfile
+import ray
 from ray import tune
 from ray.tune import CLIReporter
 from ray.tune.schedulers import ASHAScheduler
@@ -27,8 +36,6 @@ from ray.tune.schedulers import ASHAScheduler
 from .gnn_models import GCN, GAT, SAGE, GIN, process_dropout
 from ..utils.logger import get_logger
 from scipy.stats import skew
-from torch_geometric.utils import add_self_loops
-
 
 class GNNEmbedding:
     """

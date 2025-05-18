@@ -10,7 +10,6 @@ bioneuralnet.utils.preprocess
    
       clean_inf_nan
       get_logger
-      multipletests
       network_remove_high_zero_fraction
       network_remove_low_variance
       preprocess_clinical
