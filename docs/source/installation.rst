@@ -1,7 +1,7 @@
 Installation
 ============
 
-BioNeuralNet supports Python 3.10 and 3.11 in this beta release. Follow the steps below to set up BioNeuralNet and its dependencies.
+BioNeuralNet is fully compatible with Python 3.10, 3.11, and 3.12, and runs seamlessly on Windows, macOS, and Linux. Follow the steps below to set up BioNeuralNet and its dependencies.
 
 1. **Install BioNeuralNet via pip**:
 
@@ -18,7 +18,7 @@ BioNeuralNet supports Python 3.10 and 3.11 in this beta release. Follow the step
 
    .. code-block:: bash
 
-      pip install torch torchvision torchaudio
+      pip install torch
       pip install torch_geometric
 
    For GPU-accelerated builds or other configurations visit the official sites:

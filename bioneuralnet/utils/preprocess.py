@@ -6,6 +6,7 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.feature_selection import f_classif, f_regression
 from statsmodels.stats.multitest import multipletests
+from typing import Callable, Any
 
 from .logger import get_logger
 logger = get_logger(__name__)
@@ -193,7 +194,9 @@ def select_top_k_correlation(X: pd.DataFrame, y: pd.Series = None, top_k: int = 
 
         # descending correlations
         features = list(correlations.keys())
-        features.sort(key=correlations.get, reverse=True)
+        KeyFn = Callable[[str], float]
+        key_fn: KeyFn = correlations.get
+        features.sort(key=key_fn, reverse=True)
         select = min(top_k, len(features))
 
         selected = features[: select]
@@ -220,7 +223,10 @@ def select_top_k_correlation(X: pd.DataFrame, y: pd.Series = None, top_k: int = 
             correlations_avg[col] = avg
 
         features = list(correlations_avg.keys())
-        features.sort(key=correlations_avg.get)
+
+        KeyFn = Callable[[str], float]
+        key_fn: KeyFn = correlations_avg.get
+        features.sort(key=key_fn)
         select = min(top_k, len(features))
         selected = features[: select]
 

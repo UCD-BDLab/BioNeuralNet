@@ -77,7 +77,7 @@ class GNNEmbedding:
         activation: str = "relu",
         seed: Optional[int] = None,
         tune: Optional[bool] = False,
-        output_dir: Optional[str] = None,
+        output_dir: Union[str, Path, None] = None,
         ):
 
         """

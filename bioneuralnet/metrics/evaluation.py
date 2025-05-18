@@ -1,5 +1,6 @@
 import numpy as np
 from pathlib import Path
+from typing import Union, Optional
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.model_selection import train_test_split
@@ -29,9 +30,7 @@ def evaluate_model(X: np.ndarray,y: np.ndarray,model_type: str = "rf_classif",n_
 
     for run in range(runs):
         stratify = y if is_classif else None
-        X_tr, X_te, y_tr, y_te = train_test_split(
-            X, y, test_size=0.3, random_state=seed + run, stratify=stratify
-        )
+        X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.3, random_state=seed + run, stratify=stratify)
 
         if model_type == "rf_classif":
             mdl = RandomForestClassifier(n_estimators=n_estimators, random_state=seed + run)
@@ -95,7 +94,7 @@ def evaluate_rf(X: np.ndarray,y: np.ndarray,mode: str = "classification",n_estim
     Shortcut function: evaluate a RandomForest (classification or regression).
     """
     mt = "rf_classif" if mode == "classification" else "rf_reg"
-    return evaluate_model(X, y, model_type=mt, n_estimators=n_estimators,runs=runs, seed=seed, return_all=return_all)
+    return evaluate_model(X, y, model_type=mt, n_estimators=n_estimators,runs=runs, seed=seed)
 
 def evaluate_xgb(X: np.ndarray,y: np.ndarray,mode: str = "classification",n_estimators: int = 150,runs: int = 100,seed: int = 119,return_all: bool = False):
     """
@@ -103,7 +102,7 @@ def evaluate_xgb(X: np.ndarray,y: np.ndarray,mode: str = "classification",n_esti
     """
 
     mt = "xgb_classif" if mode == "classification" else "xgb_reg"
-    return evaluate_model(X, y, model_type=mt, n_estimators=n_estimators, runs=runs, seed=seed, return_all=return_all)
+    return evaluate_model(X, y, model_type=mt, n_estimators=n_estimators, runs=runs, seed=seed)
 
 def evaluate_f1w(X: np.ndarray,y: np.ndarray,model_type: str = "rf_classif",n_estimators: int = 100,runs: int = 5,seed: int = 119):
     """
@@ -147,7 +146,7 @@ def evaluate_f1m(X: np.ndarray,y: np.ndarray,model_type: str = "rf_classif",n_es
 
     return np.mean(scores), np.std(scores)
 
-def plot_grouped_performance(scores: dict[str, dict[str, tuple[float, float]]],title: str,ylabel: str = "Score",filename: str | Path = None):
+def plot_grouped_performance(scores: dict[str, dict[str, tuple[float, float]]],title: str,ylabel: str = "Score",filename: Optional[Union[str, Path]] = None):
     """
     Plot grouped bar chart and save results to text file.
     """
@@ -210,7 +209,7 @@ def plot_grouped_performance(scores: dict[str, dict[str, tuple[float, float]]],t
         logger.info(f"Saved plot to {fig_path}")
     plt.show()
 
-def plot_multiple_metrics(metrics: dict[str, dict[str, dict[str, tuple[float, float]]]],title_map: dict[str, str] = None,ylabel_map: dict[str, str] = None,filename: Path = None):
+def plot_multiple_metrics(metrics: dict[str, dict[str, dict[str, tuple[float, float]]]],title_map: Optional[dict[str, str]] = None,ylabel_map: Optional[dict[str, str]] = None,filename: Optional[Union[str, Path]] = None):
     """
     Consolidate multiple metric grouped performances into one figure.
 

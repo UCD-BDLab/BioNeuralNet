@@ -1,6 +1,7 @@
 import torch
 import pandas as pd
 import numpy as np
+from typing import Optional
 import torch.nn.functional as F
 from sklearn.covariance import GraphicalLasso
 
@@ -70,7 +71,7 @@ def gen_similarity_graph(X:pd.DataFrame, k:int = 15, metric:str = "cosine", mutu
     return final_graph
 
 
-def gen_correlation_graph(X: pd.DataFrame, k: int = 15,method: str = 'pearson', mutual: bool = False, per_node: bool = True,threshold: float = None, self_loops:bool = True) -> pd.DataFrame:
+def gen_correlation_graph(X: pd.DataFrame, k: int = 15,method: str = 'pearson', mutual: bool = False, per_node: bool = True,threshold: Optional[float] = None, self_loops:bool = True) -> pd.DataFrame:
     """
     Build a graph based on pairwise Pearson or Spearman correlations.
 
@@ -206,7 +207,7 @@ def gen_threshold_graph(X:pd.DataFrame, b: float = 6.0,k: int = 15, mutual: bool
 
     return final_graph
 
-def gen_gaussian_knn_graph(X: pd.DataFrame,k: int = 15,sigma: float = None,mutual: bool = False,self_loops: bool = True) -> pd.DataFrame:
+def gen_gaussian_knn_graph(X: pd.DataFrame,k: int = 15,sigma: Optional[float] = None ,mutual: bool = False,self_loops: bool = True) -> pd.DataFrame:
     """
     Build a normalized knn similarity graph from feature vectors. Computes pairwise cosine or Euclidean similarities, sparsifies via k-nearest neighbors or
     a global threshold. Optionally prunes to mutual neighbors and/or adds self-loops.

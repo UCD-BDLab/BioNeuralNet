@@ -64,9 +64,12 @@ class SubjectRepresentation:
 
         if embeddings is None or embeddings.empty:
             self.logger.info(
-                "No embeddings provided, please review documentation to see how to generate embeddings."
-            )
+                "No embeddings provided, please review documentation to see how to generate embeddings.")
             raise ValueError("Embeddings must be non-empty.")
+
+        if phenotype_data is not None and phenotype_col not in phenotype_data.columns:
+            raise ValueError(f"Phenotype column '{phenotype_col}' not found in phenotype data.")
+
         if not isinstance(embeddings, pd.DataFrame):
             raise ValueError("Embeddings must be provided as a pandas DataFrame.")
 

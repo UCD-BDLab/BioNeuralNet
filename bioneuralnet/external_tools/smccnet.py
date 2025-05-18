@@ -4,7 +4,7 @@ import pandas as pd
 from pathlib import Path
 import json
 import tempfile
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from ..utils.logger import get_logger
 import shutil
 
@@ -54,7 +54,7 @@ class SmCCNet:
         between_shrinkage: float = 5.0,
         cut_height: float = (1.0 - 0.1**10.0),
         preprocess: int = 0,
-        output_dir: str = None
+        output_dir: Optional[Path] = None,
     ):
         """
         Initializes the SmCCNet instance.

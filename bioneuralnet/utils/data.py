@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
+from typing import Optional
 from .logger import get_logger
 
 logger = get_logger(__name__)
 
-def variance_summary(df: pd.DataFrame, low_var_threshold: float = None) -> dict:
+def variance_summary(df: pd.DataFrame, low_var_threshold: Optional[float] = None) -> dict:
     """
     Compute summary statistics for column variances in the DataFrame
     """
@@ -22,7 +23,7 @@ def variance_summary(df: pd.DataFrame, low_var_threshold: float = None) -> dict:
 
     return summary
 
-def zero_fraction_summary(df: pd.DataFrame, high_zero_threshold: float = None) -> dict:
+def zero_fraction_summary(df: pd.DataFrame, high_zero_threshold: Optional[float] = None) -> dict:
     """
     Compute summary statistics for the fraction of zeros in each column
     """
