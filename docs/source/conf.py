@@ -61,4 +61,5 @@ autodoc_mock_imports = [
     "bioneuralnet.external_tools",
     "sklearn",
     "statsmodels",
+    "xgboost",
 ]

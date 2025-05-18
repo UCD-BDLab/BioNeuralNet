@@ -7,5 +7,6 @@ networkx
 python-louvain
 ray[tune]
 statsmodels
+xgboost
 # torch
 # torch_geometric
