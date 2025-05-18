@@ -21,7 +21,6 @@ BioNeuralNet integrates multiple open-source libraries to deliver advanced multi
 We also acknowledge R-based tools for external network construction:
 
 - **SmCCNet** - Sparse multiple canonical correlation network tool. `SmCCNet <https://cran.r-project.org/web/packages/SmCCNet/>`_
-- **WGCNA** - Weighted gene co-expression network analysis. `WGCNA <https://cran.r-project.org/web/packages/WGCNA/>`_
 
 These tools enhance BioNeuralNet's capabilities without being required for its core functionality.
 

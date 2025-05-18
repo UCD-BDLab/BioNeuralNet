@@ -10,14 +10,7 @@ These wrappers facilitate calling **R-based** adjacency-building approaches:
    :language: python
    :caption: Using SmCCNet to build an adjacency matrix from omics + phenotype data.
 
-**WGCNA**:
-  - Weighted Gene Co-expression Network Analysis wrapper for R's WGCNA package.
-
-.. literalinclude:: ../examples/wgcna_example.py
-   :language: python
-   :caption: Demonstration of WGCNA adjacency generation from expression data.
-
 **Note**:
   
-  - You must have R installed, plus the respective CRAN packages (e.g. “WGCNA” or “SmCCNet”), for these wrappers to work.
+  - You must have R installed, plus the respective CRAN packages  (“SmCCNet”), for these wrappers to work.
   - The adjacency matrices generated here can then be passed to GNNEmbedding, DPMON, or other BioNeuralNet modules.

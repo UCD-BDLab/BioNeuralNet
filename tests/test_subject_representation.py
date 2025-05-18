@@ -1,8 +1,8 @@
 import unittest
 import pandas as pd
-from bioneuralnet.subject_representation import GraphEmbedding
+from bioneuralnet.downstream_task import SubjectRepresentation
 
-class TestGraphEmbedding(unittest.TestCase):
+class TestSubjectRepresentation(unittest.TestCase):
 
     def setUp(self):
         self.omics_data = pd.DataFrame(
@@ -18,7 +18,7 @@ class TestGraphEmbedding(unittest.TestCase):
         )
 
     def test_run_with_precomputed_embeddings(self):
-        graph_embed = GraphEmbedding(
+        graph_embed = SubjectRepresentation(
             omics_data=self.omics_data,
             phenotype_data=self.phenotype_data,
             embeddings=self.precomputed_embeddings,
@@ -35,7 +35,7 @@ class TestGraphEmbedding(unittest.TestCase):
             index=["gene1", "gene2", "gene3"],
         )
         with self.assertRaises(ValueError) as context:
-            graph_embed = GraphEmbedding(
+            graph_embed = SubjectRepresentation(
                 omics_data=self.omics_data,
                 phenotype_data=self.phenotype_data,
                 embeddings=None,

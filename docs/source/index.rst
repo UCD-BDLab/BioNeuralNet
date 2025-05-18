@@ -43,7 +43,7 @@ For additional installation details, see :doc:`installation`.
 **BioNeuralNet Core Features**
 ------------------------------
 
-For an End-to-End example example of BioNeuralNet, see :doc:`BioNeuralNet`.
+For an End-to-End example example of BioNeuralNet, see :doc:`Quick_Start`.
 
 **Network Embedding**: :doc:`gnns`
    - Given a multi-omics network as input, BioNeuralNet can generate embeddings using Graph Neural Networks (GNNs).
@@ -83,7 +83,7 @@ For an End-to-End example example of BioNeuralNet, see :doc:`BioNeuralNet`.
 **External Tools**: :doc:`external_tools/index`
    - **Graph Construction**:
       - BioNeuralNet provides additional tools in the `bioneuralnet.external_tools` module.
-      - Allowing users to generate networks using R-based tools like WGCNA and SmCCNet.
+      - Allowing users to generate networks using R-based tools like SmCCNet.
       - While optional, these tools enhance BioNeuralNet's capabilities and are recommended for comprehensive analysis.
 
 What is BioNeuralNet?
@@ -136,8 +136,8 @@ Below is a quick example demonstrating the following steps:
 
 2. **Network Construction**:
 
-   - **Not performed internally**: Generate the network adjacency matrix externally (e.g., using SmCCNet).
-   - Lightweight wrappers (e.g., WGCNA, SmCCNet) are available in `bioneuralnet.external_tools` for convenience.
+   - **Not performed internally**: Generate the network adjacency matrix externally (SmCCNet).
+   - Lightweight wrappers (SmCCNet) are available in `bioneuralnet.external_tools` for convenience, R is required for their usage.
 
 3. **Disease Prediction**:
 
@@ -191,13 +191,13 @@ Below is a quick example demonstrating the following steps:
    metrics
    utils
    downstream_tasks
-   BioNeuralNet.ipynb
+   Quick_Start.ipynb
+   TCGA-BRCA_Dataset.ipynb
    TOPMED.ipynb
    tutorials/index
    external_tools/index
    user_api
    faq
-   future
 
 
 Indices and References

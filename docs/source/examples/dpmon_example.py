@@ -3,7 +3,7 @@ import pandas as pd
 from bioneuralnet.datasets import DatasetLoader
 from bioneuralnet.external_tools import SmCCNet
 from bioneuralnet.network_embedding import GNNEmbedding
-from bioneuralnet.subject_representation import GraphEmbedding
+from bioneuralnet.downstream_task import SubjectRepresentation
 from bioneuralnet.downstream_task import DPMON
 from bioneuralnet.metrics import evaluate_rf, plot_performance
 
@@ -52,8 +52,8 @@ embeddings = GNNEmbedding(
 embeddings.fit()
 embeddings_output = embeddings.embed(as_df=True)
 
-# Perform Subject Representation using GraphEmbedding
-enhanced_omics = GraphEmbedding(
+# Perform Subject Representation using SubjectRepresentation
+enhanced_omics = SubjectRepresentation(
     omics_data=merged_omics,
     embeddings=embeddings_output,
     phenotype_data=phenotype,

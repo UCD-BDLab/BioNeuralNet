@@ -2,18 +2,26 @@ from pathlib import Path
 import pandas as pd
 
 class DatasetLoader:
-    def __init__(self, dataset_name: str, feature_method: str = "var"):
+    def __init__(self, dataset_name: str):
         """
         Args:
-            dataset_name (str): "example1", "monet", or "tcga_brca"
-            feature_method (str): for "tcga_brca" only, one of:
-                - "var" (variance filter, default)
-                - "ae" (autoencoder selection)
-                - "anova" (ANOVA F-test selection)
-                - "rf" (RandomForest importance selection)
+            dataset_name (str): "example1", "monet", or "tcga_brca".
+
+        returns:
+
+            - data (dict): Dictionary of DataFrames, where keys are table names and values are DataFrames.
+            - shape (dict): Dictionary of table names to their shapes (n_rows, n_cols).
+            
+        Example:
+
+            tcga_brca = DatasetLoader("tcga_brca")
+            tcga_brca.shape
+            # {'brca_mirna': (108, 1000), 'brca_pam50': (108, 50), ...}
+            mirna = tcga_brca.data["brca_mirna"]
+            rna = tcga_brca.data["brca_rna"]
+                
         """
         self.dataset_name = dataset_name.strip().lower()
-        self.feature_method = feature_method.strip().lower()
         self.base_dir = Path(__file__).parent
         self.data: dict[str, pd.DataFrame] = {}
         
@@ -44,19 +52,20 @@ class DatasetLoader:
                 "clinical_data": pd.read_csv(folder / "clinical_data.csv"),
             }
 
-        elif self.dataset_name == "tcga_brca":
-            valid = {"var", "ae", "anova", "rf"}
-            if self.feature_method not in valid:
-                raise ValueError(f"For tcga_brca, feature_method must be one of {valid}, but got {self.feature_method}")
+        elif self.dataset_name == "brca":
+            self.data["mirna"] = pd.read_csv(folder / "mirna.csv", index_col=0)
+            self.data["pam50"] = pd.read_csv(folder / "pam50.csv", index_col=0)
+            self.data["clinical"] = pd.read_csv(folder / "clinical.csv", index_col=0)
 
-            self.data["brca_mirna"]   = pd.read_csv(folder / "brca_mirna.csv",   index_col=0)
-            self.data["brca_pam50"]   = pd.read_csv(folder / "brca_pam50.csv",   index_col=0)
-            self.data["brca_clinical"] = pd.read_csv(folder / "brca_clinical.csv", index_col=0)
+            meth_part1 = pd.read_csv(folder / "meth_1.csv", index_col=0)
+            meth_part2= pd.read_csv(folder / "meth_2.csv", index_col=0)
 
-            meth_file = f"brca_meth_{self.feature_method}.csv"
-            rna_file  = f"brca_rna_{self.feature_method}.csv"
-            self.data["brca_meth"] = pd.read_csv(folder / meth_file, index_col=0)
-            self.data["brca_rna"]  = pd.read_csv(folder / rna_file,  index_col=0)
+            rna_part1 = pd.read_csv(folder / "rna_1.csv", index_col=0)
+            rna_part2 = pd.read_csv(folder / "rna_2.csv", index_col=0)
+
+            self.data["meth"] = pd.concat([meth_part1, meth_part2], axis=0)
+            self.data["rna"] = pd.concat([rna_part1, rna_part2], axis=0)
+
         else:
             raise ValueError(f"Dataset '{self.dataset_name}' is not recognized.")
 

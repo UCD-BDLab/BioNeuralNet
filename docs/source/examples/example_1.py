@@ -6,14 +6,14 @@ Steps:
 1. Load synthetic multi-omics and phenotype data using DatasetLoader.
 2. Generate an adjacency matrix using SmCCNet based on multi-omics and phenotype data.
 3. Generate GNN node embeddings (GNNEmbedding) using the adjacency, omics, phenotype, and clinical data.
-4. Integrate the embeddings into omics data using GraphEmbedding to enhance feature representation.
+4. Integrate the embeddings into omics data using SubjectRepresentation to enhance feature representation.
 """
 
 import pandas as pd
 from bioneuralnet.datasets import DatasetLoader
 from bioneuralnet.external_tools import SmCCNet
 from bioneuralnet.network_embedding import GNNEmbedding
-from bioneuralnet.subject_representation import GraphEmbedding
+from bioneuralnet.downstream_task import SubjectRepresentation
 
 def run_smccnet_workflow() -> pd.DataFrame:
     """
@@ -23,7 +23,7 @@ def run_smccnet_workflow() -> pd.DataFrame:
     1) Loads synthetic omics and phenotype data.
     2) Generates a Multi-Omics Network (adjacency matrix) using SmCCNet.
     3) Runs GNNEmbedding to produce node embeddings.
-    4) Integrates embeddings into omics data using GraphEmbedding.
+    4) Integrates embeddings into omics data using SubjectRepresentation.
 
     Returns:
         pd.DataFrame: Enhanced omics data integrated with GNN embeddings.
@@ -69,9 +69,9 @@ def run_smccnet_workflow() -> pd.DataFrame:
         embeddings_output = gnn_embedding.embed(as_df=True)
         print(f"GNN embeddings generated. Shape: {embeddings_output.shape}")
 
-        # Integrate embeddings into omics data using GraphEmbedding
-        print("Running GraphEmbedding...")
-        graph_embedding = GraphEmbedding(
+        # Integrate embeddings into omics data using SubjectRepresentation
+        print("Running SubjectRepresentation...")
+        graph_embedding = SubjectRepresentation(
             omics_data=merged_omics,
             embeddings=embeddings_output,
             phenotype_data=phenotype,
@@ -89,7 +89,7 @@ def run_smccnet_workflow() -> pd.DataFrame:
 
 if __name__ == "__main__":
     try:
-        print("Starting SmCCNet + GNNEmbedding + GraphEmbedding Workflow...")
+        print("Starting SmCCNet + GNNEmbedding + SubjectRepresentation Workflow...")
 
         enhanced_omics = run_smccnet_workflow()
 

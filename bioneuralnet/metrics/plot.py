@@ -72,17 +72,18 @@ def plot_performance_three(raw_score, gnn_score, other_score, labels=["Raw","GNN
         raise ValueError("Scores must be tuples of (mean, std)")
     scores = [raw_score[0], gnn_score[0], other_score[0]]
     errors = [raw_score[1], gnn_score[1], other_score[1]]
+    
     x = np.arange(len(scores))
     width = 0.23
 
-    fig, ax = plt.subplots(figsize=(4.0, 4))
-    bars = ax.bar(x, scores, width, yerr=errors, capsize=2,
+    fig, ax = plt.subplots(figsize=(6,5))
+    bars = ax.bar(x, scores, width, yerr=errors, capsize=3,
                   color=["#4E79A7", "#F28E2B", "#76B7B2"], alpha=0.95, linewidth=0)
 
     ax.set_ylabel("Accuracy", fontsize=11)
-    ax.set_title(title, fontsize=12, pad=10)
+    ax.set_title(title, fontsize=12, pad=15)
     ax.set_xticks(x)
-    ax.set_xticklabels(labels, fontsize=10)
+    ax.set_xticklabels(labels, fontsize=11)
     ax.set_ylim(0, 1)
     ax.grid(True, axis="y", linestyle="--", alpha=0.4)
 
@@ -92,7 +93,7 @@ def plot_performance_three(raw_score, gnn_score, other_score, labels=["Raw","GNN
         ax.text(bar.get_x() + bar.get_width() / 2, height + err + 0.015,
                 f"{height:.3f}", ha="center", va="bottom", fontsize=10, fontweight="bold")
 
-    plt.subplots_adjust(left=0.18, right=0.95, bottom=0.15, top=0.88)
+    plt.subplots_adjust(left=0.2, right=0.95, bottom=0.2, top=0.85)
 
     if filename:
         plt.savefig(str(filename), dpi=300, bbox_inches="tight")
