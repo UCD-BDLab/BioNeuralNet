@@ -18,7 +18,9 @@ bioneuralnet.egg-info
 .mypy_cache
 Quick Start.ipynb
 TCGA-BRCA_Datatest.ipynb
-
+DevNotes.md
+TCGA-BRCA_Datatest_copy.ipynb
+split
 # Other example data and tests not needed in the repo.
 
 Output**

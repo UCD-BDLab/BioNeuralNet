@@ -17,6 +17,8 @@ BioNeuralNet integrates multiple open-source libraries to deliver advanced multi
 - **ray[tune]:** Scalable hyperparameter tuning for GNN models. `ray[tune] <https://docs.ray.io/en/latest/tune/>`_
 - **matplotlib:** Data visualization. `matplotlib <https://github.com/matplotlib/matplotlib/>`_
 - **python-louvain:** Community detection algorithms for graphs. `python louvain <https://github.com/taynaud/python-louvain/>`_
+- **statsmodels:** Statistical tests and models, including ANOVA and linear regression. `statsmodels <https://github.com/statsmodels/statsmodels/>`_
+- **xgboost:** Gradient boosting for classification and regression. `xgboost <https://github.com/dmlc/xgboost/>`_
 
 We also acknowledge R-based tools for external network construction:
 
@@ -35,47 +37,65 @@ Please refer to our contribution guidelines in the repository for more details.
 Frequently Asked Questions (FAQ)
 --------------------------------
 
-**Q1: What is BioNeuralNet?**  
-A1: BioNeuralNet is a Python framework for integrating multi-omics data with Graph Neural Networks (GNNs). It provides end-to-end solutions for network embedding, clustering, subject representation, and disease prediction.
+**Q1: What is BioNeuralNet?**:
 
-**Q2: What are the key features of BioNeuralNet?**  
-A2:  
-- **Graph Clustering:** Identify communities using Correlated Louvain, Hybrid Louvain, and Correlated PageRank methods.  
-- **GNN Embedding:** Generate node embeddings using advanced GNN models.  
-- **Subject Representation:** Enrich omics data with learned embeddings.  
-- **Disease Prediction:** Leverage DPMON for integrated, end-to-end disease prediction.
+   - BioNeuralNet is a Python framework for integrating multi-omics data with Graph Neural Networks (GNNs). It provides end-to-end solutions for network embedding, clustering, subject representation, and disease prediction.
 
-**Q3: How do I install BioNeuralNet?**  
-A3: Install via pip:
+**Q2: What are the key features of BioNeuralNet?**:
+
+   - **Graph Clustering:** Identify communities using Correlated Louvain, Hybrid Louvain, and Correlated PageRank methods.  
+   - **GNN Embedding:** Generate node embeddings using advanced GNN models.  
+   - **Subject Representation:** Enrich omics data with learned embeddings.  
+   - **Disease Prediction:** Leverage DPMON for integrated, end-to-end disease prediction.
+
+**Q3: How do I install BioNeuralNet?**:
+
+   - Install via pip
 
 .. code-block:: bash
 
    pip install bioneuralnet
 
-For full installation instructions, see the :doc:`installation` guide.
 
-**Q4: Does BioNeuralNet support GPU acceleration?**  
-A4: Yes. If a CUDA-compatible GPU is available, BioNeuralNet will utilize it via PyTorch.
+**Q4: Does BioNeuralNet support GPU acceleration?**:
 
-**Q5: Can I use my own network instead of SmCCNet?**  
-A5: Absolutely. You can supply a pre-computed adjacency matrix directly to the GNNEmbedding or DPMON modules.
+   - Yes. If a CUDA-compatible GPU is available, BioNeuralNet will utilize it via PyTorch.
+
+**Q5: Can I use my own network instead of SmCCNet or internal graph generation functions?**
+
+   - Absolutely. You can supply a pre-computed adjacency matrix directly to the GNNEmbedding or DPMON modules.
 
 **Q6: How is DPMON different from standard GNN models?**  
-A6: DPMON is tailored for multi-omics disease prediction by jointly learning node embeddings and a classifier, integrating both local and global graph structures.
 
-**Q7: What clustering methods does BioNeuralNet support?**  
-A7: BioNeuralNet offers:  
-- Correlated Louvain  
-- Hybrid Louvain  
-- Correlated PageRank
+   - DPMON is tailored for multi-omics disease prediction by jointly learning node embeddings and a classifier, integrating both local and global graph structures.
 
-**Q8: How can I contribute to BioNeuralNet?**  
-A8: Contributions are encouraged! Fork the repository, develop your feature, and submit a pull request. See our contribution guidelines on GitHub.
+**Q7: What clustering methods does BioNeuralNet support?**:
 
-**Q9: Where can I find tutorials and examples?**  
-A9: For detailed guides and demos, visit :doc:`tutorials/index` and check out the example notebooks provided in the repository.
+   - Correlated Louvain  
+   - Hybrid Louvain  
+   - Correlated PageRank
 
-**Q10: What license is BioNeuralNet released under?**  
-A10: BioNeuralNet is distributed under the MIT License. For details, see the `MIT LICENSE <https://github.com/UCD-BDLab/BioNeuralNet?tab=MIT-1-ov-file>`_ page.
+**Q8: How can I contribute to BioNeuralNet?**:
+
+   - Contributions are welcome! You can:
+      - Report issues or bugs on our `GitHub Issues page <https://github.com/UCD-BDLab/BioNeuralNet/issues>`_.
+      - Suggest new features or improvements.
+      - Share your experiences or use cases with the community.
+
+   - How to contribute:
+      - Fork the repository, add your features, components, or algorithms, and submit a pull request.
+      - Please refer to our `contribution guidelines <https://github.com/UCD-BDLab/BioNeuralNet?tab=readme-ov-file#8-contributing>`_ for more details.
+
+**Q9: Where can I find tutorials and examples?**:
+
+   - We provide a set of tutorials and example notebooks to help you get started with BioNeuralNet. You can find them in the `tutorials` directory of the repository.  
+   - For a quick start, check out the following notebooks:
+
+      - :doc:`Quick_Start`.
+      - :doc:`TCGA-BRCA_Dataset`.
+
+**Q10: What license is BioNeuralNet released under?**:
+
+   - BioNeuralNet is released under the MIT License. You can find the full license text in the `MIT LICENSE <https://github.com/UCD-BDLab/BioNeuralNet?tab=MIT-1-ov-file>`_  file in the repository.
 
 Return to :doc:`../index`

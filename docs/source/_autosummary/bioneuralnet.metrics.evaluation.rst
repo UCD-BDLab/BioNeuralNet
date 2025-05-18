@@ -23,6 +23,4 @@ bioneuralnet.metrics.evaluation
    .. autosummary::
    
       Path
-      XGBClassifier
-      XGBRegressor
    

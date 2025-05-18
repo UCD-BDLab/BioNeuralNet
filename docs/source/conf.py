@@ -58,7 +58,6 @@ intersphinx_mapping = {
 autodoc_mock_imports = [
     "torch",
     "torch_geometric",
-    "bioneuralnet.external_tools",
     "sklearn",
     "statsmodels",
     "xgboost",

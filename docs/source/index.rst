@@ -13,16 +13,14 @@ BioNeuralNet - Multi-Omics Integration with Graph Neural Networks
 .. image:: https://img.shields.io/badge/GitHub-View%20Code-blue
    :target: https://github.com/UCD-BDLab/BioNeuralNet
 
-
 .. figure:: _static/LOGO_WB.png
    :align: center
    :alt: BioNeuralNet Logo
 
+:doc:`installation`
+-------------------
 
-Installation
-------------
-
-To install BioNeuralNet, simply run:
+To install BioNeuralNet via pip:
 
 .. code-block:: bash
 
@@ -30,6 +28,10 @@ To install BioNeuralNet, simply run:
 
 For additional installation details, see :doc:`installation`.
 
+For end-to-end examples of `BioNeuralNet`: 
+
+   - :doc:`Quick_Start`.
+   - :doc:`TCGA-BRCA_Dataset`.
 
 **BioNeuralNet Overview**
 -------------------------
@@ -40,52 +42,6 @@ For additional installation details, see :doc:`installation`.
    Embeddings form the core of BioNeuralNet, enabling a number of downstream applications.
 
 
-**BioNeuralNet Core Features**
-------------------------------
-
-For an End-to-End example example of BioNeuralNet, see :doc:`Quick_Start`.
-
-**Network Embedding**: :doc:`gnns`
-   - Given a multi-omics network as input, BioNeuralNet can generate embeddings using Graph Neural Networks (GNNs).
-   - Generate embeddings using methods such as **GCN**, **GAT**, **GraphSAGE**, and **GIN**.
-   - Outputs can be obtained as native tensors or converted to pandas DataFrames for easy analysis and visualization.
-   - Embeddings unlock numerous downstream applications, including disease prediction, enhanced subject representation, clustering, and more.
-
-**Graph Clustering**: :doc:`clustering`
-   - Identify functional modules or communities using **correlated clustering methods** (e.g., CorrelatedPageRank, CorrelatedLouvain, HybridLouvain) that integrate phenotype correlation to extract biologically relevant modules [1]_.
-   - Clustering methods can be applied to any network represented allowing flexible analysis across different domains.
-   - All clustering components return either raw partitions dictionaries or induced subnetwork adjacency matrices (as DataFrames) for visualization.
-   - Use cases include, feature selection, biomarker discovery, and network-based analysis.
-
-**Downstream Tasks**: :doc:`downstream_tasks`
-   - **Subject Representation**:
-      - Integrate node embeddings back into omics data to enrich subject-level profiles by weighting features with learned embedding.
-      - This embedding-enriched data can be used for downstream tasks such as disease prediction or biomarker discovery.
-      - The result can be returned as a DataFrame or a PyTorch tensor, fitting naturally into downstream analyses.
-
-   - **Disease Prediction for Multi-Omics Network DPMON** [2]_:
-      - Classification End-to-End pipeline for disease prediction using Graph Neural Network embeddings.
-      - DPMON supports hyperparameter tuning-when enabled, it finds the best for the given data.
-      - This approach, along with the native pandas integration across modules, ensures that BioNeuralNet can be easily incorporated into your analysis workflows.
-
-**Metrics**: :doc:`metrics`
-   - Several plotting funcctions to visualize networks, emebddings, variance distribution, cluster comparison, and more.
-   - Correlation based functions to compare clustersand omics data with the phenotype.
-
-**Utilities**: :doc:`utils`
-   - **Filtering Functions**:
-      - Network filtering allows users to select variance or zero-fraction filtering to an omics network.
-      - Reducing noise, and removing outliers.
-   
-   - **Data Conversion**:
-      - Convert RData files both CSV and to Pandas DataFrame. For ease of integration for R-based workflows.
-
-**External Tools**: :doc:`external_tools/index`
-   - **Graph Construction**:
-      - BioNeuralNet provides additional tools in the `bioneuralnet.external_tools` module.
-      - Allowing users to generate networks using R-based tools like SmCCNet.
-      - While optional, these tools enhance BioNeuralNet's capabilities and are recommended for comprehensive analysis.
-
 What is BioNeuralNet?
 ---------------------
 BioNeuralNet is a **Python-based** framework designed to bridge the gap between **multi-omics data analysis** and **Graph Neural Networks (GNNs)**. By leveraging advanced techniques, it enables:
@@ -94,6 +50,7 @@ BioNeuralNet is a **Python-based** framework designed to bridge the gap between 
 - **GNN Embeddings**: Learns network-based feature representations from biological graphs, capturing both **biological structure** and **feature correlations** for enhanced analysis.  
 - **Subject Representation**: Generates high-quality embeddings for individuals based on multi-omics profiles.  
 - **Disease Prediction**: Builds predictive models using integrated multi-layer biological networks.
+- **Interoperability**: Component outputs are structured as **pandas DataFrames**, ensuring easy integration with existing workflows and tools.
 
 Why GNNs?
 ---------
@@ -136,7 +93,7 @@ Below is a quick example demonstrating the following steps:
 
 2. **Network Construction**:
 
-   - **Not performed internally**: Generate the network adjacency matrix externally (SmCCNet).
+   - In this example we generate the network using a external R package (SmCCNet[3]_).
    - Lightweight wrappers (SmCCNet) are available in `bioneuralnet.external_tools` for convenience, R is required for their usage.
 
 3. **Disease Prediction**:
@@ -151,12 +108,14 @@ Below is a quick example demonstrating the following steps:
    import pandas as pd
    from bioneuralnet.external_tools import SmCCNet
    from bioneuralnet.downstream_task import DPMON
+   from bioneuralnet.datasets import DatasetLoader
 
-   # Step 1: Data Preparation
-   phenotype_data = pd.read_csv('phenotype_data.csv')
-   omics_proteins = pd.read_csv('omics_proteins.csv')
-   omics_metabolites = pd.read_csv('omics_metabolites.csv')
-   clinical_dt = pd.read_csv('clinical_data.csv')
+   # Step 1: Load your data or use one of the provided datasets
+   Example = DatasetLoader("example1")
+   omics_proteins = Example.data["X1"]
+   omics_metabolites = Example.data["X2"]
+   phenotype_data = Example.data["Y"]
+   clinical_data = Example.data["clinical_data"]
 
    # Step 2: Network Construction
    smccnet = SmCCNet(
@@ -174,12 +133,58 @@ Below is a quick example demonstrating the following steps:
        adjacency_matrix=global_network,
        omics_list=[omics_proteins, omics_metabolites],
        phenotype_data=phenotype_data,
-       clinical_data=clinical_dt,
+       clinical_data=clinical_data,
        model="GCN",
    )
    predictions = dpmon.run()
    print("Disease phenotype predictions:\n", predictions)
 
+**BioNeuralNet Core Features**
+------------------------------
+
+For an End-to-End example example of BioNeuralNet, see :doc:`Quick_Start` and :doc:`TCGA-BRCA_Dataset`.
+
+:doc:`gnns`:
+   - Given a multi-omics network as input, BioNeuralNet can generate embeddings using Graph Neural Networks (GNNs).
+   - Generate embeddings using methods such as **GCN**, **GAT**, **GraphSAGE**, and **GIN**.
+   - Outputs can be obtained as native tensors or converted to pandas DataFrames for easy analysis and visualization.
+   - Embeddings unlock numerous downstream applications, including disease prediction, enhanced subject representation, clustering, and more.
+
+:doc:`clustering`:
+   - Identify functional modules or communities using **correlated clustering methods** (e.g., CorrelatedPageRank, CorrelatedLouvain, HybridLouvain) that integrate phenotype correlation to extract biologically relevant modules [1]_.
+   - Clustering methods can be applied to any network represented allowing flexible analysis across different domains.
+   - All clustering components return either raw partitions dictionaries or induced subnetwork adjacency matrices (as DataFrames) for visualization.
+   - Use cases include, feature selection, biomarker discovery, and network-based analysis.
+
+:doc:`downstream_tasks`:
+   - **Subject Representation**:
+      - Integrate node embeddings back into omics data to enrich subject-level profiles by weighting features with learned embedding.
+      - This embedding-enriched data can be used for downstream tasks such as disease prediction or biomarker discovery.
+      - The result can be returned as a DataFrame or a PyTorch tensor, fitting naturally into downstream analyses.
+
+   - **Disease Prediction for Multi-Omics Network DPMON** [2]_:
+      - Classification End-to-End pipeline for disease prediction using Graph Neural Network embeddings.
+      - DPMON supports hyperparameter tuning-when enabled, it finds the best for the given data.
+      - This approach, along with the native pandas integration across modules, ensures that BioNeuralNet can be easily incorporated into your analysis workflows.
+
+:doc:`metrics`:
+   - Visualize embeddings, feature variance, clustering comparison, and network structure in 2D.  
+   - Evaluate embedding quality and clustering relevance using correlation with phenotype.  
+   - Performance benchmarking tools for classification tasks using various models.  
+   - Useful for assessing feature importance, validating network structure, and comparing cluster outputs.
+
+:doc:`utils`:
+   - Build graphs using k-NN similarity, Pearson/Spearman correlation, RBF kernels, mutual information, or soft-thresholding.  
+   - Filter and preprocess omics or clinical data by variance, correlation, random forest importance, or ANOVA F-test.  
+   - Tools for network pruning, feature selection, and data cleaning.  
+   - Quickly summarize datasets with variance, zero-fraction, expression level, or correlation overviews.  
+   - Includes conversion tools for RData and integrated logging.
+
+:doc:`external_tools/index`:
+   - **Graph Construction**:
+      - BioNeuralNet provides additional tools in the `bioneuralnet.external_tools` module.
+      - Includes support for **SmCCNet** (Sparse Multiple Canonical Correlation Network), an R-based tool for constructing phenotype-informed correlation networks [3]_.
+      - These tools are optional but enhance BioNeuralNet's graph construction capabilities and are recommended for more integrative or exploratory workflows.
 
 .. toctree::
    :maxdepth: 2
@@ -208,3 +213,4 @@ Indices and References
 
 .. [1] Abdel-Hafiz, M., Najafi, M., et al. "Significant Subgraph Detection in Multi-omics Networks for Disease Pathway Identification." *Frontiers in Big Data*, 5 (2022). DOI: `10.3389/fdata.2022.894632 <https://doi.org/10.3389/fdata.2022.894632>`_.
 .. [2] Hussein, S., Ramos, V., et al. "Learning from Multi-Omics Networks to Enhance Disease Prediction: An Optimized Network Embedding and Fusion Approach." In *2024 IEEE International Conference on Bioinformatics and Biomedicine (BIBM)*, Lisbon, Portugal, 2024, pp. 4371-4378. DOI: `10.1109/BIBM62325.2024.10822233 <https://doi.org/10.1109/BIBM62325.2024.10822233>`_.
+.. [3] Liu, W., Vu, T., Konigsberg, I. R., Pratte, K. A., Zhuang, Y., & Kechris, K. J. (2023). "Network-Based Integration of Multi-Omics Data for Biomarker Discovery and Phenotype Prediction." *Bioinformatics*, 39(5), btat204. DOI: `10.1093/bioinformatics/btat204 <https://doi.org/10.1093/bioinformatics/btat204>`_.

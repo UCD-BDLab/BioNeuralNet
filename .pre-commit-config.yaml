@@ -1,0 +1,62 @@
+exclude: ^docs/
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=92160']
+
+  # - repo: https://github.com/psf/black
+  #   rev: 24.10.0
+  #   hooks:
+  #     - id: black
+  #       name: Format Python code with Black
+  #       language_version: python3
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.14.1
+    hooks:
+      - id: mypy
+        name: Static type checking with MyPy
+        args: [--ignore-missing-imports]
+
+  - repo: local
+    hooks:
+      - id: remove-pyc-and-pycache
+        name: Remove .pyc files and __pycache__ directories
+        entry: bash -c "find . \( -path './.venv' -o -path './docs' -o -path './node_modules' \) -prune -o -type f -name '*.pyc' -exec rm -f {} + -o -type d -name '__pycache__' -exec rm -rf {} +"
+        language: system
+        stages: [pre-commit]
+
+      - id: clean-coverage-files
+        name: Remove stale .coverage files
+        entry: bash -c "find . -name '.coverage*' -delete"
+        language: system
+        stages: [pre-commit]
+
+      - id: check-forbidden-files
+        name: Prevent adding forbidden file types except in allowed directory
+        entry: |
+          bash -c '
+          FILES="$(git diff --cached --name-only)"
+          if echo "$FILES" | grep -E "\.RData$"; then
+            echo "Forbidden file types detected (RData)!"
+            exit 1
+          fi
+          if echo "$FILES" | grep -E "\.csv$" | grep -vE "^bioneuralnet/datasets/(example1|brca|monet)/"; then
+            echo "Forbidden CSV files detected (outside allowed folders)!"
+            exit 1
+          fi
+          '
+        language: system
+        stages: [pre-commit]
+
+#      - id: run-tests
+#        name: Run Tests with Pytest
+#        entry: pytest --ignore=docs/source/examples --cov=bioneuralnet --cov-report=term-missing || true
+#        language: system
+#        types: [python]
