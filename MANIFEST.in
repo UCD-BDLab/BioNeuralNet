@@ -15,8 +15,15 @@ recursive-include bioneuralnet/datasets/monet *.csv
 recursive-include bioneuralnet/datasets/example1 *.csv
 recursive-include bioneuralnet/datasets/brca *.csv
 
+# include bioneuralnet/datasets/brca/clinical.csv
+# include bioneuralnet/datasets/brca/pam50.csv
+# include bioneuralnet/datasets/brca/mirna.csv
+# exclude bioneuralnet/datasets/brca/meth_*.csv
+# exclude bioneuralnet/datasets/brca/rna_*.csv
+
 # Include documentation source files
-recursive-include docs *
+prune docs
+prune tests
 
 # Include example scripts
 recursive-include examples *.py
