@@ -69,10 +69,10 @@ class SubjectRepresentation:
             raise ValueError("Embeddings must be non-empty.")
         if not isinstance(embeddings, pd.DataFrame):
             raise ValueError("Embeddings must be provided as a pandas DataFrame.")
-        
+
         if tune and phenotype_data is None:
             raise ValueError("Phenotype data must be provided for classification-based tuning.")
-        
+
         if seed is not None:
             torch.manual_seed(seed)
             if torch.cuda.is_available():
@@ -84,7 +84,7 @@ class SubjectRepresentation:
         self.logger.info(f"Seed set to {self.seed}.")
 
         self.omics_data = omics_data.copy(deep=True)
-        self.embeddings = embeddings.copy(deep=True) 
+        self.embeddings = embeddings.copy(deep=True)
         self.phenotype_data = phenotype_data.copy(deep=True)
         self.phenotype_col = phenotype_col
         self.reduce_method = reduce_method.upper()
@@ -107,12 +107,12 @@ class SubjectRepresentation:
                 f"Embeddings: {self.embeddings.shape} and Omics: {self.omics_data.shape}"
             )
         self.logger.info(f"Found {len(common_features)} common features between network and omics data.")
-        
+
         # output directory
         if output_dir is None:
             self.temp_dir_obj = tempfile.TemporaryDirectory()
             self.output_dir = self.temp_dir_obj.name
-            
+
             self.logger.info(f"No output_dir provided; using temporary directory: {self.output_dir}")
         else:
             self.output_dir = Path(output_dir)
@@ -126,7 +126,7 @@ class SubjectRepresentation:
         If tuning is enabled, runs hyperparameter tuning and uses the best config to reduce embeddings.
         Otherwise, uses the default reduction method.
         Returns:
-        
+
             - Enhanced omics data as a DataFrame.
         """
         self.logger.info("Starting Subject Representation workflow.")
@@ -144,7 +144,7 @@ class SubjectRepresentation:
                 ae_params = best_config.get("ae_params", {"epochs": 16, "hidden_dim": 8, "lr": 1e-3, "dropout": 0.2, "activation": "relu"})
                 reduced = self._reduce_embeddings(method=best_config["method"], ae_params=ae_params, compressed_dim=best_config["compressed_dim"])
                 enhanced_omics_data = self._integrate_embeddings(reduced=reduced, method=best_config["integration_method"], alpha=best_config["alpha"], beta=best_config["beta"])
-            
+
             else:
                 method = self.reduce_method.upper()
                 ae_params_def = {"epochs": 16, "hidden_dim": 8, "lr": 1e-3, "dropout": 0.2, "activation": "relu"}
@@ -195,11 +195,11 @@ class SubjectRepresentation:
         elif method in ["ae"]:
             self.logger.info("Using autoencoder for reduction.")
             ae_params = ae_params or {
-                "epochs": 64, 
-                "hidden_dim": 8, 
-                "lr": 1e-3, 
-                "dropout": 0.2, 
-                "activation": "relu", 
+                "epochs": 64,
+                "hidden_dim": 8,
+                "lr": 1e-3,
+                "dropout": 0.2,
+                "activation": "relu",
             }
             X = torch.tensor(self.embeddings.values, dtype=torch.float)
 
@@ -226,7 +226,7 @@ class SubjectRepresentation:
             model.eval()
             with torch.no_grad():
                 z, _ = model(X)
-   
+
             z_np = z.detach().cpu().numpy()
             if z_np.ndim == 1:
                 z_np = z_np.reshape(-1, 1)
@@ -245,18 +245,18 @@ class SubjectRepresentation:
     def _integrate_embeddings(self, reduced: pd.DataFrame, method="multiply", alpha=2.0, beta=0.5) -> pd.DataFrame:
         """
         Integrates the reduced embeddings with the omics data using a multiplicative approach.
-        
+
         With the default parameters (alpha = 2.0, beta = 0.5), each feature is updated as:
-            
+
             - enhanced = beta * raw + (1 - beta) * (alpha * normalized_weight * raw)
-        
+
         For example, with alpha = 2.0 and beta = 0.5:
-        
+
             - If a features normalized weight is 1.0:
                 - enhanced = 0.5xraw + 0.5x(2.0x1.0xraw) = 0.5xraw + raw = 1.5xraw
             - If a features normalized weight is 0.5:
                 - enhanced = 0.5xraw + 0.5x(2.0x0.5xraw) = 0.5xraw + 0.5xraw = raw
-        
+
         This is so at least 50% of the final output is influenced by the computed weight
         """
         missing_features = set(self.omics_data.columns) - set(reduced.index)
@@ -268,7 +268,7 @@ class SubjectRepresentation:
             if not reduced.index.equals(self.omics_data.columns):
                 self.logger.info("Aligning reduced embeddings index with omics_data columns.")
                 reduced = reduced.reindex(self.omics_data.columns)
-            
+
             # normalize the embeddings and compute a weight series
             if isinstance(reduced, pd.DataFrame):
                 for col in reduced.columns:
@@ -278,7 +278,7 @@ class SubjectRepresentation:
                 weight_series = (reduced - reduced.min()) / (reduced.max() - reduced.min())
             else:
                 raise ValueError("Reduced embeddings must be a pandas DataFrame or Series.")
-            
+
             weight_series = weight_series.fillna(0)
             ranks = weight_series.rank(method="average")
             scaled_ranks = 2 * (ranks - ranks.min()) / (ranks.max() - ranks.min()) - 1
@@ -306,7 +306,7 @@ class SubjectRepresentation:
 
         self.logger.info(f"Final Enhanced Omics Shape: {enhanced.shape}")
         return enhanced
-    
+
     def _run_tuning(self) -> Dict[str, Any]:
         """
         Runs tuning for SubjectRepresentation.
@@ -325,7 +325,7 @@ class SubjectRepresentation:
         """
         search_config = {
             "method": tune.choice(["PCA", "AE"]),
-            "compressed_dim": tune.choice([1, 2, 3, 4]),  
+            "compressed_dim": tune.choice([1, 2, 3, 4]),
             "ae_params": {
                 "epochs": tune.choice([64, 128, 256, 512, 1024]),
                 "hidden_dim": tune.choice([16, 32, 64, 128, 256, 512]),
@@ -334,7 +334,7 @@ class SubjectRepresentation:
                 "activation": tune.choice(["relu", "tanh", "sigmoid"]),
             },
             "integration_method": tune.choice(["multiply"]),
-            "alpha": tune.choice([1.5, 2.0, 2.5, 3.0]),  
+            "alpha": tune.choice([1.5, 2.0, 2.5, 3.0]),
             "beta": tune.choice([0.1, 0.3, 0.5, 0.7]),
         }
 
@@ -342,11 +342,11 @@ class SubjectRepresentation:
             try:
                 method = config["method"].upper()
                 ae_params = config.get("ae_params", {
-                    "epochs": 64, 
-                    "hidden_dim": 4, 
-                    "dropout": 0.2, 
-                    "lr": 1e-3, 
-                    "activation": "relu", 
+                    "epochs": 64,
+                    "hidden_dim": 4,
+                    "dropout": 0.2,
+                    "lr": 1e-3,
+                    "activation": "relu",
                 })
                 alpha = config.get("alpha", 2.0)
                 beta = config.get("beta", 0.5)
@@ -409,7 +409,7 @@ class SubjectRepresentation:
                 analysis = e.args[1]
 
         best_trial = None
-        best_score = 0.0  
+        best_score = 0.0
 
         if analysis and hasattr(analysis, "get_best_trial"):
             try:
@@ -431,7 +431,7 @@ class SubjectRepresentation:
             self.logger.info(f"Best Graph Embedding parameters saved to {best_params_file}")
         else:
             self.logger.info("No valid best trial config found; skipping save.")
-            
+
         return best_trial.config if best_trial else {}
 
 def get_activation(activation: str):
@@ -464,16 +464,16 @@ class AutoEncoder(nn.Module):
     Builds encoder and decoder layers based on a list of hidden dimensions.
     Allows tuning of dropout, activation, and network architecture.
     """
-    def __init__(self, input_dim: int, hidden_dims: int = 64, compressed_dim: int = 1, 
+    def __init__(self, input_dim: int, hidden_dims: int = 64, compressed_dim: int = 1,
                  dropout: float = 0.0, activation: str = "relu"):
         super(AutoEncoder, self).__init__()
         self.activation = get_activation(activation)
-        
+
         if isinstance(hidden_dims, (int, float)):
             hidden_dims = generate_hidden_dims(int(hidden_dims))
         elif not isinstance(hidden_dims, list):
             raise ValueError("hidden_dims must be an int, float, or a list of ints.")
-        
+
         # encoder:
         encoder_layers = []
         current_dim = input_dim
@@ -485,7 +485,7 @@ class AutoEncoder(nn.Module):
         encoder_layers.append(nn.Linear(current_dim, compressed_dim))
         # the * operator unpacks the list into separate arguments
         self.encoder = nn.Sequential(*encoder_layers)
-        
+
         # decoder:
         decoder_layers = []
         current_dim = compressed_dim
@@ -496,7 +496,7 @@ class AutoEncoder(nn.Module):
             current_dim = h_dim
         decoder_layers.append(nn.Linear(current_dim, input_dim))
         self.decoder = nn.Sequential(*decoder_layers)
-        
+
     def forward(self, x):
         z = self.encoder(x)
         recon = self.decoder(z)

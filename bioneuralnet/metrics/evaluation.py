@@ -17,7 +17,7 @@ def evaluate_model(X: np.ndarray,y: np.ndarray,model_type: str = "rf_classif",n_
       - (accuracy_mean, accuracy_std)
       - (f1_weighted_mean, f1_weighted_std)
       - (f1_macro_mean, f1_macro_std)
-    
+
     For regression:
 
       - (r2_mean, r2_std)
@@ -68,7 +68,7 @@ def evaluate_model(X: np.ndarray,y: np.ndarray,model_type: str = "rf_classif",n_
 def evaluate_single_run(X: np.ndarray,y: np.ndarray,model_type: str = "rf_classif",n_estimators: int = 100,test_size: float = 0.3,seed: int = 119):
     """
     Do one train/test split, train the specified model.
-      
+
     Return: (accuracy, f1_weighted, f1_macro)
     """
     stratify = y if "classif" in model_type else None
@@ -119,7 +119,7 @@ def evaluate_f1w(X: np.ndarray,y: np.ndarray,model_type: str = "rf_classif",n_es
             mdl = XGBClassifier(n_estimators=n_estimators,eval_metric="logloss",random_state=seed+run)
         else:
             raise ValueError("Unsupported model_type for F1 scoring")
-        
+
         mdl.fit(X_train, y_train)
         y_pred = mdl.predict(X_test)
         scores.append(f1_score(y_test, y_pred, average="weighted"))
@@ -140,7 +140,7 @@ def evaluate_f1m(X: np.ndarray,y: np.ndarray,model_type: str = "rf_classif",n_es
             mdl = XGBClassifier(n_estimators=n_estimators,eval_metric="logloss",random_state=seed+run)
         else:
             raise ValueError("Unsupported model_type for F1 scoring")
-        
+
         mdl.fit(X_train, y_train)
         y_pred = mdl.predict(X_test)
         scores.append(f1_score(y_test, y_pred, average="macro"))

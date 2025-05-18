@@ -39,9 +39,9 @@ class DPMON:
         Instead of node-level MSE regression, DPMON aggregates node embeddings with patient-level omics data.
         A downstream classification head (e.g., softmax layer with CrossEntropyLoss) is applied for sample-level disease prediction.
         This end-to-end approach leverages both local (node-level) and global (patient-level) network information
-    
+
     Attributes:
-    
+
         adjacency_matrix (pd.DataFrame): The adjacency matrix of the network.
         omics_list (List[pd.DataFrame]): A list of omics datasets.
         phenotype_data (pd.DataFrame): A DataFrame containing the disease phenotype.
@@ -58,7 +58,7 @@ class DPMON:
         tune (bool): Whether to perform hyperparameter tuning. Default=False.
         gpu (bool): Whether to use GPU. Default=False.
         cuda (int): The CUDA device ID. Default=0.
-        output_dir (Optional[str]): The output directory. Default=None.        
+        output_dir (Optional[str]): The output directory. Default=None.
     """
     def __init__(
         self,
@@ -111,11 +111,11 @@ class DPMON:
         self.cuda = cuda
 
         if output_dir is None:
-            self.output_dir = Path(os.getcwd()) / "dpmon"  
+            self.output_dir = Path(os.getcwd()) / "dpmon"
         else:
             self.output_dir = Path(output_dir)
 
-        self.output_dir.mkdir(parents=True, exist_ok=True)  
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         logger.info(f"Output directory set to: {self.output_dir}")
 
 
@@ -180,7 +180,7 @@ class DPMON:
         # Combine omics datasets
         combined_omics = pd.concat(self.omics_list, axis=1)
         combined_omics = combined_omics[self.adjacency_matrix.columns]
-        
+
         if "phenotype" not in combined_omics.columns:
             combined_omics = combined_omics.merge(
                 self.phenotype_data[["phenotype"]],
@@ -201,7 +201,7 @@ class DPMON:
             best_config["nn_hidden_dim2"] = int(best_config["nn_hidden_dim2"])
             best_config["num_epochs"] = int(best_config["num_epochs"])
             logger.info(f"Best tuned parameters: {best_config}")
-            
+
             logger.info(f"Best tuned parameters: {best_config}")
             dpmon_params.update(best_config)
             logger.info("Running standard training with tuned parameters.")
@@ -213,7 +213,7 @@ class DPMON:
                 output_dir=self.output_dir,
             )
             return predictions
-        
+
         else:
             logger.info("Running standard training for DPMON.")
             predictions = run_standard_training(
@@ -418,7 +418,7 @@ def run_hyperparameter_tuning(
     gpu_resources = 1 if dpmon_params["gpu"] else 0
 
     best_configs = []
-    
+
     for omics_data, omics_network_tg in zip(omics_dataset, omics_networks_tg):
         logger.info(
             f"Starting hyperparameter tuning for dataset shape: {omics_data.shape}"

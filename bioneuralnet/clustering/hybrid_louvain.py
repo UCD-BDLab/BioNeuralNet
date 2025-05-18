@@ -16,7 +16,7 @@ class HybridLouvain:
     HybridLouvain Class that combines Correlated Louvain and Correlated PageRank for community detection.
 
     Attributes:
-    
+
         G (nx.Graph): NetworkX graph object.
         B (pd.DataFrame): Omics data.
         Y (pd.DataFrame): Phenotype data.
@@ -41,7 +41,7 @@ class HybridLouvain:
 
     ):
         self.logger = get_logger(__name__)
-                
+
         if seed is not None:
             torch.manual_seed(seed)
             np.random.seed(seed)
@@ -49,7 +49,7 @@ class HybridLouvain:
                 torch.cuda.manual_seed_all(seed)
                 torch.backends.cudnn.deterministic = True
                 torch.backends.cudnn.benchmark = False
-        
+
         self.gpu = gpu
         self.seed = seed
         self.logger.info("Initializing HybridLouvain...")
@@ -241,4 +241,3 @@ class HybridLouvain:
             return dfs
         else:
             return {"curr": current_partition, "clus": all_clusters}
-        

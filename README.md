@@ -11,7 +11,7 @@
 
 ![BioNeuralNet Logo](assets/LOGO_WB.png)
 
-**BioNeuralNet** is a Python framework for integrating and analyzing multi-omics data using **Graph Neural Networks (GNNs)**.  
+**BioNeuralNet** is a Python framework for integrating and analyzing multi-omics data using **Graph Neural Networks (GNNs)**.
 It provides tools for network construction, embedding generation, clustering, and disease prediction, all within a modular, scalable, and reproducible pipeline.
 
 ![BioNeuralNet Workflow](assets/BioNeuralNet.png)
@@ -162,13 +162,13 @@ print("Disease phenotype predictions:\n", predictions)
 
 ## 5. Frequently Asked Questions (FAQ)
 
-- **Does BioNeuralNet support GPU acceleration?**  
+- **Does BioNeuralNet support GPU acceleration?**
   Yes, install PyTorch with CUDA support.
 
-- **Can I use my own omics network?**  
+- **Can I use my own omics network?**
   Yes, you can provide a custom network as an adjancy matrix instead of using SmCCNet.
 
-- **What clustering methods are supported?**  
+- **What clustering methods are supported?**
   BioNeuralNet supports Correlated Louvain, Hybrid Louvain, and Correlated PageRank.
 
 For more FAQs, please visit our [FAQ page](https://bioneuralnet.readthedocs.io/en/latest/faq.html).

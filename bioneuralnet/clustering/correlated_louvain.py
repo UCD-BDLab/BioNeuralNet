@@ -26,7 +26,7 @@ class CorrelatedLouvain:
     """
     CorrelatedLouvain Class for Community Detection with Correlated Omics Data.
     Attributes:
-    
+
         G (nx.Graph): NetworkX graph object.
         B (pd.DataFrame): Omics data.
         Y (pd.DataFrame): Phenotype data.
@@ -221,15 +221,15 @@ class CorrelatedLouvain:
 
         adjacency_matrices = []
         for cl, nodes in clusters.items():
-            self.logger.debug(f"Cluster {cl} size: {len(nodes)}")  
-            if len(nodes) > 2: 
-                valid_nodes = list(set(nodes).intersection(set(self.B.columns)))  
+            self.logger.debug(f"Cluster {cl} size: {len(nodes)}")
+            if len(nodes) > 2:
+                valid_nodes = list(set(nodes).intersection(set(self.B.columns)))
                 if valid_nodes:
                     adjacency_matrix = self.B.loc[:, valid_nodes].fillna(0)
                     adjacency_matrices.append(adjacency_matrix)
 
         print(f"Clusters with >2 nodes: {len(adjacency_matrices)}")
-        
+
         return adjacency_matrices
 
     def get_quality(self) -> float:

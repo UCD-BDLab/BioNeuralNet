@@ -48,9 +48,9 @@ class GCN(nn.Module):
             in_dim = input_dim if i == 0 else hidden_dim
             self.convs.append(GCNConv(in_dim, hidden_dim))
             self.bns.append(nn.Identity())
-            
+
         self.regressor = nn.Linear(hidden_dim, 1) if self.final_layer == "regression" else nn.Identity()
-    
+
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
         for conv, bn in zip(self.convs, self.bns):
@@ -61,7 +61,7 @@ class GCN(nn.Module):
                 x = F.dropout(x, p=self.dropout, training=self.training)
         x = self.regressor(x)
         return x
-    
+
     def get_embeddings(self, data):
         x, edge_index = data.x, data.edge_index
         for conv, bn in zip(self.convs, self.bns):
@@ -87,16 +87,16 @@ class GAT(nn.Module):
         self.final_layer = final_layer
         self.heads = heads
         self.activation = get_activation(activation)
-        
+
         self.convs = nn.ModuleList()
         self.bns = nn.ModuleList()
         for i in range(layer_num):
             in_dim = input_dim if i == 0 else hidden_dim * heads
             self.convs.append(GATConv(in_dim, hidden_dim, heads=heads))
             self.bns.append(nn.Identity())
-            
+
         self.regressor = nn.Linear(hidden_dim * heads, 1) if self.final_layer == "regression" else nn.Identity()
-        
+
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
         for conv, bn in zip(self.convs, self.bns):
@@ -107,7 +107,7 @@ class GAT(nn.Module):
                 x = F.dropout(x, p=self.dropout, training=self.training)
         x = self.regressor(x)
         return x
-    
+
     def get_embeddings(self, data):
         x, edge_index = data.x, data.edge_index
         for conv, bn in zip(self.convs, self.bns):
@@ -132,16 +132,16 @@ class SAGE(nn.Module):
         self.dropout = process_dropout(dropout)
         self.final_layer = final_layer
         self.activation = get_activation(activation)
-        
+
         self.convs = nn.ModuleList()
         self.bns = nn.ModuleList()
         for i in range(layer_num):
             in_dim = input_dim if i == 0 else hidden_dim
             self.convs.append(SAGEConv(in_dim, hidden_dim))
             self.bns.append(nn.Identity())
-            
+
         self.regressor = nn.Linear(hidden_dim, 1) if self.final_layer == "regression" else nn.Identity()
-        
+
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
         for conv, bn in zip(self.convs, self.bns):
@@ -152,7 +152,7 @@ class SAGE(nn.Module):
                 x = F.dropout(x, p=self.dropout, training=self.training)
         x = self.regressor(x)
         return x
-    
+
     def get_embeddings(self, data):
         x, edge_index = data.x, data.edge_index
         for conv, bn in zip(self.convs, self.bns):
@@ -164,8 +164,8 @@ class SAGE(nn.Module):
         return x
 
 class GIN(nn.Module):
-    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="relu", seed=None): 
-        
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="relu", seed=None):
+
         if seed is not None:
             torch.manual_seed(seed)
             if torch.cuda.is_available():
@@ -178,7 +178,7 @@ class GIN(nn.Module):
         self.dropout = process_dropout(dropout)
         self.final_layer = final_layer
         self.activation = get_activation(activation)
-        
+
         self.convs = nn.ModuleList()
         self.bns = nn.ModuleList()
         for i in range(layer_num):
@@ -191,9 +191,9 @@ class GIN(nn.Module):
             )
             self.convs.append(GINConv(mlp))
             self.bns.append(nn.Identity())
-            
+
         self.regressor = nn.Linear(hidden_dim, 1) if self.final_layer == "regression" else nn.Identity()
-        
+
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
         for conv, bn in zip(self.convs, self.bns):
@@ -204,7 +204,7 @@ class GIN(nn.Module):
                 x = F.dropout(x, p=self.dropout, training=self.training)
         x = self.regressor(x)
         return x
-    
+
     def get_embeddings(self, data):
         x, edge_index = data.x, data.edge_index
         for conv, bn in zip(self.convs, self.bns):

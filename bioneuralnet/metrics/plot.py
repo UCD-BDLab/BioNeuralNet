@@ -22,9 +22,9 @@ def plot_variance_distribution(df: pd.DataFrame, bins: int = 50):
 
         df (pd.DataFrame): Input data.
         bins (int): Number of bins for the histogram.
-    
+
     Returns:
-    
+
         matplotlib.figure.Figure: Generated figure.
     """
     variances = df.var()
@@ -35,14 +35,14 @@ def plot_variance_distribution(df: pd.DataFrame, bins: int = 50):
     ax.set_title("Distribution of Feature Variances")
     ax.set_xlabel("Variance")
     ax.set_ylabel("Frequency")
-    
+
     logger.info("Variance distribution plot generated.")
     return fig
 
 def plot_variance_by_feature(df: pd.DataFrame):
     """
     Plot the variance for each feature against its index or name.
-    
+
     Parameters:
 
         df (pd.DataFrame): Input data.
@@ -60,7 +60,7 @@ def plot_variance_by_feature(df: pd.DataFrame):
     ax.set_xlabel("Feature")
     ax.set_ylabel("Variance")
     ax.tick_params(axis='x', rotation=90)
-    
+
     logger.info("Variance vs. feature index plot generated.")
     return fig
 
@@ -72,7 +72,7 @@ def plot_performance_three(raw_score, gnn_score, other_score, labels=["Raw","GNN
         raise ValueError("Scores must be tuples of (mean, std)")
     scores = [raw_score[0], gnn_score[0], other_score[0]]
     errors = [raw_score[1], gnn_score[1], other_score[1]]
-    
+
     x = np.arange(len(scores))
     width = 0.23
 
@@ -144,19 +144,19 @@ def plot_performance(embedding_result, raw_rf_acc, title="Performance Comparison
     if filename:
         plt.savefig(str(filename), dpi=300, bbox_inches="tight")
         print(f"Saved plot to {filename}")
-        
+
     plt.show()
 
 
 def plot_embeddings(embeddings, node_labels=None):
     """
     Plot the embeddings in 2D space using t-SNE.
-    
+
     Parameters:
 
         embeddings (array-like): High-dimensional embedding data.
         node_labels (array-like or DataFrame, optional): Labels for the nodes to color the points.
-    
+
     """
     X = np.array(embeddings)
 
@@ -165,9 +165,9 @@ def plot_embeddings(embeddings, node_labels=None):
         logger.info(f"Skipping plot: not enough samples ({X.shape[0]}) for TSNE.")
         return
     reducer = TSNE(n_components=2, init="pca", perplexity=perplexity)
-    
+
     X_reduced = reducer.fit_transform(X)
-    
+
     if node_labels is None:
         c_values = np.zeros(X.shape[0])
     elif hasattr(node_labels, "iloc"):
@@ -175,18 +175,18 @@ def plot_embeddings(embeddings, node_labels=None):
         c_values = np.array(node_labels.iloc[:, 0], dtype=float).flatten()
     else:
         c_values = np.array(node_labels, dtype=float).flatten()
-    
+
     fig, ax = plt.subplots(figsize=(10, 8))
-    
+
     scatter = ax.scatter(
         X_reduced[:, 0], X_reduced[:, 1],
         c=c_values,
         cmap="viridis",
         s=60,
         alpha=0.9,
-        edgecolor="k" 
+        edgecolor="k"
     )
-    
+
     ax.invert_yaxis()
     ax.set_title(f"Embeddings in 2D space from {embeddings.shape[1]}D")
 
@@ -205,9 +205,9 @@ def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show
         weight_threshold (float): Minimum weight to keep an edge (default: 0.0).
         show_labels (bool): Whether to show node labels.
         show_edge_weights (bool): Whether to show edge weights.
-    
+
     Returns:
-    
+
         pd.DataFrame: Mapping of node indexes to actual gene names.
     """
     full_G = nx.from_pandas_adjacency(adjacency_matrix)
@@ -218,13 +218,13 @@ def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show
 
     if weight_threshold > 0:
         edges_to_remove = []
-        
+
         for u, v, d in G.edges(data=True):
             weight = d.get('weight', 0)
             if weight < weight_threshold:
                 edges_to_remove.append((u, v))
 
-        G.remove_edges_from(edges_to_remove)  
+        G.remove_edges_from(edges_to_remove)
 
     isolated_nodes = list(nx.isolates(G))
     G.remove_nodes_from(isolated_nodes)
@@ -269,11 +269,11 @@ def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show
 
     if show_edge_weights and edge_weights:
         edge_labels = nx.get_edge_attributes(G, 'weight')
-        
+
         formatted_edge_labels = {}
         for edge, weight in edge_labels.items():
             formatted_edge_labels[edge] = f"{weight:.4f}"
-        
+
         nx.draw_networkx_edge_labels(G, pos, edge_labels=formatted_edge_labels, font_size=9, ax=ax_graph)
 
     if show_labels:
@@ -305,13 +305,13 @@ def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show
 
     return mapping_df
 
-def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.DataFrame, 
+def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.DataFrame,
                      omics_merged: pd.DataFrame, label1: str = "Louvain", label2: str = "SmCCNet"):
     """
     Compare clusters from two methods by computing the correlation for each induced subnetwork.
     Both inputs are expected to be lists of pandas DataFrames. If the lists have different lengths,
     only the first min(n, m) clusters are compared.
-    
+
     Parameters:
 
         louvain_clusters: list of pd.DataFrame
@@ -326,7 +326,7 @@ def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.D
             Label for the first method.
         label2: str
             Label for the second method.
-    
+
     Returns:
 
         pd.DataFrame: Results table with cluster indices, sizes, and correlations
@@ -334,12 +334,12 @@ def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.D
     smccnet_clusters_fixed = []
 
     for cluster_df in smccnet_clusters:
-        valid_genes = [] 
-        
+        valid_genes = []
+
         for gene in cluster_df.index:
             if gene in omics_merged.columns:
                 valid_genes.append(gene)
-        
+
         if len(valid_genes) > 0:
             sample_level_data = omics_merged[valid_genes]
             smccnet_clusters_fixed.append(sample_level_data)
@@ -349,7 +349,7 @@ def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.D
     smccnet_clusters_fixed = smccnet_clusters_fixed[:min_len]
 
     results = []
-    
+
     for i, (df_louvain, df_smccnet) in enumerate(zip(louvain_clusters, smccnet_clusters_fixed), start=1):
         size_louvain, corr_louvain = cluster_correlation(df_louvain, pheno)
         size_smccnet, corr_smccnet = cluster_correlation(df_smccnet, pheno)
@@ -357,23 +357,23 @@ def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.D
         if corr_louvain is not None and corr_smccnet is not None:
             results.append((f"Cluster_{i}", size_louvain, corr_louvain, size_smccnet, corr_smccnet))
 
-    df_results = pd.DataFrame(results, columns=["Cluster", "Louvain Size", "Louvain Correlation", 
+    df_results = pd.DataFrame(results, columns=["Cluster", "Louvain Size", "Louvain Correlation",
                                                 "SMCCNET Size", "SMCCNET Correlation"])
-    
+
     fig, ax = plt.subplots(figsize=(10, 5))
-    
-    ax.plot(df_results.index + 1, df_results["Louvain Correlation"], marker="o", linestyle="-", 
+
+    ax.plot(df_results.index + 1, df_results["Louvain Correlation"], marker="o", linestyle="-",
             label=label1, color="blue")
-    ax.plot(df_results.index + 1, df_results["SMCCNET Correlation"], marker="s", linestyle="--", 
+    ax.plot(df_results.index + 1, df_results["SMCCNET Correlation"], marker="s", linestyle="--",
             label=label2, color="red")
 
     for i, row in df_results.iterrows():
-        ax.text(i + 1, row["Louvain Correlation"] + 0.05, 
-                f"{row['Louvain Size']}", ha="center", fontsize=10, 
+        ax.text(i + 1, row["Louvain Correlation"] + 0.05,
+                f"{row['Louvain Size']}", ha="center", fontsize=10,
                 color="blue", fontweight="bold", bbox=dict(facecolor="white", alpha=0.7, edgecolor="none"))
-        
-        ax.text(i + 1, row["SMCCNET Correlation"] + 0.05, 
-                f"{row['SMCCNET Size']}", ha="center", fontsize=10, 
+
+        ax.text(i + 1, row["SMCCNET Correlation"] + 0.05,
+                f"{row['SMCCNET Size']}", ha="center", fontsize=10,
                 color="red", fontweight="bold", bbox=dict(facecolor="white", alpha=0.7, edgecolor="none"))
 
     ax.set_xticks(range(1, len(df_results) + 1))

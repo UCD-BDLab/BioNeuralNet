@@ -40,7 +40,7 @@ from scipy.stats import skew
 class GNNEmbedding:
     """
     GNNEmbedding Class for Generating Graph Neural Network (GNN) Based Embeddings.
-    
+
     Attributes:
         adjacency_matrix : pd.DataFrame
         omics_data : pd.DataFrame
@@ -84,7 +84,7 @@ class GNNEmbedding:
         Initializes the GNNEmbedding instance.
         """
         self.logger = get_logger(__name__)
-        
+
         # Input validation
         if adjacency_matrix.empty:
             raise ValueError("Adjacency matrix cannot be empty.")
@@ -94,7 +94,7 @@ class GNNEmbedding:
             raise ValueError("Adjacency matrix, omics data must have the same number of samples.")
         if clinical_data is not None and clinical_data.empty:
             raise ValueError("Clinical data was provided but is empty.")
-    
+
         if isinstance(phenotype_data, pd.Series):
             self.phenotype_data = phenotype_data.copy(deep=True)
 
@@ -111,7 +111,7 @@ class GNNEmbedding:
         else:
             raise ValueError("Phenotype data must be a Series or a DataFrame.")
 
-            
+
         if seed is not None:
             torch.manual_seed(seed)
             np.random.seed(seed)
@@ -196,7 +196,7 @@ class GNNEmbedding:
             self.logger.info(f"Retraining with best config: {best_config}")
             self.fit()
             self.logger.info("Model retrained with best hyperparameters.")
-        
+
         try:
             self.embeddings = self._generate_embeddings(self.model, self.data)
             self.logger.info("Node embeddings generated.")
@@ -235,7 +235,7 @@ class GNNEmbedding:
         except Exception as e:
             self.logger.error(f"Error during conversion: {e}")
             raise
-        
+
     def _prepare_node_features(self) -> pd.DataFrame:
         """
         1. Align network & omics nodes.
@@ -254,7 +254,7 @@ class GNNEmbedding:
 
         if len(nodes) == 0:
             raise ValueError("No common features found between the network and omics data.")
-        
+
         if len(nodes) != len(network_features):
             missing = set(network_features) - set(nodes)
             self.logger.warning(f"Length of common features: {len(nodes)}")
@@ -306,9 +306,9 @@ class GNNEmbedding:
                 for cvar in clinical_cols:
                     clinical_series = self.clinical_data[cvar].loc[common_index]
                     corr_val = vec.corr(clinical_series)
-                    
+
                     corr_vector[cvar] = corr_val if not pd.isna(corr_val) else 0.0
-               
+
                 full_feature_vec = {
                     "pagerank": pagerank[node],
                     "eigenvector": eigenvector[node],
@@ -317,7 +317,7 @@ class GNNEmbedding:
                 full_feature_vec.update(corr_vector)
                 node_features_dict[node] = full_feature_vec
 
-        
+
             node_features_df = pd.DataFrame.from_dict(node_features_dict, orient="index")
             self.logger.info(f"Built feature matrix with clinical correlations shape: {node_features_df.shape}")
 
@@ -326,7 +326,7 @@ class GNNEmbedding:
             if self.phenotype_data is None or self.phenotype_data.empty:
                 raise ValueError("No phenotype data available for statistical features.")
             pheno = self.phenotype_data.loc[omics_filtered.index].dropna()
-            
+
             stat_features = {}
             for node in nodes:
                 vec = omics_filtered[node].loc[pheno.index].dropna()
@@ -372,7 +372,7 @@ class GNNEmbedding:
         samples = self.omics_data.index.intersection(self.phenotype_data.index)
         omics_data =  self.omics_data.loc[samples, nodes]
         pheno = self.phenotype_data.loc[samples]
-        
+
         if len(samples)==0:
             raise ValueError("No overlapping samples between omics and phenotype.")
         if len(nodes)==0:
@@ -385,7 +385,7 @@ class GNNEmbedding:
             val = vec.corr(pheno)
 
             labels_dict[node] = 0.0 if pd.isna(val) else val
-            
+
         labels_series = pd.Series(labels_dict, index=nodes)
 
         ranks = labels_series.rank(method="average")
@@ -522,7 +522,7 @@ class GNNEmbedding:
             embeddings = model.get_embeddings(data)
 
         return embeddings.cpu()
-    
+
     def _tune_helper(self, config):
         """
         The function that each Ray Tune trial calls.
@@ -553,8 +553,8 @@ class GNNEmbedding:
 
             X = node_embeddings.detach().cpu().numpy()
 
-            dim_stds = np.std(X, axis=0)      
-            keep_dims = dim_stds >= 1e-4     
+            dim_stds = np.std(X, axis=0)
+            keep_dims = dim_stds >= 1e-4
             num_dims_kept = np.sum(keep_dims)
 
             if num_dims_kept == 0:
@@ -651,12 +651,12 @@ class GNNEmbedding:
         best_config_json = json.dumps(best_trial.config, indent=4)
 
         try:
-            df = result.get_dataframe()  
+            df = result.get_dataframe()
         except AttributeError:
             df = result.dataframe(metric="composite_score", mode="min")
 
         summary_file = save_dir / f"summary_{num_nodes}_{timestamp}.txt"
-        
+
         with open(summary_file, "w") as f:
             f.write(f"Best trial\n")
             f.write(best_config_json)
@@ -678,5 +678,5 @@ class GNNEmbedding:
             json.dump(best_trial.config, f, indent=4)
 
         self.logger.info(f"Best embedding parameters saved to {best_params_file}")
-        
+
         return best_trial.config

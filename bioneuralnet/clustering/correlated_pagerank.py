@@ -459,7 +459,7 @@ class CorrelatedPageRank:
 
         def short_dirname_creator(trial):
             return f"_{trial.trial_id}"
-        
+
         resources = {"cpu": 1, "gpu": 1} if self.device.type == "cuda" else {"cpu": 1, "gpu": 0}
 
         analysis = tune.run(

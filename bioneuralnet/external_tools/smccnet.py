@@ -25,7 +25,7 @@ class SmCCNet:
 
     This class handles the preprocessing of omics data, execution of the SmCCNet R script,
     and retrieval of the resulting adjacency matrix from a designated output directory.
-    
+
     Attributes:
 
         phenotype_df (pd.DataFrame): DataFrame containing phenotype data, shape [samples x 1 or more].
@@ -46,11 +46,11 @@ class SmCCNet:
         omics_dfs: List[pd.DataFrame],
         data_types: List[str],
         kfold: int = 5,
-        eval_method: str = "",        
+        eval_method: str = "",
         subSampNum: int = 500,
         summarization: str = "NetSHy",
         seed: int = 119,
-        ncomp_pls: int = 0,              
+        ncomp_pls: int = 0,
         between_shrinkage: float = 5.0,
         cut_height: float = (1.0 - 0.1**10.0),
         preprocess: int = 0,
@@ -94,10 +94,10 @@ class SmCCNet:
 
             self.r_script = r_script_path
             self.logger.warning(f"Using fallback R script path: {self.r_script}")
-        
+
         if isinstance(phenotype_df, pd.Series):
             phenotype_df = phenotype_df.to_frame(name="phenotype")
-            
+
         if isinstance(phenotype_df, pd.DataFrame) and phenotype_df.shape[1] > 1:
             self.logger.warning("Phenotype DataFrame has more than one column. Renaming to phenotype and keeping only the first column")
             phenotype_df = phenotype_df.iloc[:, :1]
@@ -105,7 +105,7 @@ class SmCCNet:
 
         if not isinstance(phenotype_df, pd.DataFrame):
             raise ValueError("phenotype_df must be a pandas DataFrame or Series.")
-            
+
         self.phenotype_df = phenotype_df.copy(deep=True)
 
         self.omics_dfs = []
@@ -138,12 +138,12 @@ class SmCCNet:
         if len(self.omics_dfs) != len(self.data_types):
             self.logger.error("Number of omics DataFrames does not match number of data types.")
             raise ValueError("Mismatch between omics dataframes and data types.")
-        
+
         if eval_method in ("auc","accuracy","f1"):
             uniques = set(phenotype_df.iloc[:, 0].unique())
             if not uniques.issubset({0,1}):
                 raise ValueError("eval_method=classification, but phenotype is not strictly 0/1.")
-        
+
         if eval_method == "Rsquared" and ncomp_pls>0:
             raise ValueError("Continuous eval can't use PLS. Set ncomp_pls=0 for CCA.")
 
@@ -184,8 +184,8 @@ class SmCCNet:
 
         self.logger.info("Validating and serializing input data for SmCCNet...")
         if self.phenotype_df.columns[0] != "phenotype":
-            self.logger.warning("Renaming target column to 'phenotype' for consistency.") 
-            self.phenotype_df.columns = ["phenotype"] 
+            self.logger.warning("Renaming target column to 'phenotype' for consistency.")
+            self.phenotype_df.columns = ["phenotype"]
 
 
         # if index_match == True:
@@ -233,7 +233,7 @@ class SmCCNet:
         self.logger.info(f"Serialized phenotype with {len(pheno_df)} samples.")
 
         return serialized_data
-    
+
 
     def run_smccnet(self, serialized_data: Dict[str, Any]) -> None:
         """
@@ -243,7 +243,7 @@ class SmCCNet:
         try:
             self.logger.info("Executing SmCCNet R script...")
             json_data = json.dumps(serialized_data) + "\n"
-            
+
             # script_dir = os.path.dirname(os.path.abspath(__file__))
 
             # r_script = os.path.join(script_dir, "SmCCNet.R")

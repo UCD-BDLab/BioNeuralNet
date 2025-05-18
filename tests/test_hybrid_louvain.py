@@ -40,7 +40,7 @@ class TestHybridLouvain(unittest.TestCase):
             phenos.append(np.random.rand())
             i = i + 1
         self.Y = pd.DataFrame({"phenotype": phenos})
-        
+
     def test_run(self):
         hl = HybridLouvain(self.G, self.B, self.Y, k3=0.2, k4=0.8, max_iter=5, weight="weight", tune=False)
         res = hl.run()

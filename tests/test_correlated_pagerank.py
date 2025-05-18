@@ -8,12 +8,12 @@ class TestCorrelatedPageRank(unittest.TestCase):
     def setUp(self):
         self.G = nx.complete_graph(4, create_using=nx.DiGraph())
         nodes = list(self.G.nodes())
-        
+
         data = {node: np.random.rand(10) for node in nodes}
         self.B = pd.DataFrame(data)
-        
+
         self.Y = pd.DataFrame({"phenotype": np.random.rand(10)})
-        
+
     def test_run_valid(self):
         cp = CorrelatedPageRank(
             self.G, self.B, self.Y,
@@ -28,7 +28,7 @@ class TestCorrelatedPageRank(unittest.TestCase):
         ]
         for key in expected_keys:
             self.assertIn(key, res)
-            
+
     def test_run_empty_seed(self):
         cp = CorrelatedPageRank(
             self.G, self.B, self.Y,
