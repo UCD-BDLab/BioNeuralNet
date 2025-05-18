@@ -1,7 +1,14 @@
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch_geometric.nn import GCNConv, GATConv, SAGEConv, GINConv
+try:
+    import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
+    from torch_geometric.nn import GCNConv, GATConv, SAGEConv, GINConv
+except ModuleNotFoundError:
+    raise ImportError(
+        "This module requires PyTorch and PyTorch Geometric. "
+        "Please install it by following the instructions at: "
+        "https://bioneuralnet.readthedocs.io/en/latest/installation.html"
+    )
 
 def process_dropout(dropout):
     if isinstance(dropout, bool):
@@ -22,8 +29,7 @@ def get_activation(activation_choice):
         raise ValueError(f"Unsupported activation function: {activation_choice}")
 
 class GCN(nn.Module):
-    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True,
-                 final_layer="regression", activation="elu", seed=None):
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="elu", seed=None):
         if seed is not None:
             torch.manual_seed(seed)
             if torch.cuda.is_available():
@@ -67,8 +73,7 @@ class GCN(nn.Module):
         return x
 
 class GAT(nn.Module):
-    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, heads=1,
-                 final_layer="regression", activation="elu", seed=None):
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, heads=1, final_layer="regression", activation="elu", seed=None):
         if seed is not None:
             torch.manual_seed(seed)
             if torch.cuda.is_available():
@@ -114,8 +119,7 @@ class GAT(nn.Module):
         return x
 
 class SAGE(nn.Module):
-    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True,
-                 final_layer="regression", activation="elu", seed=None):
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="elu", seed=None):
         if seed is not None:
             torch.manual_seed(seed)
             if torch.cuda.is_available():
@@ -160,8 +164,7 @@ class SAGE(nn.Module):
         return x
 
 class GIN(nn.Module):
-    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True,
-                 final_layer="regression", activation="relu", seed=None): 
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="relu", seed=None): 
         
         if seed is not None:
             torch.manual_seed(seed)

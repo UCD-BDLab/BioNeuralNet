@@ -6,5 +6,6 @@ scikit-learn
 networkx
 python-louvain
 ray[tune]
+statsmodels
 # torch
 # torch_geometric

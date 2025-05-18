@@ -1,13 +1,21 @@
 import pandas as pd
 import os
 import json
+import tempfile
 from typing import Optional, Dict, Any, List
 from pathlib import Path
 from datetime import datetime
 
-import torch
-import torch.nn as nn
-import torch.optim as optim
+try:
+    import torch
+    import torch.nn as nn
+    import torch.optim as optim
+except ModuleNotFoundError:
+    raise ImportError(
+        "SubjectRepresentation requires PyTorch. "
+        "Please install it by following the instructions at: "
+        "https://bioneuralnet.readthedocs.io/en/latest/installation.html"
+    )
 
 from ray import tune
 from ray.tune import TuneError
@@ -15,7 +23,6 @@ from ray.tune import CLIReporter
 from ray.tune.schedulers import ASHAScheduler
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import accuracy_score, r2_score
-import tempfile
 
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split

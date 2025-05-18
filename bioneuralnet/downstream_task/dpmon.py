@@ -7,11 +7,19 @@ import networkx as nx
 from typing import Optional, List
 from pathlib import Path
 
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch_geometric.data import Data
-from torch_geometric.transforms import RandomNodeSplit
+try:
+    import torch
+    import torch.nn as nn
+    import torch.optim as optim
+    from torch_geometric.data import Data
+    from torch_geometric.transforms import RandomNodeSplit
+except ModuleNotFoundError:
+    raise ImportError(
+        "DPMON (Disease Prediction using Multi-Omics Networks) requires PyTorch Geometric. "
+        "Please install it by following the instructions at: "
+        "https://bioneuralnet.readthedocs.io/en/latest/installation.html"
+    )
+
 
 from ray import train
 from ray import tune

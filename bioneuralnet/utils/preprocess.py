@@ -60,7 +60,7 @@ def preprocess_clinical(X: pd.DataFrame, y: pd.Series, top_k: int = 10, scale: b
     else:
         df_cat_encoded = pd.DataFrame(index=df_numeric_scaled.index)
     
-    df_combined = pd.concat([df_numeric_scaled, df_cat_encoded], axis=1)
+    df_combined = pd.concat([df_numeric_scaled, df_cat_encoded, df_ignore],axis=1,join="inner")
     df_features = df_combined.loc[:, df_combined.std(axis=0) > 0]
     
     if y_series.nunique() <= 10:
@@ -92,10 +92,8 @@ def preprocess_clinical(X: pd.DataFrame, y: pd.Series, top_k: int = 10, scale: b
     selected_columns = []
     for idx in selected_idx:
         selected_columns.append(feature_names[idx])
-
-    final_features = pd.concat([df_ignore, df_features[selected_columns]], axis=1)
     
-    return final_features
+    return df_features[selected_columns]
 
 def clean_inf_nan(df: pd.DataFrame) -> pd.DataFrame:
     """
