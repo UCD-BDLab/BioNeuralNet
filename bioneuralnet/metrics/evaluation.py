@@ -1,6 +1,6 @@
 import numpy as np
 from pathlib import Path
-from typing import Union, Optional, Tuple, Dict
+from typing import Union, Optional, Tuple, cast
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.model_selection import train_test_split
@@ -136,15 +136,6 @@ def evaluate_f1m(X: np.ndarray,y: np.ndarray,model_type: str = "rf_classif",n_es
 
     return np.mean(scores), np.std(scores)
 
-import numpy as np
-import matplotlib.pyplot as plt
-from pathlib import Path
-from typing import Optional, Union
-import numpy.typing as npt
-import logging
-
-logger = logging.getLogger(__name__)
-
 def plot_grouped_performance(
     scores: dict[str, dict[str, tuple[float, float]]],
     title: str,
@@ -158,7 +149,6 @@ def plot_grouped_performance(
     groups = list(scores.keys())
     sublabels = list(next(iter(scores.values())).keys())
 
-    # Build raw lists of means and errors
     means_list: list[list[float]] = []
     errs_list: list[list[float]] = []
     for g in groups:
@@ -171,9 +161,8 @@ def plot_grouped_performance(
         means_list.append(row_m)
         errs_list.append(row_e)
 
-    # Convert to NumPy arrays with explicit typing for MyPy
-    means: npt.NDArray[np.float_] = np.array(means_list, dtype=float)
-    errs: npt.NDArray[np.float_] = np.array(errs_list, dtype=float)
+    means = cast(np.ndarray, np.array(means_list, dtype=float))
+    errs  = cast(np.ndarray, np.array(errs_list,  dtype=float))
 
     ind = np.arange(len(groups))
     width = 0.8 / len(sublabels)
@@ -238,7 +227,6 @@ def plot_multiple_metrics(
 ) -> None:
     """
     Consolidate multiple metric grouped performances into one figure.
-    Adds numeric labels on top of each bar.
     """
     logger.info(f"Plotting multiple metrics: {list(metrics.keys())}")
     n = len(metrics)
@@ -263,8 +251,8 @@ def plot_multiple_metrics(
             means_list.append(row_m)
             errs_list.append(row_e)
 
-        means: npt.NDArray[np.float_] = np.array(means_list, dtype=float)
-        errs: npt.NDArray[np.float_] = np.array(errs_list, dtype=float)
+        means = cast(np.ndarray, np.array(means_list, dtype=float))
+        errs  = cast(np.ndarray, np.array(errs_list,  dtype=float))
         ind = np.arange(len(groups))
         total = 0.7
         width = total / len(sublabels)
