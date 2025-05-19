@@ -89,6 +89,7 @@ class CorrelatedPageRank:
 
         self.seed = seed
         self.gpu = gpu
+        self.results: dict[str, float] = {}
 
         self.device = torch.device("cuda" if gpu and torch.cuda.is_available() else "cpu")
         self.logger.info(f"Initialized Correlated Louvain. device={self.device}")

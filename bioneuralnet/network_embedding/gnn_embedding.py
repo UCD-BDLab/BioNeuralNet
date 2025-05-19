@@ -77,7 +77,7 @@ class GNNEmbedding:
         activation: str = "relu",
         seed: Optional[int] = None,
         tune: Optional[bool] = False,
-        output_dir: Union[str, Path, None] = None,
+        output_dir: Optional[Union[str, Path]] = None,
         ):
 
         """
@@ -146,7 +146,7 @@ class GNNEmbedding:
 
         if output_dir is None:
             self.temp_dir_obj = tempfile.TemporaryDirectory()
-            self.output_dir = self.temp_dir_obj.name
+            self.output_dir = Path(self.temp_dir_obj.name)
             self.logger.info(f"No output_dir provided; using temporary directory: {self.output_dir}")
         else:
             self.output_dir = Path(output_dir)

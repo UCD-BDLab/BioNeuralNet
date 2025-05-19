@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import json
 import tempfile
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Union, Sequence
 from pathlib import Path
 from datetime import datetime
 
@@ -42,7 +42,7 @@ class SubjectRepresentation:
         reduce_method: str = "AE",
         seed: Optional[int] = None,
         tune: Optional[bool] = False,
-        output_dir: Optional[str] = None,
+        output_dir: Optional[Union[str, Path]] = None,
     ):
         """
         Initializes the SubjectRepresentation instance.
@@ -67,9 +67,6 @@ class SubjectRepresentation:
                 "No embeddings provided, please review documentation to see how to generate embeddings.")
             raise ValueError("Embeddings must be non-empty.")
 
-        if phenotype_data is not None and phenotype_col not in phenotype_data.columns:
-            raise ValueError(f"Phenotype column '{phenotype_col}' not found in phenotype data.")
-
         if not isinstance(embeddings, pd.DataFrame):
             raise ValueError("Embeddings must be provided as a pandas DataFrame.")
 
@@ -88,7 +85,7 @@ class SubjectRepresentation:
 
         self.omics_data = omics_data.copy(deep=True)
         self.embeddings = embeddings.copy(deep=True)
-        self.phenotype_data = phenotype_data.copy(deep=True)
+        self.phenotype_data = phenotype_data
         self.phenotype_col = phenotype_col
         self.reduce_method = reduce_method.upper()
         self.tune = tune
@@ -114,14 +111,13 @@ class SubjectRepresentation:
         # output directory
         if output_dir is None:
             self.temp_dir_obj = tempfile.TemporaryDirectory()
-            self.output_dir = self.temp_dir_obj.name
-
+            self.output_dir = Path(self.temp_dir_obj.name)
             self.logger.info(f"No output_dir provided; using temporary directory: {self.output_dir}")
         else:
             self.output_dir = Path(output_dir)
             self.logger.info(f"Output directory set to: {self.output_dir}")
-            # create the directory with pathlib
-            Path(self.output_dir).mkdir(parents=True, exist_ok=True)
+
+        self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def run(self) -> pd.DataFrame:
         """
@@ -165,7 +161,7 @@ class SubjectRepresentation:
             self.logger.error(f"Error in Subject Representation workflow: {e}")
             raise
 
-    def _reduce_embeddings(self, method: str, ae_params: dict = None, compressed_dim: int = 2) -> pd.DataFrame:
+    def _reduce_embeddings(self, method: str, ae_params: Optional[dict[Any, Any]] = None, compressed_dim: int = 2) -> pd.DataFrame:
         """
         Reduces the dimensionality of the embeddings.
         Returns a DataFrame with `compressed_dim` columns.
@@ -467,8 +463,7 @@ class AutoEncoder(nn.Module):
     Builds encoder and decoder layers based on a list of hidden dimensions.
     Allows tuning of dropout, activation, and network architecture.
     """
-    def __init__(self, input_dim: int, hidden_dims: int = 64, compressed_dim: int = 1,
-                 dropout: float = 0.0, activation: str = "relu"):
+    def __init__(self, input_dim: int, hidden_dims: Union[int, Sequence[int]] = 64, compressed_dim: int = 1,dropout: float = 0.0, activation: str = "relu"):
         super(AutoEncoder, self).__init__()
         self.activation = get_activation(activation)
 

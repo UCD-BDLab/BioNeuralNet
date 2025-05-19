@@ -60,5 +60,4 @@ autodoc_mock_imports = [
     "torch_geometric",
     "sklearn",
     "statsmodels",
-    "xgboost",
 ]

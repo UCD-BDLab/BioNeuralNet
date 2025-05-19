@@ -6,7 +6,7 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.feature_selection import f_classif, f_regression
 from statsmodels.stats.multitest import multipletests
-from typing import Callable, Any
+from typing import Callable, TypeAlias, overload
 
 from .logger import get_logger
 logger = get_logger(__name__)
@@ -193,13 +193,12 @@ def select_top_k_correlation(X: pd.DataFrame, y: pd.Series = None, top_k: int = 
                 correlations[column] = abs(col)
 
         # descending correlations
-        features = list(correlations.keys())
-        KeyFn = Callable[[str], float]
-        key_fn: KeyFn = correlations.get
-        features.sort(key=key_fn, reverse=True)
-        select = min(top_k, len(features))
+        def key_fn(k: str) -> float:
+            return correlations[k]
 
-        selected = features[: select]
+        features = list(correlations.keys())
+        features.sort(key=key_fn, reverse=True)
+        selected = features[:top_k]
 
     # unsupervised
     else:
@@ -222,13 +221,12 @@ def select_top_k_correlation(X: pd.DataFrame, y: pd.Series = None, top_k: int = 
             avg = total / (len(columns) - 1)
             correlations_avg[col] = avg
 
-        features = list(correlations_avg.keys())
+        def key_fn(k: str) -> float:
+            return correlations_avg[k]
 
-        KeyFn = Callable[[str], float]
-        key_fn: KeyFn = correlations_avg.get
-        features.sort(key=key_fn)
-        select = min(top_k, len(features))
-        selected = features[: select]
+        features = list(correlations_avg.keys())
+        features.sort(key=key_fn, reverse=True)
+        selected = features[:top_k]
 
     logger.info(f"Selected {len(selected)} features by correlation")
 

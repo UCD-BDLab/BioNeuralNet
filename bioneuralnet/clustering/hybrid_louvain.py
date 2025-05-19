@@ -157,10 +157,19 @@ class HybridLouvain:
 
             best_corr = 0
             best_seed = None
+
+            if not isinstance(partition, dict):
+                raise TypeError("Expected 'partition' to be a dict")
+
             for com in set(partition.values()):
-                nodes = [n for n in self.G.nodes() if partition[n] == com]
+                nodes = []
+                for n in self.G.nodes():
+                    if partition[n] == com:
+                        nodes.append(n)
+
                 if len(nodes) < 2:
                     continue
+
                 try:
                     corr, _ = louvain._compute_community_correlation(nodes)
                     if abs(corr) > abs(best_corr):
@@ -170,6 +179,7 @@ class HybridLouvain:
                     self.logger.info(
                         f"Error computing correlation for community {com}: {e}"
                     )
+
             if best_seed is None:
                 self.logger.info("No valid seed community found; stopping iterations.")
                 break

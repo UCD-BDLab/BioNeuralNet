@@ -18,7 +18,6 @@ BioNeuralNet integrates multiple open-source libraries to deliver advanced multi
 - **matplotlib:** Data visualization. `matplotlib <https://github.com/matplotlib/matplotlib/>`_
 - **python-louvain:** Community detection algorithms for graphs. `python louvain <https://github.com/taynaud/python-louvain/>`_
 - **statsmodels:** Statistical tests and models, including ANOVA and linear regression. `statsmodels <https://github.com/statsmodels/statsmodels/>`_
-- **xgboost:** Gradient boosting for classification and regression. `xgboost <https://github.com/dmlc/xgboost/>`_
 
 We also acknowledge R-based tools for external network construction:
 
