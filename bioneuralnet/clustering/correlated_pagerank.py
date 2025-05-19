@@ -29,7 +29,6 @@ class CorrelatedPageRank:
         max_iter (int): Maximum number of iterations for PageRank convergence.
         tol (float): Tolerance for convergence.
         k (float): Weighting factor for composite correlation-conductance score.
-        output_dir (str): Directory to save outputs.
     """
 
     def __init__(
@@ -90,6 +89,7 @@ class CorrelatedPageRank:
 
         self.seed = seed
         self.gpu = gpu
+        self.results: dict[str, float] = {}
 
         self.device = torch.device("cuda" if gpu and torch.cuda.is_available() else "cpu")
         self.logger.info(f"Initialized Correlated Louvain. device={self.device}")
@@ -121,7 +121,7 @@ class CorrelatedPageRank:
             self.logger.error(f"Input validation error: {e}")
             raise
 
-    def phen_omics_corr(self, nodes: List[Any]) -> Tuple[float, str]:
+    def phen_omics_corr(self, nodes: List[Any]= []) -> Tuple[float, str]:
         """
         Calculates the Pearson correlation between the PCA of omics data and phenotype.
 
@@ -152,8 +152,7 @@ class CorrelatedPageRank:
             raise
 
     def sweep_cut(
-        self, p: Dict[Any, float]
-    ) -> Tuple[List[Any], int, float, float, float, str]:
+        self, p: Dict[Any, float] = {}) -> Tuple[List[Any], int, float, float, float, str]:
         try:
             best_cluster = set()
             min_comp_score = float("inf")
@@ -241,7 +240,7 @@ class CorrelatedPageRank:
             self.logger.error(f"Error in sweep_cut: {e}")
             raise
 
-    def generate_weighted_personalization(self, nodes: List[Any]) -> Dict[Any, float]:
+    def generate_weighted_personalization(self, nodes: List[Any] = []) -> Dict[Any, float]:
         """
         Generates a weighted personalization vector for PageRank.
 
@@ -279,7 +278,7 @@ class CorrelatedPageRank:
             raise
 
 
-    def run_pagerank_clustering(self, seed_nodes: List[Any]) -> Dict[str, Any]:
+    def run_pagerank_clustering(self, seed_nodes: List[Any] = []) -> Dict[str, Any]:
         """
         Executes the PageRank clustering algorithm.
 
@@ -353,7 +352,7 @@ class CorrelatedPageRank:
             raise
 
 
-    def run(self, seed_nodes: List[Any]) -> Dict[str, Any]:
+    def run(self, seed_nodes: List[Any] = []) -> Dict[str, Any]:
         """
         Executes the correlated PageRank clustering pipeline.
 
@@ -459,7 +458,7 @@ class CorrelatedPageRank:
 
         def short_dirname_creator(trial):
             return f"_{trial.trial_id}"
-        
+
         resources = {"cpu": 1, "gpu": 1} if self.device.type == "cuda" else {"cpu": 1, "gpu": 0}
 
         analysis = tune.run(

@@ -13,7 +13,6 @@ bioneuralnet.metrics.evaluation
       evaluate_model
       evaluate_rf
       evaluate_single_run
-      evaluate_xgb
       get_logger
       plot_grouped_performance
       plot_multiple_metrics
@@ -23,6 +22,4 @@ bioneuralnet.metrics.evaluation
    .. autosummary::
    
       Path
-      XGBClassifier
-      XGBRegressor
    

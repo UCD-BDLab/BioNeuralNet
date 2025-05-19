@@ -4,7 +4,7 @@ import pandas as pd
 from pathlib import Path
 import json
 import tempfile
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional, Union
 from ..utils.logger import get_logger
 import shutil
 
@@ -25,7 +25,7 @@ class SmCCNet:
 
     This class handles the preprocessing of omics data, execution of the SmCCNet R script,
     and retrieval of the resulting adjacency matrix from a designated output directory.
-    
+
     Attributes:
 
         phenotype_df (pd.DataFrame): DataFrame containing phenotype data, shape [samples x 1 or more].
@@ -46,15 +46,15 @@ class SmCCNet:
         omics_dfs: List[pd.DataFrame],
         data_types: List[str],
         kfold: int = 5,
-        eval_method: str = "",        
+        eval_method: str = "",
         subSampNum: int = 500,
         summarization: str = "NetSHy",
         seed: int = 119,
-        ncomp_pls: int = 0,              
+        ncomp_pls: int = 0,
         between_shrinkage: float = 5.0,
         cut_height: float = (1.0 - 0.1**10.0),
         preprocess: int = 0,
-        output_dir: str = None
+        output_dir: Optional[Union[str, Path]] = None,
     ):
         """
         Initializes the SmCCNet instance.
@@ -86,18 +86,18 @@ class SmCCNet:
             self.logger.info(f"Using R script via importlib: {self.r_script}")
 
         except Exception:
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            r_script_path = os.path.join(script_dir, "SmCCNet.R")
+            script_dir = Path(__file__).resolve().parent
+            r_script_path = script_dir / "SmCCNet.R"
 
-            if not os.path.isfile(r_script_path):
+            if not r_script_path.is_file():
                 raise FileNotFoundError(f"SmCCNet.R script not found via importlib or local path: {r_script_path}")
 
-            self.r_script = r_script_path
+            self.r_script = str(r_script_path)
             self.logger.warning(f"Using fallback R script path: {self.r_script}")
-        
+
         if isinstance(phenotype_df, pd.Series):
             phenotype_df = phenotype_df.to_frame(name="phenotype")
-            
+
         if isinstance(phenotype_df, pd.DataFrame) and phenotype_df.shape[1] > 1:
             self.logger.warning("Phenotype DataFrame has more than one column. Renaming to phenotype and keeping only the first column")
             phenotype_df = phenotype_df.iloc[:, :1]
@@ -105,7 +105,7 @@ class SmCCNet:
 
         if not isinstance(phenotype_df, pd.DataFrame):
             raise ValueError("phenotype_df must be a pandas DataFrame or Series.")
-            
+
         self.phenotype_df = phenotype_df.copy(deep=True)
 
         self.omics_dfs = []
@@ -138,22 +138,22 @@ class SmCCNet:
         if len(self.omics_dfs) != len(self.data_types):
             self.logger.error("Number of omics DataFrames does not match number of data types.")
             raise ValueError("Mismatch between omics dataframes and data types.")
-        
+
         if eval_method in ("auc","accuracy","f1"):
             uniques = set(phenotype_df.iloc[:, 0].unique())
             if not uniques.issubset({0,1}):
                 raise ValueError("eval_method=classification, but phenotype is not strictly 0/1.")
-        
+
         if eval_method == "Rsquared" and ncomp_pls>0:
             raise ValueError("Continuous eval can't use PLS. Set ncomp_pls=0 for CCA.")
 
         # output directory
         if output_dir is None:
             self.temp_dir_obj = tempfile.TemporaryDirectory()
-            self.output_dir = self.temp_dir_obj.name
+            self.output_dir = Path(self.temp_dir_obj.name)
             self.logger.info(f"No output_dir provided; using temporary directory: {self.output_dir}")
         else:
-            self.output_dir = output_dir
+            self.output_dir = Path(output_dir)
             self.logger.info(f"Output directory set to: {self.output_dir}")
             # create the directory with pathlib
             Path(self.output_dir).mkdir(parents=True, exist_ok=True)
@@ -184,8 +184,8 @@ class SmCCNet:
 
         self.logger.info("Validating and serializing input data for SmCCNet...")
         if self.phenotype_df.columns[0] != "phenotype":
-            self.logger.warning("Renaming target column to 'phenotype' for consistency.") 
-            self.phenotype_df.columns = ["phenotype"] 
+            self.logger.warning("Renaming target column to 'phenotype' for consistency.")
+            self.phenotype_df.columns = ["phenotype"]
 
 
         # if index_match == True:
@@ -233,7 +233,7 @@ class SmCCNet:
         self.logger.info(f"Serialized phenotype with {len(pheno_df)} samples.")
 
         return serialized_data
-    
+
 
     def run_smccnet(self, serialized_data: Dict[str, Any]) -> None:
         """
@@ -243,7 +243,7 @@ class SmCCNet:
         try:
             self.logger.info("Executing SmCCNet R script...")
             json_data = json.dumps(serialized_data) + "\n"
-            
+
             # script_dir = os.path.dirname(os.path.abspath(__file__))
 
             # r_script = os.path.join(script_dir, "SmCCNet.R")
@@ -253,7 +253,6 @@ class SmCCNet:
             # rscript_path = shutil.which("Rscript")
             # if rscript_path is None:
             #     raise EnvironmentError("Rscript not found in system PATH.")
-
             cmd = [
                 self.rscript_path,
                 self.r_script,
@@ -268,7 +267,7 @@ class SmCCNet:
                 str(self.cut_height),
                 str(self.preprocess),
             ]
-            self.logger.debug("Running command: " + " ".join(cmd))
+            self.logger.info(f"Running command: {cmd}")
 
             # fire off spinner thread
             stop_spinner = threading.Event()
@@ -283,10 +282,15 @@ class SmCCNet:
 
             spin_thread = threading.Thread(target=spinner)
             spin_thread.start()
+            cmd_clean: list[str] = []
+            for c in cmd:
+                if c is None:
+                    raise ValueError("Command argument cannot be None")
+                cmd_clean.append(str(c))
 
             # run Rscript (blocks until done)
             result = subprocess.run(
-                cmd,
+                cmd_clean,
                 input=json_data,
                 text=True,
                 capture_output=True,
@@ -316,7 +320,7 @@ class SmCCNet:
             raise
 
 
-    def get_clusters(self) -> list[pd.DataFrame, Any]:
+    def get_clusters(self) -> list[Any]:
         """
         Retrieves the subnetwork clusters generated by SmCCNet.
 

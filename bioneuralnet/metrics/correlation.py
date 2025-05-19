@@ -31,7 +31,7 @@ def omics_correlation(omics: pd.DataFrame, pheno: pd.DataFrame) -> Tuple[float, 
     if omics.empty or target.empty:
         logger.error("Omics data and phenotype must not be empty.")
         raise ValueError("Omics data and phenotype must not be empty.")
-    
+
     if omics.shape[0] != len(target):
         logger.error("Number of rows in omics data and phenotype must be the same.")
         raise ValueError("Omics data and phenotype must have the same length.")
@@ -50,12 +50,12 @@ def omics_correlation(omics: pd.DataFrame, pheno: pd.DataFrame) -> Tuple[float, 
 def cluster_correlation(cluster_df: pd.DataFrame, pheno: pd.DataFrame) -> tuple:
     """
     Compute the Pearson correlation coefficient between PC1 of a cluster and phenotype.
-    
+
     Parameters:
-    
+
         cluster_df: DataFrame representing a cluster of samples.
         pheno: DataFrame representing the phenotype.
-    
+
     Returns:
 
         (cluster_size, correlation) or (size, None) if correlation fails.
@@ -67,7 +67,7 @@ def cluster_correlation(cluster_df: pd.DataFrame, pheno: pd.DataFrame) -> tuple:
         return (cluster_size, None)
 
     subset = cluster_df.fillna(0)
-    
+
     if subset.var().sum() == 0:
         logger.warning("Cluster skipped: all features have zero variance.")
         return (cluster_size, None)
@@ -77,7 +77,7 @@ def cluster_correlation(cluster_df: pd.DataFrame, pheno: pd.DataFrame) -> tuple:
         pc1 = pca.fit_transform(subset)
         pc1_series = pd.Series(pc1.flatten(), index=subset.index, name="PC1")
 
-        pheno_series = pheno.iloc[:, 0]  
+        pheno_series = pheno.iloc[:, 0]
         pc1_series, pheno_series = pc1_series.align(pheno_series, join="inner")
 
         if len(pc1_series) < 3:
@@ -95,11 +95,11 @@ def cluster_correlation(cluster_df: pd.DataFrame, pheno: pd.DataFrame) -> tuple:
 def louvain_to_adjacency(louvain_cluster: pd.DataFrame) -> pd.DataFrame:
     """
     Convert a Louvain cluster to an adjacency matrix.
-    
+
     Parameters:
 
         louvain_cluster: represents an induced subnetwork (from Louvain).
-    
+
     Returns:
 
         pd.DataFrame: Adjacency matrix

@@ -24,12 +24,11 @@ The module also contains several plotting functions:
 Evaluation
 ----------
 
-Functions to train and evaluate RandomForest and XGBoost models over one or multiple runs (Mostly used internally for testings purposes):
+Functions to train and evaluate RandomForest over one or multiple runs (Mostly used internally for testings purposes):
 
 - :func:`bioneuralnet.metrics.evaluate_model` evaluates a model over multiple runs.
 - :func:`bioneuralnet.metrics.evaluate_single_run` runs a single evaluation loop.
 - :func:`bioneuralnet.metrics.evaluate_rf` evaluates a Random Forest model.
-- :func:`bioneuralnet.metrics.evaluate_xgb` evaluates an XGBoost model.
 - :func:`bioneuralnet.metrics.evaluate_f1w` computes the weighted F1 score.
 - :func:`bioneuralnet.metrics.evaluate_f1m` computes the macro F1 score.
 - :func:`bioneuralnet.metrics.compare_clusters` compares and plots clusters from different methods.

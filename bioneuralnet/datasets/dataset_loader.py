@@ -11,7 +11,7 @@ class DatasetLoader:
 
             - data (dict): Dictionary of DataFrames, where keys are table names and values are DataFrames.
             - shape (dict): Dictionary of table names to their shapes (n_rows, n_cols).
-            
+
         Example:
 
             tcga_brca = DatasetLoader("tcga_brca")
@@ -19,12 +19,12 @@ class DatasetLoader:
             # {'brca_mirna': (108, 1000), 'brca_pam50': (108, 50), ...}
             mirna = tcga_brca.data["brca_mirna"]
             rna = tcga_brca.data["brca_rna"]
-                
+
         """
         self.dataset_name = dataset_name.strip().lower()
         self.base_dir = Path(__file__).parent
         self.data: dict[str, pd.DataFrame] = {}
-        
+
         self._load_data()
 
     def _load_data(self):

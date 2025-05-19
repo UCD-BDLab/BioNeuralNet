@@ -10,7 +10,7 @@ def get_logger(name: str) -> logging.Logger:
         name (str): Name of the logger.
 
     Returns:
-    
+
         logging.Logger: Configured logger instance.
     """
     logger = logging.getLogger(name)

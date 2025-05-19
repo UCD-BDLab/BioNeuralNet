@@ -16,7 +16,7 @@ class HybridLouvain:
     HybridLouvain Class that combines Correlated Louvain and Correlated PageRank for community detection.
 
     Attributes:
-    
+
         G (nx.Graph): NetworkX graph object.
         B (pd.DataFrame): Omics data.
         Y (pd.DataFrame): Phenotype data.
@@ -41,7 +41,7 @@ class HybridLouvain:
 
     ):
         self.logger = get_logger(__name__)
-                
+
         if seed is not None:
             torch.manual_seed(seed)
             np.random.seed(seed)
@@ -49,7 +49,7 @@ class HybridLouvain:
                 torch.cuda.manual_seed_all(seed)
                 torch.backends.cudnn.deterministic = True
                 torch.backends.cudnn.benchmark = False
-        
+
         self.gpu = gpu
         self.seed = seed
         self.logger.info("Initializing HybridLouvain...")
@@ -157,10 +157,19 @@ class HybridLouvain:
 
             best_corr = 0
             best_seed = None
+
+            if not isinstance(partition, dict):
+                raise TypeError("Expected 'partition' to be a dict")
+
             for com in set(partition.values()):
-                nodes = [n for n in self.G.nodes() if partition[n] == com]
+                nodes = []
+                for n in self.G.nodes():
+                    if partition[n] == com:
+                        nodes.append(n)
+
                 if len(nodes) < 2:
                     continue
+
                 try:
                     corr, _ = louvain._compute_community_correlation(nodes)
                     if abs(corr) > abs(best_corr):
@@ -170,6 +179,7 @@ class HybridLouvain:
                     self.logger.info(
                         f"Error computing correlation for community {com}: {e}"
                     )
+
             if best_seed is None:
                 self.logger.info("No valid seed community found; stopping iterations.")
                 break
@@ -241,4 +251,3 @@ class HybridLouvain:
             return dfs
         else:
             return {"curr": current_partition, "clus": all_clusters}
-        

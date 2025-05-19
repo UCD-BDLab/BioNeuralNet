@@ -40,7 +40,7 @@ class TestCorrelatedLouvain(unittest.TestCase):
             phenos.append(np.random.rand())
             i = i + 1
         self.Y = pd.DataFrame({"phenotype": phenos})
-        
+
     def test_run_partition(self):
         cl = CorrelatedLouvain(self.G, self.B, self.Y, k3=0.2, k4=0.8, weight="weight", tune=False)
         part = cl.run(as_dfs=False)
@@ -49,7 +49,7 @@ class TestCorrelatedLouvain(unittest.TestCase):
         for k in part:
             keys.append(k)
         self.assertTrue(len(keys) > 0)
-        
+
     def test_run_dfs(self):
         cl = CorrelatedLouvain(self.G, self.B, self.Y, k3=0.2, k4=0.8, weight="weight", tune=False)
         dfs = cl.run(as_dfs=True)
@@ -58,7 +58,7 @@ class TestCorrelatedLouvain(unittest.TestCase):
         while i < len(dfs):
             self.assertIsInstance(dfs[i], pd.DataFrame)
             i = i + 1
-            
+
     def test_get_quality(self):
         cl = CorrelatedLouvain(self.G, self.B, self.Y, k3=0.2, k4=0.8, weight="weight", tune=False)
         cl.run(as_dfs=False)

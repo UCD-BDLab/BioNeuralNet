@@ -3,7 +3,7 @@
 library("SmCCNet")
 library("WGCNA")
 library("jsonlite")
-library("dplyr") 
+library("dplyr")
 
 options(stringsAsFactors = FALSE)
 allowWGCNAThreads(nThreads = 4)
@@ -69,7 +69,7 @@ omics_list   <- lapply(omics_list, function(m) m[ids, , drop = FALSE])
 phenotype_df <- phenotype_df[ids, , drop = FALSE]
 
 Y <- as.numeric(phenotype_df$phenotype)
-Yfactor <- factor(Y) 
+Yfactor <- factor(Y)
 
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) < 10) {
@@ -146,7 +146,7 @@ if (any(is.na(Y)) || any(is.infinite(Y))) {
   stop("ERROR: Phenotype vector Y contains NA or Inf")
 }
 
-#Y_binary <- ifelse(Y > median(Y), 1, 0) 
+#Y_binary <- ifelse(Y > median(Y), 1, 0)
 
 if (length(data_types) == 1 && !is.null(ncomp_pls)) {
   message("Single-omics PLS scenario")
@@ -224,16 +224,16 @@ if (length(rdata_files) == 0) {
 } else {
   for (file in rdata_files) {
     message("Processing file: ", file, "\n")
-    
+
     temp_env <- new.env()
     loaded_names <- load(file, envir = temp_env)
-    
+
     if ("M" %in% loaded_names && exists("M", envir = temp_env)) {
       sub_net <- get("M", envir = temp_env)
-      
+
       file_base   <- tools::file_path_sans_ext(basename(file))
       csv_filename <- paste0(file_base, ".csv")
-      
+
       write.csv(sub_net, file = csv_filename, row.names = TRUE)
       message("Subnetwork matrix from ", file, " written to ", csv_filename, "\n\n")
     } else {

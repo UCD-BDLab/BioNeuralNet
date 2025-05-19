@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
+from typing import Optional
 from .logger import get_logger
 
 logger = get_logger(__name__)
 
-def variance_summary(df: pd.DataFrame, low_var_threshold: float = None) -> dict:
+def variance_summary(df: pd.DataFrame, low_var_threshold: Optional[float] = None) -> dict:
     """
     Compute summary statistics for column variances in the DataFrame
     """
@@ -19,10 +20,10 @@ def variance_summary(df: pd.DataFrame, low_var_threshold: float = None) -> dict:
     }
     if low_var_threshold is not None:
         summary["num_low_variance_features"] = (variances < low_var_threshold).sum()
-    
+
     return summary
 
-def zero_fraction_summary(df: pd.DataFrame, high_zero_threshold: float = None) -> dict:
+def zero_fraction_summary(df: pd.DataFrame, high_zero_threshold: Optional[float] = None) -> dict:
     """
     Compute summary statistics for the fraction of zeros in each column
     """
@@ -37,7 +38,7 @@ def zero_fraction_summary(df: pd.DataFrame, high_zero_threshold: float = None) -
     }
     if high_zero_threshold is not None:
         summary["num_high_zero_features"] = (zero_fraction > high_zero_threshold).sum()
-    
+
     return summary
 
 def expression_summary(df: pd.DataFrame) -> dict:
@@ -81,13 +82,13 @@ def explore_data_stats(omics_df: pd.DataFrame, name: str = "Data") -> None:
     print(f"Statistics for {name}:")
     var_stats = variance_summary(omics_df, low_var_threshold=1e-4)
     print(f"Variance Summary: {var_stats}")
-    
+
     zero_stats = zero_fraction_summary(omics_df, high_zero_threshold=0.50)
     print(f"Zero Fraction Summary: {zero_stats}")
-    
+
     expr_stats = expression_summary(omics_df)
     print(f"Expression Summary: {expr_stats}")
-    
+
     try:
         corr_stats = correlation_summary(omics_df)
         print(f"Correlation Summary: {corr_stats}")

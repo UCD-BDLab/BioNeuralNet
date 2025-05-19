@@ -3,7 +3,7 @@ import networkx as nx
 import pandas as pd
 import torch
 import os
-from typing import Optional, Union
+from typing import Optional, Union, Any
 
 from community.community_louvain import (
     modularity as original_modularity,
@@ -26,7 +26,7 @@ class CorrelatedLouvain:
     """
     CorrelatedLouvain Class for Community Detection with Correlated Omics Data.
     Attributes:
-    
+
         G (nx.Graph): NetworkX graph object.
         B (pd.DataFrame): Omics data.
         Y (pd.DataFrame): Phenotype data.
@@ -79,6 +79,7 @@ class CorrelatedLouvain:
                 torch.backends.cudnn.benchmark = False
         self.seed = seed
         self.gpu = gpu
+        self.clusters: dict[Any, Any] = {}
 
         self.device = torch.device("cuda" if gpu and torch.cuda.is_available() else "cpu")
         self.logger.info(f"Initialized Correlated Louvain. device={self.device}")
@@ -213,23 +214,23 @@ class CorrelatedLouvain:
         Convert the partition dictionary into a list of adjacency matrices (DataFrames),
         where each adjacency matrix represents a cluster with more than 2 nodes.
         """
-        clusters = {}
-        for node, cl in partition.items():
-            clusters.setdefault(cl, []).append(node)
 
-        self.logger.debug(f"Total detected clusters: {len(clusters)}")
+        for node, cl in partition.items():
+            self.clusters.setdefault(cl, []).append(node)
+
+        self.logger.debug(f"Total detected clusters: {len(self.clusters)}")
 
         adjacency_matrices = []
-        for cl, nodes in clusters.items():
-            self.logger.debug(f"Cluster {cl} size: {len(nodes)}")  
-            if len(nodes) > 2: 
-                valid_nodes = list(set(nodes).intersection(set(self.B.columns)))  
+        for cl, nodes in self.clusters.items():
+            self.logger.debug(f"Cluster {cl} size: {len(nodes)}")
+            if len(nodes) > 2:
+                valid_nodes = list(set(nodes).intersection(set(self.B.columns)))
                 if valid_nodes:
                     adjacency_matrix = self.B.loc[:, valid_nodes].fillna(0)
                     adjacency_matrices.append(adjacency_matrix)
 
         print(f"Clusters with >2 nodes: {len(adjacency_matrices)}")
-        
+
         return adjacency_matrices
 
     def get_quality(self) -> float:

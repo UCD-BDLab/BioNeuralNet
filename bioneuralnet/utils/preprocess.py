@@ -6,6 +6,7 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.feature_selection import f_classif, f_regression
 from statsmodels.stats.multitest import multipletests
+from typing import Callable, TypeAlias, overload
 
 from .logger import get_logger
 logger = get_logger(__name__)
@@ -35,39 +36,39 @@ def preprocess_clinical(X: pd.DataFrame, y: pd.Series, top_k: int = 10, scale: b
         y_series = y.copy()
     else:
         raise ValueError("y must be a pandas Series or single-column DataFrame")
-    
+
     ignore_columns = ignore_columns or []
     missing = set(ignore_columns) - set(X.columns)
     if missing:
         raise KeyError(f"Ignored columns not in X: {missing}")
     df_ignore = X[ignore_columns].copy()
     X = X.drop(columns=ignore_columns)
-    
+
     df_numeric = X.select_dtypes(include="number")
     df_categorical = X.select_dtypes(include=["object", "category", "bool"])
     df_numeric_clean = clean_inf_nan(df_numeric)
-    
+
     if scale:
         scaler = RobustScaler()
         scaled_array = scaler.fit_transform(df_numeric_clean)
         df_numeric_scaled = pd.DataFrame(scaled_array,columns=df_numeric_clean.columns,index=df_numeric_clean.index)
     else:
         df_numeric_scaled = df_numeric_clean.copy()
-    
+
     if not df_categorical.empty:
         df_cat_filled = df_categorical.fillna("Missing").astype(str)
         df_cat_encoded = pd.get_dummies(df_cat_filled, drop_first=True)
     else:
         df_cat_encoded = pd.DataFrame(index=df_numeric_scaled.index)
-    
+
     df_combined = pd.concat([df_numeric_scaled, df_cat_encoded, df_ignore],axis=1,join="inner")
     df_features = df_combined.loc[:, df_combined.std(axis=0) > 0]
-    
+
     if y_series.nunique() <= 10:
         model = RandomForestClassifier(n_estimators=150,random_state=119,class_weight="balanced")
     else:
         model = RandomForestRegressor(n_estimators=150,random_state=119)
-    
+
     model.fit(df_features, y_series)
     importances = model.feature_importances_
     feature_names = df_features.columns.tolist()
@@ -77,7 +78,7 @@ def preprocess_clinical(X: pd.DataFrame, y: pd.Series, top_k: int = 10, scale: b
 
     for i in range(len(order) - 1, -1, -1):
         descending.append(order[i])
-    
+
     if top_k < len(descending):
         count = top_k
         logger.info(f"Selected top {count} features by RandomForest importance")
@@ -88,11 +89,11 @@ def preprocess_clinical(X: pd.DataFrame, y: pd.Series, top_k: int = 10, scale: b
     selected_idx = []
     for i in range(count):
         selected_idx.append(descending[i])
-    
+
     selected_columns = []
     for idx in selected_idx:
         selected_columns.append(feature_names[idx])
-    
+
     return df_features[selected_columns]
 
 def clean_inf_nan(df: pd.DataFrame) -> pd.DataFrame:
@@ -192,11 +193,12 @@ def select_top_k_correlation(X: pd.DataFrame, y: pd.Series = None, top_k: int = 
                 correlations[column] = abs(col)
 
         # descending correlations
-        features = list(correlations.keys())
-        features.sort(key=correlations.get, reverse=True)
-        select = min(top_k, len(features))
+        def key_fn(k: str) -> float:
+            return correlations[k]
 
-        selected = features[: select]
+        features = list(correlations.keys())
+        features.sort(key=key_fn, reverse=True)
+        selected = features[:top_k]
 
     # unsupervised
     else:
@@ -219,13 +221,15 @@ def select_top_k_correlation(X: pd.DataFrame, y: pd.Series = None, top_k: int = 
             avg = total / (len(columns) - 1)
             correlations_avg[col] = avg
 
+        def key_fn(k: str) -> float:
+            return correlations_avg[k]
+
         features = list(correlations_avg.keys())
-        features.sort(key=correlations_avg.get)
-        select = min(top_k, len(features))
-        selected = features[: select]
+        features.sort(key=key_fn, reverse=True)
+        selected = features[:top_k]
 
     logger.info(f"Selected {len(selected)} features by correlation")
-    
+
     return numbers_only[selected]
 
 def select_top_randomforest(X: pd.DataFrame, y: pd.Series, top_k: int = 1000, seed: int = 119) -> pd.DataFrame:
@@ -345,7 +349,7 @@ def prune_network(adjacency_matrix, weight_threshold=0.0):
         - weight_threshold (float): Minimum weight to keep an edge (default: 0.0).
 
     Returns:
-    
+
         - pd.DataFrame:
     """
     logger.info(f"Pruning network with weight threshold: {weight_threshold}")
@@ -357,13 +361,13 @@ def prune_network(adjacency_matrix, weight_threshold=0.0):
 
     if weight_threshold > 0:
         edges_to_remove = []
-        
+
         for u, v, d in G.edges(data=True):
             weight = d.get('weight', 0)
             if weight < weight_threshold:
                 edges_to_remove.append((u, v))
 
-        G.remove_edges_from(edges_to_remove)  
+        G.remove_edges_from(edges_to_remove)
 
     isolated_nodes = list(nx.isolates(G))
     G.remove_nodes_from(isolated_nodes)
@@ -371,7 +375,7 @@ def prune_network(adjacency_matrix, weight_threshold=0.0):
     network_after_prunning =  nx.to_pandas_adjacency(G, dtype=float)
     current_nodes = G.number_of_nodes()
     current_edges = G.number_of_edges()
-    
+
     logger.info(f"Pruning network with weight threshold: {weight_threshold}")
     logger.info(f"Number of nodes in full network: {total_nodes}")
     logger.info(f"Number of edges in full network: {total_edges}")
@@ -395,7 +399,7 @@ def prune_network_by_quantile(adjacency_matrix, quantile=0.5):
     """
     logger.info(f"Pruning network using quantile: {quantile}")
     G = nx.from_pandas_adjacency(adjacency_matrix)
-    
+
     weights = []
 
     for u, v, data in G.edges(data=True):
@@ -405,10 +409,10 @@ def prune_network_by_quantile(adjacency_matrix, quantile=0.5):
     if len(weights) == 0:
          logger.warning("Network contains no edges")
          return nx.to_pandas_adjacency(G, dtype=float)
-    
+
     weight_threshold = np.quantile(weights, quantile)
     logger.info(f"Computed weight threshold: {weight_threshold} for quantile: {quantile}")
-    
+
     edges_to_remove = []
 
     for u, v, data in G.edges(data=True):
@@ -418,22 +422,22 @@ def prune_network_by_quantile(adjacency_matrix, quantile=0.5):
     G.remove_edges_from(edges_to_remove)
     isolated_nodes = list(nx.isolates(G))
     G.remove_nodes_from(isolated_nodes)
-    
+
     pruned_adjacency = nx.to_pandas_adjacency(G, dtype=float)
     logger.info(f"Number of nodes after pruning: {G.number_of_nodes()}")
     logger.info(f"Number of edges after pruning: {G.number_of_edges()}")
-    
+
     return pruned_adjacency
 
 def network_remove_low_variance(network: pd.DataFrame, threshold: float = 1e-6) -> pd.DataFrame:
     """
     Remove rows and columns from adjacency matrix where the variance is below a threshold.
-    
+
     Parameters:
 
         network (pd.DataFrame): Adjacency matrix.
         threshold (float): Variance threshold.
-        
+
     Returns:
 
         pd.DataFrame: Filtered adjacency matrix.
@@ -448,12 +452,12 @@ def network_remove_low_variance(network: pd.DataFrame, threshold: float = 1e-6) 
 def network_remove_high_zero_fraction(network: pd.DataFrame, threshold: float = 0.95) -> pd.DataFrame:
     """
     Remove rows and columns from adjacency matrix where the fraction of zero entries is higher than the threshold.
-    
+
     Parameters:
 
         network (pd.DataFrame): Adjacency matrix.
         threshold (float): Zero-fraction threshold.
-        
+
     Returns:
 
         pd.DataFrame: Filtered adjacency matrix.

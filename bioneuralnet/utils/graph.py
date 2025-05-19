@@ -1,6 +1,7 @@
 import torch
 import pandas as pd
 import numpy as np
+from typing import Optional
 import torch.nn.functional as F
 from sklearn.covariance import GraphicalLasso
 
@@ -27,7 +28,7 @@ def gen_similarity_graph(X:pd.DataFrame, k:int = 15, metric:str = "cosine", mutu
         x_torch = torch.tensor(X.values, dtype=torch.float32, device=device)
     else:
         raise TypeError("X must be a pandas.DataFrame")
-    
+
     N = x_torch.size(0)
 
     # full similarity matrix
@@ -41,7 +42,7 @@ def gen_similarity_graph(X:pd.DataFrame, k:int = 15, metric:str = "cosine", mutu
 
     # building the knn graph or global threshold mask
     if per_node:
-        _, index = torch.topk(S, k=k+1, dim=1) 
+        _, index = torch.topk(S, k=k+1, dim=1)
         mask = torch.zeros(N, N, dtype=torch.bool, device=device)
         for i in range(N):
             for j in index[i, 1:k+1]:
@@ -66,11 +67,11 @@ def gen_similarity_graph(X:pd.DataFrame, k:int = 15, metric:str = "cosine", mutu
 
     A_numpy = A.cpu().numpy()
     final_graph =pd.DataFrame(A_numpy, index=nodes, columns=nodes)
-    
+
     return final_graph
 
 
-def gen_correlation_graph(X: pd.DataFrame, k: int = 15,method: str = 'pearson', mutual: bool = False, per_node: bool = True,threshold: float = None, self_loops:bool = True) -> pd.DataFrame:
+def gen_correlation_graph(X: pd.DataFrame, k: int = 15,method: str = 'pearson', mutual: bool = False, per_node: bool = True,threshold: Optional[float] = None, self_loops:bool = True) -> pd.DataFrame:
     """
     Build a graph based on pairwise Pearson or Spearman correlations.
 
@@ -100,7 +101,7 @@ def gen_correlation_graph(X: pd.DataFrame, k: int = 15,method: str = 'pearson', 
         x_torch = torch.tensor(X.values, dtype=torch.float32, device=device)
     else:
         raise TypeError("X must be a pandas.DataFrame")
-    
+
     N = x_torch.size(0)
 
     # rank transform for Spearman
@@ -171,7 +172,7 @@ def gen_threshold_graph(X:pd.DataFrame, b: float = 6.0,k: int = 15, mutual: bool
         x_torch = torch.tensor(X.values, dtype=torch.float32, device=device)
     else:
         raise TypeError("X must be a pandas.DataFrame")
-    
+
     N = x_torch.size(0)
 
     # pearson correlation matrix
@@ -202,11 +203,11 @@ def gen_threshold_graph(X:pd.DataFrame, b: float = 6.0,k: int = 15, mutual: bool
         W.fill_diagonal_(1.0)
 
     W = F.normalize(W, p=1, dim=1)
-    final_graph = pd.DataFrame(W.cpu().numpy(), index=nodes, columns=nodes) 
+    final_graph = pd.DataFrame(W.cpu().numpy(), index=nodes, columns=nodes)
 
     return final_graph
 
-def gen_gaussian_knn_graph(X: pd.DataFrame,k: int = 15,sigma: float = None,mutual: bool = False,self_loops: bool = True) -> pd.DataFrame:
+def gen_gaussian_knn_graph(X: pd.DataFrame,k: int = 15,sigma: Optional[float] = None ,mutual: bool = False,self_loops: bool = True) -> pd.DataFrame:
     """
     Build a normalized knn similarity graph from feature vectors. Computes pairwise cosine or Euclidean similarities, sparsifies via k-nearest neighbors or
     a global threshold. Optionally prunes to mutual neighbors and/or adds self-loops.
@@ -232,7 +233,7 @@ def gen_gaussian_knn_graph(X: pd.DataFrame,k: int = 15,sigma: float = None,mutua
         X_torch = torch.tensor(X.values, dtype=torch.float32, device=device)
     else:
         raise TypeError("X must be a pandas.DataFrame")
-    
+
     N = X_torch.size(0)
 
     D2 = torch.cdist(X_torch, X_torch).pow(2)
@@ -282,7 +283,7 @@ def gen_lasso_graph(X: pd.DataFrame, alpha: float = 0.01, self_loops: bool = Tru
         x_numpy = X.values
     else:
         raise TypeError("X must be a pandas.DataFrame")
-    
+
     model = GraphicalLasso(alpha=alpha, max_iter=200)
     model.fit(x_numpy)
 
@@ -318,7 +319,7 @@ def gen_mst_graph(X: pd.DataFrame, self_loops: bool = True) -> pd.DataFrame:
         X_torch = torch.tensor(X.values, dtype=torch.float32, device=device)
     else:
         raise TypeError("X must be a pandas.DataFrame")
-    
+
     N = X_torch.size(0)
     D = torch.cdist(X_torch, X_torch)
 
@@ -378,7 +379,7 @@ def gen_snn_graph(X: pd.DataFrame,k: int = 15,mutual: bool = False, self_loops: 
         X_torch = torch.tensor(X.values, dtype=torch.float32, device=device)
     else:
         raise TypeError("X must be a pandas.DataFrame")
-    
+
     N = X_torch.size(0)
     S = torch.mm(X_torch, X_torch.t())
     _, index = torch.topk(S, k=k+1, dim=1)
