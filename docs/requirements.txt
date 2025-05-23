@@ -4,3 +4,4 @@ sphinx-autosummary-accessors
 sphinxcontrib-napoleon
 pandoc
 nbsphinx
+myst_nb

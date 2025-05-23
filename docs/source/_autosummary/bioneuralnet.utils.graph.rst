@@ -16,3 +16,9 @@ bioneuralnet.utils.graph
       gen_snn_graph
       gen_threshold_graph
    
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      GraphicalLasso
+   

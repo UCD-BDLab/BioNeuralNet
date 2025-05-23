@@ -14,3 +14,10 @@ bioneuralnet.metrics.correlation
       omics_correlation
       pearsonr
    
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      PCA
+      StandardScaler
+   

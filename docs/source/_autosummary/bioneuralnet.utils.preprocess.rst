@@ -9,9 +9,13 @@ bioneuralnet.utils.preprocess
    .. autosummary::
    
       clean_inf_nan
+      f_classif
+      f_regression
       get_logger
+      multipletests
       network_remove_high_zero_fraction
       network_remove_low_variance
+      overload
       preprocess_clinical
       prune_network
       prune_network_by_quantile
@@ -19,4 +23,12 @@ bioneuralnet.utils.preprocess
       select_top_k_variance
       select_top_randomforest
       top_anova_f_features
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      RandomForestClassifier
+      RandomForestRegressor
+      RobustScaler
    

@@ -1,11 +1,12 @@
 # BioNeuralNet: Multi-Omics Integration with Graph Neural Networks
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![PyPI](https://img.shields.io/pypi/v/bioneuralnet)
-![GitHub Issues](https://img.shields.io/github/issues/UCD-BDLab/BioNeuralNet)
-![GitHub Contributors](https://img.shields.io/github/contributors/UCD-BDLab/BioNeuralNet)
-![Downloads](https://static.pepy.tech/badge/bioneuralnet)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/UCD-BDLab/BioNeuralNet/blob/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/bioneuralnet)](https://pypi.org/project/bioneuralnet/)
+[![GitHub Issues](https://img.shields.io/github/issues/UCD-BDLab/BioNeuralNet)](https://github.com/UCD-BDLab/BioNeuralNet/issues)
+[![GitHub Contributors](https://img.shields.io/github/contributors/UCD-BDLab/BioNeuralNet)](https://github.com/UCD-BDLab/BioNeuralNet/graphs/contributors)
+[![Downloads](https://static.pepy.tech/badge/bioneuralnet)](https://pepy.tech/project/bioneuralnet)
 [![Documentation](https://img.shields.io/badge/docs-read%20the%20docs-blue.svg)](https://bioneuralnet.readthedocs.io/en/latest/)
+
 
 ## Welcome to BioNeuralNet 1.0.7
 

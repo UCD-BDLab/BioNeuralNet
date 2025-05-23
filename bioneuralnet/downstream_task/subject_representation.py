@@ -22,7 +22,7 @@ from ray.tune import TuneError
 from ray.tune import CLIReporter
 from ray.tune.schedulers import ASHAScheduler
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-from sklearn.metrics import accuracy_score, r2_score
+from sklearn.metrics import accuracy_score, r2_score, mean_squared_error
 
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
@@ -247,14 +247,16 @@ class SubjectRepresentation:
 
         With the default parameters (alpha = 2.0, beta = 0.5), each feature is updated as:
 
-            - enhanced = beta * raw + (1 - beta) * (alpha * normalized_weight * raw)
+            enhanced = beta * raw + (1 - beta) * (alpha * normalized_weight * raw)
 
         For example, with alpha = 2.0 and beta = 0.5:
 
-            - If a features normalized weight is 1.0:
-                - enhanced = 0.5xraw + 0.5x(2.0x1.0xraw) = 0.5xraw + raw = 1.5xraw
-            - If a features normalized weight is 0.5:
-                - enhanced = 0.5xraw + 0.5x(2.0x0.5xraw) = 0.5xraw + 0.5xraw = raw
+            If a features normalized weight is 1.0:
+
+                enhanced = 0.5xraw + 0.5x(2.0x1.0xraw) = 0.5xraw + raw = 1.5xraw
+            If a features normalized weight is 0.5:
+
+                enhanced = 0.5xraw + 0.5x(2.0x0.5xraw) = 0.5xraw + 0.5xraw = raw
 
         This is so at least 50% of the final output is influenced by the computed weight
         """
@@ -340,37 +342,32 @@ class SubjectRepresentation:
         def tune_helper(config):
             try:
                 method = config["method"].upper()
-                ae_params = config.get("ae_params", {
-                    "epochs": 64,
-                    "hidden_dim": 4,
-                    "dropout": 0.2,
-                    "lr": 1e-3,
-                    "activation": "relu",
-                })
-                alpha = config.get("alpha", 2.0)
-                beta = config.get("beta", 0.5)
-                compressed_dim = config.get("compressed_dim", 2)
+                ae_params = config["ae_params"]
+                alpha = config["alpha"]
+                beta = config["beta"]
+                compressed_dim = config["compressed_dim"]
 
                 reduced = self._reduce_embeddings(method=method, compressed_dim=compressed_dim,ae_params=ae_params)
-                enhanced = self._integrate_embeddings(reduced, method="multiply", alpha=alpha, beta=beta)
+                enhanced = self._integrate_embeddings(reduced, method=config["integration_method"], alpha=alpha, beta=beta)
                 common_index = enhanced.index.intersection(self.phenotype_data.index)
 
                 X = enhanced.loc[common_index].values
                 y = self.phenotype_data.loc[common_index, self.phenotype_col]
 
                 is_classification = y.dtype != float and y.nunique() <= 20
-                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=self.seed)
+                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
                 if is_classification:
-                    model = RandomForestClassifier(random_state=self.seed)
+                    model = RandomForestClassifier()
                     model.fit(X_train, y_train.astype(int))
                     y_pred = model.predict(X_test)
                     score = accuracy_score(y_test, y_pred)
                 else:
-                    model = RandomForestRegressor(random_state=self.seed)
+                    model = RandomForestRegressor()
                     model.fit(X_train, y_train)
                     y_pred = model.predict(X_test)
-                    score = r2_score(y_test, y_pred)
+                    mse = mean_squared_error(y_test, y_pred)
+                    score = -mse
 
                 tune.report({"score": score})
 
@@ -392,7 +389,7 @@ class SubjectRepresentation:
             analysis = tune.run(
                 tune_helper,
                 config=search_config,
-                num_samples=10,
+                num_samples=20,
                 scheduler=scheduler,
                 progress_reporter=reporter,
                 storage_path=os.path.expanduser("~/sr"),

@@ -3,70 +3,49 @@ Metrics
 
 The metrics module includes functions that perform statistical analyses and generate visualizations. Functions from the metrics module allow users to assess and explore network-based embeddings, evaluate clustering performance, and explore the tabular data and network structure.
 
-Correlation Metrics
--------------------
-
-- :func:`bioneuralnet.metrics.omics_correlation` function computes the Pearson correlation coefficient between the first principal component of the omics data and a phenotype. The data are standardized and reduced in dimension by PCA before correlation is computed.
-- :func:`bioneuralnet.metrics.cluster_correlation` function computes the Pearson correlation for a cluster of features with a phenotype. Clusters with fewer than two features or zero variance are handled appropriately.
-
 Visualization
 -------------
 
 The module also contains several plotting functions:
 
-- :func:`bioneuralnet.metrics.plot_variance_distribution` plots the distribution of feature variances ...
-- :func:`bioneuralnet.metrics.plot_variance_by_feature` shows the variance of each feature against its index.
-- :func:`bioneuralnet.metrics.plot_performance` compares performance metrics between raw and enhanced omics data.
-- :func:`bioneuralnet.metrics.plot_embeddings` visualizes high-dimensional embeddings in 2D using t-SNE.
-- :func:`bioneuralnet.metrics.plot_network` displays the network graph from an adjacency matrix.
-- :func:`bioneuralnet.metrics.compare_clusters` compares clusters from different methods.
+- :func:`bioneuralnet.metrics.plot.plot_variance_distribution` plots the distribution of feature variances.
+- :func:`bioneuralnet.metrics.plot.plot_embeddings` visualizes high-dimensional embeddings by projecting them into a 2 dimensional space.
+- :func:`bioneuralnet.metrics.plot.plot_network` displays the network graph from an adjacency matrix.
+- :func:`bioneuralnet.metrics.plot.plot_variance_by_feature` shows the variance of each feature against its index.
+- :func:`bioneuralnet.metrics.plot.plot_multiple_metrics` shows the variance of each feature against its index.
 
-Evaluation
-----------
-
-Functions to train and evaluate RandomForest over one or multiple runs (Mostly used internally for testings purposes):
-
-- :func:`bioneuralnet.metrics.evaluate_model` evaluates a model over multiple runs.
-- :func:`bioneuralnet.metrics.evaluate_single_run` runs a single evaluation loop.
-- :func:`bioneuralnet.metrics.evaluate_rf` evaluates a Random Forest model.
-- :func:`bioneuralnet.metrics.evaluate_f1w` computes the weighted F1 score.
-- :func:`bioneuralnet.metrics.evaluate_f1m` computes the macro F1 score.
-- :func:`bioneuralnet.metrics.compare_clusters` compares and plots clusters from different methods.
 
 Example Usage
 -------------
 
-**1. Variance Distribution**
-The following example generates and plots the distribution of feature variances:
+**1. Network Visualization**
+Visualization of network with a 0.12 weight threshold. The top right corner shows the orignal network metrics.
 
-.. image:: _static/variance_distribution.png
+.. image:: _static/plot_network.png
    :align: center
-   :alt: Variance Distribution Plot
+   :alt: Network Visualization of Louvain Clusters
 
 .. code-block:: python
 
-   from bioneuralnet.metrics import plot_variance_distribution
+   from bioneuralnet.metrics import plot_network
+   from bioneuralnet.metrics import louvain_to_adjacency
 
-   fig = plot_variance_distribution(omics2, bins=100)
+   cluster1 = louvain_clusters[0]
+   cluster2 = louvain_clusters[1]
 
----
+   # Convert Louvain clusters into adjacency matrices
+   louvain_adj1 = louvain_to_adjacency(cluster1)
+   louvain_adj2 = louvain_to_adjacency(cluster2)
 
-**2. Variance Per Feature**
-Plots variance for the first 20 features.
+   # Plot using the converted adjacency matrices
+   cluster1_mapping = plot_network(louvain_adj1, weight_threshold=0.12, show_labels=True, show_edge_weights=False)
+   display(cluster1_mapping.head())
 
-.. image:: _static/variance_by_feature.png
-   :align: center
-   :alt: Variance Per Feature Plot
+   cluster2_mapping = plot_network(louvain_adj2, weight_threshold=0.12, show_labels=True, show_edge_weights=False)
+   display(cluster2_mapping.head())
 
-.. code-block:: python
-
-   from bioneuralnet.metrics import plot_variance_by_feature
-
-   fig2 = plot_variance_by_feature(omics2.iloc[:, 0:20])
-
-
-**3. GNN Embeddings**
-Training a **GNN-based embedding model** and visualizing the embeddings.
+**2. Embeddings Visualization**
+Visualizing a 64 dimension embedding space projected into a 2 dimensional space.
 
 .. image:: _static/plot_embeddings.png
    :align: center
@@ -99,31 +78,48 @@ Training a **GNN-based embedding model** and visualizing the embeddings.
    embeddings_plot = plot_embeddings(embeddings_array, node_labels)
 
 
-**4. Network Visualization**
-This section visualizes Louvain clusters in a network format.
+**3. Variance Distribution**
+The following example generates and plots the distribution of feature variances.
 
-.. image:: _static/plot_network.png
+.. image:: _static/variance_distribution.png
    :align: center
-   :alt: Network Visualization of Louvain Clusters
+   :alt: Variance Distribution Plot
 
 .. code-block:: python
 
-   from bioneuralnet.metrics import plot_network
-   from bioneuralnet.metrics import louvain_to_adjacency
+   from bioneuralnet.metrics import plot_variance_distribution
 
-   cluster1 = louvain_clusters[0]
-   cluster2 = louvain_clusters[1]
+   fig = plot_variance_distribution(omics2, bins=100)
 
-   # Convert Louvain clusters into adjacency matrices
-   louvain_adj1 = louvain_to_adjacency(cluster1)
-   louvain_adj2 = louvain_to_adjacency(cluster2)
 
-   # Plot using the converted adjacency matrices
-   cluster1_mapping = plot_network(louvain_adj1, weight_threshold=0.12, show_labels=True, show_edge_weights=False)
-   display(cluster1_mapping.head())
+**4. Variance Per Feature**
+Plots variance for the first 20 features.
 
-   cluster2_mapping = plot_network(louvain_adj2, weight_threshold=0.12, show_labels=True, show_edge_weights=False)
-   display(cluster2_mapping.head())
+.. image:: _static/variance_by_feature.png
+   :align: center
+   :alt: Variance Per Feature Plot
+
+.. code-block:: python
+
+   from bioneuralnet.metrics import plot_variance_by_feature
+
+   fig2 = plot_variance_by_feature(omics2.iloc[:, 0:20])
+
+Correlation Metrics
+-------------------
+
+- :func:`bioneuralnet.metrics.correlation.omics_correlation` function computes the Pearson correlation coefficient between the first principal component of the omics data and a phenotype. The data are standardized and reduced in dimension by PCA before correlation is computed.
+- :func:`bioneuralnet.metrics.correlation.cluster_correlation` function computes the Pearson correlation for a cluster of features with a phenotype. Clusters with fewer than two features or zero variance are handled appropriately.
+
+Evaluation
+----------
+
+Functions to train and evaluate RandomForest over one or multiple runs (Mostly used internally for testings purposes):
+
+- :func:`bioneuralnet.metrics.evaluation.evaluate_model` evaluates a model over multiple runs.
+- :func:`bioneuralnet.metrics.evaluation.evaluate_rf` evaluates a Random Forest model.
+- :func:`bioneuralnet.metrics.evaluation.evaluate_f1w` computes the weighted F1 score.
+- :func:`bioneuralnet.metrics.evaluation.evaluate_f1m` computes the macro F1 score.
 
 
 Further Information

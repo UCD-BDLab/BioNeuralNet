@@ -1,6 +1,8 @@
 Utils
 =====
 
+The `utils` module provides a collection of supporting functions for data preparation, logging, graph construction, and exploratory analysis. These utilities streamline common preprocessing workflows and enable efficient manipulation of omics and clinical datasets within BioNeuralNet.
+
 RData Conversion
 ----------------
 

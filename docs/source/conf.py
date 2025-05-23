@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.abspath("../../"))
 try:
     release = metadata.version("bioneuralnet")
 except metadata.PackageNotFoundError:
-    release = "1.0"
+    release = "1.0.7"
 
 project = "BioNeuralNet"
 version = release
@@ -19,10 +19,13 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
     "nbsphinx",
+    "myst_nb",
 ]
+nb_execution_mode = "off"
+myst_enable_extensions = ["colon_fence"]
 
-pygments_style = "friendly"
-pygments_dark_style = "native"
+pygments_style = "monokai"
+pygments_dark_style = "monokai"
 highlight_language = "python"
 nbsphinx_codecell_lexer = "ipython3"
 nbsphinx_execute = "never"
@@ -38,11 +41,14 @@ autodoc_default_options = {
 
 autosummary_generate = True
 napoleon_google_docstring = True
-napoleon_numpy_docstring = False
+napoleon_numpy_docstring = True
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 html_static_path = ["_static"]
-html_theme = "sphinx_rtd_theme"
+html_theme = "furo"
+html_title = "BioNeuralNet Documentation"
+html_css_files = ["custom.css"]
+#html_theme = "sphinx_rtd_theme"
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
@@ -58,6 +64,4 @@ intersphinx_mapping = {
 autodoc_mock_imports = [
     "torch",
     "torch_geometric",
-    "sklearn",
-    "statsmodels",
 ]

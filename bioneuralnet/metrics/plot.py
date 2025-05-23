@@ -1,15 +1,20 @@
 import numpy as np
 import pandas as pd
-from bioneuralnet.metrics.correlation import cluster_correlation
+from pathlib import Path
+from typing import Union, Optional, cast
 from bioneuralnet.utils import get_logger
+from .correlation import cluster_correlation
+import networkx as nx
+import matplotlib.pyplot as plt
+from sklearn.manifold import TSNE
 
-try:
-    import networkx as nx
-    import matplotlib.pyplot as plt
-    from sklearn.manifold import TSNE
+# try:
+#     import networkx as nx
+#     import matplotlib.pyplot as plt
+#     from sklearn.manifold import TSNE
 
-except ImportError:
-    raise ImportError("Please install the required packages for plotting: pip install matplotlib")
+# except ImportError:
+#     raise ImportError("Please install the required packages for plotting: pip install matplotlib")
 
 logger = get_logger(__name__)
 
@@ -101,9 +106,22 @@ def plot_performance_three(raw_score, gnn_score, other_score, labels=["Raw","GNN
 
     plt.show()
 
-def plot_performance(embedding_result, raw_rf_acc, title="Performance Comparison", filename=None):
+def plot_performance(embedding_result, raw_rf_acc, title="Performance Comparison", filename=None, metric_name="Accuracy", labels=None):
     """
-    Clean and minimal bar plot comparing raw vs embeddings-based performance.
+    A minimal bar plot comparing two performance metrics. e.g., raw vs embeddings based performance.
+
+    Parameters:
+
+        embedding_result: tuple or dict containing (mean, std) of the metric for the model using embeddings.
+        raw_rf_acc: tuple or dict containing (mean, std) of the metric for the baseline model.
+        title: string, title of the plot.
+        filename: string or Path, if provided, the plot will be saved to this file.
+        metric_name: string, name of the metric to display on the Y-axis (e.g., "Accuracy").
+        labels: iterable of two strings (default: ["Label 1", "Label 2"]).
+
+    Returns:
+
+        None. Displays (and optionally saves) the bar plot.
     """
     def parse_score(x):
         if isinstance(x, dict):
@@ -116,28 +134,30 @@ def plot_performance(embedding_result, raw_rf_acc, title="Performance Comparison
     embed_acc, embed_std = parse_score(embedding_result)
     raw_acc, raw_std = parse_score(raw_rf_acc)
 
-    labels = ["Raw Omics", "Omics + Embeddings"]
+    if labels is None:
+        labels = ["Label 1", "Label 2"]
+    if len(labels) != 2:
+        raise ValueError("labels must be a sequence of length 2.")
+
     scores = [raw_acc, embed_acc]
     errors = [raw_std, embed_std]
     x = np.arange(len(scores))
     width = 0.23
 
     fig, ax = plt.subplots(figsize=(3.2, 4))
-    bars = ax.bar(x, scores, width, yerr=errors, capsize=2,
-                  color=["#4E79A7", "#F28E2B"], alpha=0.95, linewidth=0)
+    bars = ax.bar(x, scores, width,yerr=errors, capsize=2,color=["#4E79A7", "#F28E2B"],alpha=0.95, linewidth=0)
 
-    ax.set_ylabel("Accuracy", fontsize=11)
+    ax.set_ylabel(metric_name, fontsize=11)
     ax.set_title(title, fontsize=12, pad=10)
     ax.set_xticks(x)
     ax.set_xticklabels(labels, fontsize=10)
     ax.set_ylim(0, 1)
     ax.grid(True, axis="y", linestyle="--", alpha=0.4)
 
-    for i in range(len(bars)):
-        height = bars[i].get_height()
+    for i, bar in enumerate(bars):
+        h   = bar.get_height()
         err = errors[i]
-        ax.text(bars[i].get_x() + bars[i].get_width() / 2, height + err + 0.015,
-                f"{height:.3f}", ha="center", va="bottom", fontsize=10, fontweight="bold")
+        ax.text(bar.get_x() + bar.get_width() / 2, h + err + 0.015, f"{h:.3f}",ha="center", va="bottom",fontsize=10, fontweight="bold")
 
     plt.subplots_adjust(left=0.18, right=0.95, bottom=0.15, top=0.88)
 
@@ -204,7 +224,7 @@ def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show
         adjacency_matrix (pd.DataFrame): The adjacency matrix of the network.
         weight_threshold (float): Minimum weight to keep an edge (default: 0.0).
         show_labels (bool): Whether to show node labels.
-        show_edge_weights (bool): Whether to show edge weights.
+        show_edge_weights (bool): Whether to show edge weights
 
     Returns:
 
@@ -215,13 +235,17 @@ def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show
     total_edges = full_G.number_of_edges()
 
     G = full_G.copy()
+    for _, _, d in G.edges(data=True):
+        d["abs_weight"] = abs(d.get("weight", 0.0))
 
     if weight_threshold > 0:
         edges_to_remove = []
 
         for u, v, d in G.edges(data=True):
-            weight = d.get('weight', 0)
-            if weight < weight_threshold:
+            raw_w = d.get('weight', 0)
+            abs_w = abs(raw_w)
+            d['abs_weight'] = abs_w
+            if abs_w < weight_threshold:
                 edges_to_remove.append((u, v))
 
         G.remove_edges_from(edges_to_remove)
@@ -250,22 +274,32 @@ def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show
         node_sizes.append(150 + (degrees[node] / max_degree) * 300)
 
     edge_weights = []
-    for u, v in G.edges():
-        weight = G[u][v]['weight']
-        edge_weights.append(weight)
+    for u, v, d in G.edges(data=True):
+        edge_weights.append(d['abs_weight'])
 
     edge_widths = []
     if edge_weights:
-        min_weight = min(edge_weights)
-        max_weight = max(edge_weights)
+        min_w = edge_weights[0]
+        max_w = edge_weights[0]
         for w in edge_weights:
-            edge_widths.append(2 + 4 * (w - min_weight) / (max_weight - min_weight + 1e-6))
+            if w < min_w:
+                min_w = w
+            if w > max_w:
+                max_w = w
 
-    pos = nx.kamada_kawai_layout(G)
+        span = max_w - min_w if max_w > min_w else 1e-6
+
+        for w in edge_weights:
+            width = 2 + 4 * (w - min_w) / span
+            edge_widths.append(width)
+    else:
+        edge_widths = []
+
+    pos = nx.kamada_kawai_layout(G, weight="abs_weight")
     fig, ax_graph = plt.subplots(figsize=(14, 8))
 
     nx.draw_networkx_nodes(G, pos, node_size=node_sizes, node_color="gold", edgecolors="black", linewidths=1.5, alpha=0.9, ax=ax_graph)
-    nx.draw_networkx_edges(G, pos, alpha=0.8, width=edge_widths, edge_color="black", ax=ax_graph)
+    nx.draw_networkx_edges(G, pos, alpha=0.9, width=edge_widths, edge_color="black", ax=ax_graph)
 
     if show_edge_weights and edge_weights:
         edge_labels = nx.get_edge_attributes(G, 'weight')
@@ -305,8 +339,7 @@ def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show
 
     return mapping_df
 
-def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.DataFrame,
-                     omics_merged: pd.DataFrame, label1: str = "Louvain", label2: str = "SmCCNet"):
+def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.DataFrame, omics_merged: pd.DataFrame, label1: str = "Hybrid Louvain", label2: str = "SmCCNet"):
     """
     Compare clusters from two methods by computing the correlation for each induced subnetwork.
     Both inputs are expected to be lists of pandas DataFrames. If the lists have different lengths,
@@ -314,39 +347,97 @@ def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.D
 
     Parameters:
 
-        louvain_clusters: list of pd.DataFrame
-            Each DataFrame represents an induced subnetwork (from Louvain).
-        smccnet_clusters: list of pd.DataFrame
-            Each DataFrame represents an induced subnetwork (from SMCCNET).
-        pheno: pd.DataFrame
-            Phenotype data (the first column is used).
-        omics_merged: pd.DataFrame
-            Full omics data
-        label1: str
-            Label for the first method.
-        label2: str
-            Label for the second method.
+        louvain_clusters (list of pd.DataFrame): Each DataFrame represents an induced subnetwork (e.g. from Hybrid Louvain).
+        smccnet_clusters (list of pd.DataFrame): Each DataFrame represents an induced subnetwork (e.g. from SMCCNET).
+        pheno (pd.DataFrame): Phenotype data (the first column is used).
+        omics_merged (pd.DataFrame): Full omics data (used to re-index SMCCNet clusters).
+        label1 (str): Label for the first method.
+        label2 (str): Label for the second method.
 
     Returns:
 
-        pd.DataFrame: Results table with cluster indices, sizes, and correlations
+        pd.DataFrame: Results table with cluster indices, sizes, and phenotype correlations.
+
+    Plots:
+
+        A line plot comparing the correlation of PC1 vs phenotype for each method. 
+        Louvain and SMCCNet curves are shown with their cluster sizes annotated.
     """
+
     smccnet_clusters_fixed = []
 
-    for cluster_df in smccnet_clusters:
+    i = 0
+    while i < len(smccnet_clusters):
+        cluster_df = smccnet_clusters[i]
         valid_genes = []
-
-        for gene in cluster_df.index:
+        
+        j = 0
+        while j < len(cluster_df.index):
+            gene = cluster_df.index[j]
             if gene in omics_merged.columns:
                 valid_genes.append(gene)
+            j += 1
 
         if len(valid_genes) > 0:
             sample_level_data = omics_merged[valid_genes]
             smccnet_clusters_fixed.append(sample_level_data)
+        i += 1
 
-    min_len = min(len(louvain_clusters), len(smccnet_clusters_fixed))
-    louvain_clusters = louvain_clusters[:min_len]
-    smccnet_clusters_fixed = smccnet_clusters_fixed[:min_len]
+    louvain_sizes = []
+    i = 0
+    while i < len(louvain_clusters):
+        df = louvain_clusters[i]
+        size = df.shape[1]
+        louvain_sizes.append((i, size))
+        i += 1
+
+    smccnet_sizes = []
+    i = 0
+    while i < len(smccnet_clusters_fixed):
+        df = smccnet_clusters_fixed[i]
+        size = df.shape[1]
+        smccnet_sizes.append((i, size))
+        i += 1
+
+    def get_size(pair):
+        return pair[1]
+
+    louvain_sizes.sort(key=get_size, reverse=True)
+    smccnet_sizes.sort(key=get_size, reverse=True)
+
+    if len(louvain_sizes) < len(smccnet_sizes):
+        k = len(louvain_sizes)
+    else:
+        k = len(smccnet_sizes)
+
+    top_louvain_indices = []
+    i = 0
+    while i < k:
+        top_louvain_indices.append(louvain_sizes[i][0])
+        i += 1
+
+    top_smccnet_indices = []
+    i = 0
+    while i < k:
+        top_smccnet_indices.append(smccnet_sizes[i][0])
+        i += 1
+
+    top_louvain_clusters = []
+    i = 0
+    while i < len(top_louvain_indices):
+        idx = top_louvain_indices[i]
+        top_louvain_clusters.append(louvain_clusters[idx])
+        i += 1
+
+    top_smccnet_clusters = []
+    i = 0
+    while i < len(top_smccnet_indices):
+        idx = top_smccnet_indices[i]
+        top_smccnet_clusters.append(smccnet_clusters_fixed[idx])
+        i += 1
+
+    louvain_clusters = top_louvain_clusters
+    smccnet_clusters_fixed = top_smccnet_clusters
 
     results = []
 
@@ -386,3 +477,87 @@ def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.D
     plt.show()
 
     return df_results
+
+def plot_multiple_metrics(
+    metrics: dict[str, dict[str, tuple[float, float]]],
+    title_map: Optional[dict[str, str]] = None,
+    ylabel_map: Optional[dict[str, str]] = None,
+    filename: Optional[Union[str, Path]] = None
+) -> None:
+    """
+    Plot multiple grouped performance metrics as side-by-side bar plots.
+
+    Parameters:
+
+        metrics (dict): A nested dictionary of the form:{metric_name: {group_name: (mean, std)}}.
+        title_map (dict, optional): Maps each metric name to a custom plot title.
+        ylabel_map (dict, optional): Maps each metric name to a Y-axis label.
+        filename (str or Path, optional): If provided, saves the figure to this path.
+
+    Returns:
+
+        None. Displays or shows a matplotlib figure with grouped metric comparisons.
+
+    """
+    logger.info(f"Plotting multiple metrics: {list(metrics.keys())}")
+    n = len(metrics)
+    fig, axes = plt.subplots(1, n, figsize=(5 * n, 5), sharey=True)
+    if n == 1:
+        axes = [axes]
+
+    for ax, (metric, sc) in zip(axes, metrics.items()):
+        groups = list(sc.keys())
+        sublabels = [""]
+
+        means_list: list[list[float]] = []
+        errs_list: list[list[float]] = []
+
+        for g in groups:
+            row_m: list[float] = []
+            row_e: list[float] = []
+            for s in sublabels:
+                m, e = sc[g]
+                row_m.append(m)
+                row_e.append(e)
+            means_list.append(row_m)
+            errs_list.append(row_e)
+
+        means = cast(np.ndarray, np.array(means_list, dtype=float))
+        errs  = cast(np.ndarray, np.array(errs_list,  dtype=float))
+        ind = np.arange(len(groups))
+        total = 0.7
+        width = total / len(sublabels)
+
+        for i in range(len(sublabels)):
+            x = ind + i * width
+            y = means[:, i]
+            yerr = errs[:, i]
+
+            bars = ax.bar(x, y, width, yerr=yerr, capsize=3,color=["#4E79A7", "#F28E2B"], label=sublabels[i])
+            for bar in bars:
+                height = bar.get_height()
+                bar_x = bar.get_x() + bar.get_width() / 2
+                bar_y = height + 0.01
+                ax.text(bar_x, bar_y, f"{height:.2f}", ha='center', va='bottom', fontsize=8)
+
+        ax.set_xticks(ind + total / 2 - width / 2)
+        ax.set_xticklabels(groups, fontsize=11)
+
+        title = title_map.get(metric, metric) if title_map else metric
+        ylabel = ylabel_map.get(metric, metric) if ylabel_map else metric
+
+        ax.set_title(title, fontsize=14, pad=12)
+        ax.set_ylabel(ylabel, fontsize=12)
+        if "Accuracy" in ylabel or "F1" in ylabel:
+            ax.set_ylim(0, 1.3)
+        ax.grid(True, axis="y", linestyle="--", alpha=0.3)
+
+    plt.tight_layout(pad=2.0)
+
+    if filename:
+        fig.savefig(str(filename), dpi=300, bbox_inches="tight")
+        logger.info(f"Saved combined figure to {filename}")
+    else:
+        plt.show()
+
+    plt.close(fig)

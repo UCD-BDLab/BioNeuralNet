@@ -29,7 +29,7 @@ def get_activation(activation_choice):
         raise ValueError(f"Unsupported activation function: {activation_choice}")
 
 class GCN(nn.Module):
-    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="elu", seed=None):
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="elu", seed=None, self_loop_and_norm=None):
         if seed is not None:
             torch.manual_seed(seed)
             if torch.cuda.is_available():
@@ -46,7 +46,10 @@ class GCN(nn.Module):
         self.bns = nn.ModuleList()
         for i in range(layer_num):
             in_dim = input_dim if i == 0 else hidden_dim
-            self.convs.append(GCNConv(in_dim, hidden_dim))
+            if self_loop_and_norm is not None:
+                self.convs.append(GCNConv(in_dim, hidden_dim, add_self_loops=False, normalize=False))
+            else:
+                self.convs.append(GCNConv(in_dim, hidden_dim))
             self.bns.append(nn.Identity())
 
         self.regressor = nn.Linear(hidden_dim, 1) if self.final_layer == "regression" else nn.Identity()
@@ -73,7 +76,7 @@ class GCN(nn.Module):
         return x
 
 class GAT(nn.Module):
-    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, heads=1, final_layer="regression", activation="elu", seed=None):
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, heads=1, final_layer="regression", activation="elu", seed=None, self_loop_and_norm=None):
         if seed is not None:
             torch.manual_seed(seed)
             if torch.cuda.is_available():
@@ -92,7 +95,10 @@ class GAT(nn.Module):
         self.bns = nn.ModuleList()
         for i in range(layer_num):
             in_dim = input_dim if i == 0 else hidden_dim * heads
-            self.convs.append(GATConv(in_dim, hidden_dim, heads=heads))
+            if self_loop_and_norm is not None:
+                self.convs.append(GATConv(in_dim, hidden_dim, heads=heads, add_self_loops=False))
+            else:
+                self.convs.append(GATConv(in_dim, hidden_dim, heads=heads))
             self.bns.append(nn.Identity())
 
         self.regressor = nn.Linear(hidden_dim * heads, 1) if self.final_layer == "regression" else nn.Identity()
@@ -119,7 +125,7 @@ class GAT(nn.Module):
         return x
 
 class SAGE(nn.Module):
-    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="elu", seed=None):
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="elu", seed=None, self_loop_and_norm=None):
         if seed is not None:
             torch.manual_seed(seed)
             if torch.cuda.is_available():
@@ -137,7 +143,10 @@ class SAGE(nn.Module):
         self.bns = nn.ModuleList()
         for i in range(layer_num):
             in_dim = input_dim if i == 0 else hidden_dim
-            self.convs.append(SAGEConv(in_dim, hidden_dim))
+            if self_loop_and_norm is not None:
+                self.convs.append(SAGEConv(in_dim, hidden_dim,normalize=False))
+            else:
+                self.convs.append(SAGEConv(in_dim, hidden_dim))
             self.bns.append(nn.Identity())
 
         self.regressor = nn.Linear(hidden_dim, 1) if self.final_layer == "regression" else nn.Identity()
@@ -164,7 +173,7 @@ class SAGE(nn.Module):
         return x
 
 class GIN(nn.Module):
-    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="relu", seed=None):
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="relu", seed=None, self_loop_and_norm=None):
 
         if seed is not None:
             torch.manual_seed(seed)

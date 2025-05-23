@@ -1,14 +1,11 @@
 Graph Construction
 ==================
 
-These wrappers facilitate calling **R-based** adjacency-building approaches:
+These wrappers facilitate calling **R-based** packages for network construction, specifically **SmCCNet**.:
 
 **SmCCNet**:
-  - Constructs networks via sparse canonical correlation. Ideal for multi-omics correlation or partial correlation tasks.
 
-.. literalinclude:: ../examples/smccnet_example.py
-   :language: python
-   :caption: Using SmCCNet to build an adjacency matrix from omics + phenotype data.
+  - Constructs networks via sparse canonical correlation. Ideal for multi-omics correlation or partial correlation tasks.
 
 **Note**:
   
