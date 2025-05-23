@@ -87,7 +87,7 @@ def evaluate_rf(X: np.ndarray,y: np.ndarray,mode: str = "classification",n_estim
     Convenience wrapper for evaluating a RandomForest model (classifier or regressor)
 
     Parameters:
-    
+
         X: Feature matrix
         y: Target array
         mode: Either "classification" or "regression"

@@ -90,7 +90,7 @@ class GNNEmbedding:
             raise ValueError("Omics data cannot be empty.")
         if clinical_data is not None and clinical_data.empty:
             raise ValueError("Clinical data was provided but is empty.")
-        
+
         if adjacency_matrix.shape[0] != adjacency_matrix.shape[1]:
             raise ValueError("Adjacency matrix must be square.")
         if not adjacency_matrix.index.equals(adjacency_matrix.columns):
@@ -110,11 +110,11 @@ class GNNEmbedding:
                 raise ValueError(f"Cannot determine phenotype column. "f"Either provide a single-column DataFrame or set 'phenotype_col' to a valid column name.")
         else:
             raise ValueError("Phenotype data must be a Series or a DataFrame.")
-        
+
         #lastly we check if phenotype columns is in omics data
         if phenotype_col in omics_data.columns:
             raise ValueError(f"Phenotype column '{phenotype_col}' is present in omics data. Please remove it.")
-        
+
         if seed is not None:
             torch.manual_seed(seed)
             np.random.seed(seed)

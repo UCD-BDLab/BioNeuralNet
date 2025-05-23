@@ -360,7 +360,7 @@ def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.D
 
     Plots:
 
-        A line plot comparing the correlation of PC1 vs phenotype for each method. 
+        A line plot comparing the correlation of PC1 vs phenotype for each method.
         Louvain and SMCCNet curves are shown with their cluster sizes annotated.
     """
 
@@ -370,7 +370,7 @@ def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.D
     while i < len(smccnet_clusters):
         cluster_df = smccnet_clusters[i]
         valid_genes = []
-        
+
         j = 0
         while j < len(cluster_df.index):
             gene = cluster_df.index[j]
