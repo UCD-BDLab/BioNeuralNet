@@ -14,7 +14,6 @@
       evaluate_f1w
       evaluate_model
       evaluate_rf
-      evaluate_single_run
       louvain_to_adjacency
       omics_correlation
       plot_embeddings

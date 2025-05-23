@@ -37,18 +37,25 @@ from .downstream_task import DPMON
 from .clustering import CorrelatedPageRank
 from .clustering import CorrelatedLouvain
 from .clustering import HybridLouvain
+from .datasets import DatasetLoader
+from .external_tools import SmCCNet
 
 from .metrics import omics_correlation
 from .metrics import cluster_correlation
 from .metrics import louvain_to_adjacency
 from .metrics import evaluate_rf
+from .metrics import evaluate_model
+from .metrics import evaluate_f1m
+from .metrics import evaluate_f1w
 from .metrics import plot_performance_three
 from .metrics import plot_variance_distribution
 from .metrics import plot_variance_by_feature
 from .metrics import plot_performance
 from .metrics import plot_embeddings
 from .metrics import plot_network
+from .metrics import plot_multiple_metrics
 from .metrics import compare_clusters
+
 
 from .utils import get_logger
 from .utils import rdata_to_df
@@ -75,8 +82,6 @@ from .utils import gen_lasso_graph
 from .utils import gen_mst_graph
 from .utils import gen_snn_graph
 
-from .datasets import DatasetLoader
-from .external_tools import SmCCNet
 
 __all__: list = [
     "__version__",
@@ -97,6 +102,10 @@ __all__: list = [
     "plot_embeddings",
     "plot_network",
     "compare_clusters",
+    "plot_multiple_metrics",
+    "evaluate_model",
+    "evaluate_f1m",
+    "evaluate_f1w",
     "get_logger",
     "rdata_to_df",
     "variance_summary",
@@ -122,9 +131,6 @@ __all__: list = [
     "gen_mst_graph",
     "gen_snn_graph",
     "DatasetLoader",
-    "NetworkLoader",
     "SmCCNet",
-    "WGCNA",
-    "Node2Vec"
     "evaluate_model",
 ]

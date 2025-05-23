@@ -9,8 +9,10 @@ bioneuralnet.network\_embedding.gnn\_embedding
    .. autosummary::
    
       get_logger
+      mean_squared_error
       process_dropout
       skew
+      train_test_split
    
    .. rubric:: Classes
 
@@ -23,6 +25,7 @@ bioneuralnet.network\_embedding.gnn\_embedding
       GIN
       GNNEmbedding
       Path
+      RandomForestRegressor
       SAGE
       datetime
    

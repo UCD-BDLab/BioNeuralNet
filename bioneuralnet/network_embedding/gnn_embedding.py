@@ -6,9 +6,7 @@ import numpy as np
 from typing import Optional,Union
 from datetime import datetime
 from pathlib import Path
-import networkx as nx
 import tempfile
-
 
 try:
     import torch
@@ -17,6 +15,7 @@ try:
     from torch_geometric.data import Data
     from torch_geometric.utils import from_networkx
     from torch_geometric.utils import add_self_loops
+    from torch_geometric.utils import degree
 except ModuleNotFoundError:
     raise ImportError(
         "GNNEmbedding requires PyTorch Geometric. "
@@ -28,7 +27,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from sklearn.ensemble import RandomForestRegressor
 
-import ray
 from ray import tune
 from ray.tune import CLIReporter
 from ray.tune.schedulers import ASHAScheduler
@@ -90,10 +88,15 @@ class GNNEmbedding:
             raise ValueError("Adjacency matrix cannot be empty.")
         if omics_data.empty:
             raise ValueError("Omics data cannot be empty.")
-        if adjacency_matrix.shape[0] == omics_data.shape[0]:
-            raise ValueError("Adjacency matrix, omics data must have the same number of samples.")
         if clinical_data is not None and clinical_data.empty:
             raise ValueError("Clinical data was provided but is empty.")
+
+        if adjacency_matrix.shape[0] != adjacency_matrix.shape[1]:
+            raise ValueError("Adjacency matrix must be square.")
+        if not adjacency_matrix.index.equals(adjacency_matrix.columns):
+            raise ValueError("Adjacency matrix must have the same index and columns.")
+        if omics_data.shape[1] != adjacency_matrix.shape[0]:
+            raise ValueError("Number of omics features must match adjacency matrix size.")
 
         if isinstance(phenotype_data, pd.Series):
             self.phenotype_data = phenotype_data.copy(deep=True)
@@ -104,13 +107,13 @@ class GNNEmbedding:
             elif phenotype_data.shape[1] == 1:
                 self.phenotype_data = phenotype_data.iloc[:, 0].copy(deep=True)
             else:
-                raise ValueError(
-                    f"Cannot determine phenotype column. "
-                    f"Either provide a single-column DataFrame or set 'phenotype_col' to a valid column name."
-                )
+                raise ValueError(f"Cannot determine phenotype column. "f"Either provide a single-column DataFrame or set 'phenotype_col' to a valid column name.")
         else:
             raise ValueError("Phenotype data must be a Series or a DataFrame.")
 
+        #lastly we check if phenotype columns is in omics data
+        if phenotype_col in omics_data.columns:
+            raise ValueError(f"Phenotype column '{phenotype_col}' is present in omics data. Please remove it.")
 
         if seed is not None:
             torch.manual_seed(seed)
@@ -238,13 +241,16 @@ class GNNEmbedding:
 
     def _prepare_node_features(self) -> pd.DataFrame:
         """
+        Prepare node features by computing centrality measures, statistical features and/or correlation.
         1. Align network & omics nodes.
         2. Compute graph-centralities (pagerank, eigenvector, katz).
         3. If clinical_data exists:
-            - compute Pearson correlations vs. each clinical var.
+
+            compute Pearson correlations vs. each clinical var.
         Else:
-            - compute mean, log-skew, median-abs-dev of omics per node.
-        4. Rank-scale every feature to [-1,1].
+
+            compute mean, log-skew, median-abs-dev of omics per node.
+        4. Standardize every feature to zero mean and unit variance.
         5. Save and return the final features DataFrame.
         """
         self.logger.info("Preparing node features.")
@@ -263,19 +269,19 @@ class GNNEmbedding:
             raise ValueError("Mismatch between network features and omics data columns.")
 
         self.logger.info(f"Found {len(nodes)} common features between network and omics data.")
-        omics_filtered   = self.omics_data[nodes]
+        omics_filtered = self.omics_data[nodes]
         network_filtered = self.adjacency_matrix.loc[nodes, nodes]
 
         G = nx.from_pandas_adjacency(network_filtered)
 
-        pagerank = nx.pagerank(G, alpha=0.85, weight="weight", max_iter=1000)
-        katz = nx.katz_centrality_numpy(G, alpha=0.005, beta=1.0, weight="weight")
+        pagerank = nx.pagerank(G, weight="weight")
+        katz = nx.katz_centrality_numpy(G, weight="weight")
 
         eigenvector = {}
         for comp in nx.connected_components(G):
             sub = G.subgraph(comp)
             try:
-                ec = nx.eigenvector_centrality(sub, max_iter=1000, tol=1e-6, weight="weight")
+                ec = nx.eigenvector_centrality(sub, weight="weight")
             except nx.PowerIterationFailedConvergence:
                 ec = {}
                 self.logger.warning(
@@ -287,11 +293,10 @@ class GNNEmbedding:
             eigenvector.update(ec)
 
         nodes = list(network_filtered.index)
-        centralities_df = pd.DataFrame({
-            "pagerank":   pagerank,
-            "eigenvector": eigenvector,
-            "katz":       katz
-        }).reindex(nodes)
+        centralities_df = pd.DataFrame({"pagerank": pagerank,"eigenvector": eigenvector,"katz": katz}).reindex(nodes)
+
+        #due to the different magnitudes from centralities and stats, we need to scale them
+        centralities_df = (centralities_df - centralities_df.mean()) / centralities_df.std()
 
         if self.clinical_data is not None and not self.clinical_data.empty:
             clinical_cols = list(self.clinical_data.columns)
@@ -306,14 +311,19 @@ class GNNEmbedding:
                 for cvar in clinical_cols:
                     clinical_series = self.clinical_data[cvar].loc[common_index]
                     corr_val = vec.corr(clinical_series)
-
-                    corr_vector[cvar] = corr_val if not pd.isna(corr_val) else 0.0
+                    if pd.isna(corr_val):
+                        z = 0.0
+                    else:
+                        r_clip = np.clip(corr_val, -0.999999, 0.999999)
+                        z = np.arctanh(r_clip)
+                    corr_vector[cvar] = z
 
                 full_feature_vec = {
-                    "pagerank": pagerank[node],
-                    "eigenvector": eigenvector[node],
-                    "katz": katz[node],
+                    "pagerank": centralities_df.at[node, "pagerank"],
+                    "eigenvector": centralities_df.at[node, "eigenvector"],
+                    "katz": centralities_df.at[node, "katz"],
                 }
+
                 full_feature_vec.update(corr_vector)
                 node_features_dict[node] = full_feature_vec
 
@@ -334,6 +344,7 @@ class GNNEmbedding:
                     mean_val = np.nan
                     skew_val = np.nan
                     mad_val = np.nan
+                    log_skew_val = np.nan
                 else:
                     mean_val = vec.mean()
                     skew_val = skew(vec)
@@ -346,10 +357,11 @@ class GNNEmbedding:
             node_features_df = stat_df.join(centralities_df)
             self.logger.info(f"Built statistical feature matrix shape: {node_features_df.shape}")
 
-        ranks = node_features_df.rank(method="average")
-        scale_den = (ranks.max() - ranks.min()).replace(0, 1)
-        scaled_ranks = 2 * (ranks - ranks.min()) / scale_den - 1
-        node_features_df = scaled_ranks
+        # ranks = node_features_df.rank(method="average")
+        # scale_den = (ranks.max() - ranks.min()).replace(0, 1)
+        # scaled_ranks = 2 * (ranks - ranks.min()) / scale_den - 1
+        # node_features_df = scaled_ranks
+        node_features_df = (node_features_df - node_features_df.mean()) / node_features_df.std()
 
         timestamp = datetime.now().strftime("%m%d_%H_%M_%S")
         labels_file = self.output_dir / f"features_{network_filtered.shape[0]}_{timestamp}.txt"
@@ -381,26 +393,27 @@ class GNNEmbedding:
         labels_dict = {}
 
         for node in nodes:
-            vec = pd.to_numeric(omics_data[node], errors="coerce")
-            val = vec.corr(pheno)
+            r = pd.to_numeric(omics_data[node], errors="coerce").corr(pheno)
+            r = 0.0 if pd.isna(r) else np.clip(r, -0.999999, 0.999999)
+            z = np.arctanh(r)
+            labels_dict[node] = z
 
-            labels_dict[node] = 0.0 if pd.isna(val) else val
-
-        labels_series = pd.Series(labels_dict, index=nodes)
-
-        ranks = labels_series.rank(method="average")
-        den   = (ranks.max() - ranks.min()) or 1
-        scaled = 2*(ranks - ranks.min())/den - 1
+        #labels_series = pd.Series(labels_dict, index=nodes)
+        # ranks = labels_series.rank(method="average")
+        # den = (ranks.max() - ranks.min()) or 1
+        # scaled = 2*(ranks - ranks.min())/den - 1
+        labels = pd.Series(labels_dict, index=nodes)
+        labels = (labels - labels.mean()) / labels.std()
 
         timestamp = datetime.now().strftime("%m%d_%H_%M_%S")
         labels_file = self.output_dir / f"labels_{self.adjacency_matrix.shape[0]}_{timestamp}.txt"
 
         with open(labels_file, "w") as f:
-            f.write(scaled.to_string())
+            f.write(labels.to_string())
 
         self.logger.info(f"Node labels prepared successfully and saved to {labels_file}.")
 
-        return scaled
+        return labels
 
     def _build_pyg_data(self, node_features: pd.DataFrame, node_labels: pd.Series) -> Data:
         self.logger.info("Constructing PyTorch Geometric Data object.")
@@ -425,15 +438,16 @@ class GNNEmbedding:
             # no edge_attr
             data.edge_weight = torch.ones(data.edge_index.size(1))
 
-        # data.edge_index, data.edge_weight = add_self_loops(
-        #     data.edge_index, data.edge_weight, fill_value=1.0, num_nodes=len(nodes)
-        # )
-        # if isinstance(conv, (SAGEConv, GINConv)):
-        #     data.edge_index, data.edge_weight = add_self_loops(
-        #     data.edge_index, data.edge_weight, fill_value=1.0, num_nodes=data.num_nodes)
+        data.edge_index, data.edge_weight = add_self_loops(data.edge_index,data.edge_weight,fill_value=data.edge_weight.mean(),num_nodes=data.num_nodes)
+        row, col = data.edge_index
+        deg = degree(row, data.num_nodes, dtype=data.edge_weight.dtype)
+        deg_inv_sqrt = deg.pow(-0.5)
+        deg_inv_sqrt[deg_inv_sqrt == float('inf')] = 0
+        norm_w = deg_inv_sqrt[row] * data.edge_weight * deg_inv_sqrt[col]
+        data.edge_weight = norm_w
 
         data.x = torch.tensor(node_features.loc[nodes].values, dtype=torch.float)
-        data.y = torch.tensor(node_labels.loc[nodes].values,   dtype=torch.float)
+        data.y = torch.tensor(node_labels.loc[nodes].values, dtype=torch.float)
 
         self.logger.info("PyTorch Geometric Data object constructed successfully.")
         return data
@@ -441,7 +455,9 @@ class GNNEmbedding:
     def _initialize_gnn_model(self) -> nn.Module:
         """
         Initialize the GNN model based on the specified type.
+
         Returns:
+
             nn.Module
         """
         self.logger.info(f"Initializing GNN model of type '{self.model_type}' with hidden_dim={self.hidden_dim} and layer_num={self.layer_num}.")
@@ -449,13 +465,13 @@ class GNNEmbedding:
             raise ValueError("Data is not initialized or is missing the 'x' attribute.")
         input_dim = self.data.x.shape[1]
         if self.model_type.upper() == "GCN":
-            return GCN(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout,activation=self.activation, seed = self.seed)
+            return GCN(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout,activation=self.activation, seed = self.seed, self_loop_and_norm=False)
         elif self.model_type.upper() == "GAT":
-            return GAT(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout,activation=self.activation, seed = self.seed)
+            return GAT(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout,activation=self.activation, seed = self.seed, self_loop_and_norm=False)
         elif self.model_type.upper() == "SAGE":
-            return SAGE(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout,activation=self.activation, seed = self.seed)
+            return SAGE(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout,activation=self.activation, seed = self.seed, self_loop_and_norm=False)
         elif self.model_type.upper() == "GIN":
-            return GIN(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout, activation=self.activation, seed = self.seed)
+            return GIN(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout, activation=self.activation, seed = self.seed, self_loop_and_norm=False)
         else:
             self.logger.error(f"Unsupported model_type: {self.model_type}")
             raise ValueError(f"Unsupported model_type: {self.model_type}")
@@ -474,7 +490,7 @@ class GNNEmbedding:
         loss_fn = nn.MSELoss()
 
         best_loss = float("inf")
-        patience = 100
+        patience = 50
         counter = 0
 
         for epoch in range(1, self.num_epochs + 1):
@@ -499,8 +515,8 @@ class GNNEmbedding:
             else:
                 counter += 1
 
-            if epoch % 50 == 0 or epoch == 1 or epoch == self.num_epochs:
-                self.logger.info(f"Epoch [{epoch}/{self.num_epochs}] - Loss: {loss.item():.4f} - EarlyStop: {counter}/{patience}")
+            if epoch % 100 == 0 or epoch == 1 or epoch == self.num_epochs:
+                self.logger.info(f"Epoch [{epoch}/{self.num_epochs}] | Loss: {loss.item():.4f} | EarlyStop: {counter}/{patience}")
 
             if counter >= patience:
                 self.logger.warning(f"Early stopping triggered at epoch {epoch}. Best loss: {best_loss:.4f}")
@@ -544,7 +560,7 @@ class GNNEmbedding:
                 gpu=self.device.type,
                 seed=self.seed,
                 tune=False,
-                activation=self.activation,
+                activation=config["activation"],
                 output_dir=self.output_dir,
             )
 
@@ -554,19 +570,12 @@ class GNNEmbedding:
             X = node_embeddings.detach().cpu().numpy()
 
             dim_stds = np.std(X, axis=0)
-            keep_dims = dim_stds >= 1e-4
+            keep_dims = dim_stds >= 1e-5
             num_dims_kept = np.sum(keep_dims)
 
             if num_dims_kept == 0:
-                self.logger.warning(
-                    "All embedding dimensions are nearly constant. Discarding trial."
-                )
-                tune.report({
-                    "mse": 1e6,
-                    "composite_score": 1e6,
-                    "mean_dim_std": 0.0
-                })
-
+                self.logger.warning("All embedding dimensions are nearly constant. Discarding trial.")
+                tune.report({"mse": 1e8,"composite_score": 1e8,"mean_dim_std": 0.0})
                 return
 
             X = X[:, keep_dims]
@@ -574,15 +583,8 @@ class GNNEmbedding:
             mean_dim_std = np.mean(new_dim_stds)
 
             y = tuned_instance._prepare_node_labels().values
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=0.3, random_state=self.seed
-            )
-            reg = RandomForestRegressor(
-                n_estimators=150,
-                max_depth=None,
-                n_jobs=-1,
-                random_state=self.seed
-            )
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=self.seed)
+            reg = RandomForestRegressor()
             reg.fit(X_train, y_train)
             y_pred = reg.predict(X_test)
             mse = mean_squared_error(y_test, y_pred)
@@ -592,7 +594,6 @@ class GNNEmbedding:
                 "mse": mse,
                 "composite_score": composite_score,
                 "mean_dim_std": mean_dim_std,
-
                 "dims_original": len(dim_stds),
                 "dims_dropped": int(len(dim_stds) - num_dims_kept)
             })
@@ -604,25 +605,24 @@ class GNNEmbedding:
             traceback.print_exc()
             tune.report({"mse": 1e8, "composite_score": 1e8, "mean_dim_std": 0.0})
 
-
-    def run_gnn_embedding_tuning(self, num_samples=15):
+    def run_gnn_embedding_tuning(self, num_samples=20):
         """
         Run hyperparameter tuning with Ray Tune.
         """
         num_nodes = self.adjacency_matrix.shape[0]
         config = {
             "model_type": tune.choice(["GAT","GCN","SAGE","GIN"]),
-            "hidden_dim": tune.choice([16, 32, 64, 128, 256, 512]),
-            "layer_num": tune.choice([2, 3, 4, 5, 6]),
-            "dropout": tune.choice([0.0, 0.1, 0.2, 0.3, 0.4, 0.5]),
-            "num_epochs": tune.choice([128, 256, 512, 1024, 2048]),
-            "lr": tune.loguniform(1e-6, 1e-3),
-            "weight_decay": tune.choice([0.0, 1e-6, 1e-5, 1e-4, 1e-3]),
+            "hidden_dim": tune.choice([16, 32, 64, 128, 256, 512, 1024]),
+            "layer_num": tune.choice([2, 3, 4, 5, 6, 7]),
+            "dropout": tune.choice([0.0, 0.2, 0.4, 0.6]),
+            "num_epochs": tune.choice([256, 512, 1024, 2048, 4096]),
+            "lr": tune.loguniform(1e-6, 1e-2),
+            "weight_decay": tune.choice([1e-6, 1e-5, 1e-4, 1e-3, 1e-2]),
             "activation": tune.choice(["relu", "elu", "leaky_relu"]),
         }
 
-        scheduler = ASHAScheduler(metric="composite_score", mode="min", grace_period=1, reduction_factor=2)
-        reporter = CLIReporter(metric_columns=["mse", "training_iteration"])
+        scheduler = ASHAScheduler(metric="mse", mode="min", grace_period=1, reduction_factor=2)
+        reporter = CLIReporter(metric_columns=["mse", "composite_score", "mean_dim_std", "training_iteration"])
 
         def short_dirname_creator(trial):
             return f"_{trial.trial_id}"
@@ -646,23 +646,36 @@ class GNNEmbedding:
         save_dir = Path(self.output_dir)/"tuning_results"
         os.makedirs(save_dir, exist_ok=True)
 
-        best_trial = result.get_best_trial("composite_score", "min", "last")
-
-        best_config_json = json.dumps(best_trial.config, indent=4)
-
+        # we grab the logged results
         try:
             df = result.get_dataframe()
         except AttributeError:
-            df = result.dataframe(metric="composite_score", mode="min")
+            df = result.dataframe()
+
+        # only pull the last row per trial
+        df_last = (df.sort_values("training_iteration").groupby("trial_id", as_index=False).last())
+        K = min(3, len(df_last))
+        top_k = df_last.nsmallest(K, "mse")
+
+        # lowest composite_score among the top K trials
+        best_row = top_k.loc[top_k.composite_score.idxmin()]
+        best_trial_id = best_row["trial_id"]
+        best_trial = None
+        for trial in result.trials:
+            if trial.trial_id == best_trial_id:
+                best_trial = trial
+                break
+
+        if best_trial is None:
+            raise RuntimeError(f"Could not find trial with id {best_trial_id}")
 
         summary_file = save_dir / f"summary_{num_nodes}_{timestamp}.txt"
 
         with open(summary_file, "w") as f:
-            f.write(f"Best trial\n")
-            f.write(best_config_json)
-            f.write("\n\n")
-            f.write(df.to_string(index=False))
-
+            f.write(f"Top {K} by MSE:\n")
+            f.write(top_k.to_string(index=False))
+            f.write("\n\nFinal pick:\n")
+            f.write(json.dumps(best_trial.config, indent=4))
 
         self.logger.info(f"Full trial summary saved to {summary_file}")
 
@@ -672,7 +685,6 @@ class GNNEmbedding:
 
         # best config as a JSON file
         timestamp = datetime.now().strftime("%m%d_%H_%M_%S")
-        save_dir.mkdir(exist_ok=True)
         best_params_file = save_dir / f"emb_tuned_{num_nodes}_{timestamp}.json"
         with open(best_params_file, "w") as f:
             json.dump(best_trial.config, f, indent=4)

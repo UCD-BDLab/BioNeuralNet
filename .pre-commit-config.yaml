@@ -28,7 +28,8 @@ repos:
     hooks:
       - id: remove-pyc-and-pycache
         name: Remove .pyc files and __pycache__ directories
-        entry: bash -c "find . \( -path './.venv' -o -path './docs' -o -path './node_modules' \) -prune -o -type f -name '*.pyc' -exec rm -f {} + -o -type d -name '__pycache__' -exec rm -rf {} +"
+        entry: bash -c 'find . \( -path "./.enviroment" -o -path "./.testing" -o -path "./.venv" -o -path "./docs" -o -path "./node_modules" \) -prune -o -type f -name "*.pyc" -exec rm -f {} + -o -type d -name "__pycache__" -exec rm -rf {} +'
+        pass_filenames: false
         language: system
         stages: [pre-commit]
 

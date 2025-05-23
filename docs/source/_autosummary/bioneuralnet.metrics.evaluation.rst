@@ -8,18 +8,26 @@ bioneuralnet.metrics.evaluation
 
    .. autosummary::
    
+      accuracy_score
       evaluate_f1m
       evaluate_f1w
       evaluate_model
       evaluate_rf
-      evaluate_single_run
+      f1_score
       get_logger
-      plot_grouped_performance
-      plot_multiple_metrics
+      r2_score
+      train_test_split
    
    .. rubric:: Classes
 
    .. autosummary::
    
-      Path
+      RandomForestClassifier
+      RandomForestRegressor
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      DataConversionWarning
    

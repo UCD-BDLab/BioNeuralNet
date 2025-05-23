@@ -19,4 +19,6 @@ bioneuralnet.clustering.correlated\_pagerank
       Any
       CLIReporter
       CorrelatedPageRank
+      PCA
+      StandardScaler
    

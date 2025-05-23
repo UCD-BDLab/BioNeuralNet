@@ -17,6 +17,7 @@ BioNeuralNet - Multi-Omics Integration with Graph Neural Networks
    :align: center
    :alt: BioNeuralNet Logo
 
+
 :doc:`installation`
 -------------------
 
@@ -112,16 +113,16 @@ Below is a quick example demonstrating the following steps:
 
    # Step 1: Load your data or use one of the provided datasets
    Example = DatasetLoader("example1")
-   omics_proteins = Example.data["X1"]
-   omics_metabolites = Example.data["X2"]
-   phenotype_data = Example.data["Y"]
-   clinical_data = Example.data["clinical_data"]
+   omics_genes = Example.data["X1"]
+   omics_proteins = Example.data["X2"]
+   phenotype = Example.data["Y"]
+   clinical = Example.data["clinical_data"]
 
    # Step 2: Network Construction
    smccnet = SmCCNet(
-       phenotype_df=phenotype_data,
-       omics_dfs=[omics_proteins, omics_metabolites],
-       data_types=["protein", "metabolite"],
+       phenotype_df=phenotype,
+       omics_dfs=[omics_genes, omics_proteins],
+       data_types=["Genes", "Proteins"],
        kfold=5,
        summarization="PCA",
    )
@@ -131,12 +132,12 @@ Below is a quick example demonstrating the following steps:
    # Step 3: Disease Prediction (DPMON)
    dpmon = DPMON(
        adjacency_matrix=global_network,
-       omics_list=[omics_proteins, omics_metabolites],
-       phenotype_data=phenotype_data,
-       clinical_data=clinical_data,
+       omics_list=[omics_genes, omics_proteins],
+       phenotype_data=phenotype,
+       clinical_data=clinical,
        model="GCN",
    )
-   predictions = dpmon.run()
+   predictions, avg_accuracy = dpmon.run()
    print("Disease phenotype predictions:\n", predictions)
 
 **BioNeuralNet Core Features**
@@ -193,8 +194,8 @@ For an End-to-End example example of BioNeuralNet, see :doc:`Quick_Start` and :d
    installation
    gnns
    clustering
-   metrics
    utils
+   metrics
    downstream_tasks
    Quick_Start.ipynb
    TCGA-BRCA_Dataset.ipynb

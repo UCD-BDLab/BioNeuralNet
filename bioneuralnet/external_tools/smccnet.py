@@ -32,7 +32,7 @@ class SmCCNet:
         omics_dfs (List[pd.DataFrame]): List of omics DataFrames.
         data_types (List[str]): List of omics data type strings (e.g. ["Genes", "miRNA"]).
         kfold (int): Number of folds for cross-validation. Default=5.
-        eval_method (str): e.g. 'accuracy', 'auc', 'f1', or 'Rsquared' (if you patch SmCCNet).
+        eval_method (str): e.g. 'accuracy', 'auc', 'f1', or 'Rsquared'.
         subSampNum (int): # of subsamplings. Default=50.
         summarization (str): 'NetSHy', 'PCA', or 'SVD'. Default='NetSHy'.
         seed (int): Random seed. Default=123.

@@ -8,9 +8,13 @@ bioneuralnet.downstream\_task.subject\_representation
 
    .. autosummary::
    
+      accuracy_score
       generate_hidden_dims
       get_activation
       get_logger
+      mean_squared_error
+      r2_score
+      train_test_split
    
    .. rubric:: Classes
 
@@ -20,7 +24,10 @@ bioneuralnet.downstream\_task.subject\_representation
       Any
       AutoEncoder
       CLIReporter
+      PCA
       Path
+      RandomForestClassifier
+      RandomForestRegressor
       SubjectRepresentation
       datetime
    

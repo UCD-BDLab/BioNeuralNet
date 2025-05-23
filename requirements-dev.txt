@@ -12,6 +12,8 @@ nbsphinx
 pandoc
 nbconvert
 ipykernel
+myst_nb
+furo
 
 # code quality and formatting
 flake8

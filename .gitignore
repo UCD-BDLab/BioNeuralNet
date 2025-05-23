@@ -16,11 +16,15 @@ bioneuralnet.egg-info
 /build/
 /docker_files/
 .mypy_cache
-Quick Start.ipynb
+Quick_Start_testing*.ipynb
 TCGA-BRCA_Datatest.ipynb
 DevNotes.md
 TCGA-BRCA_Datatest_copy.ipynb
 split
+doc_examples_outdated
+dpmon_output
+.enviroment
+TCGA-BRCA_Dataset_testing*.ipynb
 # Other example data and tests not needed in the repo.
 
 Output**

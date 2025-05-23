@@ -18,6 +18,9 @@ bioneuralnet.clustering.correlated\_louvain
    .. autosummary::
    
       ASHAScheduler
+      Any
       CLIReporter
       CorrelatedLouvain
+      PCA
+      StandardScaler
    

@@ -33,7 +33,7 @@ class HybridLouvain:
         Y: pd.DataFrame,
         k3: float = 0.2,
         k4: float = 0.8,
-        max_iter: int = 10,
+        max_iter: int = 3,
         weight: str = "weight",
         gpu: bool = False,
         seed: Optional[int] = None,

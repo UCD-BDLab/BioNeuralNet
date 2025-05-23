@@ -42,7 +42,8 @@ Example:
        clinical_data=clinical_data,
        model='GAT'
    )
-   predictions = dpmon_obj.run()
+   predictions, avg_accuracy = dpmon.run()
+   print("Disease phenotype predictions:\n", predictions)
 
 **Methods**:
 
