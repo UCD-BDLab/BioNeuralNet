@@ -5,3 +5,4 @@ sphinxcontrib-napoleon
 pandoc
 nbsphinx
 myst_nb
+furo
