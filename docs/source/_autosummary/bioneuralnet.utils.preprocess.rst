@@ -28,6 +28,7 @@ bioneuralnet.utils.preprocess
 
    .. autosummary::
    
+      OrdinalEncoder
       RandomForestClassifier
       RandomForestRegressor
       RobustScaler

@@ -246,7 +246,7 @@ def setup_device(gpu, cuda):
 def slice_omics_datasets(
     omics_dataset: pd.DataFrame, adjacency_matrix: pd.DataFrame
 ) -> List[pd.DataFrame]:
-    logger.info("Slicing omics dataset based on network nodes.")
+    logger.debug("Slicing omics dataset based on network nodes.")
     omics_network_nodes_names = adjacency_matrix.index.tolist()
 
     # Clean omics dataset columns
@@ -272,7 +272,7 @@ def build_omics_networks_tg(
     omics_datasets: List[pd.DataFrame],
     clinical_data: pd.DataFrame,
 ) -> List[Data]:
-    logger.info("Building PyTorch Geometric Data object from adjacency matrix.")
+    logger.debug("Building PyTorch Geometric Data object from adjacency matrix.")
     omics_network_nodes_names = adjacency_matrix.index.tolist()
 
     G = nx.from_pandas_adjacency(adjacency_matrix)
@@ -285,7 +285,7 @@ def build_omics_networks_tg(
 
     if clinical_data is not None and not clinical_data.empty:
         clinical_vars = clinical_data.columns.tolist()
-        logger.info(f"Using clinical vars for node features: {clinical_vars}")
+        logger.debug(f"Using clinical vars for node features: {clinical_vars}")
         omics_dataset = omics_datasets[0]
         missing_nodes = set(omics_network_nodes_names) - set(omics_dataset.columns)
         if missing_nodes:
@@ -385,11 +385,11 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
         avg_accuracy = sum(accuracies) / len(accuracies)
         std_accuracy = statistics.stdev(accuracies) if len(accuracies) > 1 else 0.0
         logger.info(f"Best Accuracy: {best_accuracy:.4f}")
-        logger.info(f"Average Accuracy: {avg_accuracy:.4f}")
-        logger.info(f"Standard Deviation of Accuracy: {std_accuracy:.4f}")
+        logger.info(f"Average Accuracy across {len(accuracies)} models: {avg_accuracy:.4f}")
+        logger.info(f"Standard Deviation across all models: {std_accuracy:.4f}")
+        logger.info(f"Returning best model predictions and average accuracy (predictions, avg_accuracy).")
 
     return best_predictions_df, avg_accuracy
-
 
 def run_hyperparameter_tuning(
     dpmon_params, adjacency_matrix, combined_omics, clinical_data
@@ -408,7 +408,7 @@ def run_hyperparameter_tuning(
         "weight_decay": tune.loguniform(1e-4, 1e-1),
         "nn_hidden_dim1": tune.choice([4, 8, 16, 32, 64, 128]),
         "nn_hidden_dim2": tune.choice([4, 8, 16, 32, 64, 128]),
-        "num_epochs": tune.choice([2, 16, 64, 512, 1024, 4096, 8192]),
+        "num_epochs": tune.choice([16, 64, 256, 512, 1024,2048, 4096, 8192]),
     }
 
     reporter = CLIReporter(metric_columns=["loss", "accuracy", "training_iteration"])
@@ -501,7 +501,7 @@ def run_hyperparameter_tuning(
 
         result = tune.run(
             tune_train_n,
-            resources_per_trial={"cpu": 2, "gpu": gpu_resources},
+            resources_per_trial={"cpu": 1, "gpu": gpu_resources},
             config=pipeline_configs,
             num_samples=10,
             verbose=0,
@@ -515,9 +515,7 @@ def run_hyperparameter_tuning(
         best_trial = result.get_best_trial("loss", "min", "last")
         logger.info("Best trial config: {}".format(best_trial.config))
         logger.info("Best trial final loss: {}".format(best_trial.last_result["loss"]))
-        logger.info(
-            "Best trial final accuracy: {}".format(best_trial.last_result["accuracy"])
-        )
+        logger.info("Best trial final accuracy: {}".format(best_trial.last_result["accuracy"]))
         best_configs.append(best_trial.config)
 
     best_configs_df = pd.DataFrame(best_configs)
@@ -534,15 +532,13 @@ def train_model(model, criterion, optimizer, train_data, train_labels, epoch_num
         optimizer.step()
 
         if (epoch + 1) % 10 == 0 or epoch == 0:
-            logger.info(f"Epoch [{epoch+1}/{epoch_num}], Loss: {loss.item():.4f}")
+            logger.debug(f"Epoch [{epoch+1}/{epoch_num}], Loss: {loss.item():.4f}")
 
     model.eval()
     with torch.no_grad():
         predictions, _ = model(train_data, train_labels["omics_network"])
         _, predicted = torch.max(predictions, 1)
-        accuracy = (predicted == train_labels["labels"]).sum().item() / len(
-            train_labels["labels"]
-        )
+        accuracy = (predicted == train_labels["labels"]).sum().item() / len(train_labels["labels"])
         logger.info(f"Training Accuracy: {accuracy:.4f}")
 
     return accuracy

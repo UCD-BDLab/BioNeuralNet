@@ -18,10 +18,8 @@ BioNeuralNet - Multi-Omics Integration with Graph Neural Networks
    :alt: BioNeuralNet Logo
 
 
-:doc:`installation`
--------------------
-
-To install BioNeuralNet via pip:
+Install BioNeuralNet via pip:
+-----------------------------
 
 .. code-block:: bash
 
@@ -194,12 +192,11 @@ For an End-to-End example example of BioNeuralNet, see :doc:`Quick_Start` and :d
    installation
    gnns
    clustering
-   utils
    metrics
+   utils
    downstream_tasks
    Quick_Start.ipynb
    TCGA-BRCA_Dataset.ipynb
-   TOPMED.ipynb
    tutorials/index
    external_tools/index
    user_api

@@ -2,127 +2,152 @@ Metrics
 =======
 
 The metrics module includes functions that perform statistical analyses and generate visualizations. Functions from the metrics module allow users to assess and explore network-based embeddings, evaluate clustering performance, and explore the tabular data and network structure.
+The following examples and plots are from our :doc:`Quick_Start`.
 
 Visualization
 -------------
 
 The module also contains several plotting functions:
 
-- :func:`bioneuralnet.metrics.plot.plot_variance_distribution` plots the distribution of feature variances.
-- :func:`bioneuralnet.metrics.plot.plot_embeddings` visualizes high-dimensional embeddings by projecting them into a 2 dimensional space.
 - :func:`bioneuralnet.metrics.plot.plot_network` displays the network graph from an adjacency matrix.
-- :func:`bioneuralnet.metrics.plot.plot_variance_by_feature` shows the variance of each feature against its index.
-- :func:`bioneuralnet.metrics.plot.plot_multiple_metrics` shows the variance of each feature against its index.
-
+- :func:`bioneuralnet.metrics.plot.plot_embeddings` visualizes high-dimensional embeddings by projecting them into a 2 dimensional space.
 
 Example Usage
 -------------
 
-**1. Network Visualization**
-Visualization of network with a 0.12 weight threshold. The top right corner shows the orignal network metrics.
+**Network Visualization**
+Visualization of network showing labels but no edge weights.
 
 .. image:: _static/plot_network.png
    :align: center
-   :alt: Network Visualization of Louvain Clusters
+   :alt: Network Visualization of Louvain Clusters exampleOne
+
+**Table Output:**
+
++-------+-----------+--------+
+| Index |   Omic    | Degree |
++=======+===========+========+
+|  11   | Gene_411  |   6    |
++-------+-----------+--------+
+|  16   | Gene_7    |   5    |
++-------+-----------+--------+
+|  24   | Gene_174  |   5    |
++-------+-----------+--------+
+|   3   | Gene_1    |   4    |
++-------+-----------+--------+
+|  28   | Gene_114  |   4    |
++-------+-----------+--------+
+
+Visualization of network showing labels and edge weights.
+
+.. image:: _static/plot_network2.png
+   :align: center
+   :alt: Network Visualization of Louvain Clusters exampleTwo
+
+**Table Output:**
+
++--------+-----------+--------+
+| Index  |   Omic    | Degree |
++========+===========+========+
+|   1    | Gene_7    |   4    |
++--------+-----------+--------+
+|   2    | Gene_6    |   4    |
++--------+-----------+--------+
+|   3    | Gene_1    |   4    |
++--------+-----------+--------+
+|   4    | Gene_446  |   4    |
++--------+-----------+--------+
+|   5    | Gene_53   |   4    |
++--------+-----------+--------+
 
 .. code-block:: python
 
    from bioneuralnet.metrics import plot_network
    from bioneuralnet.metrics import louvain_to_adjacency
 
-   cluster1 = louvain_clusters[0]
-   cluster2 = louvain_clusters[1]
+   cluster1 = hybrid_result[0]
+   cluster2 = hybrid_result[1]
 
    # Convert Louvain clusters into adjacency matrices
    louvain_adj1 = louvain_to_adjacency(cluster1)
    louvain_adj2 = louvain_to_adjacency(cluster2)
 
    # Plot using the converted adjacency matrices
-   cluster1_mapping = plot_network(louvain_adj1, weight_threshold=0.12, show_labels=True, show_edge_weights=False)
-   display(cluster1_mapping.head())
+   cluster1_mapping = plot_network(louvain_adj1, weight_threshold=0.1, show_labels=True, show_edge_weights=False)
+   print(cluster1_mapping.head())
+   cluster2_mapping = plot_network(louvain_adj2, weight_threshold=0.01, show_labels=True, show_edge_weights=True)
+   print(cluster2_mapping.head())
 
-   cluster2_mapping = plot_network(louvain_adj2, weight_threshold=0.12, show_labels=True, show_edge_weights=False)
-   display(cluster2_mapping.head())
 
-**2. Embeddings Visualization**
-Visualizing a 64 dimension embedding space projected into a 2 dimensional space.
+**Embeddings Visualization**
 
-.. image:: _static/plot_embeddings.png
+Visualizing a 16 dimension embedding space projected into a 2 dimensional space.
+
+.. image:: _static/embeddings.png
    :align: center
    :alt: 2D t-SNE Projection of Embeddings
 
 .. code-block:: python
-
-   from bioneuralnet.network_embedding import GNNEmbedding
-
-   merged_omics = pd.concat([omics1, omics2], axis=1)
-
-   gnn = GNNEmbedding(
-       adjacency_matrix=global_network,
-       omics_data=merged_omics,
-       phenotype_data=phenotype,
-       clinical_data=clinical,
-       phenotype_col="phenotype",
-   )
-
-   gnn.fit()
-   embeddings = gnn.embed(as_df=True)
-   display(embeddings.head())
 
    from bioneuralnet.metrics import plot_embeddings
 
    # Using our embeddings instance, we get the necessary labels for the graph.
    node_labels = gnn._prepare_node_labels()
    embeddings_array = embeddings.values  
-
    embeddings_plot = plot_embeddings(embeddings_array, node_labels)
-
-
-**3. Variance Distribution**
-The following example generates and plots the distribution of feature variances.
-
-.. image:: _static/variance_distribution.png
-   :align: center
-   :alt: Variance Distribution Plot
-
-.. code-block:: python
-
-   from bioneuralnet.metrics import plot_variance_distribution
-
-   fig = plot_variance_distribution(omics2, bins=100)
-
-
-**4. Variance Per Feature**
-Plots variance for the first 20 features.
-
-.. image:: _static/variance_by_feature.png
-   :align: center
-   :alt: Variance Per Feature Plot
-
-.. code-block:: python
-
-   from bioneuralnet.metrics import plot_variance_by_feature
-
-   fig2 = plot_variance_by_feature(omics2.iloc[:, 0:20])
 
 Correlation Metrics
 -------------------
 
-- :func:`bioneuralnet.metrics.correlation.omics_correlation` function computes the Pearson correlation coefficient between the first principal component of the omics data and a phenotype. The data are standardized and reduced in dimension by PCA before correlation is computed.
-- :func:`bioneuralnet.metrics.correlation.cluster_correlation` function computes the Pearson correlation for a cluster of features with a phenotype. Clusters with fewer than two features or zero variance are handled appropriately.
+- :func:`bioneuralnet.metrics.correlation.cluster_correlation` computes the Pearson correlation for a cluster of features with a phenotype. Clusters with fewer than two features or with zero variance are handled properly.
+
+**Cluster Comparison**
+Hybrid louvain with the SmCCNet clusters.
+
+.. image:: _static/clusters.png
+   :align: center
+   :alt: clusters Graph Comparison
+
+.. code-block:: python
+
+   # Lets compare hytbrid louvain with the SmCCNet clusters
+   print("Number of clusters:", len(hybrid_result))
+
+   compare_clusters(hybrid_result, clusters, phenotype, merged_omics)
 
 Evaluation
 ----------
 
-Functions to train and evaluate RandomForest over one or multiple runs (Mostly used internally for testings purposes):
+- :func:`bioneuralnet.metrics.evaluation.evaluate_rf` trains and evaluates a Random Forest model over multiple runs.
+- :func:`bioneuralnet.metrics.plot.plot_multiple_metrics` plots multiple metrics on the same figure.
 
-- :func:`bioneuralnet.metrics.evaluation.evaluate_model` evaluates a model over multiple runs.
-- :func:`bioneuralnet.metrics.evaluation.evaluate_rf` evaluates a Random Forest model.
-- :func:`bioneuralnet.metrics.evaluation.evaluate_f1w` computes the weighted F1 score.
-- :func:`bioneuralnet.metrics.evaluation.evaluate_f1m` computes the macro F1 score.
+**Plotting Multiple Performance Metrics**
+Visualizing performance metrics comparison.
+
+.. image:: _static/performance.png
+   :align: center
+   :alt: plot of multiple performance metrics
+
+.. code-block:: python
+
+   from bioneuralnet.metrics import evaluate_rf, plot_multiple_metrics
+
+   # raw omics evaluation
+   X_raw = merged_omics.values
+   y_global = phenotype.values
+   rf_acc, rd_f1w, rf_f1m = evaluate_rf(X_raw, y_global, n_estimators=100, runs=5, mode="classification")
+
+   # metrics dictionary
+   metrics = {
+      "Accuracy": {"Raw": rf_acc,"DPMON": dpmon_acc_tuple},
+      "F1-Weighted": {"Raw": rd_f1w,"DPMON": dpmon_f1w_tuple},
+      "F1-Macro": {"Raw": rf_f1m,"DPMON": dpmon_f1m_tuple}
+   }
+
+   plot_multiple_metrics(metrics)
 
 
 Further Information
 -------------------
 
-For more details on each function and its parameters, please refer to the inline documentation in the source code. Our GitHub repository is available from the index page.
+For more details on each function and its parameters, see the metrics reference: https://bioneuralnet.readthedocs.io/en/latest/_autosummary/bioneuralnet.metrics.html

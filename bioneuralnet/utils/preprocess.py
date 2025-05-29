@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 
-from sklearn.preprocessing import RobustScaler
+from sklearn.preprocessing import RobustScaler, OrdinalEncoder
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.feature_selection import f_classif, f_regression
 from statsmodels.stats.multitest import multipletests
@@ -54,14 +54,14 @@ def preprocess_clinical(X: pd.DataFrame, y: pd.Series, top_k: int = 10, scale: b
         df_numeric_scaled = pd.DataFrame(scaled_array,columns=df_numeric_clean.columns,index=df_numeric_clean.index)
     else:
         df_numeric_scaled = df_numeric_clean.copy()
-
+        
     if not df_categorical.empty:
         df_cat_filled = df_categorical.fillna("Missing").astype(str)
         df_cat_encoded = pd.get_dummies(df_cat_filled, drop_first=True)
     else:
         df_cat_encoded = pd.DataFrame(index=df_numeric_scaled.index)
 
-    df_combined = pd.concat([df_numeric_scaled, df_cat_encoded, df_ignore],axis=1,join="inner")
+    df_combined = pd.concat([df_numeric_scaled, df_cat_encoded],axis=1,join="inner")
     df_features = df_combined.loc[:, df_combined.std(axis=0) > 0]
 
     if y_series.nunique() <= 10:
@@ -93,6 +93,12 @@ def preprocess_clinical(X: pd.DataFrame, y: pd.Series, top_k: int = 10, scale: b
     selected_columns = []
     for idx in selected_idx:
         selected_columns.append(feature_names[idx])
+    
+    df_selected = df_features[selected_columns].copy()
+
+    for col in df_ignore.columns:
+        if col in selected_columns:
+            df_selected[col] = df_ignore[col]
 
     return df_features[selected_columns]
 
