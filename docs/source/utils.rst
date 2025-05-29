@@ -1,7 +1,8 @@
 Utils
 =====
 
-The `utils` module provides a collection of supporting functions for data preparation, logging, graph construction, and exploratory analysis. These utilities streamline common preprocessing workflows and enable efficient manipulation of omics and clinical datasets within BioNeuralNet.
+The `utils` module provides a collection of supporting functions for data preparation, logging, graph construction, and exploratory analysis. 
+These utilities streamline common preprocessing workflows and enable efficient manipulation of omics and clinical datasets.
 
 RData Conversion
 ----------------
@@ -108,8 +109,7 @@ A collection of data-cleaning and feature-selection functions for clinical and o
 
 **Clinical Preprocessing**
 
-- :func:`bioneuralnet.utils.preprocess.preprocess_clinical`  
-  Splits numeric and categorical features; replaces Inf/NaN; optionally scales numeric data (RobustScaler); encodes categoricals; drops zero-variance; and selects top-k features by RandomForest importance.  
+- :func:`bioneuralnet.utils.preprocess.preprocess_clinical` splits numeric and categorical features; replaces Inf/NaN; optionally scales numeric data (RobustScaler); encodes categoricals; drops zero-variance; and selects top-k features by RandomForest importance.  
 
   **Example**:
 
@@ -118,8 +118,7 @@ A collection of data-cleaning and feature-selection functions for clinical and o
       from bioneuralnet.utils.preprocess import preprocess_clinical
       df_top = preprocess_clinical(X, y, top_k=10, scale=True)
 
-- :func:`bioneuralnet.utils.preprocess.clean_inf_nan`  
-  Replaces Inf with NaN, imputes medians, drops zero-variance columns, and logs counts.  
+- :func:`bioneuralnet.utils.preprocess.clean_inf_nan` replaces Inf with NaN, imputes medians, drops zero-variance columns, and logs counts.  
 
   **Example**:
 
@@ -130,8 +129,7 @@ A collection of data-cleaning and feature-selection functions for clinical and o
 
 **Variance-Based Selection**
 
-- :func:`bioneuralnet.utils.preprocess.select_top_k_variance`  
-  Cleans data, then picks the top-k numeric features by variance.  
+- :func:`bioneuralnet.utils.preprocess.select_top_k_variance` cleans data, then picks the top-k numeric features by variance.  
 
   **Example**:
 
@@ -142,22 +140,22 @@ A collection of data-cleaning and feature-selection functions for clinical and o
 
 **Correlation-Based Selection**
 
-- :func:`bioneuralnet.utils.preprocess.select_top_k_correlation`  
-  - **Supervised:** if you pass `y`, selects features by absolute Pearson correlation with `y`.  
-  - **Unsupervised:** if `y=None`, picks features with the lowest average inter-feature correlation (redundancy reduction).  
+- :func:`bioneuralnet.utils.preprocess.select_top_k_correlation`:
+
+   - **Supervised:** if you pass `y`, selects features by absolute Pearson correlation with `y`.  
+   - **Unsupervised:** if `y=None`, picks features with the lowest average inter-feature correlation (redundancy reduction).  
 
   **Example**:
 
    .. code-block:: python
 
       from bioneuralnet.utils.preprocess import select_top_k_correlation
-      df_sup = select_top_k_correlation(X, y, top_k=100)   # supervised  
-      df_unsup = select_top_k_correlation(X, top_k=100)    # unsupervised
+      df_sup = select_top_k_correlation(X, y, top_k=100) # supervised  
+      df_unsup = select_top_k_correlation(X, top_k=100) # unsupervised
 
 **RandomForest Feature Importance**
 
-- :func:`bioneuralnet.utils.preprocess.select_top_randomforest`  
-  Requires numeric inputs; cleans data; drops zero-variance; fits RandomForest; and returns the top-k features by importance.  
+- :func:`bioneuralnet.utils.preprocess.select_top_randomforest` fits RandomForest (classification or regression), and returns the top-k features by importance.  
 
   **Example**:
 
@@ -168,8 +166,7 @@ A collection of data-cleaning and feature-selection functions for clinical and o
 
 **ANOVA F-Test Selection**
 
-- :func:`bioneuralnet.utils.preprocess.top_anova_f_features`  
-  Runs ANOVA F-test (classification or regression), applies FDR correction, selects all significant features, and pads with next-best to reach `max_features`.  
+- :func:`bioneuralnet.utils.preprocess.top_anova_f_features` runs ANOVA F-test (classification or regression), applies FDR correction, selects all significant features, and pads with next-best to reach `max_features`.  
 
   **Example**:
 
@@ -180,16 +177,16 @@ A collection of data-cleaning and feature-selection functions for clinical and o
 
 **Network Pruning**
 
-- :func:`bioneuralnet.utils.preprocess.prune_network`  
-  Prunes edges below a weight threshold, removes isolates, and logs before/after stats.  
+- :func:`bioneuralnet.utils.preprocess.prune_network` prunes edges below a weight threshold, removes isolates, and logs before/after stats.  
 
-  **Example**::
+  **Example**:
+
+   .. code-block:: python
 
       from bioneuralnet.utils.preprocess import prune_network
       pruned = prune_network(adj_df, weight_threshold=0.1)
 
-- :func:`bioneuralnet.utils.preprocess.prune_network_by_quantile`  
-  Uses a quantile cutoff on edge weights, prunes accordingly, removes isolates, and logs stats.  
+- :func:`bioneuralnet.utils.preprocess.prune_network_by_quantile` uses a quantile cutoff on edge weights, prunes accordingly, removes isolates, and logs stats.  
 
   **Example**:
 
@@ -198,8 +195,7 @@ A collection of data-cleaning and feature-selection functions for clinical and o
       from bioneuralnet.utils.preprocess import prune_network_by_quantile
       pruned_q = prune_network_by_quantile(adj_df, quantile=0.75)
 
-- :func:`bioneuralnet.utils.preprocess.network_remove_low_variance`  
-  Drops rows/columns in the adjacency matrix whose variance falls below a threshold.  
+- :func:`bioneuralnet.utils.preprocess.network_remove_low_variance` drops rows/columns in the adjacency matrix whose variance falls below a threshold.  
 
   **Example**:
 
@@ -208,8 +204,7 @@ A collection of data-cleaning and feature-selection functions for clinical and o
       from bioneuralnet.utils.preprocess import network_remove_low_variance
       filtered = network_remove_low_variance(adj_df, threshold=1e-5)
 
-- :func:`bioneuralnet.utils.preprocess.network_remove_high_zero_fraction`  
-  Removes rows/columns where the fraction of zero weights exceeds a threshold (default 0.95).  
+- :func:`bioneuralnet.utils.preprocess.network_remove_high_zero_fraction` removes rows/columns where the fraction of zero weights exceeds a threshold (default 0.95).  
 
   **Example**:
 
@@ -222,54 +217,49 @@ A collection of data-cleaning and feature-selection functions for clinical and o
 Data Summary Utilities
 ----------------------
 
-- :func:`bioneuralnet.utils.data_summary.variance_summary`
-  - Computes summary statistics for column variances.
+- :func:`bioneuralnet.utils.data.variance_summary` computes summary statistics for column variances.
 
   **Example**:
 
    .. code-block:: python
 
-      from bioneuralnet.utils.data_summary import variance_summary
+      from bioneuralnet.utils.data import variance_summary
       stats = variance_summary(df, low_var_threshold=1e-4)
 
-- :func:`bioneuralnet.utils.data_summary.zero_fraction_summary`
-  - Computes statistics for the fraction of zeros per column.
+- :func:`bioneuralnet.utils.data.zero_fraction_summary` computes statistics for the fraction of zeros per column.
 
   **Example**:
 
    .. code-block:: python
 
-      from bioneuralnet.utils.data_summary import zero_fraction_summary
+      from bioneuralnet.utils.data import zero_fraction_summary
       stats = zero_fraction_summary(df, high_zero_threshold=0.5)
 
-- :func:`bioneuralnet.utils.data_summary.expression_summary`
-  - Computes summary of mean expression values across features.
+- :func:`bioneuralnet.utils.data.expression_summary` computes summary of mean expression values across features.
 
   **Example**:
 
    .. code-block:: python
 
-      from bioneuralnet.utils.data_summary import expression_summary
+      from bioneuralnet.utils.data import expression_summary
       stats = expression_summary(df)
 
-- :func:`bioneuralnet.utils.data_summary.correlation_summary`
-  - Computes statistics of each feature's maximum pairwise correlation (excluding self).
+- :func:`bioneuralnet.utils.data.correlation_summary` computes statistics of each feature's maximum pairwise correlation (excluding self).
 
   **Example**:
 
    .. code-block:: python
 
-      from bioneuralnet.utils.data_summary import correlation_summary
+      from bioneuralnet.utils.data import correlation_summary
       stats = correlation_summary(df)
 
-- :func:`bioneuralnet.utils.data_summary.explore_data_stats`
-  - Prints an overall summary (variance, zero fraction, expression, correlation) to stdout.
+- :func:`bioneuralnet.utils.data.explore_data_stats` prints an overall summary (variance, zero fraction, expression, correlation) to stdout.
 
   **Example**:
 
    .. code-block:: python
       
-      from bioneuralnet.utils.data_summary import explore_data_stats
+      from bioneuralnet.utils.data import explore_data_stats
       explore_data_stats(df, name="MyOmicsData")
 
 References

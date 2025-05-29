@@ -28,6 +28,7 @@ tox
 # build dependencies
 setuptools>=42
 twine
+build
 
 #others
 ipywidgets
