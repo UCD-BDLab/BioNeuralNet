@@ -2,11 +2,10 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 
-from sklearn.preprocessing import RobustScaler, OrdinalEncoder
+from sklearn.preprocessing import RobustScaler
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.feature_selection import f_classif, f_regression
 from statsmodels.stats.multitest import multipletests
-from typing import Callable, TypeAlias, overload
 
 from .logger import get_logger
 logger = get_logger(__name__)
