@@ -1,5 +1,5 @@
-BioNeuralNet - Multi-Omics Integration with Graph Neural Networks
-=================================================================
+BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool
+=================================================================================
 
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://github.com/UCD-BDLab/BioNeuralNet/blob/main/LICENSE

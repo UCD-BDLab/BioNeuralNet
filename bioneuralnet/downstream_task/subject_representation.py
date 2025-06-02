@@ -61,14 +61,17 @@ class SubjectRepresentation:
 
         if omics_data is None or omics_data.empty:
             raise ValueError("Omics data must be non-empty.")
-
-        if embeddings is None or embeddings.empty:
-            self.logger.info(
-                "No embeddings provided, please review documentation to see how to generate embeddings.")
+        
+        if embeddings is None:
+            self.logger.warning("No embeddings provided, please review documentation to see how to generate embeddings.")
             raise ValueError("Embeddings must be non-empty.")
 
         if not isinstance(embeddings, pd.DataFrame):
             raise ValueError("Embeddings must be provided as a pandas DataFrame.")
+
+        if embeddings.empty:
+            self.logger.warning("No embeddings provided, please review documentation to see how to generate embeddings.")
+            raise ValueError("Embeddings must be non-empty.")
 
         if tune and phenotype_data is None:
             raise ValueError("Phenotype data must be provided for classification-based tuning.")
@@ -260,6 +263,9 @@ class SubjectRepresentation:
 
         This is so at least 50% of the final output is influenced by the computed weight
         """
+        if not isinstance(reduced, (pd.DataFrame, pd.Series)):
+            raise ValueError("Reduced embeddings must be a pandas DataFrame or Series.")
+        
         missing_features = set(self.omics_data.columns) - set(reduced.index)
         if missing_features:
             self.logger.warning(f"Missing {len(missing_features)} features in reduced embeddings: {list(missing_features)[:5]}")
@@ -277,8 +283,6 @@ class SubjectRepresentation:
                 weight_series = reduced.mean(axis=1)
             elif isinstance(reduced, pd.Series):
                 weight_series = (reduced - reduced.min()) / (reduced.max() - reduced.min())
-            else:
-                raise ValueError("Reduced embeddings must be a pandas DataFrame or Series.")
 
             weight_series = weight_series.fillna(0)
             ranks = weight_series.rank(method="average")
