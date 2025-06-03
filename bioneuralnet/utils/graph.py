@@ -4,6 +4,9 @@ import numpy as np
 from typing import Optional
 import torch.nn.functional as F
 from sklearn.covariance import GraphicalLasso
+from .logger import get_logger
+
+logger = get_logger(__name__)
 
 def gen_similarity_graph(X:pd.DataFrame, k:int = 15, metric:str = "cosine", mutual:bool = False, per_node:bool = True, self_loops:bool = True) -> pd.DataFrame:
     """
@@ -30,6 +33,7 @@ def gen_similarity_graph(X:pd.DataFrame, k:int = 15, metric:str = "cosine", mutu
         raise TypeError("X must be a pandas.DataFrame")
 
     N = x_torch.size(0)
+    k = min(k, N-1)
 
     # full similarity matrix
     if metric == "cosine":
@@ -280,18 +284,25 @@ def gen_lasso_graph(X: pd.DataFrame, alpha: float = 0.01, self_loops: bool = Tru
     """
     if isinstance(X, pd.DataFrame):
         nodes = X.index
-        x_numpy = X.values
+        x_numpy = X.values.T
     else:
         raise TypeError("X must be a pandas.DataFrame")
 
-    model = GraphicalLasso(alpha=alpha, max_iter=200)
-    model.fit(x_numpy)
+    try:
+        model = GraphicalLasso(alpha=alpha, max_iter=1000)
+        model.fit(x_numpy)
 
-    P = torch.from_numpy(model.precision_).abs()
-    W = (P + P.t()) / 2
+        P = torch.from_numpy(model.precision_).abs()
+        W = (P + P.t()) / 2
+
+    except FloatingPointError:
+        logger.warning("Graphical Lasso failed to converge, using identity matrix instead.")
+        N = len(nodes)
+        W = torch.eye(N, dtype=torch.float32)
 
     if self_loops:
-        W.fill_diagonal_(W.diagonal() + 1.0)
+        diag_indices = torch.arange(W.size(0), device=W.device)
+        W[diag_indices, diag_indices] += 1.0
 
     W = F.normalize(W, p=1, dim=1)
     final_graph = pd.DataFrame(W.cpu().numpy(), index=nodes, columns=nodes)

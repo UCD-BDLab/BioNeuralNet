@@ -89,7 +89,8 @@ class GNNEmbedding:
         if omics_data.empty:
             raise ValueError("Omics data cannot be empty.")
         if clinical_data is not None and clinical_data.empty:
-            raise ValueError("Clinical data was provided but is empty.")
+            self.logger.warning("Clinical data was provided but is empty, setting to None.")
+            clinical_data = None
 
         if adjacency_matrix.shape[0] != adjacency_matrix.shape[1]:
             raise ValueError("Adjacency matrix must be square.")
