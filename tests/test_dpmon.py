@@ -6,7 +6,6 @@ import shutil
 from bioneuralnet.downstream_task import DPMON
 import warnings
 
-
 class TestDPMON(unittest.TestCase):
     def setUp(self):
         self.adjacency_matrix = pd.DataFrame([[1.0, 0.3, 0.1], [0.3, 1.0, 0.05], [0.1, 0.05, 1.0]],index=["gene1", "gene2", "gene3"],columns=["gene1", "gene2", "gene3"],)

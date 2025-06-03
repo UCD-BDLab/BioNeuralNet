@@ -58,6 +58,6 @@ repos:
 
       - id: run-tests
         name: Run Tests with Pytest
-        entry: bash -c "pytest tests --cov=bioneuralnet --cov-report=term-missing || true"
+        entry: bash -c "pytest tests"
         language: system
         types: [python]

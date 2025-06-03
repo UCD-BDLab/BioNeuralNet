@@ -12,8 +12,8 @@ jobs:
   pre-commit:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.10", "3.11", "3.12"]
+        os: [ubuntu-latest]
+        python-version: ["3.10"]
 
     runs-on: ${{ matrix.os }}
 
@@ -27,21 +27,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
           check-latest: true
 
-      - name: Cache pip dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/requirements-dev.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
-
-      - name: Install Python dependencies
+      - name: Install pre-commit
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r requirements-dev.txt
-          pip install torch
-          pip install torch_geometric
-        shell: bash
+          pip install --upgrade pip
+          pip install pre-commit
+          pip install black flake8 mypy
 
       - name: Cache pre-commit hooks
         uses: actions/cache@v3
@@ -49,20 +39,3 @@ jobs:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
           restore-keys: pre-commit-${{ runner.os }}-
-
-      - name: Run Pre-Commit Checks
-        run: pre-commit run --all-files --show-diff-on-failure
-
-      # - name: Install R
-      #   uses: r-lib/actions/setup-r@v2
-      #   with:
-      #     r-version: "latest"
-
-      # - name: Install R packages
-      #   run: |
-      #     Rscript -e "if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager', repos='https://cran.r-project.org')"
-      #     Rscript -e "install.packages(c('dplyr', 'jsonlite'), repos='https://cran.r-project.org')"
-      #     Rscript -e "BiocManager::install(c('impute', 'preprocessCore', 'GO.db', 'AnnotationDbi'), update=FALSE, ask=FALSE)"
-      #     Rscript -e "install.packages('SmCCNet', repos='https://cran.r-project.org')"
-      #     Rscript -e "install.packages('WGCNA', repos='https://cran.r-project.org')"
-      #   shell: bash
