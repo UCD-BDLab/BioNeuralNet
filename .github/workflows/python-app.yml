@@ -42,7 +42,7 @@ jobs:
         shell: bash
 
       - name: Run pytest
-        run: pytest -n auto tests/
+        run: pytest tests/
 
       # - name: Install R
       #   uses: r-lib/actions/setup-r@v2
