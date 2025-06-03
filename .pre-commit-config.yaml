@@ -35,7 +35,7 @@ repos:
 
       - id: clean-coverage-files
         name: Remove stale .coverage files
-        entry: bash -c "find . -name '.coverage*' -delete"
+        entry: bash -c "find . -name '.coverage*' -exec rm -f {} + 2>/dev/null || true"
         language: system
         stages: [pre-commit]
 
@@ -56,8 +56,8 @@ repos:
         language: system
         stages: [pre-commit]
 
-#      - id: run-tests
-#        name: Run Tests with Pytest
-#        entry: pytest --ignore=docs/source/examples --cov=bioneuralnet --cov-report=term-missing || true
-#        language: system
-#        types: [python]
+      - id: run-tests
+        name: Run Tests with Pytest
+        entry: bash -c "pytest tests --cov=bioneuralnet --cov-report=term-missing || true"
+        language: system
+        types: [python]

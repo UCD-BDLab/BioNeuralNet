@@ -21,7 +21,7 @@ class TestDPMON(unittest.TestCase):
     @patch("bioneuralnet.downstream_task.dpmon.run_standard_training")
     def test_run_without_tune(self, mock_standard):
         warnings.filterwarnings("ignore")
-        
+
         mock_standard.return_value = (pd.DataFrame({"Actual": [2, 3], "Predicted": [2, 2]}, index=["sample1", "sample2"]), 0.89)
 
         dpmon = DPMON(

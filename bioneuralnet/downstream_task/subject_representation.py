@@ -61,7 +61,7 @@ class SubjectRepresentation:
 
         if omics_data is None or omics_data.empty:
             raise ValueError("Omics data must be non-empty.")
-        
+
         if embeddings is None:
             self.logger.warning("No embeddings provided, please review documentation to see how to generate embeddings.")
             raise ValueError("Embeddings must be non-empty.")
@@ -265,7 +265,7 @@ class SubjectRepresentation:
         """
         if not isinstance(reduced, (pd.DataFrame, pd.Series)):
             raise ValueError("Reduced embeddings must be a pandas DataFrame or Series.")
-        
+
         missing_features = set(self.omics_data.columns) - set(reduced.index)
         if missing_features:
             self.logger.warning(f"Missing {len(missing_features)} features in reduced embeddings: {list(missing_features)[:5]}")

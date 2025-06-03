@@ -99,6 +99,5 @@ class TestGraphGeneration(unittest.TestCase):
         with self.assertRaises(TypeError):
             gen_snn_graph("oops, not a df")
 
-
 if __name__ == "__main__":
     unittest.main()

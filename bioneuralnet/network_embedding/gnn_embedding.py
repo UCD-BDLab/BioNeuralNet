@@ -91,7 +91,7 @@ class GNNEmbedding:
         if clinical_data is not None and clinical_data.empty:
             self.logger.warning("Clinical data was provided but is empty, setting to None.")
             clinical_data = None
-            
+
         if adjacency_matrix.shape[0] != adjacency_matrix.shape[1]:
             raise ValueError("Adjacency matrix must be square.")
         if not adjacency_matrix.index.equals(adjacency_matrix.columns):

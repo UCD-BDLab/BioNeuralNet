@@ -20,14 +20,14 @@ class TestHybridLouvain(unittest.TestCase):
 
         def fake_compute_corr(nodes):
             return (0.7, None)
-        
+
         fake_louvain._compute_community_correlation.side_effect = fake_compute_corr
         mock_louvain_cls.return_value = fake_louvain
 
         fake_pagerank = MagicMock()
         def fake_pr_run(best_seed):
             return {"cluster_nodes": best_seed}
-        
+
         fake_pagerank.run.side_effect = fake_pr_run
         mock_page_rank_cls.return_value = fake_pagerank
 
