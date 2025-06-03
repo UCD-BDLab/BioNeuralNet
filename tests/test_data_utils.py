@@ -39,7 +39,7 @@ class TestDataUtils(unittest.TestCase):
         self.assertAlmostEqual(stats["variance_min"], 4.0)
         self.assertAlmostEqual(stats["variance_max"], 4.0)
         self.assertAlmostEqual(stats["variance_std"], 0.0)
-        
+
         self.assertNotIn("num_low_variance_features", stats)
 
     def test_variance_summary_with_threshold(self):
@@ -97,7 +97,7 @@ class TestDataUtils(unittest.TestCase):
         buf = io.StringIO()
         old_stdout = sys.stdout
         sys.stdout = buf
-        
+
         try:
             explore_data_stats(self.df_corr, name="TestDF")
         finally:

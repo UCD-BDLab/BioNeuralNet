@@ -22,7 +22,7 @@ class TestPreprocessFunctions(unittest.TestCase):
             "smoker": [True, False, True, False],
             "ignore": [1, 1, 1, 1]
         }, index=["s1", "s2", "s3", "s4"])
-        
+
         self.y_clin = pd.Series([0, 1, 0, 1], index=["s1", "s2", "s3", "s4"])
 
         self.X_small = pd.DataFrame({

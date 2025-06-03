@@ -8,12 +8,12 @@ class TestDatasetLoader(unittest.TestCase):
         loader = DatasetLoader("example1")
         keys = set(loader.data.keys())
         self.assertEqual(keys, {"X1", "X2", "Y", "clinical_data"})
-        
+
         for df in loader.data.values():
             self.assertIsInstance(df, pd.DataFrame)
             self.assertGreater(df.shape[0], 0)
             self.assertGreater(df.shape[1], 0)
-        
+
         for name, shape in loader.shape.items():
             self.assertIsInstance(shape, tuple)
             self.assertEqual(len(shape), 2)
@@ -23,12 +23,12 @@ class TestDatasetLoader(unittest.TestCase):
         keys = set(loader.data.keys())
 
         self.assertEqual(keys, {"gene_data", "mirna_data", "phenotype", "rppa_data", "clinical_data"})
-        
+
         for df in loader.data.values():
             self.assertIsInstance(df, pd.DataFrame)
             self.assertGreater(df.shape[0], 0)
             self.assertGreater(df.shape[1], 0)
-        
+
         for name, shape in loader.shape.items():
             self.assertIsInstance(shape, tuple)
             self.assertEqual(len(shape), 2)
