@@ -32,7 +32,7 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         run: |
           twine upload \
-            --repository-url https://upload.pkg.github.com/${{ github.repository }} \
+            --repository-url https://upload.pypi.github.io/UCD-BDLab/BioNeuralNet \
             dist/*
 
       - name: Publish to PyPI
