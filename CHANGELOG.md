@@ -71,4 +71,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **BUG**: A bug related to rdata files missing
 - **Updated License**: BioNeuralNet is now distributed under the [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/).
 
-- **New realease**: A new release will include documentation for the other updates. (1.1.0)
+- **New release**: A new release will include documentation for the other updates. (1.1.0)
