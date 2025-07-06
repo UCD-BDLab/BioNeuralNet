@@ -1,8 +1,8 @@
 BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool
 =================================================================================
 
-.. image:: https://img.shields.io/badge/license-MIT-blue.svg
-   :target: https://github.com/UCD-BDLab/BioNeuralNet/blob/main/LICENSE
+.. image:: https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey.svg
+   :target: https://creativecommons.org/licenses/by-nc-nd/4.0/
 
 .. image:: https://img.shields.io/pypi/v/bioneuralnet
    :target: https://pypi.org/project/bioneuralnet/
