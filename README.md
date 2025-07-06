@@ -1,6 +1,6 @@
 # BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/UCD-BDLab/BioNeuralNet/blob/main/LICENSE)
+[![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
 [![PyPI](https://img.shields.io/pypi/v/bioneuralnet)](https://pypi.org/project/bioneuralnet/)
 [![GitHub Issues](https://img.shields.io/github/issues/UCD-BDLab/BioNeuralNet)](https://github.com/UCD-BDLab/BioNeuralNet/issues)
 [![GitHub Contributors](https://img.shields.io/github/contributors/UCD-BDLab/BioNeuralNet)](https://github.com/UCD-BDLab/BioNeuralNet/graphs/contributors)
@@ -228,7 +228,8 @@ pytest
 
 ## 9. License
 
-BioNeuralNet is distributed under the [MIT License](https://github.com/UCD-BDLab/BioNeuralNet/blob/main/LICENSE).
+BioNeuralNet is distributed under the [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+See the [LICENSE](LICENSE) file for details.
 
 ## 10. Contact
 
