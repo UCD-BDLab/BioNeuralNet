@@ -28,10 +28,10 @@ jobs:
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-
         run: |
-          twine upload \
-            --repository-url https://upload.pypi.github.io/UCD-BDLab/BioNeuralNet \
+          python -m pip install --upgrade pip twine
+          python -m twine upload \
+            --repository-url https://api.github.com/orgs/${{ github.repository_owner }}/packages/pypi/upload \
             dist/*
 
       - name: Publish to PyPI
