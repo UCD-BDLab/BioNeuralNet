@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.abspath("../../"))
 try:
     release = metadata.version("bioneuralnet")
 except metadata.PackageNotFoundError:
-    release = "1.0.9"
+    release = "1.1.0"
 
 project = "BioNeuralNet"
 version = release

@@ -15,6 +15,7 @@ bioneuralnet.utils.graph
       gen_similarity_graph
       gen_snn_graph
       gen_threshold_graph
+      get_logger
    
    .. rubric:: Classes
 
