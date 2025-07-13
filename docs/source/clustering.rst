@@ -1,158 +1,95 @@
 Correlated Clustering
 =====================
 
-BioNeuralNet includes internal modules for performing **correlated clustering** on complex networks.
-These methods extend traditional community detection by integrating **phenotype correlation**, allowing users to extract **biologically relevant, phenotype-associated modules** from any network.
+BioNeuralNet provides **correlated clustering methods** designed specifically to identify biologically relevant communities within multi-omics networks. By integrating **phenotype correlations**, these approaches enhance traditional community detection methods, capturing biologically meaningful network modules strongly associated with clinical or phenotypic outcomes.
 
-Overview
---------
+Key Features
+------------
+- **Phenotype-Aware Clustering**: Incorporates external phenotype information directly into clustering algorithms, resulting in communities that are both structurally cohesive and biologically meaningful.
+- **Flexible Application**: Methods are applicable to any network data represented as adjacency matrices, facilitating diverse research scenarios including biomarker discovery and functional module identification.
+- **Integration with Downstream Analysis**: Clusters obtained can directly feed into downstream tasks such as disease prediction, feature selection, and biomarker identification.
 
-Our framework supports three key **correlated clustering** approaches:
+Supported Clustering Methods
+----------------------------
 
-- **Correlated PageRank**:
+Correlated PageRank
+-------------------
+A variant of PageRank that biases node rankings toward phenotype-relevant nodes, prioritizing features with strong phenotype associations:
 
-  - A **modified PageRank algorithm** that prioritizes nodes based on their correlation with an external phenotype.
-  
-  - The **personalization vector** is computed using phenotype correlation, ensuring that **biologically significant nodes receive more influence**.
-  
-  - This method is ideal for **identifying high-impact nodes** within a given network.
+.. math::
 
-- **Correlated Louvain**:
+     \mathbf{r} = \alpha \cdot \mathbf{M} \mathbf{r} + (1 - \alpha) \mathbf{p}
 
-  - An adaptation of the **Louvain community detection algorithm**, modified to optimize for **both network modularity and phenotype correlation**.
-  - The objective function for community detection is given by:
+- :math:`\mathbf{M}`: Normalized adjacency (transition probability matrix).
+- :math:`\mathbf{p}`: Phenotype-informed personalization vector (based on correlation).
+- Ideal for ranking biologically impactful nodes.
 
-    .. math::
+Correlated Louvain
+------------------
+Modifies Louvain community detection to balance structural modularity and phenotype correlation, optimizing:
 
-       Q^* = k_L \cdot Q + (1 - k_L) \cdot \overline{\lvert \rho \rvert},
+.. math::
 
-    where:
+       Q^* = k_L \cdot Q + (1 - k_L) \cdot \overline{\lvert \rho \rvert}
 
-      - :math:`Q` is the standard **Newman-Girvan modularity**, defined as:
+- :math:`Q`: Newman-Girvan modularity, measuring network structural cohesiveness.
+- :math:`\overline{\lvert \rho \rvert}`: Mean absolute Pearson correlation between cluster features and phenotype.
+- :math:`k_L`: User-defined parameter balancing structure and phenotype relevance.
+- Efficient for identifying phenotype-enriched communities.
 
-        .. math::
+Hybrid Louvain (Iterative Refinement)
+-------------------------------------
+Combines Correlated Louvain with Correlated PageRank iteratively to refine community assignments:
 
-           Q = \frac{1}{2m} \sum_{i,j} \bigl(A_{ij} - \frac{k_i k_j}{2m} \bigr) \delta(c_i, c_j),
-
-        where :math:`A_{ij}` represents the adjacency matrix, :math:`k_i` and :math:`k_j` are node degrees, and :math:`\delta(c_i, c_j)` indicates whether nodes belong to the same community.
-      - :math:`\overline{\lvert \rho \rvert}` is the **mean absolute Pearson correlation** between the **first principal component (PC1) of the subgraph's features** and the phenotype.
-      - :math:`k_L` is a user-defined weight (e.g., :math:`k_L = 0.2`), balancing **network modularity and phenotype correlation**.
-
-  - This method **detects communities** that are both **structurally cohesive and strongly associated with phenotype**.
-
-- **Hybrid Louvain**:
-
-  - A **refinement approach** that combines **Correlated Louvain** and **Correlated PageRank** in an iterative process.
- 
-  - The key steps are:
-
-    1. **Initial Community Detection**:
-
-       - The **input network (adjacency matrix)** is clustered using **Correlated Louvain**.
-       - This identifies **initial phenotype-associated modules**.
-
-    2. **Iterative Refinement with Correlated PageRank**:
-
-       - In each iteration:
-
-         - The **most correlated module** is **expanded** based on Correlated PageRank.
-         - The refined network is **re-clustered using Correlated Louvain**.
-         - This process continues **until convergence**.
-
-    3. **Final Cluster Extraction**:
-
-       - The final **phenotype-optimized modules** are extracted and returned.
-       - The quality of the clustering is measured using **both modularity and phenotype correlation metrics**.
+1. Initial clustering using Correlated Louvain identifies phenotype-associated modules.
+2. Clusters iteratively refined by expanding highly correlated modules using Correlated PageRank.
+3. Repeated until convergence, producing optimized phenotype-associated communities.
 
 .. figure:: _static/hybrid_clustering.png
    :align: center
-   :alt: Overview hybrid clustering workflow
+   :alt: Hybrid Clustering Workflow
 
-   **Hybrid Clustering**: Precedure and steps for the hybrid clustering method.
+   Workflow: Hybrid Louvain iteratively integrates Correlated PageRank and Correlated Louvain to produce refined phenotype-associated clusters.
 
-
-Mathematical Approach
+Comparison of Methods
 ---------------------
-
-**Correlated PageRank:**
-
-   - Correlated PageRank extends the traditional PageRank formulation by **biasing the random walk towards phenotype-associated nodes**.
-   
-   - The **ranking function** is defined as:
-
-  .. math::
-
-     \mathbf{r} = \alpha \cdot \mathbf{M} \mathbf{r} + (1 - \alpha) \mathbf{p},
-
-  where:
-
-  - :math:`\mathbf{M}` is the transition probability matrix, derived from the **normalized adjacency matrix**.
-  - :math:`\mathbf{p}` is the **personalization vector**, computed using **phenotype correlation**.
-  - :math:`\alpha` is the **teleportation factor** (default: :math:`\alpha = 0.85`).
-
-- Unlike standard PageRank, which assumes a **uniform teleportation distribution**, **Correlated PageRank prioritizes phenotype-relevant nodes**.
-
-Graphical Comparison
---------------------
-
-Below is an illustration of **different clustering approaches** on a sample network:
+The figure below illustrates the difference between standard and correlated clustering methods, highlighting BioNeuralNet's ability to extract biologically meaningful modules.
 
 .. figure:: _static/clustercorrelation.png
    :align: center
-   :alt: Comparison of Correlated Clustering Methods
+   :alt: Clustering Method Comparison
 
-   **Figure 2:** Comparison between SmCCNet generated clusters and Correlated Louvain clusters
+   Comparison: Standard (SmCCNet) versus Correlated Louvain clusters.
 
-Integration with BioNeuralNet
-------------------------------
+Applications and Use Cases
+--------------------------
+BioNeuralNet correlated clustering is versatile and suitable for diverse network analyses:
 
-Our **correlated clustering methods** seamlessly integrate into **BioNeuralNet** and can be applied to **any network represented as an adjacency matrix**.
+- **Multi-Omics Networks**: Extract biologically relevant gene/protein modules associated with clinical phenotypes.
+- **Neuroimaging Networks**: Identify functional brain modules linked to neurological diseases.
+- **Disease Networks**: Reveal patient or epidemiological network communities strongly linked to clinical outcomes.
 
-Use cases include:
+Integration into BioNeuralNet Workflow
+--------------------------------------
+Clustering outputs seamlessly feed into downstream BioNeuralNet modules:
 
-   - **Multi-Omics Networks**: Extracting **biologically relevant subgraphs** from gene expression, proteomics, or metabolomics data.
-   - **Brain Connectivity Graphs**: Identifying **functional modules associated with neurological disorders**.
-   - **Social & Disease Networks**: Detecting **community structures in epidemiology and patient networks**.
+- **GNN Embedding Generation**: Train Graph Neural Networks on phenotype-enriched clusters.
+- **Disease Prediction (DPMON)**: Utilize phenotype-associated modules for improved predictive accuracy.
+- **Biomarker Discovery**: Extract features or modules strongly predictive of disease status.
 
-Our framework supports:
+User Recommendations
+--------------------
+- **Correlated PageRank**: Best for prioritizing individual high-impact features or nodes.
+- **Correlated Louvain**: Ideal for extracting phenotype-associated functional communities efficiently.
+- **Hybrid Louvain**: Recommended for maximal biological interpretability, particularly in complex multi-omics scenarios.
 
-   - **Graph Neural Network Embedding**: Training GNNs on **phenotype-optimized clusters**.
-   
-   - **Predictive Biomarker Discovery**: Identifying key **features associated with disease outcomes**.
-   
-   - **Customizable Modularity Optimization**: Allowing users to **adjust the trade-off between structure and phenotype correlation**.
+Reference and Further Reading
+-----------------------------
+For detailed methodology and benchmarking, refer to our publication:
 
-Notes for Users
----------------
-
-1. **Input Requirements**:
-
-   - Any **graph-based dataset** can be used as input, provided as an **adjacency matrix**.
-   
-   - Phenotype data should be supplied in **numerical format** (e.g., disease severity scores, expression levels).
-
-2. **Cluster Comparison**:
-
-   - **Correlated Louvain extracts phenotype-associated modules.**
-   
-   - **Hybrid Louvain iteratively refines clusters using Correlated PageRank.**
-   
-   - Users can compare results using **modularity scores and phenotype correlation metrics**.
-
-3. **Method Selection**:
-
-   - **Correlated PageRank** is ideal for **ranking high-impact nodes in a phenotype-aware manner**.
-   
-   - **Correlated Louvain** is best for **detecting phenotype-associated communities**.
-  
-   - **Hybrid Louvain** provides the most refined, **biologically meaningful clusters**.
-
-Conclusion
-----------
-
-The **correlated clustering methods** implemented in BioNeuralNet provide a **powerful, flexible framework** for extracting **highly structured, phenotype-associated modules** from any network.
-By integrating **phenotype correlation directly into the clustering process**, these methods enable **more biologically relevant and disease-informative network analysis**.
-
-paper link: https://doi.org/10.3389/fdata.2022.894632 
+- Abdel-Hafiz et al., Frontiers in Big Data, 2022. [1]_
 
 Return to :doc:`../index`
+
+.. [1] Abdel-Hafiz, M., Najafi, M., et al. "Significant Subgraph Detection in Multi-omics Networks for Disease Pathway Identification." *Frontiers in Big Data*, 5 (2022). DOI: `10.3389/fdata.2022.894632 <https://doi.org/10.3389/fdata.2022.894632>`_.
+

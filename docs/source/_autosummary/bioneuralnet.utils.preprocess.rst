@@ -15,7 +15,6 @@ bioneuralnet.utils.preprocess
       multipletests
       network_remove_high_zero_fraction
       network_remove_low_variance
-      overload
       preprocess_clinical
       prune_network
       prune_network_by_quantile
@@ -28,7 +27,6 @@ bioneuralnet.utils.preprocess
 
    .. autosummary::
    
-      OrdinalEncoder
       RandomForestClassifier
       RandomForestRegressor
       RobustScaler

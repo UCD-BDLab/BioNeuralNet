@@ -21,7 +21,7 @@ BioNeuralNet integrates multiple open-source libraries to deliver advanced multi
 
 We also acknowledge R-based tools for external network construction:
 
-- **SmCCNet** - Sparse multiple canonical correlation network tool. `SmCCNet <https://cran.r-project.org/web/packages/SmCCNet/>`_
+- **SmCCNet**: Sparse multiple canonical correlation network tool. `SmCCNet <https://cran.r-project.org/web/packages/SmCCNet/>`_
 
 These tools enhance BioNeuralNet's capabilities without being required for its core functionality.
 
@@ -38,7 +38,7 @@ Frequently Asked Questions (FAQ)
 
 **Q1: What is BioNeuralNet?**:
 
-   - BioNeuralNet is a Python framework for integrating multi-omics data with Graph Neural Networks (GNNs). It provides end-to-end solutions for network embedding, clustering, subject representation, and disease prediction.
+   - BioNeuralNet is a **flexible, modular Python framework** developed to facilitate end-to-end **network-based multi-omics analysis** using **Graph Neural Networks (GNNs)**. It addresses the complexities associated with multi-omics data—such as high dimensionality, sparsity, and intricate molecular interactions—by converting biological networks into meaningful, low-dimensional embeddings suitable for downstream tasks.
 
 **Q2: What are the key features of BioNeuralNet?**:
 
@@ -77,11 +77,13 @@ Frequently Asked Questions (FAQ)
 **Q8: How can I contribute to BioNeuralNet?**:
 
    - Contributions are welcome! You can:
+   
       - Report issues or bugs on our `GitHub Issues page <https://github.com/UCD-BDLab/BioNeuralNet/issues>`_.
       - Suggest new features or improvements.
       - Share your experiences or use cases with the community.
 
    - How to contribute:
+
       - Fork the repository, add your features, components, or algorithms, and submit a pull request.
       - Please refer to our `contribution guidelines <https://github.com/UCD-BDLab/BioNeuralNet?tab=readme-ov-file#8-contributing>`_ for more details.
 
@@ -95,6 +97,6 @@ Frequently Asked Questions (FAQ)
 
 **Q10: What license is BioNeuralNet released under?**:
 
-   - BioNeuralNet is released under the MIT License. You can find the full license text in the `MIT LICENSE <https://github.com/UCD-BDLab/BioNeuralNet?tab=MIT-1-ov-file>`_  file in the repository.
+   - BioNeuralNet is distributed under the [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/).
 
 Return to :doc:`../index`
