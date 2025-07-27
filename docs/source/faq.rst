@@ -31,14 +31,33 @@ Contributions to BioNeuralNet are welcome. If you wish to contribute new feature
 
 `UCD-BDLab/BioNeuralNet <https://github.com/UCD-BDLab/BioNeuralNet>`_
 
-Please refer to our contribution guidelines in the repository for more details.
+   - **Ways to contribute**:
+   
+      - Report issues or bugs on our `GitHub Issues page <https://github.com/UCD-BDLab/BioNeuralNet/issues>`_.
+      - Suggest new features or improvements.
+      - Share your experiences or use cases with the community.
+
+   - **Implementing new features**:
+
+      - Fork the repo and create a feature branch.
+      - Add tests and documentation for new features.
+      - Run the test suite and and pre-commit hooks before opening a Pull Request(PR).
+      - A new PR should pass all tests and adhere to the project's coding standards.
+
+.. code-block:: bash
+   
+   git clone https://github.com/UCD-BDLab/BioNeuralNet.git
+   cd BioNeuralNet
+   pip install -r requirements-dev.txt
+   pre-commit install
+   pytest --cov=bioneuralnet
 
 Frequently Asked Questions (FAQ)
 --------------------------------
 
 **Q1: What is BioNeuralNet?**:
 
-   - BioNeuralNet is a **flexible, modular Python framework** developed to facilitate end-to-end **network-based multi-omics analysis** using **Graph Neural Networks (GNNs)**. It addresses the complexities associated with multi-omics data—such as high dimensionality, sparsity, and intricate molecular interactions—by converting biological networks into meaningful, low-dimensional embeddings suitable for downstream tasks.
+   - BioNeuralNet is a flexible, modular Python framework developed to facilitate end-to-end network-based multi-omics analysis** using **Graph Neural Networks (GNNs)**. It addresses the complexities associated with multi-omics data, such as high dimensionality, sparsity, and intricate molecular interactions, by converting biological networks into meaningful, low-dimensional embeddings suitable for downstream tasks.
 
 **Q2: What are the key features of BioNeuralNet?**:
 
@@ -48,8 +67,6 @@ Frequently Asked Questions (FAQ)
    - **Disease Prediction:** Leverage DPMON for integrated, end-to-end disease prediction.
 
 **Q3: How do I install BioNeuralNet?**:
-
-   - Install via pip
 
 .. code-block:: bash
 
@@ -62,32 +79,9 @@ Frequently Asked Questions (FAQ)
 
 **Q5: Can I use my own network instead of SmCCNet or internal graph generation functions?**
 
-   - Absolutely. You can supply a pre-computed adjacency matrix directly to the GNNEmbedding or DPMON modules.
+   - Absolutely. You can supply a pre-computed adjacency matrix directly to the **GNNEmbedding** or **DPMON** modules.
 
-**Q6: How is DPMON different from standard GNN models?**  
-
-   - DPMON is tailored for multi-omics disease prediction by jointly learning node embeddings and a classifier, integrating both local and global graph structures.
-
-**Q7: What clustering methods does BioNeuralNet support?**:
-
-   - Correlated Louvain  
-   - Hybrid Louvain  
-   - Correlated PageRank
-
-**Q8: How can I contribute to BioNeuralNet?**:
-
-   - Contributions are welcome! You can:
-   
-      - Report issues or bugs on our `GitHub Issues page <https://github.com/UCD-BDLab/BioNeuralNet/issues>`_.
-      - Suggest new features or improvements.
-      - Share your experiences or use cases with the community.
-
-   - How to contribute:
-
-      - Fork the repository, add your features, components, or algorithms, and submit a pull request.
-      - Please refer to our `contribution guidelines <https://github.com/UCD-BDLab/BioNeuralNet?tab=readme-ov-file#8-contributing>`_ for more details.
-
-**Q9: Where can I find tutorials and examples?**:
+**Q6: Where can I find tutorials and examples?**:
 
    - We provide a set of tutorials and example notebooks to help you get started with BioNeuralNet. You can find them in the `tutorials` directory of the repository.  
    - For a quick start, check out the following notebooks:
@@ -95,8 +89,8 @@ Frequently Asked Questions (FAQ)
       - :doc:`Quick_Start`.
       - :doc:`TCGA-BRCA_Dataset`.
 
-**Q10: What license is BioNeuralNet released under?**:
+**Q7: What license is BioNeuralNet released under?**:
 
-   - BioNeuralNet is distributed under the [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+   - BioNeuralNet is distributed under the `Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0) <https://creativecommons.org/licenses/by-nc-nd/4.0/>`_.
 
 Return to :doc:`../index`
