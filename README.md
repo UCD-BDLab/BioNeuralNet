@@ -135,45 +135,45 @@ For detailed explanations of BioNeuralNet's supported GNN architectures and thei
 
 ```Python
 
-  import pandas as pd
-  from bioneuralnet.external_tools import SmCCNet
-  from bioneuralnet.downstream_task import DPMON
-  from bioneuralnet.datasets import DatasetLoadeR
+import pandas as pd
+from bioneuralnet.external_tools import SmCCNet
+from bioneuralnet.downstream_task import DPMON
+from bioneuralnet.datasets import DatasetLoader
 
-  # Load the dataset and access individual omics modalities
-  example = DatasetLoader("example1")
-  omics_genes = example.data["X1"]
-  omics_proteins = example.data["X2"]
-  phenotype = example.data["Y"]
-  clinical = example.data["clinical"]
+# Load the dataset and access individual omics modalities
+example = DatasetLoader("example1")
+omics_genes = example.data["X1"]
+omics_proteins = example.data["X2"]
+phenotype = example.data["Y"]
+clinical = example.data["clinical_data"]
 
-  # Network Construction with SmCCNet
-  smccnet = SmCCNet(
-      phenotype_df=phenotype,
-      omics_dfs=[omics_genes, omics_proteins],
-      data_types=["Genes", "Proteins"],
-      kfold=5,
-      summarization="PCA",
-  )
-  global_network, clusters = smccnet.run()
-  print("Adjacency matrix generated." )
+# Network Construction with SmCCNet
+smccnet = SmCCNet(
+    phenotype_df=phenotype,
+    omics_dfs=[omics_genes, omics_proteins],
+    data_types=["Genes", "Proteins"],
+    kfold=5,
+    summarization="PCA",
+)
+global_network, clusters = smccnet.run()
+print("Adjacency matrix generated." )
 
-  # Disease Prediction using DPMON
-  dpmon = DPMON(
-      adjacency_matrix=global_network,
-      omics_list=[omics_genes, omics_proteins],
-      phenotype_data=phenotype,
-      clinical_data=clinical,
-      model="GCN",
-      repeat_num=5,
-      tune=True,
-      gpu=True, 
-      cuda=0,
-      output_dir="./output"
-  )
+# Disease Prediction using DPMON
+dpmon = DPMON(
+    adjacency_matrix=global_network,
+    omics_list=[omics_genes, omics_proteins],
+    phenotype_data=phenotype,
+    clinical_data=clinical,
+    model="GCN",
+    repeat_num=5,
+    tune=True,
+    gpu=True, 
+    cuda=0,
+    output_dir="./output"
+)
 
-  predictions, avg_accuracy = dpmon.run()
-  print("Disease phenotype predictions:\n", predictions)
+predictions, avg_accuracy = dpmon.run()
+print("Disease phenotype predictions:\n", predictions)
 ```
 
 ## 5. Explore BioNeuralNet's Documentation
