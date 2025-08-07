@@ -200,6 +200,7 @@ We welcome contributions to BioNeuralNet! If you have ideas for new features, im
    metrics
    utils
    downstream_tasks
+   network_construction.ipynb
    datasets.ipynb
    Quick_Start.ipynb
    TCGA-BRCA_Dataset.ipynb

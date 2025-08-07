@@ -8,30 +8,35 @@ from .logger import get_logger
 
 logger = get_logger(__name__)
 
-def gen_similarity_graph(X:pd.DataFrame, k:int = 15, metric:str = "cosine", mutual:bool = False, per_node:bool = True, self_loops:bool = True) -> pd.DataFrame:
+def gen_similarity_graph(X:pd.DataFrame, k:int = 15, metric:str = "cosine", mutual:bool = False, per_node:bool = True, self_loops:bool = False) -> pd.DataFrame:
     """
-    Build a normalized knn similarity graph from feature vectors. Computes pairwise cosine or ecledian disntace,then sparsifies via knn or global a threshold.
-    Optionally prunes to mutual neighbors and/or adds self-loops.
+    Build a normalized k-nearest neighbors (kNN) similarity graph from feature vectors.  
+
+    The function computes pairwise `cosine` or `Euclidean` distances, sparsifies the matrix by keeping `top-k` neighbours per node (or by applying a global threshold), optionally prunes edges to mutual neighbours, and can add self-loops.
 
     Args:
-        - X: pandas.DataFrame of shape (N, D) (rows = nodes, cols = features)
-        - k (int): Number of neighbors to keep per node.
-        - metric (str): "cosine" or "euclidean" (uses gaussian kernel on distances).
-        - mutual (bool): If True, retain only mutual edges (i->j and j->i).
-        - per_node (bool): If True, use per-node top_k; else global cutoff.
-        - self_loops (bool): If True, add self-loop weight of 1.
+    
+        - X: Dataframe of shape (N, D) where, N(`rows`) is the number of subjects/samples and D(`columns`) represents the multi-omics features.
+        - k: Number of neighbors to keep per node.
+        - metric: `cosine` or `Euclidean` (uses gaussian kernel on distances).  
+        - mutual: If `True`, retain only mutual edges (i->j and j->i).
+        - per_node: If `True`, use per-node `k`, else apply a global cutoff.
+        - self_loops: If `True`, add a self-loop weight of 1.
 
     Returns:
 
-        - DataFrame of shape (N, N) the normalized adjacency matrix
+        - DataFrame of shape (D, D) the normalized feature-feature (multi-omics) adjacency matrix (network).
+
     """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if isinstance(X, pd.DataFrame):
+        X = X.T
         nodes = X.index
+        number_of_omics = len(nodes)
         x_torch = torch.tensor(X.values, dtype=torch.float32, device=device)
     else:
         raise TypeError("X must be a pandas.DataFrame")
-
+    
     N = x_torch.size(0)
     k = min(k, N-1)
 
@@ -72,36 +77,43 @@ def gen_similarity_graph(X:pd.DataFrame, k:int = 15, metric:str = "cosine", mutu
     A_numpy = A.cpu().numpy()
     final_graph =pd.DataFrame(A_numpy, index=nodes, columns=nodes)
 
+    if final_graph.shape != (number_of_omics, number_of_omics):
+        logger.info(f"Please make sure your input X follows the description: A DataFrame (N, D) where, N(rows) is the number of subjects/samples and D(columns) represents the multi-omics features.")
+        raise ValueError(f"Generated graph shape {final_graph.shape} does not match expected shape ({number_of_omics}, {number_of_omics}).")
+    
     return final_graph
 
 
-def gen_correlation_graph(X: pd.DataFrame, k: int = 15,method: str = 'pearson', mutual: bool = False, per_node: bool = True,threshold: Optional[float] = None, self_loops:bool = True) -> pd.DataFrame:
+def gen_correlation_graph(X: pd.DataFrame, k: int = 15,method: str = 'pearson', mutual: bool = False, per_node: bool = True,threshold: Optional[float] = None, self_loops:bool = False) -> pd.DataFrame:
     """
-    Build a graph based on pairwise Pearson or Spearman correlations.
+    Build a normalized k-nearest neighbors (kNN) correlation graph from feature vectors.  
+
+    The function computes pairwise `pearson` or `spearman` correlations, sparsifies the matrix by keeping `top-k`neighbours per node (or by applying a global threshold), optionally prunes edges to mutual neighbours, and can add self-loops.
 
     Args:
-
-        - X pd.dataframe (N, D) data tensor where rows are nodes.
-        - k (int): Number of neighbors to keep per node if per_node is True.
-        - method (str): 'pearson' or 'spearman'.
-        - mutual (bool): If True, only mutual knn edges.
-        - per_node (bool): If True, use per node topk selection, else global threshold.
-        - threshold (float): Correlation cutoff when per_node is False.
-        - self_loops (bool): If True, adds weight 1 to diagonal.
+    
+        - X: Dataframe of shape (N, D) where, N(`rows`) is the number of subjects/samples and D(`columns`) represents the multi-omics features.
+        - k: Number of neighbors to keep per node.
+        - method: `pearson` or `spearman`.
+        - mutual: If `True`, retain only mutual edges (i->j and j->i).
+        - per_node: If `True`, use per-node `k`, else apply a global cutoff.
+        - threshold: Correlation cutoff when `per_node` is `False`.
+        - self_loops: If `True`, add a self-loop weight of 1.
 
     Returns:
 
-        - pandas.DataFrame. Normalized adjacency matrix (N x N) of the sparse correlation graph.
+        - DataFrame of shape (D, D) the normalized feature-feature (multi-omics) adjacency matrix (network).
 
     Note:
 
-        - Correlation is very expensive to compute, so this function is not recommended for large datasets.
+        - Correlation can be expensive to compute; this function is not recommended for very large datasets.
 
     """
-
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if isinstance(X, pd.DataFrame):
+        X = X.T
         nodes = X.index
+        number_of_omics = len(nodes)
         x_torch = torch.tensor(X.values, dtype=torch.float32, device=device)
     else:
         raise TypeError("X must be a pandas.DataFrame")
@@ -149,30 +161,36 @@ def gen_correlation_graph(X: pd.DataFrame, k: int = 15,method: str = 'pearson', 
     W = F.normalize(W, p=1, dim=1)
     final_graph = pd.DataFrame(W.cpu().numpy(), index=nodes, columns=nodes)
 
+    if final_graph.shape != (number_of_omics, number_of_omics):
+        logger.info(f"Please make sure your input X follows the description: A DataFrame (N, D) where, N(rows) is the number of subjects/samples and D(columns) represents the multi-omics features.")
+        raise ValueError(f"Generated graph shape {final_graph.shape} does not match expected shape ({number_of_omics}, {number_of_omics}).")
+
     return final_graph
 
 
-def gen_threshold_graph(X:pd.DataFrame, b: float = 6.0,k: int = 15, mutual: bool = False, self_loops: bool = True) -> pd.DataFrame:
+def gen_threshold_graph(X:pd.DataFrame, b: float = 6.0,k: int = 15, mutual: bool = False, self_loops: bool = False) -> pd.DataFrame:
     """
-    Generate a soft threshold co-xpression network this is very similar to how WGCNA works
+    Build a normalized k-nearest neighbors (kNN) soft-threshold co-expression graph, similar to the network-construction step in WGCNA.  
+
+    The function computes absolute pair-wise Pearson correlations, applies apower-law soft threshold with exponent `b`, sparsifies the matrix bykeeping `top-k` neighbours per node, optionally prunes edges to mutualneighbours, and can add self-loops.
 
     Args:
-
-        - X (pd.DataFrame): Data matrix where rows are nodes and columns are features.
-        - b (float): Thresholding exponent applied to absolute correlations.
-        - k (int): Number of neighbors to keep per node.
-        - mutual (bool): If True, only mutual knn edges.
-        - self_loops (bool): If True, adds weight 1 to diagonal.
+    
+        - X: Dataframe of shape (N, D) where, N(`rows`) is the number of subjects/samples and D(`columns`) represents the multi-omics features.
+        - b: Soft-threshold exponent applied to absolute correlations.
+        - k: Number of neighbors to keep per node.
+        - mutual: If `True`, retain only mutual edges (i->j and j->i).
+        - self_loops: If `True`, add a self-loop weight of 1.
 
     Returns:
 
-        - pandas.DataFrame: Normalized adjacency matrix (N x N) of the soft-thresholded graph.
+        - DataFrame of shape (D, D) the normalized feature-feature (multi-omics) adjacency matrix (network).
     """
-
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
     if isinstance(X, pd.DataFrame):
+        X = X.T
         nodes = X.index
+        number_of_omics = len(nodes)
         x_torch = torch.tensor(X.values, dtype=torch.float32, device=device)
     else:
         raise TypeError("X must be a pandas.DataFrame")
@@ -209,31 +227,35 @@ def gen_threshold_graph(X:pd.DataFrame, b: float = 6.0,k: int = 15, mutual: bool
     W = F.normalize(W, p=1, dim=1)
     final_graph = pd.DataFrame(W.cpu().numpy(), index=nodes, columns=nodes)
 
+    if final_graph.shape != (number_of_omics, number_of_omics):
+        logger.info(f"Please make sure your input X follows the description: A DataFrame (N, D) where, N(rows) is the number of subjects/samples and D(columns) represents the multi-omics features.")
+        raise ValueError(f"Generated graph shape {final_graph.shape} does not match expected shape ({number_of_omics}, {number_of_omics}).")
+
     return final_graph
 
-def gen_gaussian_knn_graph(X: pd.DataFrame,k: int = 15,sigma: Optional[float] = None ,mutual: bool = False,self_loops: bool = True) -> pd.DataFrame:
+def gen_gaussian_knn_graph(X: pd.DataFrame,k: int = 15,sigma: Optional[float] = None ,mutual: bool = False, self_loops: bool = True) -> pd.DataFrame:
     """
-    Build a normalized knn similarity graph from feature vectors. Computes pairwise cosine or Euclidean similarities, sparsifies via k-nearest neighbors or
-    a global threshold. Optionally prunes to mutual neighbors and/or adds self-loops.
+    Build a normalized k-nearest neighbors (kNN) similarity graph using a Gaussian(RBF) kernel.  
+
+    The function computes pairwise Euclidean distances, converts them to similarities with a Gaussian kernel (bandwidth `sigma`; if `None`, the median-distance heuristic is used), sparsifies the matrix by keeping `top-k` neighbours per node, optionally prunes edges to mutual neighbours, and can add self-loops.
 
     Args:
-
-        - X (pd.DataFrame): Feature matrix where rows are nodes and columns are features.
-        - k (int): Number of neighbors to keep per node.
-        - metric (str): 'cosine' or 'euclidean', uses Gaussian kernel for distances.
-        - mutual (bool): If True, only mutual knn edges.
-        - per_node (bool): If True, use per-node topk selection; else global threshold.
-        - self_loops (bool): If True, adds weight 1 to diagonal.
+    
+        - X: Dataframe of shape (N, D) where, N(`rows`) is the number of subjects/samples and D(`columns`) represents the multi-omics features.
+        - k: Number of neighbors to keep per node.
+        - sigma: Bandwidth of the Gaussian kernel; if `None`, uses the median squared distance.
+        - mutual: If `True`, retain only mutual edges (i->j and j->i).
+        - self_loops: If `True`, add a self-loop weight of 1.
 
     Returns:
 
-        - pandas.DataFrame: Normalized adjacency matrix (N x N) of the sparse similarity graph.
+        - DataFrame of shape (D, D) the normalized feature-feature (multi-omics) adjacency matrix (network).
     """
-
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
     if isinstance(X, pd.DataFrame):
+        X = X.T
         nodes = X.index
+        number_of_omics = len(nodes)
         X_torch = torch.tensor(X.values, dtype=torch.float32, device=device)
     else:
         raise TypeError("X must be a pandas.DataFrame")
@@ -264,32 +286,39 @@ def gen_gaussian_knn_graph(X: pd.DataFrame,k: int = 15,sigma: Optional[float] = 
     W = F.normalize(W, p=1, dim=1)
     final_graph = pd.DataFrame(W.cpu().numpy(), index=nodes, columns=nodes)
 
+    if final_graph.shape != (number_of_omics, number_of_omics):
+        logger.info(f"Please make sure your input X follows the description: A DataFrame (N, D) where, N(rows) is the number of subjects/samples and D(columns) represents the multi-omics features.")
+        raise ValueError(f"Generated graph shape {final_graph.shape} does not match expected shape ({number_of_omics}, {number_of_omics}).")
+
     return final_graph
 
 
-def gen_lasso_graph(X: pd.DataFrame, alpha: float = 0.01, self_loops: bool = True) -> pd.DataFrame:
+def gen_lasso_graph(X: pd.DataFrame, alpha: float = 0.01, self_loops: bool = False, max_iter:int = 500) -> pd.DataFrame:
     """
-    Infer a sparse network via Graphical Lasso.
+    Build a sparse network using Graphical Lasso (inverse-covariance estimation).  
+
+    The function fits a precision matrix with L1 regularization (`alpha`),converts the non-zero entries to edge weights, can add self-loops, and row-normalizes the result.
 
     Args:
-
-        - X (pd.DataFrame): Data matrix where rows are nodes and columns are features.
-        - alpha (float): Regularization parameter for Graphical Lasso.
-        - self_loops (bool): If True, adds weight 1 to diagonal.
+    
+        - X: Dataframe of shape (N, D) where, N(`rows`) is the number of subjects/samples and D(`columns`) represents the multi-omics features.
+        - alpha: Regularization strength for Graphical Lasso; larger values yield sparser graphs.
+        - self_loops: If `True`, add a self-loop weight of 1.
 
     Returns:
 
-        - pandas.DataFrame: Normalized adjacency matrix (N x N) of the inferred network.
-
+        - DataFrame of shape (D, D) the normalized feature-feature (multi-omics) adjacency matrix (network).
     """
+
     if isinstance(X, pd.DataFrame):
-        nodes = X.index
-        x_numpy = X.values.T
+        nodes = X.columns
+        number_of_omics = len(nodes)
+        x_numpy = X.values 
     else:
         raise TypeError("X must be a pandas.DataFrame")
 
     try:
-        model = GraphicalLasso(alpha=alpha, max_iter=1000)
+        model = GraphicalLasso(alpha=alpha, max_iter=max_iter)
         model.fit(x_numpy)
 
         P = torch.from_numpy(model.precision_).abs()
@@ -307,26 +336,33 @@ def gen_lasso_graph(X: pd.DataFrame, alpha: float = 0.01, self_loops: bool = Tru
     W = F.normalize(W, p=1, dim=1)
     final_graph = pd.DataFrame(W.cpu().numpy(), index=nodes, columns=nodes)
 
+    if final_graph.shape != (number_of_omics, number_of_omics):
+        logger.info(f"Please make sure your input X follows the description: A DataFrame (N, D) where, N(rows) is the number of subjects/samples and D(columns) represents the multi-omics features.")
+        raise ValueError(f"Generated graph shape {final_graph.shape} does not match expected shape ({number_of_omics}, {number_of_omics}).")
+
     return final_graph
 
-def gen_mst_graph(X: pd.DataFrame, self_loops: bool = True) -> pd.DataFrame:
+def gen_mst_graph(X: pd.DataFrame, self_loops: bool = False) -> pd.DataFrame:
     """
-    Compute the minimum spanning tree (MST) on Euclidean distances.
+    Build a minimum-spanning-tree (MST) graph from feature vectors.  
+
+    The function computes pairwise Euclidean distances, extracts the MST, can add self-loops, and row-normalizes the result.
 
     Args:
-
-        - X (pd.DataFrame): Feature matrix where rows are nodes and columns are features.
-        - self_loops (bool): If True, adds weight 1 to diagonal.
+    
+        - X: Dataframe of shape (N, D) where, N(`rows`) is the number of subjects/samples and D(`columns`) represents the multi-omics features.
+        - self_loops: If `True`, add a self-loop weight of 1.
 
     Returns:
 
-        - pandas.DataFrame: Normalized adjacency matrix (N x N) of the MST graph.
+        - DataFrame of shape (D, D) the normalized feature-feature (multi-omics) adjacency matrix (network).
     """
-
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     if isinstance(X, pd.DataFrame):
+        X = X.T
         nodes = X.index
+        number_of_omics = len(nodes)
         X_torch = torch.tensor(X.values, dtype=torch.float32, device=device)
     else:
         raise TypeError("X must be a pandas.DataFrame")
@@ -366,27 +402,35 @@ def gen_mst_graph(X: pd.DataFrame, self_loops: bool = True) -> pd.DataFrame:
     W = F.normalize(W, p=1, dim=1)
     final_graph = pd.DataFrame(W.cpu().numpy(), index=nodes, columns=nodes)
 
+    if final_graph.shape != (number_of_omics, number_of_omics):
+        logger.info(f"Please make sure your input X follows the description: A DataFrame (N, D) where, N(rows) is the number of subjects/samples and D(columns) represents the multi-omics features.")
+        raise ValueError(f"Generated graph shape {final_graph.shape} does not match expected shape ({number_of_omics}, {number_of_omics}).")
+
     return final_graph
 
-def gen_snn_graph(X: pd.DataFrame,k: int = 15,mutual: bool = False, self_loops: bool = True) -> pd.DataFrame:
+def gen_snn_graph(X: pd.DataFrame,k: int = 15,mutual: bool = False, self_loops: bool = False) -> pd.DataFrame:
     """
-    Build a shared nearest neighbor (SNN) graph.
+    Build a shared-nearest-neighbor (SNN) graph from feature vectors.  
+
+    The function first finds the `top-k` nearest neighbours for each node,counts how many neighbours two nodes share, converts that count to anSNN similarity score, optionally prunes edges to mutual neighbours, and can add self-loops.
 
     Args:
-
-        - X (pd.DataFrame): Feature matrix where rows are nodes and columns are features.
-        - k (int): Number of neighbors to keep per node.
-        - mutual (bool): If True, only mutual knn edges.
-        - self_loops (bool): If True, adds weight 1 to diagonal.
+    
+        - X: Dataframe of shape (N, D) where, N(`rows`) is the number of subjects/samples and D(`columns`) represents the multi-omics features.
+        - k: Number of neighbors to keep per node.
+        - mutual: If `True`, retain only mutual edges (i->j and j->i).
+        - self_loops: If `True`, add a self-loop weight of 1.
 
     Returns:
 
-        - pandas.DataFrame: Normalized adjacency matrix (N x N) of the SNN graph.
+        - DataFrame of shape (D, D) the normalized feature-feature (multi-omics) adjacency matrix (network).
     """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     if isinstance(X, pd.DataFrame):
+        X = X.T
         nodes = X.index
+        number_of_omics = len(nodes)
         X_torch = torch.tensor(X.values, dtype=torch.float32, device=device)
     else:
         raise TypeError("X must be a pandas.DataFrame")
@@ -409,13 +453,17 @@ def gen_snn_graph(X: pd.DataFrame,k: int = 15,mutual: bool = False, self_loops: 
             W[i, j] = shared
 
     if mutual:
-        Wij = W.clone()
-        W = torch.min(Wij, Wij.t())
+        W = W.clone()
+        W = torch.min(W, W.t())
 
     if self_loops:
         W.fill_diagonal_(1.0)
 
     W = F.normalize(W, p=1, dim=1)
     final_graph = pd.DataFrame(W.cpu().numpy(), index=nodes, columns=nodes)
+
+    if final_graph.shape != (number_of_omics, number_of_omics):
+        logger.info(f"Please make sure your input X follows the description: A DataFrame (N, D) where, N(rows) is the number of subjects/samples and D(columns) represents the multi-omics features.")
+        raise ValueError(f"Generated graph shape {final_graph.shape} does not match expected shape ({number_of_omics}, {number_of_omics}).")
 
     return final_graph
