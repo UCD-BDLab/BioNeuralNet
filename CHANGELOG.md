@@ -66,7 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **Updated Tutorials and Documentation**: New end to end jupiter notebook example.
 - **Updated Test**: All test have been updated and new ones have been added.
 
-## [1.1.0] - 2025-07-12
+## [1.1.1] - 2025-07-12
 
 ### **Added**
 - **New Embedding Integration Utility**
