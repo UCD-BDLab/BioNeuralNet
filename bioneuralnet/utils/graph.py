@@ -8,7 +8,7 @@ from .logger import get_logger
 
 logger = get_logger(__name__)
 
-def gen_similarity_graph(X:pd.DataFrame, k:int = 15, metric:str = "cosine", mutual:bool = False, per_node:bool = True, self_loops:bool = False, normalize:bool = True) -> pd.DataFrame:
+def gen_similarity_graph(X:pd.DataFrame, k:int = 15, metric:str = "cosine", mutual:bool = False, per_node:bool = True, self_loops:bool = False) -> pd.DataFrame:
     """
     Build a normalized k-nearest neighbors (kNN) similarity graph from feature vectors.  
 
@@ -22,7 +22,6 @@ def gen_similarity_graph(X:pd.DataFrame, k:int = 15, metric:str = "cosine", mutu
         - mutual: If `True`, retain only mutual edges (i->j and j->i).
         - per_node: If `True`, use per-node `k`, else apply a global cutoff.
         - self_loops: If `True`, add a self-loop weight of 1.
-        - normalize: If `True`, row-normalize the resulting adjacency matrix.
 
     Returns:
 
@@ -73,8 +72,7 @@ def gen_similarity_graph(X:pd.DataFrame, k:int = 15, metric:str = "cosine", mutu
         A = A + torch.eye(N, device=device, dtype=x_torch.dtype)
 
     # row normalize
-    if normalize:
-        A = F.normalize(A, p=1, dim=1)
+    A = F.normalize(A, p=1, dim=1)
 
     A_numpy = A.cpu().numpy()
     final_graph =pd.DataFrame(A_numpy, index=nodes, columns=nodes)
@@ -235,7 +233,7 @@ def gen_threshold_graph(X:pd.DataFrame, b: float = 6.0,k: int = 15, mutual: bool
 
     return final_graph
 
-def gen_gaussian_knn_graph(X: pd.DataFrame,k: int = 15,sigma: Optional[float] = None ,mutual: bool = False,self_loops: bool = False) -> pd.DataFrame:
+def gen_gaussian_knn_graph(X: pd.DataFrame,k: int = 15,sigma: Optional[float] = None ,mutual: bool = False, self_loops: bool = True) -> pd.DataFrame:
     """
     Build a normalized k-nearest neighbors (kNN) similarity graph using a Gaussian(RBF) kernel.  
 
