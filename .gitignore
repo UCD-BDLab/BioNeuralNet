@@ -26,6 +26,8 @@ dpmon_output
 .enviroment
 TCGA-BRCA_Dataset_testing*.ipynb
 testsOLD
+network_construction_run.ipynb
+datasets_run.ipynb
 # Other example data and tests not needed in the repo.
 
 Output**

@@ -214,7 +214,7 @@ def plot_embeddings(embeddings, node_labels=None):
     plt.show()
 
 
-def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show_edge_weights=False):
+def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show_edge_weights=False, layout="kamada"):
     """
     Plots a network graph from an adjacency matrix with improved visualization.
     Also adds a summary table mapping node indexes to actual gene names.
@@ -295,7 +295,13 @@ def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show
     else:
         edge_widths = []
 
-    pos = nx.kamada_kawai_layout(G, weight="abs_weight")
+    if layout == "spectral":
+        pos = nx.spectral_layout(G)
+    elif layout == "spring":
+        pos = nx.spring_layout(G, weight="abs_weight", seed=117, iterations=50)
+    else:
+        pos = nx.kamada_kawai_layout(G, weight="abs_weight")
+
     fig, ax_graph = plt.subplots(figsize=(14, 8))
 
     nx.draw_networkx_nodes(G, pos, node_size=node_sizes, node_color="gold", edgecolors="black", linewidths=1.5, alpha=0.9, ax=ax_graph)
