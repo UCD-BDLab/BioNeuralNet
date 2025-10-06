@@ -222,4 +222,49 @@ class GIN(nn.Module):
             x = self.activation(x)
             if self.dropout > 0.0:
                 x = F.dropout(x, p=self.dropout, training=self.training)
+        return x 
+
+class Transformer(nn.Module):
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="relu", seed=None, self_loop_and_norm=None):
+        if seed is not None:
+            torch.manual_seed(seed)
+            if torch.cuda.is_available():
+                torch.cuda.manual_seed_all(seed)
+                torch.backends.cudnn.deterministic = True
+                torch.backends.cudnn.benchmark = False
+
+        super().__init__()
+
+        self.dropout = process_dropout(dropout)
+        self.final_layer = final_layer
+        self.activation = get_activation(activation)
+
+        self.convs = nn.ModuleList()
+        self.bns = nn.ModuleList()
+        for i in range(layer_num):
+            in_dim = input_dim if i == 0 else hidden_dim
+            self.convs.append(TransformerConv(in_dim, hidden_dim))
+            self.bns.append(nn.Identity())
+
+        self.regressor = nn.Linear(hidden_dim, 1) if self.final_layer == "regression" else nn.Identity()
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+        for conv, bn in zip(self.convs, self.bns):
+            x = conv(x, edge_index)
+            x = bn(x)
+            x = self.activation(x)
+            if self.dropout > 0.0:
+                x = F.dropout(x, p=self.dropout, training=self.training)
+        x = self.regressor(x)
+        return x
+
+    def get_embeddings(self, data):
+        x, edge_index = data.x, data.edge_index
+        for conv, bn in zip(self.convs, self.bns):
+            x = conv(x, edge_index)
+            x = bn(x)
+            x = self.activation(x)
+            if self.dropout > 0.0:
+                x = F.dropout(x, p=self.dropout, training=self.training)
         return x
