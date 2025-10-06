@@ -2,7 +2,7 @@ try:
     import torch
     import torch.nn as nn
     import torch.nn.functional as F
-    from torch_geometric.nn import GCNConv, GATConv, SAGEConv, GINConv
+    from torch_geometric.nn import GCNConv, GATConv, SAGEConv, GINConv, TransformerConv
 except ModuleNotFoundError:
     raise ImportError(
         "This module requires PyTorch and PyTorch Geometric. "
