@@ -43,7 +43,7 @@ class Leiden:
             f"Initialized Leiden with {len(self.G)} graph nodes."
         )
 
-    def run(self):
+    def run(self) -> np.ndarray:
         # Hybrid approach: apply Leiden to get communities, then run KMeans on embeddings inside each community
         labels_hybrid = np.full_like(self.labels_leiden, fill_value=-1)
         next_label = 0
@@ -64,3 +64,5 @@ class Leiden:
             for j in range(k_local):
                 labels_hybrid[idx[km_local.labels_ == j]] = next_label
                 next_label += 1
+        
+        return labels_hybrid
