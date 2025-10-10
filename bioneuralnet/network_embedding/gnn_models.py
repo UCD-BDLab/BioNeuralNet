@@ -54,8 +54,7 @@ class GCN(nn.Module):
 
         self.regressor = nn.Linear(hidden_dim, 1) if self.final_layer == "regression" else nn.Identity()
 
-    def forward(self, data):
-        x, edge_index = data.x, data.edge_index
+    def forward(self, x, edge_index):
         for conv, bn in zip(self.convs, self.bns):
             x = conv(x, edge_index)
             x = bn(x)
@@ -103,8 +102,7 @@ class GAT(nn.Module):
 
         self.regressor = nn.Linear(hidden_dim * heads, 1) if self.final_layer == "regression" else nn.Identity()
 
-    def forward(self, data):
-        x, edge_index = data.x, data.edge_index
+    def forward(self, x, edge_index):
         for conv, bn in zip(self.convs, self.bns):
             x = conv(x, edge_index)
             x = bn(x)
@@ -151,8 +149,7 @@ class SAGE(nn.Module):
 
         self.regressor = nn.Linear(hidden_dim, 1) if self.final_layer == "regression" else nn.Identity()
 
-    def forward(self, data):
-        x, edge_index = data.x, data.edge_index
+    def forward(self, x, edge_index):
         for conv, bn in zip(self.convs, self.bns):
             x = conv(x, edge_index)
             x = bn(x)
@@ -203,8 +200,7 @@ class GIN(nn.Module):
 
         self.regressor = nn.Linear(hidden_dim, 1) if self.final_layer == "regression" else nn.Identity()
 
-    def forward(self, data):
-        x, edge_index = data.x, data.edge_index
+    def forward(self, x, edge_index):
         for conv, bn in zip(self.convs, self.bns):
             x = conv(x, edge_index)
             x = bn(x)

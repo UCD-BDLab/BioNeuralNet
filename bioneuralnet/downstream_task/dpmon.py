@@ -601,7 +601,7 @@ class NeuralNetwork(nn.Module):
         )
 
     def forward(self, omics_dataset, omics_network_tg):
-        omics_network_nodes_embedding = self.gnn(omics_network_tg)
+        omics_network_nodes_embedding = self.gnn(omics_network_tg.x, omics_network_tg.edge_index)
         omics_network_nodes_embedding_ae = self.autoencoder(
             omics_network_nodes_embedding
         )

@@ -497,7 +497,7 @@ class GNNEmbedding:
         for epoch in range(1, self.num_epochs + 1):
             optimizer.zero_grad()
 
-            output = model(data)
+            output = model(data.x, data.edge_index)
             output = output.view(-1)
             target = data.y.to(self.device)
 
