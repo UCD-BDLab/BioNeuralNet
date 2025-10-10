@@ -1,0 +1,6 @@
+id	filename	md5	size	state
+6a09fc95-7c32-4545-8c48-a4b2027b649f	6a09fc95-7c32-4545-8c48-a4b2027b649f/nationwidechildrens.org_clinical.TCGA-E9-A3Q9.xml	5768d548ff1093cebfdb21357457f194	88736	validated
+745674b2-3aaa-433b-a76a-7220a8eb7e46	745674b2-3aaa-433b-a76a-7220a8eb7e46/nationwidechildrens.org_clinical.TCGA-EW-A1P1.xml	8267617e461e99cf7428f7dc3acd757d	105673	validated
+9f870d93-c292-48ff-9b88-7d907dcbb929	9f870d93-c292-48ff-9b88-7d907dcbb929/nationwidechildrens.org_clinical.TCGA-E2-A2P5.xml	a2bf6eb092b04cb121751f5f5a13fff1	76130	validated
+be44103d-9aad-48bf-a727-fcdf6d625d54	be44103d-9aad-48bf-a727-fcdf6d625d54/nationwidechildrens.org_clinical.TCGA-E2-A158.xml	3aa114260f0751012acbcb2bec3cd453	76023	validated
+cb48c54b-afe4-46fc-bcde-7a802c6c6157	cb48c54b-afe4-46fc-bcde-7a802c6c6157/nationwidechildrens.org_clinical.TCGA-E9-A1R0.xml	263f8e0fc947fda97a6c9d615d6f2136	77183	validated

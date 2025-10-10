@@ -10,6 +10,9 @@ except ModuleNotFoundError:
         "https://bioneuralnet.readthedocs.io/en/latest/installation.html"
     )
 
+# Importing Graph Transformer implementation
+from .graph_transformer import GraphTransformer
+
 def process_dropout(dropout):
     if isinstance(dropout, bool):
         return 0.5 if dropout else 0.0

@@ -31,7 +31,7 @@ from ray import tune
 from ray.tune import CLIReporter
 from ray.tune.schedulers import ASHAScheduler
 
-from .gnn_models import GCN, GAT, SAGE, GIN, process_dropout
+from .gnn_models import GCN, GAT, SAGE, GIN, GraphTransformer, process_dropout
 from ..utils.logger import get_logger
 from scipy.stats import skew
 
@@ -125,9 +125,10 @@ class GNNEmbedding:
                 torch.backends.cudnn.benchmark = False
 
         self.seed = seed
-        self.adjacency_matrix = adjacency_matrix.copy(deep=True)
-        self.omics_data = omics_data.copy(deep=True)
-        self.clinical_data = clinical_data.copy(deep=True) if clinical_data is not None else None
+        # Using shallow copy to avoid duplicating large memory; inputs are treated as read-only
+        self.adjacency_matrix = adjacency_matrix.copy(deep=False)
+        self.omics_data = omics_data.copy(deep=False)
+        self.clinical_data = clinical_data.copy(deep=False) if clinical_data is not None else None
         self.phenotype_col = phenotype_col
 
         self.model_type = model_type
@@ -271,12 +272,28 @@ class GNNEmbedding:
 
         self.logger.info(f"Found {len(nodes)} common features between network and omics data.")
         omics_filtered = self.omics_data[nodes]
-        network_filtered = self.adjacency_matrix.loc[nodes, nodes]
+        # Avoiding copying large adjacency if nodes already match features
+        if set(nodes) == set(network_features):
+            self.logger.debug("Nodes match network features; using original adjacency without slicing.")
+            network_filtered = self.adjacency_matrix
+        else:
+            network_filtered = self.adjacency_matrix.loc[nodes, nodes]
 
         G = nx.from_pandas_adjacency(network_filtered)
 
         pagerank = nx.pagerank(G, weight="weight")
-        katz = nx.katz_centrality_numpy(G, weight="weight")
+        # Memory-safe Katz centrality: avoiding dense numpy for large graphs
+        try:
+            if G.number_of_nodes() <= 2000:
+                katz = nx.katz_centrality_numpy(G, weight="weight")
+            else:
+                self.logger.warning(
+                    f"Graph has {G.number_of_nodes()} nodes; using iterative Katz centrality to avoid dense memory allocation."
+                )
+                katz = nx.katz_centrality(G, weight="weight", alpha=0.001, max_iter=1000, tol=1e-06)
+        except Exception as e:
+            self.logger.warning(f"Katz centrality failed ({e}); falling back to degree centrality.")
+            katz = nx.degree_centrality(G)
 
         eigenvector = {}
         for comp in nx.connected_components(G):
@@ -418,8 +435,13 @@ class GNNEmbedding:
 
     def _build_pyg_data(self, node_features: pd.DataFrame, node_labels: pd.Series) -> Data:
         self.logger.info("Constructing PyTorch Geometric Data object.")
+        # Align labels to node feature order if needed
         if not node_labels.index.equals(node_features.index):
-            raise ValueError("`node_labels` must have the same index and order as `node_features`.")
+            self.logger.warning("Label index/order mismatch; reindexing labels to match node_features.")
+            node_labels = node_labels.reindex(node_features.index)
+            if node_labels.isna().any():
+                missing = list(node_labels[node_labels.isna()].index)
+                raise ValueError(f"Missing labels for nodes: {missing}")
 
         nodes = node_features.index
         adj = self.adjacency_matrix.loc[nodes, nodes]
@@ -447,8 +469,17 @@ class GNNEmbedding:
         norm_w = deg_inv_sqrt[row] * data.edge_weight * deg_inv_sqrt[col]
         data.edge_weight = norm_w
 
-        data.x = torch.tensor(node_features.loc[nodes].values, dtype=torch.float)
-        data.y = torch.tensor(node_labels.loc[nodes].values, dtype=torch.float)
+        # sanitizing features and labels
+        safe_features = node_features.loc[nodes].replace([np.inf, -np.inf], np.nan).fillna(0.0)
+        # adding jitter for zero-variance columns to break ties
+        col_std = safe_features.std()
+        zero_var_cols = col_std.index[col_std.fillna(0.0) < 1e-12]
+        if len(zero_var_cols) > 0:
+            jitter = np.random.default_rng(self.seed).normal(0, 1e-6, size=(safe_features.shape[0], len(zero_var_cols)))
+            safe_features.loc[:, zero_var_cols] = safe_features.loc[:, zero_var_cols] + jitter
+        safe_labels = node_labels.loc[nodes].replace([np.inf, -np.inf], np.nan).fillna(0.0)
+        data.x = torch.tensor(safe_features.values, dtype=torch.float)
+        data.y = torch.tensor(safe_labels.values, dtype=torch.float)
 
         self.logger.info("PyTorch Geometric Data object constructed successfully.")
         return data
@@ -473,6 +504,8 @@ class GNNEmbedding:
             return SAGE(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout,activation=self.activation, seed = self.seed, self_loop_and_norm=False)
         elif self.model_type.upper() == "GIN":
             return GIN(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout, activation=self.activation, seed = self.seed, self_loop_and_norm=False)
+        elif self.model_type.upper() == "GRAPHTRANSFORMER":
+            return GraphTransformer(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout, activation=self.activation, seed=self.seed, heads=4)
         else:
             self.logger.error(f"Unsupported model_type: {self.model_type}")
             raise ValueError(f"Unsupported model_type: {self.model_type}")
@@ -508,7 +541,15 @@ class GNNEmbedding:
                 break
 
             loss.backward()
+            # gradient clipping to improve stability
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()
+
+            # checking for NaNs in parameters/outputs
+            with torch.no_grad():
+                if not torch.isfinite(output).all():
+                    self.logger.warning("Non-finite outputs detected; applying clamp.")
+                    output = torch.nan_to_num(output, nan=0.0, posinf=1.0, neginf=-1.0)
 
             if loss.item() < best_loss - 1e-6:
                 best_loss = loss.item()
