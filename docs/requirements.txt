@@ -6,3 +6,4 @@ pandoc
 nbsphinx
 myst_nb
 furo
+sphinx-copybutton

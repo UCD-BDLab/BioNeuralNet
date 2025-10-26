@@ -22,9 +22,10 @@
 
 If you use BioNeuralNet in your research, we kindly ask that you cite our paper:
 
-> Vicente Ramos, et al. (2025). 
-> [**BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool**](https://arxiv.org/abs/2507.20440). 
-> *arXiv preprint arXiv:2507.20440*.
+> Ramos, V., Hussein, S., et al. (2025).
+> [**BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool**](https://arxiv.org/abs/2507.20440).
+> *arXiv preprint arXiv:2507.20440* | [**DOI: 10.48550/arXiv.2507.20440**](https://doi.org/1048550/arXiv.2507.20440).
+
 
 For your convenience, you can use the following BibTeX entry:
 
@@ -46,7 +47,8 @@ For your convenience, you can use the following BibTeX entry:
 
 ## Documentation
 
-**[BioNeuralNet Documentation & Examples](https://bioneuralnet.readthedocs.io/en/latest/)**
+For complete documentation, tutorials, and examples, please visit our Read the Docs site:
+**[bioneuralnet.readthedocs.io](https://bioneuralnet.readthedocs.io/en/latest/)**
 
 ## Table of Contents
 
@@ -71,9 +73,8 @@ BioNeuralNet is available as a package on the Python Package Index (PyPI), makin
 ```bash
 pip install bioneuralnet
 ```
-> **PyPI Project Page:** [https://pypi.org/project/bioneuralnet/](https://pypi.org/project/bioneuralnet/)
->
-> **Requirements:** BioNeuralNet supports Python `3.10`, `3.11`, and `3.12`.
+**PyPI Project Page:** [https://pypi.org/project/bioneuralnet/](https://pypi.org/project/bioneuralnet/)
+>**Requirements:** BioNeuralNet is tested and supported on Python versions `3.10`, `3.11`, and `3.12`. Functionality on other versions is not guaranteed.
 
 ## 1.2. Install PyTorch and PyTorch Geometric
 BioNeuralNet relies on PyTorch for GNN computations. Install PyTorch separately:
