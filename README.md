@@ -24,7 +24,7 @@ If you use BioNeuralNet in your research, we kindly ask that you cite our paper:
 
 > Ramos, V., Hussein, S., et al. (2025).
 > [**BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool**](https://arxiv.org/abs/2507.20440).
-> *arXiv preprint arXiv:2507.20440* | [**DOI: 10.48550/arXiv.2507.20440**](https://doi.org/1048550/arXiv.2507.20440).
+> *arXiv preprint arXiv:2507.20440* | [**DOI: 10.48550/arXiv.2507.20440**](https://doi.org/10.48550/arXiv.2507.20440).
 
 
 For your convenience, you can use the following BibTeX entry:
