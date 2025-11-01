@@ -9,8 +9,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17503084.svg)](https://doi.org/10.5281/zenodo.17503084)
 
 
-
-## Welcome to BioNeuralNet 1.1.1
+## Welcome to BioNeuralNet 1.1.3
 
 ![BioNeuralNet Logo](assets/LOGO_WB.png)
 

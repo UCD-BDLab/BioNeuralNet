@@ -110,3 +110,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### **Fixed**
 - **Packaging Bug**: Missing `.csv` datasets and `.R` scripts in source distribution; `MANIFEST.in` updated to include all requisite data files.
+
+## [1.1.2] - 2025-11-01
+
+- **Linked Zenodo DOI to GitHub repository**
+
+## [1.1.3] - 2025-11-01
+
+- **Tag update to Sync Zenodo and PIPY**
