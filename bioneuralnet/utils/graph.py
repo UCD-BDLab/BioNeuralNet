@@ -88,7 +88,7 @@ def gen_correlation_graph(X: pd.DataFrame, k: int = 15,method: str = 'pearson', 
     """
     Build a normalized k-nearest neighbors (kNN) correlation graph from feature vectors.  
 
-    The function computes pairwise `pearson` or `spearman` correlations, sparsifies the matrix by keeping `top-k`neighbours per node (or by applying a global threshold), optionally prunes edges to mutual neighbours, and can add self-loops.
+    The function computes pairwise `pearson` or `spearman` correlations, sparsifies the matrix by keeping `top-k` neighbours per node (or by applying a global threshold), optionally prunes edges to mutual neighbours, and can add self-loops.
 
     Args:
     

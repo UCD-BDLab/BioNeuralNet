@@ -28,6 +28,7 @@ TCGA-BRCA_Dataset_testing*.ipynb
 testsOLD
 network_construction_run.ipynb
 datasets_run.ipynb
+jupyter_execute
 # Other example data and tests not needed in the repo.
 
 Output**

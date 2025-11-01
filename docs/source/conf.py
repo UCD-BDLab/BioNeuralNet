@@ -20,6 +20,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "nbsphinx",
     "myst_nb",
+    'sphinx_copybutton',
 ]
 nb_execution_mode = "off"
 myst_enable_extensions = ["colon_fence"]
