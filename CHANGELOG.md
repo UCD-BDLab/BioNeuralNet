@@ -70,16 +70,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### **Added**
 - **New Embedding Integration Utility**
-  - `_integrate_embeddings(reduced, method="multiply", alpha=2.0, beta=0.5)`: 
-    - Integrates reduced embeddings with raw omics features via a multiplicative scheme:  
-    - `enhanced = beta * raw + (1 - beta) * (alpha * normalized_weight * raw)`  
+  - `_integrate_embeddings(reduced, method="multiply", alpha=2.0, beta=0.5)`:
+    - Integrates reduced embeddings with raw omics features via a multiplicative scheme:
+    - `enhanced = beta * raw + (1 - beta) * (alpha * normalized_weight * raw)`
     - (default ensures ≥ 50 % of each feature’s final value is influenced by the learned weights).
 
 - **Graph-Generation Algorithms**
-  - `gen_similarity_graph`: k-NN Cosine / Gaussian RBF similarity graph  
-  - `gen_correlation_graph`: Pearson / Spearman co-expression graph  
-  - `gen_threshold_graph`: soft-threshold (WGCNA-style) correlation graph  
-  - `gen_gaussian_knn_graph`: Gaussian kernel k-NN graph  
+  - `gen_similarity_graph`: k-NN Cosine / Gaussian RBF similarity graph
+  - `gen_correlation_graph`: Pearson / Spearman co-expression graph
+  - `gen_threshold_graph`: soft-threshold (WGCNA-style) correlation graph
+  - `gen_gaussian_knn_graph`: Gaussian kernel k-NN graph
   - `gen_mutual_info_graph`: mutual-information graph
 
 - **Preprocessing Utilities**
@@ -89,24 +89,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Correlation selection (supervised / unsupervised): `select_top_k_correlation`
   - RandomForest importance: `select_top_randomforest`
   - ANOVA F-test selection: `top_anova_f_features`
-  - Network-pruning helpers:  
-      - `prune_network`, `prune_network_by_quantile`,  
+  - Network-pruning helpers:
+      - `prune_network`, `prune_network_by_quantile`,
       - `network_remove_low_variance`, `network_remove_high_zero_fraction`
 
-- **Continuous-Deployment Workflow**  
+- **Continuous-Deployment Workflow**
   Added `.github/workflows/publish.yml` to auto-publish releases to PyPI when a Git tag is pushed.
 
-- **Updated Homepage Image**  
+- **Updated Homepage Image**
   Replaced the index-page illustration to depict the full BioNeuralNet workflow.
 
 ### **Changed**
 - **Comprehensive Documentation Update**
-  - Rebuilt ReadTheDocs site with a new workflow diagram on the landing page.  
-  - Synced API reference to include all new graph-generation, preprocessing, and embedding-integration functions.  
-  - Added quick-start guide, expanded tutorials, and refreshed examples/notebooks.  
+  - Rebuilt ReadTheDocs site with a new workflow diagram on the landing page.
+  - Synced API reference to include all new graph-generation, preprocessing, and embedding-integration functions.
+  - Added quick-start guide, expanded tutorials, and refreshed examples/notebooks.
   - Updated narrative docs, docstrings, and licencing info for consistency.
 
 - **License**: Project is now distributed under the [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/).
 
 ### **Fixed**
 - **Packaging Bug**: Missing `.csv` datasets and `.R` scripts in source distribution; `MANIFEST.in` updated to include all requisite data files.
+
+## [1.1.2] - 2025-11-01
+
+- **Linked Zenodo DOI to GitHub repository**
+
+## [1.1.3] - 2025-11-01
+
+- **Tag update to Sync Zenodo and PIPY**
