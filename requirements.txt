@@ -6,7 +6,7 @@ scikit-learn
 networkx
 python-louvain
 pydantic
-ray[tune]==2.7.1
+ray[tune]
 statsmodels
 # torch
 # torch_geometric
