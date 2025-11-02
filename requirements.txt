@@ -5,7 +5,8 @@ matplotlib
 scikit-learn
 networkx
 python-louvain
-ray[tune]
+pydantic
+ray[tune]==2.7.1
 statsmodels
 # torch
 # torch_geometric

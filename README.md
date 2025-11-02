@@ -32,16 +32,16 @@ For your convenience, you can use the following BibTeX entry:
 
 <details>
   <summary>BibTeX Citation</summary>
-  
+
 ```bibtex
 @misc{ramos2025bioneuralnetgraphneuralnetwork,
-      title={BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool}, 
+      title={BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool},
       author={Vicente Ramos and Sundous Hussein and Mohamed Abdel-Hafiz and Arunangshu Sarkar and Weixuan Liu and Katerina J. Kechris and Russell P. Bowler and Leslie Lange and Farnoush Banaei-Kashani},
       year={2025},
       eprint={2507.20440},
       archivePrefix={arXiv},
       primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2507.20440}, 
+      url={https://arxiv.org/abs/2507.20440},
 }
 ```
 </details>
@@ -106,10 +106,10 @@ BioNeuralNet is a flexible, modular Python framework developed to facilitate end
   - **Similarity graphs:** k-NN (cosine/Euclidean), RBF, mutual information.
 
   - **Correlation graphs:** Pearson, Spearman; optional soft-thresholding.
-  
+
   - **Phenotype-aware graphs:** SmCCNet integration (R) for sparse multiple canonical-correlation networks.
 
-- **[Preprocessing Utilities](https://bioneuralnet.readthedocs.io/en/latest/utils.html#graph-generation):** 
+- **[Preprocessing Utilities](https://bioneuralnet.readthedocs.io/en/latest/utils.html#graph-generation):**
 
   - **RData conversion to pandas DataFrame:** Converts an RData file to CSV and loads it into a pandas DataFrame.
 
@@ -199,7 +199,7 @@ dpmon = DPMON(
     model="GCN",
     repeat_num=5,
     tune=True,
-    gpu=True, 
+    gpu=True,
     cuda=0,
     output_dir="./output"
 )
@@ -276,24 +276,24 @@ See the [LICENSE](LICENSE) file for details.
 
 If you use BioNeuralNet in your research, we kindly ask that you cite our paper:
 
-> Vicente Ramos, et al. (2025). 
-> [**BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool**](https://arxiv.org/abs/2507.20440). 
+> Vicente Ramos, et al. (2025).
+> [**BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool**](https://arxiv.org/abs/2507.20440).
 > *arXiv preprint arXiv:2507.20440*.
 
 For your convenience, you can use the following BibTeX entry:
 
 <details>
   <summary>BibTeX Citation</summary>
-  
+
 ```bibtex
 @misc{ramos2025bioneuralnetgraphneuralnetwork,
-      title={BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool}, 
+      title={BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool},
       author={Vicente Ramos and Sundous Hussein and Mohamed Abdel-Hafiz and Arunangshu Sarkar and Weixuan Liu and Katerina J. Kechris and Russell P. Bowler and Leslie Lange and Farnoush Banaei-Kashani},
       year={2025},
       eprint={2507.20440},
       archivePrefix={arXiv},
       primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2507.20440}, 
+      url={https://arxiv.org/abs/2507.20440},
 }
 ```
 </details>
