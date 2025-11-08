@@ -1,13 +1,21 @@
 import unittest
+from unittest.mock import patch
 import pandas as pd
 import numpy as np
 import io
 import sys
+import logging
+import torch
 from bioneuralnet.utils.data import variance_summary
 from bioneuralnet.utils.data import zero_fraction_summary
 from bioneuralnet.utils.data import expression_summary
 from bioneuralnet.utils.data import correlation_summary
 from bioneuralnet.utils.data import explore_data_stats
+from bioneuralnet.utils.data import impute_omics
+from bioneuralnet.utils.data import impute_omics_knn
+from bioneuralnet.utils.data import normalize_omics
+from bioneuralnet.utils.data import beta_to_m
+from bioneuralnet.utils.data import set_seed
 
 class TestDataUtils(unittest.TestCase):
     def setUp(self):
@@ -30,6 +38,21 @@ class TestDataUtils(unittest.TestCase):
             "V": [3.0, 2.0, 1.0],
             "W": [1.0, 0.0, 1.0],
         })
+        self.df_nan = pd.DataFrame({
+            "C1": [1.0, 2.0, np.nan, 4.0],
+            "C2": [10.0, np.nan, 30.0, 40.0],
+            "C3": [5.0, 5.0, 5.0, 5.0],
+        })
+        self.df_beta = pd.DataFrame({
+            "B1": [0.1, 0.5, 0.9],
+            "B2": [0.0, 1.0, 0.5],
+        })
+
+        self.mock_logger = logging.getLogger('test_logger')
+        self.mock_logger.setLevel(logging.INFO)
+        self.mock_stream = io.StringIO()
+        self.mock_handler = logging.StreamHandler(self.mock_stream)
+        self.mock_logger.addHandler(self.mock_handler)
 
     def test_variance_summary_no_threshold(self):
         stats = variance_summary(self.df_var, low_var_threshold=None)
@@ -93,17 +116,65 @@ class TestDataUtils(unittest.TestCase):
         self.assertAlmostEqual(stats["max_corr_max"], max_corr.max())
         self.assertAlmostEqual(stats["max_corr_std"], max_corr.std())
 
-    def test_explore_data_stats_prints_all_sections(self):
-        buf = io.StringIO()
-        old_stdout = sys.stdout
-        sys.stdout = buf
+    def test_impute_omics_mean(self):
+        df_imputed = impute_omics(self.df_nan, method="mean")
+        self.assertAlmostEqual(df_imputed.loc[2, "C1"], 2.3333333333333335)
+        self.assertAlmostEqual(df_imputed.loc[1, "C2"], 26.666666666666668)
+        self.assertEqual(df_imputed.isna().sum().sum(), 0)
 
-        try:
-            explore_data_stats(self.df_corr, name="TestDF")
-        finally:
-            sys.stdout = old_stdout
+    def test_impute_omics_median(self):
+        df_imputed = impute_omics(self.df_nan, method="median")
+        self.assertAlmostEqual(df_imputed.loc[1, "C2"], 30.0)
+        self.assertEqual(df_imputed.isna().sum().sum(), 0)
 
-        output = buf.getvalue()
+    def test_impute_omics_knn(self):
+        df_imputed = impute_omics_knn(self.df_nan, n_neighbors=2)
+        self.assertEqual(df_imputed.shape, self.df_nan.shape)
+        self.assertEqual(df_imputed.isna().sum().sum(), 0)
+        self.assertNotAlmostEqual(df_imputed.loc[1, "C2"], 26.666666666666668)
+
+    def test_normalize_omics_standard(self):
+        df_normalized = normalize_omics(self.df_nan.dropna(), method="standard")
+        self.assertAlmostEqual(df_normalized.mean().sum(), 0.0, places=5)
+        expected_std_sum = np.sqrt(2) * 2
+        self.assertAlmostEqual(df_normalized.std().sum(), expected_std_sum, places=5)
+
+    def test_normalize_omics_log2(self):
+        df_log = normalize_omics(self.df_var, method="log2")
+        self.assertAlmostEqual(df_log.loc[0, "A"], 1.0)
+        self.assertAlmostEqual(df_log.loc[0, "B"], 1.5849625)
+
+    def test_beta_to_m_conversion(self):
+        df_m_values = beta_to_m(self.df_beta, eps=1e-6)
+        self.assertAlmostEqual(df_m_values.loc[0, "B1"], -3.169925)
+        self.assertAlmostEqual(df_m_values.loc[2, "B2"], 0.0)
+        self.assertAlmostEqual(df_m_values.loc[0, "B2"], -19.931567126628412)
+
+    def test_set_seed_reproducibility(self):
+        test_seed = 177
+
+        set_seed(test_seed)
+        result1 = np.random.rand(5)
+
+        set_seed(test_seed)
+        result2 = np.random.rand(5)
+
+        np.testing.assert_array_equal(result1, result2)
+        set_seed(test_seed + 1)
+        tensor1 = torch.rand(5)
+
+        set_seed(test_seed + 1)
+        tensor2 = torch.rand(5)
+
+        self.assertTrue(torch.equal(tensor1, tensor2))
+
+    @patch('bioneuralnet.utils.data.logger')
+    def test_explore_data_stats_logs_all_sections(self, mock_logger):
+        mock_logger.addHandler(self.mock_handler)
+        explore_data_stats(self.df_corr, name="TestDF")
+
+        all_call_args = [call[0][0] for call in mock_logger.info.call_args_list]
+        output = "\n".join(all_call_args)
 
         self.assertIn("Statistics for TestDF:", output)
         self.assertIn("Variance Summary:", output)

@@ -13,8 +13,8 @@ BioNeuralNet: Graph Neural Networks for Multi-Omics Network Analysis
 .. image:: https://img.shields.io/badge/GitHub-View%20Code-blue
    :target: https://github.com/UCD-BDLab/BioNeuralNet
 
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.17503084.svg
-   :target: https://doi.org/10.5281/zenodo.17503084
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.17503083.svg
+   :target: https://doi.org/10.5281/zenodo.17503083
 
 .. figure:: _static/LOGO_TB.png
    :align: center
