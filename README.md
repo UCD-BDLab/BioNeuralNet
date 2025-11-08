@@ -6,8 +6,7 @@
 [![GitHub Contributors](https://img.shields.io/github/contributors/UCD-BDLab/BioNeuralNet)](https://github.com/UCD-BDLab/BioNeuralNet/graphs/contributors)
 [![Downloads](https://static.pepy.tech/badge/bioneuralnet)](https://pepy.tech/project/bioneuralnet)
 [![Documentation](https://img.shields.io/badge/docs-read%20the%20docs-blue.svg)](https://bioneuralnet.readthedocs.io/en/latest/)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17503084.svg)](https://doi.org/10.5281/zenodo.17503084)
-
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17503083.svg)](https://doi.org/10.5281/zenodo.17503083)
 
 ## Welcome to BioNeuralNet 1.1.3
 
