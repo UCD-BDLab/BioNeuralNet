@@ -169,7 +169,7 @@ def impute_omics(omics_df: pd.DataFrame, method: str = "mean") -> pd.DataFrame:
     Returns:
 
         pd.DataFrame: The DataFrame with missing values filled.
-        
+
     Raises:
 
         ValueError: If the specified imputation method is not recognized.
@@ -198,16 +198,16 @@ def impute_omics_knn(omics_df: pd.DataFrame, n_neighbors: int = 5) -> pd.DataFra
 
         pd.DataFrame: The DataFrame with missing values filled using KNN.
     """
-    
+
     has_non_numeric = False
     for col in omics_df.columns:
         if not pd.api.types.is_numeric_dtype(omics_df[col]):
             has_non_numeric = True
             break
-            
+
     if has_non_numeric:
         logger.error("KNNImputer requires numeric data. Non-numeric columns found.")
-    
+
     logger.info(f"Starting KNN imputation (k={n_neighbors}) on DataFrame (shape: {omics_df.shape}).")
     imputer = KNNImputer(n_neighbors=n_neighbors)
     imputed_data = imputer.fit_transform(omics_df.values)
@@ -215,7 +215,7 @@ def impute_omics_knn(omics_df: pd.DataFrame, n_neighbors: int = 5) -> pd.DataFra
     logger.info("KNN imputation complete")
 
     return imputed_df
-    
+
 def normalize_omics(omics_df: pd.DataFrame, method: str = "standard") -> pd.DataFrame:
     """
     Scales or transforms feature data using common normalization techniques.
@@ -225,18 +225,18 @@ def normalize_omics(omics_df: pd.DataFrame, method: str = "standard") -> pd.Data
         omics_df (pd.DataFrame): The input omics DataFrame.
         method (str): The scaling strategy. Must be 'standard' (Z-score), 'minmax', or 'log2'.
 
-        
+
     Returns:
 
         pd.DataFrame: The DataFrame with features normalized according to the specified method.
-        
+
     Raises:
 
         ValueError: If the specified normalization method is not recognized.
     """
     logger.info(f"Starting normalization on DataFrame (shape: {omics_df.shape}) using method: '{method}'.")
     data = omics_df.values
-    
+
     if method == "standard":
         scaler = StandardScaler()
         scaled_data = scaler.fit_transform(data)
@@ -254,7 +254,7 @@ def normalize_omics(omics_df: pd.DataFrame, method: str = "standard") -> pd.Data
     final_df = pd.DataFrame(scaled_data, index=omics_df.index, columns=omics_df.columns)
     logger.info("Normalization complete.")
     return final_df
-    
+
 def set_seed(seed_value: int) -> None:
     """
     Sets seeds for maximum reproducibility across Python, NumPy, and PyTorch.
@@ -271,21 +271,21 @@ def set_seed(seed_value: int) -> None:
 
     """
     logger.info(f"Setting global seed for reproducibility to: {seed_value}")
-    
+
     os.environ['PYTHONHASHSEED'] = str(seed_value)
     random.seed(seed_value)
     np.random.seed(seed_value)
     torch.manual_seed(seed_value)
-    
+
     if torch.cuda.is_available():
         logger.info("CUDA available. Applying seed to all GPU operations")
         torch.cuda.manual_seed(seed_value)
-        torch.cuda.manual_seed_all(seed_value) 
+        torch.cuda.manual_seed_all(seed_value)
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
     else:
         logger.info("CUDA not available. Seeding only CPU operations")
-        
+
     logger.info("Seed setting complete")
 
 def beta_to_m(df, eps=1e-6):
@@ -304,21 +304,21 @@ def beta_to_m(df, eps=1e-6):
         pd.DataFrame: A new DataFrame containing the log2-transformed M-values, calculated as log2(B / (1 - B)).
     """
     logger.info(f"Starting Beta-to-M value conversion (shape: {df.shape}). Epsilon: {eps}")
-    
+
     has_non_numeric = False
     for col in df.columns:
         if not pd.api.types.is_numeric_dtype(df[col]):
             has_non_numeric = True
             break
-            
+
     if has_non_numeric:
         logger.warning("Coercing non-numeric Beta-values to numeric (NaNs will be introduced)")
-        
+
     df_numeric = df.apply(pd.to_numeric, errors='coerce')
-    
+
     B = np.clip(df_numeric.values, eps, 1.0 - eps)
     M = np.log2(B / (1.0 - B))
-    
+
     logger.info("Beta-to-M conversion complete.")
 
     return pd.DataFrame(M, index=df_numeric.index, columns=df_numeric.columns)
