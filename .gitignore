@@ -69,8 +69,13 @@ TCGA_BRCA_DATA/
 !bioneuralnet/datasets/brca/
 !bioneuralnet/datasets/brca/**/*.csv
 
-!bioneuralnet/datasets/networks/
-!bioneuralnet/datasets/networks/**/*.csv
+!bioneuralnet/datasets/kipan/
+!bioneuralnet/datasets/kipan/**/*.csv
+
+!bioneuralnet/datasets/gbmlgg/
+!bioneuralnet/datasets/gbmlgg/**/*.csv
+
+
 feature_testing
 
 # Sphinx documentation build
@@ -129,3 +134,5 @@ dpmon_cv_results_SAGE_FINAL
 dpmon_tuning
 GBMLGG
 PAAN
+dpmon_cv_results_GAT_FINAL
+docs_notebooks

@@ -9,4 +9,4 @@ BioNeuralNet provides convenience wrappers for external tools, including:
    :maxdepth: 2
    :caption: External Tools
 
-   Graph_Construction
+   SmCCNet

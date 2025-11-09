@@ -38,7 +38,7 @@ Quick Start Examples
 Get started quickly with these end-to-end examples demonstrating the BioNeuralNet workflow:
 
 - :doc:`Quick_Start`
-- :doc:`TCGA-BRCA_Dataset`
+- :doc:`notebooks/index`
 
 **BioNeuralNet Workflow Overview**
 ----------------------------------
@@ -179,7 +179,7 @@ Explore BioNeuralNet's Documentation
 For detailed examples and tutorials, visit:
 
 - :doc:`Quick_Start`: A quick walkthrough demonstrating the BioNeuralNet workflow from start to finish.
-- :doc:`TCGA-BRCA_Dataset`: A detailed real-world example applying BioNeuralNet to breast cancer subtype prediction.
+- :doc:`notebooks/index`: A collection of demonstration notebooks showcasing end-to-end analyses on TCGA datasets.
 
 **Documentation Sections:**
 
@@ -223,16 +223,15 @@ We welcome contributions to BioNeuralNet! If you have ideas for new features, im
    :caption: Contents:
 
    installation
+
    gnns
    clustering
    metrics
    utils
    downstream_tasks
-   network_construction.ipynb
-   datasets.ipynb
    Quick_Start.ipynb
-   TCGA-BRCA_Dataset.ipynb
-   tutorials/index
+   notebooks/index
+   examples/index
    external_tools/index
    user_api
    faq

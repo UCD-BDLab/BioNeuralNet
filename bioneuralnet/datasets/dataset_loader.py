@@ -4,21 +4,21 @@ import pandas as pd
 class DatasetLoader:
     def __init__(self, dataset_name: str):
         """
-        Args:
-            dataset_name (str): "example1", "monet", "brca", "gbm", or "kipan".
+        Loads a pre-processed multi-omics dataset from the package.
 
-        returns:
+        Args:
+
+            - dataset_name (str): The name of the dataset to load.
+                - Valid options: "example1", "monet", "brca", "gbmlgg", or "kipan".
+
+        Returns:
 
             - data (dict): Dictionary of DataFrames, where keys are table names and values are DataFrames.
-            - shape (dict): Dictionary of table names to their shapes (n_rows, n_cols).
 
         Example:
 
-            tcga_brca = DatasetLoader("brca")
-            tcga_brca.shape
-            # {'brca_mirna': (108, 1000), 'brca_pam50': (108, 50), ...}
-            mirna = tcga_brca.data["brca_mirna"]
-            rna = tcga_brca.data["brca_rna"]
+            - tcga_kipan = DatasetLoader("kipan")
+            - tcga_kipan.shape: {'mirna': (658, 472), 'target': (658, 1), ...}
 
         """
         self.dataset_name = dataset_name.strip().lower()
@@ -59,20 +59,19 @@ class DatasetLoader:
             self.data["rna"] = pd.read_csv(folder / "rna.csv", index_col=0)
             self.data["meth"] = pd.read_csv(folder / "meth.csv", index_col=0)
 
-        # elif self.dataset_name == "gbm":
-        #     self.data["mirna"] = pd.read_csv(folder / "mirna.csv", index_col=0)
-        #     self.data["target"] = pd.read_csv(folder / "target.csv", index_col=0)
-        #     self.data["clinical"] = pd.read_csv(folder / "clinical.csv", index_col=0)
-        #     self.data["rna"] = pd.read_csv(folder / "rna.csv", index_col=0)
-        #     self.data["meth"] = pd.read_csv(folder / "meth.csv", index_col=0)
+        elif self.dataset_name == "gbmlgg":
+            self.data["mirna"] = pd.read_csv(folder / "mirna.csv", index_col=0)
+            self.data["target"] = pd.read_csv(folder / "target.csv", index_col=0)
+            self.data["clinical"] = pd.read_csv(folder / "clinical.csv", index_col=0)
+            self.data["rna"] = pd.read_csv(folder / "rna.csv", index_col=0)
+            self.data["meth"] = pd.read_csv(folder / "meth.csv", index_col=0)
 
-        # elif self.dataset_name == "kipan":
-        #     self.data["mirna"] = pd.read_csv(folder / "mirna.csv", index_col=0)
-        #     self.data["target"] = pd.read_csv(folder / "target.csv", index_col=0)
-        #     self.data["clinical"] = pd.read_csv(folder / "clinical.csv", index_col=0)
-        #     self.data["rna"] = pd.read_csv(folder / "rna.csv", index_col=0)
-        #     self.data["meth"] = pd.read_csv(folder / "meth.csv", index_col=0)
-
+        elif self.dataset_name == "kipan":
+            self.data["mirna"] = pd.read_csv(folder / "mirna.csv", index_col=0)
+            self.data["target"] = pd.read_csv(folder / "target.csv", index_col=0)
+            self.data["clinical"] = pd.read_csv(folder / "clinical.csv", index_col=0)
+            self.data["rna"] = pd.read_csv(folder / "rna.csv", index_col=0)
+            self.data["meth"] = pd.read_csv(folder / "meth.csv", index_col=0)
         else:
             raise ValueError(f"Dataset '{self.dataset_name}' is not recognized.")
 
