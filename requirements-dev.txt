@@ -14,6 +14,7 @@ nbconvert
 ipykernel
 myst_nb
 furo
+sphinx-copybutton
 
 # code quality and formatting
 flake8

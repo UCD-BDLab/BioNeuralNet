@@ -87,7 +87,7 @@ Frequently Asked Questions (FAQ)
    - For a quick start, check out the following notebooks:
 
       - :doc:`Quick_Start`.
-      - :doc:`TCGA-BRCA_Dataset`.
+      - :doc:`notebooks/index`.
 
 **Q7: What license is BioNeuralNet released under?**:
 
