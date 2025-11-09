@@ -8,7 +8,7 @@
 [![Documentation](https://img.shields.io/badge/docs-read%20the%20docs-blue.svg)](https://bioneuralnet.readthedocs.io/en/latest/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17503083.svg)](https://doi.org/10.5281/zenodo.17503083)
 
-## Welcome to BioNeuralNet 1.1.3
+## Welcome to BioNeuralNet 1.1.4
 
 ![BioNeuralNet Logo](assets/LOGO_WB.png)
 

@@ -577,7 +577,6 @@ class NeuralNetwork(nn.Module):
             self.gnn = SAGE(
                 input_dim=gnn_input_dim,
                 hidden_dim=gnn_hidden_dim,
-                #output_dim=gnn_hidden_dim,
                 layer_num=gnn_layer_num,
                 final_layer="none",
             )

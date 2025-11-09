@@ -118,3 +118,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [1.1.3] - 2025-11-01
 
 - **Tag update to Sync Zenodo and PIPY**
+
+## [1.1.4] - 2025-11-08
+
+### **Added**
+- **New Utility Functions and Global Seed**
+
+  - **Imputation**:
+    - `impute_omics`: Imputes missing values (NaNs) using `mean`, `median`, or `zero` strategies.
+
+    - `impute_omics_knn`: Implements **K-Nearest Neighbors (KNN)** imputation for missing values in omics data.
+
+  - **Normalization/Scaling**:
+    - `normalize_omics`: Scales feature data using `Z-score`, `MinMax` scaling, or `Log2` transformation.
+
+  - **Methylation Data Transformation**:
+      - `beta_to_m`: Converts methylation `Beta-values to M-values` (log2 transformation).
+
+  - **Reproducibility Utility**:
+    - `set_seed`: Sets global random seeds across Python, NumPy, and PyTorch, including configuration for deterministic CUDA operations to ensure maximum experimental reproducibility.
+
+- **New TCGA Datasets**
+
+  - **TCGA-KIPAN**: Added the Pan-Kidney cohort (KIRC, KIRP, KICH) to **DatasetLoader**.
+
+  - **TCGA-GBMLGG**: Added the combined Glioblastoma Multiforme and Lower-Grade Glioma cohort to **DatasetLoader**.
+
+### **Changed**
+
+  - **Documentation Update**: Updated the online documentation (Read the Docs/API Reference) to include the new TCGA datasets and their respective classification results using the **DPMON**.
