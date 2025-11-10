@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.abspath("../../"))
 try:
     release = metadata.version("bioneuralnet")
 except metadata.PackageNotFoundError:
-    release = "1.1.1"
+    release = "1.1.4"
 
 project = "BioNeuralNet"
 version = release
@@ -20,6 +20,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "nbsphinx",
     "myst_nb",
+    'sphinx_copybutton',
 ]
 nb_execution_mode = "off"
 myst_enable_extensions = ["colon_fence"]

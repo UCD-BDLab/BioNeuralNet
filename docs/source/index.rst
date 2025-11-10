@@ -13,6 +13,9 @@ BioNeuralNet: Graph Neural Networks for Multi-Omics Network Analysis
 .. image:: https://img.shields.io/badge/GitHub-View%20Code-blue
    :target: https://github.com/UCD-BDLab/BioNeuralNet
 
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.17503083.svg
+   :target: https://doi.org/10.5281/zenodo.17503083
+
 .. figure:: _static/LOGO_TB.png
    :align: center
    :alt: BioNeuralNet Logo
@@ -35,7 +38,7 @@ Quick Start Examples
 Get started quickly with these end-to-end examples demonstrating the BioNeuralNet workflow:
 
 - :doc:`Quick_Start`
-- :doc:`TCGA-BRCA_Dataset`
+- :doc:`notebooks/index`
 
 **BioNeuralNet Workflow Overview**
 ----------------------------------
@@ -45,6 +48,31 @@ Get started quickly with these end-to-end examples demonstrating the BioNeuralNe
    :alt: BioNeuralNet Workflow Overview
 
    `View BioNeuralNet Workflow. <https://bioneuralnet.readthedocs.io/en/latest/_images/BioNeuralNet.png>`_
+
+
+Citation
+--------
+
+If you use BioNeuralNet in your research, we kindly ask that you cite our paper:
+
+   Ramos, V., Hussein, S., et al. (2025).
+   `BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool <https://arxiv.org/abs/2507.20440>`_.
+   *arXiv preprint arXiv:2507.20440* | `DOI: 10.48550/arXiv.2507.20440 <https://doi.org/10.48550/arXiv.2507.20440>`_.
+
+For your convenience, you can use the following BibTeX entry:
+
+.. code-block:: bibtex
+
+   @misc{ramos2025bioneuralnetgraphneuralnetwork,
+         title={BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool}, 
+         author={Vicente Ramos and Sundous Hussein and Mohamed Abdel-Hafiz and Arunangshu Sarkar and Weixuan Liu and Katerina J. Kechris and Russell P. Bowler and Leslie Lange and Farnoush Banaei-Kashani},
+         year={2025},
+         eprint={2507.20440},
+         archivePrefix={arXiv},
+         primaryClass={cs.LG},
+         url={https://arxiv.org/abs/2507.20440},
+         doi={10.48550/arXiv.2507.20440}
+   }
 
 What is BioNeuralNet?
 ---------------------
@@ -151,7 +179,7 @@ Explore BioNeuralNet's Documentation
 For detailed examples and tutorials, visit:
 
 - :doc:`Quick_Start`: A quick walkthrough demonstrating the BioNeuralNet workflow from start to finish.
-- :doc:`TCGA-BRCA_Dataset`: A detailed real-world example applying BioNeuralNet to breast cancer subtype prediction.
+- :doc:`notebooks/index`: A collection of demonstration notebooks showcasing end-to-end analyses on TCGA datasets.
 
 **Documentation Sections:**
 
@@ -181,13 +209,13 @@ We welcome contributions to BioNeuralNet! If you have ideas for new features, im
    - Run the test suite and and pre-commit hooks before opening a Pull Request(PR).
    - A new PR should pass all tests and adhere to the project's coding standards.
 
-.. code-block:: bash
-   
-   git clone https://github.com/UCD-BDLab/BioNeuralNet.git
-   cd BioNeuralNet
-   pip install -r requirements-dev.txt
-   pre-commit install
-   pytest --cov=bioneuralnet
+   .. code-block:: bash
+      
+      git clone https://github.com/UCD-BDLab/BioNeuralNet.git
+      cd BioNeuralNet
+      pip install -r requirements-dev.txt
+      pre-commit install
+      pytest --cov=bioneuralnet
 
 
 .. toctree::
@@ -195,16 +223,15 @@ We welcome contributions to BioNeuralNet! If you have ideas for new features, im
    :caption: Contents:
 
    installation
+
    gnns
    clustering
    metrics
    utils
    downstream_tasks
-   network_construction.ipynb
-   datasets.ipynb
    Quick_Start.ipynb
-   TCGA-BRCA_Dataset.ipynb
-   tutorials/index
+   notebooks/index
+   examples/index
    external_tools/index
    user_api
    faq

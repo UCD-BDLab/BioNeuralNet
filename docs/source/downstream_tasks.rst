@@ -98,9 +98,7 @@ Getting Started
 To explore comprehensive end-to-end analyses and practical tutorials, refer to:
 
 - :doc:`Quick_Start`
-- :doc:`TCGA-BRCA_Dataset`
-- :doc:`tutorials/example_1`
-- :doc:`tutorials/example_2`
+- :doc:`notebooks/index`
 
 References
 ----------

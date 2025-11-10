@@ -6,9 +6,9 @@
 [![GitHub Contributors](https://img.shields.io/github/contributors/UCD-BDLab/BioNeuralNet)](https://github.com/UCD-BDLab/BioNeuralNet/graphs/contributors)
 [![Downloads](https://static.pepy.tech/badge/bioneuralnet)](https://pepy.tech/project/bioneuralnet)
 [![Documentation](https://img.shields.io/badge/docs-read%20the%20docs-blue.svg)](https://bioneuralnet.readthedocs.io/en/latest/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17503083.svg)](https://doi.org/10.5281/zenodo.17503083)
 
-
-## Welcome to BioNeuralNet 1.1.1
+## Welcome to BioNeuralNet 1.1.4
 
 ![BioNeuralNet Logo](assets/LOGO_WB.png)
 
@@ -17,9 +17,38 @@
 
 ![BioNeuralNet Workflow](assets/BioNeuralNet.png)
 
+
+## Citation
+
+If you use BioNeuralNet in your research, we kindly ask that you cite our paper:
+
+> Ramos, V., Hussein, S., et al. (2025).
+> [**BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool**](https://arxiv.org/abs/2507.20440).
+> *arXiv preprint arXiv:2507.20440* | [**DOI: 10.48550/arXiv.2507.20440**](https://doi.org/10.48550/arXiv.2507.20440).
+
+
+For your convenience, you can use the following BibTeX entry:
+
+<details>
+  <summary>BibTeX Citation</summary>
+
+```bibtex
+@misc{ramos2025bioneuralnetgraphneuralnetwork,
+      title={BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool},
+      author={Vicente Ramos and Sundous Hussein and Mohamed Abdel-Hafiz and Arunangshu Sarkar and Weixuan Liu and Katerina J. Kechris and Russell P. Bowler and Leslie Lange and Farnoush Banaei-Kashani},
+      year={2025},
+      eprint={2507.20440},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2507.20440},
+}
+```
+</details>
+
 ## Documentation
 
-**[BioNeuralNet Documentation & Examples](https://bioneuralnet.readthedocs.io/en/latest/)**
+For complete documentation, tutorials, and examples, please visit our Read the Docs site:
+**[bioneuralnet.readthedocs.io](https://bioneuralnet.readthedocs.io/en/latest/)**
 
 ## Table of Contents
 
@@ -38,12 +67,14 @@
 
 ## 1. Installation
 
-BioNeuralNet supports Python `3.10`, `3.11` and `3.12`.
+BioNeuralNet is available as a package on the Python Package Index (PyPI), making it easy to install and integrate into your workflows.
 
 ### 1.1. Install BioNeuralNet
 ```bash
 pip install bioneuralnet
 ```
+**PyPI Project Page:** [https://pypi.org/project/bioneuralnet/](https://pypi.org/project/bioneuralnet/)
+>**Requirements:** BioNeuralNet is tested and supported on Python versions `3.10`, `3.11`, and `3.12`. Functionality on other versions is not guaranteed.
 
 ## 1.2. Install PyTorch and PyTorch Geometric
 BioNeuralNet relies on PyTorch for GNN computations. Install PyTorch separately:
@@ -74,10 +105,10 @@ BioNeuralNet is a flexible, modular Python framework developed to facilitate end
   - **Similarity graphs:** k-NN (cosine/Euclidean), RBF, mutual information.
 
   - **Correlation graphs:** Pearson, Spearman; optional soft-thresholding.
-  
+
   - **Phenotype-aware graphs:** SmCCNet integration (R) for sparse multiple canonical-correlation networks.
 
-- **[Preprocessing Utilities](https://bioneuralnet.readthedocs.io/en/latest/utils.html#graph-generation):** 
+- **[Preprocessing Utilities](https://bioneuralnet.readthedocs.io/en/latest/utils.html#graph-generation):**
 
   - **RData conversion to pandas DataFrame:** Converts an RData file to CSV and loads it into a pandas DataFrame.
 
@@ -167,7 +198,7 @@ dpmon = DPMON(
     model="GCN",
     repeat_num=5,
     tune=True,
-    gpu=True, 
+    gpu=True,
     cuda=0,
     output_dir="./output"
 )
@@ -238,3 +269,30 @@ See the [LICENSE](LICENSE) file for details.
 <a id="2">[2]</a> Hussein, S., Ramos, V., et al. "Learning from Multi-Omics Networks to Enhance Disease Prediction: An Optimized Network Embedding and Fusion Approach." In *2024 IEEE International Conference on Bioinformatics and Biomedicine (BIBM)*, Lisbon, Portugal, 2024, pp. 4371-4378. [DOI: 10.1109/BIBM62325.2024.10822233](https://doi.org/10.1109/BIBM62325.2024.10822233)
 
 <a id="3">[3]</a> Liu, W., Vu, T., Konigsberg, I. R., Pratte, K. A., Zhuang, Y., & Kechris, K. J. (2023). "Network-Based Integration of Multi-Omics Data for Biomarker Discovery and Phenotype Prediction." *Bioinformatics*, 39(5), btat204. [DOI: 10.1093/bioinformatics/btat204](https://doi.org/10.1093/bioinformatics/btat204)
+
+
+## 11. Citation
+
+If you use BioNeuralNet in your research, we kindly ask that you cite our paper:
+
+> Vicente Ramos, et al. (2025).
+> [**BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool**](https://arxiv.org/abs/2507.20440).
+> *arXiv preprint arXiv:2507.20440*.
+
+For your convenience, you can use the following BibTeX entry:
+
+<details>
+  <summary>BibTeX Citation</summary>
+
+```bibtex
+@misc{ramos2025bioneuralnetgraphneuralnetwork,
+      title={BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool},
+      author={Vicente Ramos and Sundous Hussein and Mohamed Abdel-Hafiz and Arunangshu Sarkar and Weixuan Liu and Katerina J. Kechris and Russell P. Bowler and Leslie Lange and Farnoush Banaei-Kashani},
+      year={2025},
+      eprint={2507.20440},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2507.20440},
+}
+```
+</details>
