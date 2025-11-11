@@ -10,15 +10,15 @@ logger = get_logger(__name__)
 
 def gen_similarity_graph(X:pd.DataFrame, k:int = 15, metric:str = "cosine", mutual:bool = False, per_node:bool = True, self_loops:bool = False) -> pd.DataFrame:
     """
-    Build a normalized k-nearest neighbors (kNN) similarity graph from feature vectors.  
+    Build a normalized k-nearest neighbors (kNN) similarity graph from feature vectors.
 
     The function computes pairwise `cosine` or `Euclidean` distances, sparsifies the matrix by keeping `top-k` neighbours per node (or by applying a global threshold), optionally prunes edges to mutual neighbours, and can add self-loops.
 
     Args:
-    
+
         - X: Dataframe of shape (N, D) where, N(`rows`) is the number of subjects/samples and D(`columns`) represents the multi-omics features.
         - k: Number of neighbors to keep per node.
-        - metric: `cosine` or `Euclidean` (uses gaussian kernel on distances).  
+        - metric: `cosine` or `Euclidean` (uses gaussian kernel on distances).
         - mutual: If `True`, retain only mutual edges (i->j and j->i).
         - per_node: If `True`, use per-node `k`, else apply a global cutoff.
         - self_loops: If `True`, add a self-loop weight of 1.
@@ -36,7 +36,7 @@ def gen_similarity_graph(X:pd.DataFrame, k:int = 15, metric:str = "cosine", mutu
         x_torch = torch.tensor(X.values, dtype=torch.float32, device=device)
     else:
         raise TypeError("X must be a pandas.DataFrame")
-    
+
     N = x_torch.size(0)
     k = min(k, N-1)
 
@@ -80,18 +80,18 @@ def gen_similarity_graph(X:pd.DataFrame, k:int = 15, metric:str = "cosine", mutu
     if final_graph.shape != (number_of_omics, number_of_omics):
         logger.info(f"Please make sure your input X follows the description: A DataFrame (N, D) where, N(rows) is the number of subjects/samples and D(columns) represents the multi-omics features.")
         raise ValueError(f"Generated graph shape {final_graph.shape} does not match expected shape ({number_of_omics}, {number_of_omics}).")
-    
+
     return final_graph
 
 
 def gen_correlation_graph(X: pd.DataFrame, k: int = 15,method: str = 'pearson', mutual: bool = False, per_node: bool = True,threshold: Optional[float] = None, self_loops:bool = False) -> pd.DataFrame:
     """
-    Build a normalized k-nearest neighbors (kNN) correlation graph from feature vectors.  
+    Build a normalized k-nearest neighbors (kNN) correlation graph from feature vectors.
 
-    The function computes pairwise `pearson` or `spearman` correlations, sparsifies the matrix by keeping `top-k`neighbours per node (or by applying a global threshold), optionally prunes edges to mutual neighbours, and can add self-loops.
+    The function computes pairwise `pearson` or `spearman` correlations, sparsifies the matrix by keeping `top-k` neighbours per node (or by applying a global threshold), optionally prunes edges to mutual neighbours, and can add self-loops.
 
     Args:
-    
+
         - X: Dataframe of shape (N, D) where, N(`rows`) is the number of subjects/samples and D(`columns`) represents the multi-omics features.
         - k: Number of neighbors to keep per node.
         - method: `pearson` or `spearman`.
@@ -170,12 +170,12 @@ def gen_correlation_graph(X: pd.DataFrame, k: int = 15,method: str = 'pearson', 
 
 def gen_threshold_graph(X:pd.DataFrame, b: float = 6.0,k: int = 15, mutual: bool = False, self_loops: bool = False) -> pd.DataFrame:
     """
-    Build a normalized k-nearest neighbors (kNN) soft-threshold co-expression graph, similar to the network-construction step in WGCNA.  
+    Build a normalized k-nearest neighbors (kNN) soft-threshold co-expression graph, similar to the network-construction step in WGCNA.
 
     The function computes absolute pair-wise Pearson correlations, applies apower-law soft threshold with exponent `b`, sparsifies the matrix bykeeping `top-k` neighbours per node, optionally prunes edges to mutualneighbours, and can add self-loops.
 
     Args:
-    
+
         - X: Dataframe of shape (N, D) where, N(`rows`) is the number of subjects/samples and D(`columns`) represents the multi-omics features.
         - b: Soft-threshold exponent applied to absolute correlations.
         - k: Number of neighbors to keep per node.
@@ -235,12 +235,12 @@ def gen_threshold_graph(X:pd.DataFrame, b: float = 6.0,k: int = 15, mutual: bool
 
 def gen_gaussian_knn_graph(X: pd.DataFrame,k: int = 15,sigma: Optional[float] = None ,mutual: bool = False, self_loops: bool = True) -> pd.DataFrame:
     """
-    Build a normalized k-nearest neighbors (kNN) similarity graph using a Gaussian(RBF) kernel.  
+    Build a normalized k-nearest neighbors (kNN) similarity graph using a Gaussian(RBF) kernel.
 
     The function computes pairwise Euclidean distances, converts them to similarities with a Gaussian kernel (bandwidth `sigma`; if `None`, the median-distance heuristic is used), sparsifies the matrix by keeping `top-k` neighbours per node, optionally prunes edges to mutual neighbours, and can add self-loops.
 
     Args:
-    
+
         - X: Dataframe of shape (N, D) where, N(`rows`) is the number of subjects/samples and D(`columns`) represents the multi-omics features.
         - k: Number of neighbors to keep per node.
         - sigma: Bandwidth of the Gaussian kernel; if `None`, uses the median squared distance.
@@ -295,12 +295,12 @@ def gen_gaussian_knn_graph(X: pd.DataFrame,k: int = 15,sigma: Optional[float] = 
 
 def gen_lasso_graph(X: pd.DataFrame, alpha: float = 0.01, self_loops: bool = False, max_iter:int = 500) -> pd.DataFrame:
     """
-    Build a sparse network using Graphical Lasso (inverse-covariance estimation).  
+    Build a sparse network using Graphical Lasso (inverse-covariance estimation).
 
     The function fits a precision matrix with L1 regularization (`alpha`),converts the non-zero entries to edge weights, can add self-loops, and row-normalizes the result.
 
     Args:
-    
+
         - X: Dataframe of shape (N, D) where, N(`rows`) is the number of subjects/samples and D(`columns`) represents the multi-omics features.
         - alpha: Regularization strength for Graphical Lasso; larger values yield sparser graphs.
         - self_loops: If `True`, add a self-loop weight of 1.
@@ -313,7 +313,7 @@ def gen_lasso_graph(X: pd.DataFrame, alpha: float = 0.01, self_loops: bool = Fal
     if isinstance(X, pd.DataFrame):
         nodes = X.columns
         number_of_omics = len(nodes)
-        x_numpy = X.values 
+        x_numpy = X.values
     else:
         raise TypeError("X must be a pandas.DataFrame")
 
@@ -344,12 +344,12 @@ def gen_lasso_graph(X: pd.DataFrame, alpha: float = 0.01, self_loops: bool = Fal
 
 def gen_mst_graph(X: pd.DataFrame, self_loops: bool = False) -> pd.DataFrame:
     """
-    Build a minimum-spanning-tree (MST) graph from feature vectors.  
+    Build a minimum-spanning-tree (MST) graph from feature vectors.
 
     The function computes pairwise Euclidean distances, extracts the MST, can add self-loops, and row-normalizes the result.
 
     Args:
-    
+
         - X: Dataframe of shape (N, D) where, N(`rows`) is the number of subjects/samples and D(`columns`) represents the multi-omics features.
         - self_loops: If `True`, add a self-loop weight of 1.
 
@@ -410,12 +410,12 @@ def gen_mst_graph(X: pd.DataFrame, self_loops: bool = False) -> pd.DataFrame:
 
 def gen_snn_graph(X: pd.DataFrame,k: int = 15,mutual: bool = False, self_loops: bool = False) -> pd.DataFrame:
     """
-    Build a shared-nearest-neighbor (SNN) graph from feature vectors.  
+    Build a shared-nearest-neighbor (SNN) graph from feature vectors.
 
     The function first finds the `top-k` nearest neighbours for each node,counts how many neighbours two nodes share, converts that count to anSNN similarity score, optionally prunes edges to mutual neighbours, and can add self-loops.
 
     Args:
-    
+
         - X: Dataframe of shape (N, D) where, N(`rows`) is the number of subjects/samples and D(`columns`) represents the multi-omics features.
         - k: Number of neighbors to keep per node.
         - mutual: If `True`, retain only mutual edges (i->j and j->i).

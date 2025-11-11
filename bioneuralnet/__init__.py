@@ -29,7 +29,7 @@ Modules:
     - `datasets`: Contains example (synthetic) datasets for testing and demonstration purposes.
 """
 
-__version__ = "1.1.1"
+__version__ = "1.1.4"
 
 from .network_embedding import GNNEmbedding
 from .downstream_task import SubjectRepresentation
@@ -56,7 +56,6 @@ from .metrics import plot_network
 from .metrics import plot_multiple_metrics
 from .metrics import compare_clusters
 
-
 from .utils import get_logger
 from .utils import rdata_to_df
 from .utils import variance_summary
@@ -81,7 +80,11 @@ from .utils import gen_gaussian_knn_graph
 from .utils import gen_lasso_graph
 from .utils import gen_mst_graph
 from .utils import gen_snn_graph
-
+from .utils import impute_omics
+from .utils import impute_omics_knn
+from .utils import normalize_omics
+from .utils import set_seed
+from .utils import beta_to_m
 
 __all__: list = [
     "__version__",
@@ -103,7 +106,6 @@ __all__: list = [
     "plot_network",
     "compare_clusters",
     "plot_multiple_metrics",
-    "evaluate_model",
     "evaluate_f1m",
     "evaluate_f1w",
     "get_logger",
@@ -133,4 +135,9 @@ __all__: list = [
     "DatasetLoader",
     "SmCCNet",
     "evaluate_model",
+    "impute_omics",
+    "impute_omics_knn",
+    "normalize_omics",
+    "set_seed",
+    "beta_to_m",
 ]
