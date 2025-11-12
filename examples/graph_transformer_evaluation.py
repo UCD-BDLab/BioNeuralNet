@@ -27,6 +27,11 @@ import torch
 from pathlib import Path
 import argparse
 from typing import Dict, List, Tuple, Union
+import sys
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from bioneuralnet.network_embedding.gnn_embedding import GNNEmbedding
 from bioneuralnet.datasets import DatasetLoader
@@ -192,365 +197,323 @@ def plot_classification_metrics(results: Dict[str, Dict[str, Union[float, np.nda
     except Exception as cls_plot_e:
         print(f"Could not generate classification plots: {cls_plot_e}")
 
-# Load a sample dataset (BRCA dataset)
-try:
-    dataset = DatasetLoader("brca")
-    omics_data = dataset.data["rna"]
-    phenotype_data = dataset.data["pam50"]
-    print("Loaded BRCA dataset")
-except Exception as e:
-    print(f"Error loading BRCA dataset: {e}")
-    print("Using synthetic data for demonstration")
+def run_evaluation_cli():
+    try:
+        dataset = DatasetLoader("brca")
+        omics_data = dataset.data["rna"]
+        phenotype_data = dataset.data["pam50"]
+        print("Loaded BRCA dataset")
+    except Exception as e:
+        print(f"Error loading BRCA dataset: {e}")
+        print("Using synthetic data for demonstration")
 
-    n_samples = 100
-    n_features = 50
+        n_samples = 100
+        n_features = 50
 
-    # Generating synthetic omics data
+        omics_data = pd.DataFrame(
+            np.random.normal(0, 1, size=(n_samples, n_features)),
+            columns=[f"feature_{i}" for i in range(n_features)]
+        )
+
+        true_weights = np.random.normal(0, 1, size=n_features)
+        phenotype_data = pd.DataFrame({
+            'survival_time': np.dot(omics_data, true_weights) + np.random.normal(0, 0.5, size=n_samples)
+        })
+
+    omics_data = omics_data.apply(pd.to_numeric, errors='coerce')
+    omics_data = omics_data.fillna(omics_data.mean())
+
+    scaler_all = StandardScaler()
     omics_data = pd.DataFrame(
-        np.random.normal(0, 1, size=(n_samples, n_features)),
-        columns=[f"feature_{i}" for i in range(n_features)]
+        scaler_all.fit_transform(omics_data),
+        columns=omics_data.columns,
+        index=omics_data.index,
+    )
+    if isinstance(phenotype_data, pd.DataFrame):
+        target = pd.to_numeric(phenotype_data.iloc[:, 0], errors='coerce')
+    else:
+        target = pd.to_numeric(phenotype_data.squeeze(), errors='coerce')
+    target = target.fillna(target.median())
+
+    adjacency_matrix = gen_gaussian_knn_graph(omics_data, k=20)
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        omics_data, target.to_frame(name='phenotype'), test_size=0.2, random_state=42
     )
 
-    # Generating synthetic phenotype data
-    true_weights = np.random.normal(0, 1, size=n_features)
-    phenotype_data = pd.DataFrame({
-        'survival_time': np.dot(omics_data, true_weights) + np.random.normal(0, 0.5, size=n_samples)
-    })
+    models = ["RawRidge", "GCN", "GAT", "SAGE", "GIN", "GraphTransformer"]
+    results = {}
 
-# Cleaning and preparing data
-omics_data = omics_data.apply(pd.to_numeric, errors='coerce')
-omics_data = omics_data.fillna(omics_data.mean())
+    for model_type in models:
+        print(f"\nEvaluating {model_type} model...")
+        if model_type == "RawRidge":
+            try:
+                reg = Pipeline([('scaler', StandardScaler()), ('ridge', Ridge(alpha=1.0))])
+                reg.fit(X_train.values.astype(np.float64), y_train.values.flatten())
+                y_pred = reg.predict(X_test.values.astype(np.float64))
+                mse = mean_squared_error(y_test, y_pred)
+                r2 = r2_score(y_test, y_pred)
+                rmse = float(np.sqrt(mse))
+                emb_test = StandardScaler().fit_transform(X_test.values.astype(np.float64))
+                var_emb_train = float(np.var(StandardScaler().fit_transform(X_train.values.astype(np.float64))))
+                var_emb_test = float(np.var(emb_test))
+                var_target = float(np.var(y_train.values.flatten()))
+                var_pred = float(np.var(y_pred))
+                results[model_type] = {
+                    'mse': mse,
+                    'rmse': rmse,
+                    'r2': r2,
+                    'embeddings': emb_test,
+                    'y': y_test.values.flatten(),
+                    'valid': np.isfinite(mse) and np.isfinite(r2) and var_emb_test > 1e-10 and var_target > 1e-10 and var_pred > 1e-10
+                }
+                print(f"{model_type} - RMSE: {rmse:.4f}, MSE: {mse:.4f}, R²: {r2:.4f} | var(emb_train)={var_emb_train:.6e}, var(emb_test)={var_emb_test:.6e}, var(y_train)={var_target:.6e}, var(y_pred)={var_pred:.6e}")
+            except Exception as e:
+                print(f"RawRidge baseline failed: {e}")
+            continue
 
-scaler_all = StandardScaler()
-omics_data = pd.DataFrame(
-    scaler_all.fit_transform(omics_data),
-    columns=omics_data.columns,
-    index=omics_data.index,
-)
-if isinstance(phenotype_data, pd.DataFrame):
-    target = pd.to_numeric(phenotype_data.iloc[:, 0], errors='coerce')
-else:
-    target = pd.to_numeric(phenotype_data.squeeze(), errors='coerce')
-target = target.fillna(target.median())
+        if model_type == "GraphTransformer":
+            gnn_embedding = GNNEmbedding(
+                adjacency_matrix=adjacency_matrix,
+                omics_data=X_train,
+                phenotype_data=y_train,
+                model_type=model_type,
+                hidden_dim=64,
+                layer_num=3,
+                num_epochs=200,
+                lr=5e-4,
+                dropout=0.1,
+                activation="gelu",
+                weight_decay=0.0,
+            )
+        else:
+            gnn_embedding = GNNEmbedding(
+                adjacency_matrix=adjacency_matrix,
+                omics_data=X_train,
+                phenotype_data=y_train,
+                model_type=model_type,
+                hidden_dim=64,
+                layer_num=2,
+                num_epochs=50,
+                lr=0.001,
+                dropout=0.1
+            )
 
-# Generating a KNN graph from the omics data
-adjacency_matrix = gen_gaussian_knn_graph(omics_data, k=20)
+        t0 = time.time()
+        gnn_embedding.fit()
 
-# Splitting data into train and test sets
-X_train, X_test, y_train, y_test = train_test_split(
-    omics_data, target.to_frame(name='phenotype'), test_size=0.2, random_state=42
-)
+        node_embeddings = gnn_embedding.embed(as_df=False)
+        t1 = time.time()
 
-# Defining GNN models to compare
-models = ["RawRidge", "GCN", "GAT", "SAGE", "GIN", "GraphTransformer"]
-results = {}
+        nodes = adjacency_matrix.index.tolist()
+        E = node_embeddings.detach().cpu().numpy().astype(np.float64)
+        E = np.nan_to_num(E, nan=0.0, posinf=1e6, neginf=-1e6)
+        X_train_nodes = X_train[nodes].values.astype(np.float64)
+        X_test_nodes = X_test[nodes].values.astype(np.float64)
+        X_train_nodes = np.nan_to_num(X_train_nodes, nan=0.0, posinf=1e6, neginf=-1e6)
+        X_test_nodes = np.nan_to_num(X_test_nodes, nan=0.0, posinf=1e6, neginf=-1e6)
+        sample_embeddings_train = X_train_nodes.dot(E)
+        sample_embeddings_test = X_test_nodes.dot(E)
+        sample_embeddings_train = np.nan_to_num(sample_embeddings_train, nan=0.0, posinf=1e6, neginf=-1e6)
+        sample_embeddings_test = np.nan_to_num(sample_embeddings_test, nan=0.0, posinf=1e6, neginf=-1e6)
 
-# Training and evaluate each model
-for model_type in models:
-    print(f"\nEvaluating {model_type} model...")
-    # Baseline using raw features with Ridge regression
-    if model_type == "RawRidge":
         try:
             reg = Pipeline([('scaler', StandardScaler()), ('ridge', Ridge(alpha=1.0))])
-            reg.fit(X_train.values.astype(np.float64), y_train.values.flatten())
-            y_pred = reg.predict(X_test.values.astype(np.float64))
-            mse = mean_squared_error(y_test, y_pred)
-            r2 = r2_score(y_test, y_pred)
-            rmse = float(np.sqrt(mse))
-            # Using standardized raw features as embeddings for visualization
-            emb_test = StandardScaler().fit_transform(X_test.values.astype(np.float64))
-            var_emb_train = float(np.var(StandardScaler().fit_transform(X_train.values.astype(np.float64))))
-            var_emb_test = float(np.var(emb_test))
-            var_target = float(np.var(y_train.values.flatten()))
-            var_pred = float(np.var(y_pred))
-            results[model_type] = {
+            reg.fit(sample_embeddings_train, y_train.values.flatten())
+            y_pred = reg.predict(sample_embeddings_test)
+            y_pred = np.nan_to_num(y_pred, nan=0.0, posinf=1e6, neginf=-1e6)
+        except Exception as e:
+            print(f"Ridge regression failed or unavailable ({e}); falling back to mean-based baseline.")
+            y_pred = np.nan_to_num(sample_embeddings_test.mean(axis=1), nan=0.0, posinf=1e6, neginf=-1e-6)
+
+        mse = mean_squared_error(y_test, y_pred)
+        r2 = r2_score(y_test, y_pred)
+        rmse = float(np.sqrt(mse))
+        var_emb_train = float(np.var(sample_embeddings_train))
+        var_emb_test = float(np.var(sample_embeddings_test))
+        var_target = float(np.var(y_train.values.flatten()))
+        var_pred = float(np.var(y_pred))
+
+        results[model_type] = {
                 'mse': mse,
                 'rmse': rmse,
                 'r2': r2,
-                'embeddings': emb_test,
+                'embeddings': sample_embeddings_test,
                 'y': y_test.values.flatten(),
-                'valid': np.isfinite(mse) and np.isfinite(r2) and var_emb_test > 1e-10 and var_target > 1e-10 and var_pred > 1e-10
+                'valid': np.isfinite(mse) and np.isfinite(r2) and var_emb_test > 1e-10 and var_target > 1e-10 and var_pred > 1e-10,
+                'train_time_s': float(t1 - t0)
             }
-            print(f"{model_type} - RMSE: {rmse:.4f}, MSE: {mse:.4f}, R²: {r2:.4f} | var(emb_train)={var_emb_train:.6e}, var(emb_test)={var_emb_test:.6e}, var(y_train)={var_target:.6e}, var(y_pred)={var_pred:.6e}")
-        except Exception as e:
-            print(f"RawRidge baseline failed: {e}")
-        continue
 
-    if model_type == "GraphTransformer":
+        print(f"{model_type} - RMSE: {rmse:.4f}, MSE: {mse:.4f}, R²: {r2:.4f} | var(emb_train)={var_emb_train:.6e}, var(emb_test)={var_emb_test:.6e}, var(y_train)={var_target:.6e}, var(y_pred)={var_pred:.6e}")
+        if var_pred < 1e-10:
+            print(f"Warning: {model_type} predictions are nearly constant; this often yields uniform metrics.")
+
+        try:
+            if isinstance(phenotype_data, (pd.Series, pd.DataFrame)) and not np.issubdtype(np.array(phenotype_data).dtype, np.number):
+                y_cls_train = phenotype_data.loc[X_train.index]
+                y_cls_test = phenotype_data.loc[X_test.index]
+                if isinstance(y_cls_train, pd.DataFrame):
+                    y_cls_train = y_cls_train.iloc[:, 0]
+                if isinstance(y_cls_test, pd.DataFrame):
+                    y_cls_test = y_cls_test.iloc[:, 0]
+                le = LabelEncoder()
+                yc_train = le.fit_transform(np.array(y_cls_train))
+                yc_test = le.transform(np.array(y_cls_test))
+                cls_pipe = Pipeline([
+                    ('scale', StandardScaler()),
+                    ('logreg', LogisticRegression(max_iter=200, multi_class='ovr'))
+                ])
+                cls_pipe.fit(sample_embeddings_train, yc_train)
+                yc_pred = cls_pipe.predict(sample_embeddings_test)
+                f1 = f1_score(yc_test, yc_pred, average='macro')
+                try:
+                    proba = cls_pipe.predict_proba(sample_embeddings_test)
+                    if proba.shape[1] > 2:
+                        auc = roc_auc_score(yc_test, proba, multi_class='ovr', average='macro')
+                    else:
+                        auc = roc_auc_score(yc_test, proba[:, 1])
+                except Exception:
+                    auc = float('nan')
+                results[model_type].update({'f1': float(f1), 'auc': float(auc)})
+        except Exception as cls_e:
+            print(f"Classification evaluation failed for {model_type}: {cls_e}")
+
+    plot_embeddings(results, models, VIZ_DIR)
+    print("\nEvaluation complete!")
+    plot_performance(results, models, VIZ_DIR)
+    plot_classification_metrics(results, models, VIZ_DIR)
+
+    try:
+        from torch_geometric.utils import add_self_loops
         gnn_embedding = GNNEmbedding(
             adjacency_matrix=adjacency_matrix,
             omics_data=X_train,
             phenotype_data=y_train,
-            model_type=model_type,
+            model_type="GraphTransformer",
             hidden_dim=64,
-            layer_num=3,
-            num_epochs=200,
-            lr=5e-4,
+            layer_num=2,
+            num_epochs=10,
+            lr=1e-3,
             dropout=0.1,
             activation="gelu",
             weight_decay=0.0,
         )
-    else:
-        gnn_embedding = GNNEmbedding(
-            adjacency_matrix=adjacency_matrix,
-            omics_data=X_train,
-            phenotype_data=y_train,
-            model_type=model_type,
-            hidden_dim=64,
-            layer_num=2,
-            num_epochs=50,
-            lr=0.001,
-            dropout=0.1
-        )
+        gnn_embedding.fit()
+        model = gnn_embedding.model
+        if model is None:
+            raise RuntimeError("Model not initialized; cannot visualize attention.")
+        model.eval()
+        _ = model(gnn_embedding.data)
 
-    # Training the model
-    t0 = time.time()
-    gnn_embedding.fit()
-
-    # Generating node embeddings (for graph nodes/features)
-    node_embeddings = gnn_embedding.embed(as_df=False)
-    t1 = time.time()
-
-    nodes = adjacency_matrix.index.tolist()
-    E = node_embeddings.detach().cpu().numpy().astype(np.float64)  # [num_nodes, hidden_dim]
-    E = np.nan_to_num(E, nan=0.0, posinf=1e6, neginf=-1e6)
-    X_train_nodes = X_train[nodes].values.astype(np.float64)  # [n_train, num_nodes]
-    X_test_nodes = X_test[nodes].values.astype(np.float64)    # [n_test, num_nodes]
-    X_train_nodes = np.nan_to_num(X_train_nodes, nan=0.0, posinf=1e6, neginf=-1e6)
-    X_test_nodes = np.nan_to_num(X_test_nodes, nan=0.0, posinf=1e6, neginf=-1e6)
-    sample_embeddings_train = X_train_nodes.dot(E)  # [n_train, hidden_dim]
-    sample_embeddings_test = X_test_nodes.dot(E)    # [n_test, hidden_dim]
-    sample_embeddings_train = np.nan_to_num(sample_embeddings_train, nan=0.0, posinf=1e6, neginf=-1e6)
-    sample_embeddings_test = np.nan_to_num(sample_embeddings_test, nan=0.0, posinf=1e6, neginf=-1e6)
-
-    try:
-        reg = Pipeline([('scaler', StandardScaler()), ('ridge', Ridge(alpha=1.0))])
-        reg.fit(sample_embeddings_train, y_train.values.flatten())
-        y_pred = reg.predict(sample_embeddings_test)
-        y_pred = np.nan_to_num(y_pred, nan=0.0, posinf=1e6, neginf=-1e6)
-    except Exception as e:
-        print(f"Ridge regression failed or unavailable ({e}); falling back to mean-based baseline.")
-        y_pred = np.nan_to_num(sample_embeddings_test.mean(axis=1), nan=0.0, posinf=1e6, neginf=-1e6)
-
-    # Calculating evaluation metrics
-    mse = mean_squared_error(y_test, y_pred)
-    r2 = r2_score(y_test, y_pred)
-    rmse = float(np.sqrt(mse))
-    var_emb_train = float(np.var(sample_embeddings_train))
-    var_emb_test = float(np.var(sample_embeddings_test))
-    var_target = float(np.var(y_train.values.flatten()))
-    var_pred = float(np.var(y_pred))
-
-    results[model_type] = {
-            'mse': mse,
-            'rmse': rmse,
-            'r2': r2,
-            'embeddings': sample_embeddings_test,
-            'y': y_test.values.flatten(),
-            'valid': np.isfinite(mse) and np.isfinite(r2) and var_emb_test > 1e-10 and var_target > 1e-10 and var_pred > 1e-10,
-            'train_time_s': float(t1 - t0)
-        }
-
-    print(f"{model_type} - RMSE: {rmse:.4f}, MSE: {mse:.4f}, R²: {r2:.4f} | var(emb_train)={var_emb_train:.6e}, var(emb_test)={var_emb_test:.6e}, var(y_train)={var_target:.6e}, var(y_pred)={var_pred:.6e}")
-    if var_pred < 1e-10:
-        print(f"Warning: {model_type} predictions are nearly constant; this often yields uniform metrics.")
-
-    # Classification evaluation (F1, AUC) when phenotype labels are categorical (e.g., PAM50)
-    try:
-        if isinstance(phenotype_data, (pd.Series, pd.DataFrame)) and not np.issubdtype(np.array(phenotype_data).dtype, np.number):
-            y_cls_train = phenotype_data.loc[X_train.index]
-            y_cls_test = phenotype_data.loc[X_test.index]
-            if isinstance(y_cls_train, pd.DataFrame):
-                y_cls_train = y_cls_train.iloc[:, 0]
-            if isinstance(y_cls_test, pd.DataFrame):
-                y_cls_test = y_cls_test.iloc[:, 0]
-            le = LabelEncoder()
-            yc_train = le.fit_transform(np.array(y_cls_train))
-            yc_test = le.transform(np.array(y_cls_test))
-            cls_pipe = Pipeline([
-                ('scale', StandardScaler()),
-                ('logreg', LogisticRegression(max_iter=200, multi_class='ovr'))
-            ])
-            cls_pipe.fit(sample_embeddings_train, yc_train)
-            yc_pred = cls_pipe.predict(sample_embeddings_test)
-            f1 = f1_score(yc_test, yc_pred, average='macro')
-            try:
-                proba = cls_pipe.predict_proba(sample_embeddings_test)
-                if proba.shape[1] > 2:
-                    auc = roc_auc_score(yc_test, proba, multi_class='ovr', average='macro')
-                else:
-                    auc = roc_auc_score(yc_test, proba[:, 1])
-            except Exception:
-                auc = float('nan')
-            results[model_type].update({'f1': float(f1), 'auc': float(auc)})
-    except Exception as cls_e:
-        print(f"Classification evaluation failed for {model_type}: {cls_e}")
-
-# Visualizing embeddings using t-SNE (refactored into documented function)
-plot_embeddings(results, models, VIZ_DIR)
-
-print("\nEvaluation complete!")
-
-# Creating and saving comparison plot after evaluation loop (refactored)
-plot_performance(results, models, VIZ_DIR)
-
-# Additional classification plots (refactored)
-plot_classification_metrics(results, models, VIZ_DIR)
-
-try:
-    # Attention visualization for GraphTransformer
-    # Train a small model, then run a forward pass in eval mode to cache attention
-    from torch_geometric.utils import add_self_loops
-
-    gnn_embedding = GNNEmbedding(
-        adjacency_matrix=adjacency_matrix,
-        omics_data=X_train,
-        phenotype_data=y_train,
-        model_type="GraphTransformer",
-        hidden_dim=64,
-        layer_num=2,
-        num_epochs=10,
-        lr=1e-3,
-        dropout=0.1,
-        activation="gelu",
-        weight_decay=0.0,
-    )
-    gnn_embedding.fit()
-
-    # Ensuring attention is captured without dropout
-    model = gnn_embedding.model
-    if model is None:
-        raise RuntimeError("Model not initialized; cannot visualize attention.")
-    model.eval()
-    _ = model(gnn_embedding.data)  # populate model._last_attentions
-
-    if hasattr(model, 'get_last_attentions'):
-        atts = model.get_last_attentions()
-        if atts and atts[0] and atts[0].get('alpha') is not None:
-            alpha = atts[0]['alpha'].numpy()  # [num_edges_with_self_loops, heads]
-            # Aggregate attention across heads
-            att_sum = alpha.mean(axis=1)
-
-            # Using the exact edge_index cached by the layer (already includes self-loops)
-            cached_ei = atts[0].get('edge_index')
-            if cached_ei is None:
-                raise RuntimeError("Cached edge_index not available; cannot align attentions to edges.")
-            edges = cached_ei.numpy()  # shape [2, num_edges_with_self_loops]
-
-            num_nodes = int(edges.max()) + 1 if edges.size > 0 else adjacency_matrix.shape[0]
-            # Building heatmap directly from cached edges
-            heat = np.zeros((num_nodes, num_nodes), dtype=float)
-            for e_i in range(edges.shape[1]):
-                src = int(edges[0, e_i])
-                dst = int(edges[1, e_i])
-                val = float(att_sum[e_i])
-                heat[dst, src] += val
-
-            # Clip tiny negatives due to numerical issues and rescale for visibility
-            heat = np.clip(heat, 0.0, None)
-
-            # Reporting statistics to confirm non-zero attentions
-            nz = int(np.count_nonzero(heat))
-            total = int(heat.size)
-            max_val = float(heat.max()) if nz > 0 else 0.0
-            mean_val = float(heat.mean())
-            print(f"Attention heat stats: nonzero={nz}/{total}, max={max_val:.6g}, mean={mean_val:.6g}")
-
-            # Adaptive contrast scaling for better visibility
-            if nz > 0:
-                pos_vals = heat[heat > 0]
-                vmax = float(np.percentile(pos_vals, 99.0)) if pos_vals.size > 0 else float(heat.max())
-                vmin = 0.0
-            else:
-                vmax = 1.0
-                vmin = 0.0
-
-            # Optionally save full NxN heatmap controlled by CLI flags
-            SAVE_FULL_HEATMAP = bool(getattr(args, "full_heatmap", False) or getattr(args, "full_heatmap_force", False))
-            MAX_N_FOR_FULL = int(getattr(args, "full_heatmap_max_n", 4096))
-            FULL_DPI = int(getattr(args, "full_heatmap_dpi", 300))
-            if getattr(args, "full_heatmap_force", False) or (SAVE_FULL_HEATMAP and num_nodes <= MAX_N_FOR_FULL):
-                plt.figure(figsize=(8, 6))
-                plt.imshow(heat, cmap='viridis', aspect='auto', vmin=vmin, vmax=vmax)
-                plt.colorbar(label='Attention (avg across heads)')
-                plt.title('GraphTransformer Attention Heatmap (Layer 1)')
-                plt.xlabel('Source node')
-                plt.ylabel('Destination node')
-                plt.tight_layout()
-                plt.savefig(VIZ_DIR / 'graph_transformer_attention_heatmap.png', dpi=FULL_DPI)
-                print(f"Attention heatmap saved to '{VIZ_DIR / 'graph_transformer_attention_heatmap.png'}'")
-            else:
-                print("Skipping full NxN attention heatmap due to scale; see binned/scatter/top-K images for global patterns.")
-
-            # Also create binned and scatter visualizations to make global patterns visible
-            try:
-                # Binned heatmap: compress nodes into bins to avoid downsampling loss
-                B = 256 if num_nodes >= 4096 else 128
-                bin_size = int(np.ceil(num_nodes / B))
-                H = np.zeros((B, B), dtype=float)
-                C = np.zeros((B, B), dtype=int)
+        if hasattr(model, 'get_last_attentions'):
+            atts = model.get_last_attentions()
+            if atts and atts[0] and atts[0].get('alpha') is not None:
+                alpha = atts[0]['alpha'].numpy()
+                att_sum = alpha.mean(axis=1)
+                cached_ei = atts[0].get('edge_index')
+                if cached_ei is None:
+                    raise RuntimeError("Cached edge_index not available; cannot align attentions to edges.")
+                edges = cached_ei.numpy()
+                num_nodes = int(edges.max()) + 1 if edges.size > 0 else adjacency_matrix.shape[0]
+                heat = np.zeros((num_nodes, num_nodes), dtype=float)
                 for e_i in range(edges.shape[1]):
-                    sb = int(edges[0, e_i] // bin_size)
-                    db = int(edges[1, e_i] // bin_size)
-                    if 0 <= sb < B and 0 <= db < B:
-                        H[db, sb] += float(att_sum[e_i])
-                        C[db, sb] += 1
-                H_avg = np.divide(H, C, out=np.zeros_like(H), where=C > 0)
-                nz_b = int(np.count_nonzero(H_avg))
-                vmax_b = float(np.percentile(H_avg[H_avg > 0], 99.0)) if nz_b > 0 else 1.0
-                plt.figure(figsize=(8, 6))
-                plt.imshow(H_avg, cmap='magma', aspect='auto', vmin=0.0, vmax=vmax_b)
-                plt.colorbar(label=f'Mean attention per bin (B={B})')
-                plt.title(f'GraphTransformer Attention Heatmap (Binned {B}x{B})')
-                plt.xlabel('Source node bin')
-                plt.ylabel('Destination node bin')
-                plt.tight_layout()
-                plt.savefig(VIZ_DIR / 'graph_transformer_attention_heatmap_binned.png', dpi=300)
-                print(f"Binned attention heatmap saved to '{VIZ_DIR / 'graph_transformer_attention_heatmap_binned.png'}'")
-            except Exception as bin_e:
-                print(f"Could not generate binned attention heatmap: {bin_e}")
-
-            try:
-                # Scatter plot of all edges colored by attention (log-scaled for contrast)
-                from matplotlib.colors import LogNorm
-                vmin_s = max(float(att_sum.min()), 1e-8)
-                vmax_s = float(att_sum.max()) if att_sum.size > 0 else 1.0
-                plt.figure(figsize=(8, 6))
-                plt.scatter(edges[0], edges[1], c=att_sum, s=0.2, cmap='viridis',
-                            norm=LogNorm(vmin=vmin_s, vmax=vmax_s))
-                plt.xlim([0, num_nodes])
-                plt.ylim([0, num_nodes])
-                plt.xlabel('Source node')
-                plt.ylabel('Destination node')
-                plt.title('GraphTransformer Attention (Edge Scatter, log-scale)')
-                plt.tight_layout()
-                plt.savefig(VIZ_DIR / 'graph_transformer_attention_edges_scatter.png', dpi=300)
-                print(f"Edge scatter attention plot saved to '{VIZ_DIR / 'graph_transformer_attention_edges_scatter.png'}'")
-            except Exception as scat_e:
-                print(f"Could not generate edge scatter attention plot: {scat_e}")
-
-            # Optional: Saving a focused top-K subgraph heatmap for clarity
-            try:
-                k = min(200, edges.shape[1])
-                # Getting top-K edges by attention value
-                top_idx = np.argsort(att_sum)[-k:]
-                top_nodes = np.unique(edges[:, top_idx])
-                sub_heat = heat[np.ix_(top_nodes, top_nodes)]
-                sub_vmax = float(np.percentile(sub_heat[sub_heat > 0], 99.0)) if np.count_nonzero(sub_heat) > 0 else 1.0
-                plt.figure(figsize=(8, 6))
-                plt.imshow(sub_heat, cmap='inferno', aspect='auto', vmin=0.0, vmax=sub_vmax)
-                plt.colorbar(label='Attention (avg across heads)')
-                plt.title('GraphTransformer Attention Heatmap (Top-K Subgraph)')
-                plt.xlabel('Source node (subset)')
-                plt.ylabel('Destination node (subset)')
-                plt.tight_layout()
-                plt.savefig(VIZ_DIR / 'graph_transformer_attention_heatmap_topk.png', dpi=300)
-                print(f"Top-K attention subgraph heatmap saved to '{VIZ_DIR / 'graph_transformer_attention_heatmap_topk.png'}'")
-            except Exception as sub_e:
-                print(f"Could not generate top-K subgraph heatmap: {sub_e}")
+                    src = int(edges[0, e_i])
+                    dst = int(edges[1, e_i])
+                    val = float(att_sum[e_i])
+                    heat[dst, src] += val
+                heat = np.clip(heat, 0.0, None)
+                nz = int(np.count_nonzero(heat))
+                total = int(heat.size)
+                max_val = float(heat.max()) if nz > 0 else 0.0
+                mean_val = float(heat.mean())
+                print(f"Attention heat stats: nonzero={nz}/{total}, max={max_val:.6g}, mean={mean_val:.6g}")
+                if nz > 0:
+                    pos_vals = heat[heat > 0]
+                    vmax = float(np.percentile(pos_vals, 99.0)) if pos_vals.size > 0 else float(heat.max())
+                    vmin = 0.0
+                else:
+                    vmax = 1.0
+                    vmin = 0.0
+                SAVE_FULL_HEATMAP = bool(getattr(args, "full_heatmap", False) or getattr(args, "full_heatmap_force", False))
+                MAX_N_FOR_FULL = int(getattr(args, "full_heatmap_max_n", 4096))
+                FULL_DPI = int(getattr(args, "full_heatmap_dpi", 300))
+                if getattr(args, "full_heatmap_force", False) or (SAVE_FULL_HEATMAP and num_nodes <= MAX_N_FOR_FULL):
+                    plt.figure(figsize=(8, 6))
+                    plt.imshow(heat, cmap='viridis', aspect='auto', vmin=vmin, vmax=vmax)
+                    plt.colorbar(label='Attention (avg across heads)')
+                    plt.title('GraphTransformer Attention Heatmap (Layer 1)')
+                    plt.xlabel('Source node')
+                    plt.ylabel('Destination node')
+                    plt.tight_layout()
+                    plt.savefig(VIZ_DIR / 'graph_transformer_attention_heatmap.png', dpi=FULL_DPI)
+                    print(f"Attention heatmap saved to '{VIZ_DIR / 'graph_transformer_attention_heatmap.png'}'")
+                else:
+                    print("Skipping full NxN attention heatmap due to scale; see binned/scatter/top-K images for global patterns.")
+                try:
+                    B = 256 if num_nodes >= 4096 else 128
+                    bin_size = int(np.ceil(num_nodes / B))
+                    H = np.zeros((B, B), dtype=float)
+                    C = np.zeros((B, B), dtype=int)
+                    for e_i in range(edges.shape[1]):
+                        sb = int(edges[0, e_i] // bin_size)
+                        db = int(edges[1, e_i] // bin_size)
+                        if 0 <= sb < B and 0 <= db < B:
+                            H[db, sb] += float(att_sum[e_i])
+                            C[db, sb] += 1
+                    H_avg = np.divide(H, C, out=np.zeros_like(H), where=C > 0)
+                    nz_b = int(np.count_nonzero(H_avg))
+                    vmax_b = float(np.percentile(H_avg[H_avg > 0], 99.0)) if nz_b > 0 else 1.0
+                    plt.figure(figsize=(8, 6))
+                    plt.imshow(H_avg, cmap='magma', aspect='auto', vmin=0.0, vmax=vmax_b)
+                    plt.colorbar(label=f'Mean attention per bin (B={B})')
+                    plt.title(f'GraphTransformer Attention Heatmap (Binned {B}x{B})')
+                    plt.xlabel('Source node bin')
+                    plt.ylabel('Destination node bin')
+                    plt.tight_layout()
+                    plt.savefig(VIZ_DIR / 'graph_transformer_attention_heatmap_binned.png', dpi=300)
+                    print(f"Binned attention heatmap saved to '{VIZ_DIR / 'graph_transformer_attention_heatmap_binned.png'}'")
+                except Exception as bin_e:
+                    print(f"Could not generate binned attention heatmap: {bin_e}")
+                try:
+                    from matplotlib.colors import LogNorm
+                    vmin_s = max(float(att_sum.min()), 1e-8)
+                    vmax_s = float(att_sum.max()) if att_sum.size > 0 else 1.0
+                    plt.figure(figsize=(8, 6))
+                    plt.scatter(edges[0], edges[1], c=att_sum, s=0.2, cmap='viridis',
+                                norm=LogNorm(vmin=vmin_s, vmax=vmax_s))
+                    plt.xlim([0, num_nodes])
+                    plt.ylim([0, num_nodes])
+                    plt.xlabel('Source node')
+                    plt.ylabel('Destination node')
+                    plt.title('GraphTransformer Attention (Edge Scatter, log-scale)')
+                    plt.tight_layout()
+                    plt.savefig(VIZ_DIR / 'graph_transformer_attention_edges_scatter.png', dpi=300)
+                    print(f"Edge scatter attention plot saved to '{VIZ_DIR / 'graph_transformer_attention_edges_scatter.png'}'")
+                except Exception as scat_e:
+                    print(f"Could not generate edge scatter attention plot: {scat_e}")
+                try:
+                    k = min(200, edges.shape[1])
+                    top_idx = np.argsort(att_sum)[-k:]
+                    top_nodes = np.unique(edges[:, top_idx])
+                    sub_heat = heat[np.ix_(top_nodes, top_nodes)]
+                    sub_vmax = float(np.percentile(sub_heat[sub_heat > 0], 99.0)) if np.count_nonzero(sub_heat) > 0 else 1.0
+                    plt.figure(figsize=(8, 6))
+                    plt.imshow(sub_heat, cmap='inferno', aspect='auto', vmin=0.0, vmax=sub_vmax)
+                    plt.colorbar(label='Attention (avg across heads)')
+                    plt.title('GraphTransformer Attention Heatmap (Top-K Subgraph)')
+                    plt.xlabel('Source node (subset)')
+                    plt.ylabel('Destination node (subset)')
+                    plt.tight_layout()
+                    plt.savefig(VIZ_DIR / 'graph_transformer_attention_heatmap_topk.png', dpi=300)
+                    print(f"Top-K attention subgraph heatmap saved to '{VIZ_DIR / 'graph_transformer_attention_heatmap_topk.png'}'")
+                except Exception as sub_e:
+                    print(f"Could not generate top-K subgraph heatmap: {sub_e}")
+            else:
+                print("Attention weights not available for visualization.")
         else:
-            print("Attention weights not available for visualization.")
-    else:
-        print("Model does not expose attention weights.")
-except Exception as att_e:
-    print(f"Could not generate attention visualization: {att_e}")
+            print("Model does not expose attention weights.")
+    except Exception as att_e:
+        print(f"Could not generate attention visualization: {att_e}")
+
+if __name__ == "__main__":
+    run_evaluation_cli()

@@ -15,7 +15,7 @@ import networkx as nx
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 
-from preprocess_tcga_string import TCGAStringPreprocessor
+from examples.preprocess_tcga_string import TCGAStringPreprocessor
 
 plt.style.use('seaborn-v0_8-whitegrid')
 sns.set_theme(style="whitegrid")
