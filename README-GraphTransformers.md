@@ -66,13 +66,38 @@ output = model(data)  # forward pass; returns graph-level or node-level embeddin
 ## Evaluation Script
 
 You can run the example evaluation script to compare GraphTransformer behavior on synthetic or prepared data:
-- `examples/graph_transformer_evaluation.py`
+- Module: `examples.graph_transformer_evaluation`
 
 Usage example:
 
 ```bash
-python examples/graph_transformer_evaluation.py --hidden_dim 128 --num_layers 3 --heads 4
+python -m examples.graph_transformer_evaluation --hidden_dim 128 --num_layers 3 --heads 4
 ```
+
+## Classification Metrics
+
+If phenotype labels are categorical (e.g., PAM50 subtypes), the evaluation script computes Macro F1 and Macro AUC using a logistic regression classifier on the learned sample embeddings. Result plots are saved to `visualization_results`:
+
+- `graph_transformer_classification_f1.png`
+- `graph_transformer_classification_auc.png`
+
+Regression metrics (R², RMSE) remain available and are saved as:
+
+- `graph_transformer_comparison.png`
+
+## Attention Visualization
+
+For interpretability, the GraphTransformer caches the last layer’s attention weights during a forward pass. You can access them via:
+
+```python
+atts = model.get_last_attentions()  # list per layer; each dict includes 'alpha'
+```
+
+When running `examples.graph_transformer_evaluation`, an attention heatmap (averaged across heads) is generated and saved as:
+
+- `graph_transformer_attention_heatmap.png`
+
+This helps inspect which edges (gene–gene interactions) receive higher attention in the model.
 
 ## Tests
 

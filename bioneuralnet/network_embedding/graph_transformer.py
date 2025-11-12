@@ -73,6 +73,10 @@ class GraphTransformerLayer(MessagePassing):
             nn.Dropout(dropout)
         )
 
+        # cache for interpretability
+        self._last_attention = None
+        self._last_index = None
+
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -106,6 +110,11 @@ class GraphTransformerLayer(MessagePassing):
           torch.Tensor: Updated node features of shape ``[num_nodes, out_channels]``.
         """
         edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
+        # Cache the exact edge_index (including self-loops) used for attention computation
+        try:
+            self._last_edge_index = edge_index.detach().cpu()
+        except Exception:
+            self._last_edge_index = None
 
         x_norm = self.layer_norm1(x)
         # Integrate positional encoding with degree bias and add small training-time noise to break symmetry
@@ -161,6 +170,16 @@ class GraphTransformerLayer(MessagePassing):
             alpha_heads.append(alpha_h)
         alpha = torch.stack(alpha_heads, dim=1)
         alpha = F.dropout(alpha, p=self.dropout, training=self.training)
+
+        # cache attention weights for interpretability (detach to avoid grads)
+        try:
+            self._last_attention = alpha.detach().cpu()
+            # destination node indices for segment-wise softmax
+            self._last_index = (idx_e.detach().cpu() if idx_e is not None else None)
+        except Exception:
+            # best-effort caching; ignore if not available
+            self._last_attention = None
+            self._last_index = None
 
 
         out = value * alpha.unsqueeze(-1)
@@ -312,6 +331,7 @@ class GraphTransformer(nn.Module):
             raise ValueError(f"Unsupported activation function: {activation}")
 
         # Ensure stable initialization across all modules
+        self._last_attentions = []
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -350,10 +370,20 @@ class GraphTransformer(nn.Module):
         x = self.input_norm(x)
         x0 = x  # preserve input diversity with a global skip
 
+        self._last_attentions = []
         for layer in self.layers:
             x = layer(x, edge_index, edge_attr)
             x = self.activation(x)
             x = F.dropout(x, p=self.dropout, training=self.training)
+            # record last attention weights if available
+            if hasattr(layer, "_last_attention") and layer._last_attention is not None:
+                self._last_attentions.append({
+                    "alpha": layer._last_attention,
+                    "index": layer._last_index,
+                    "edge_index": getattr(layer, "_last_edge_index", None)
+                })
+            else:
+                self._last_attentions.append(None)
 
         # Add global residual to prevent representational collapse
         x = x + x0
@@ -362,6 +392,17 @@ class GraphTransformer(nn.Module):
         x = self.regressor(x)
 
         return x
+
+    def get_last_attentions(self):
+        """
+        Return cached attention weights per layer from the last forward pass.
+
+        Returns:
+          list[dict|None]: For each layer, either None or a dict with keys:
+            - 'alpha': tensor of shape [num_edges, heads]
+            - 'index': tensor of destination node indices used for segment softmax
+        """
+        return self._last_attentions
 
     def get_embeddings(self, data):
         """

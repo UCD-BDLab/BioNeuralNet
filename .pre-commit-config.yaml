@@ -22,7 +22,18 @@ repos:
     hooks:
       - id: mypy
         name: Static type checking with MyPy
-        args: [--ignore-missing-imports]
+        args:
+          - --config-file
+          - setup.cfg
+          - --explicit-package-bases
+          - --ignore-missing-imports
+          - --package
+          - bioneuralnet
+          - --package
+          - examples
+          - --package
+          - tests
+        pass_filenames: false
 
   - repo: local
     hooks:

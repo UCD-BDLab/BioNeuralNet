@@ -524,36 +524,68 @@ def download_string_ppi(output_dir=None):
     # URL for STRING PPI network (human, score > 700)
     string_url = "https://stringdb-static.org/download/protein.links.v11.5/9606.protein.links.v11.5.txt.gz"
 
-    # Downloading the file
+    file_path = output_dir / "string_ppi.txt.gz"
+    mapping_path = output_dir / "string_mapping.txt.gz"
+
+    # If cached files exist, prefer them
+    if file_path.exists() and mapping_path.exists():
+        print(f"Found cached STRING files at {output_dir}; using existing assets.")
+        return
+
+    # Attempting download with graceful handling of SSL errors
     print(f"Downloading STRING PPI network from {string_url}...")
-    response = requests.get(string_url, stream=True)
-
-    if response.status_code == 200:
-        file_path = output_dir / "string_ppi.txt.gz"
-        with open(file_path, "wb") as f:
-            for chunk in tqdm(response.iter_content(chunk_size=1024)):
-                if chunk:
-                    f.write(chunk)
-
-        print(f"STRING PPI network saved to {file_path}")
-
-        # Downloading STRING mapping
-        mapping_url = "https://stringdb-static.org/download/protein.info.v11.5/9606.protein.info.v11.5.txt.gz"
-        print(f"Downloading STRING mapping from {mapping_url}...")
-        response = requests.get(mapping_url, stream=True)
-
+    try:
+        response = requests.get(string_url, stream=True, timeout=60)
         if response.status_code == 200:
-            mapping_path = output_dir / "string_mapping.txt.gz"
+            with open(file_path, "wb") as f:
+                for chunk in tqdm(response.iter_content(chunk_size=1024)):
+                    if chunk:
+                        f.write(chunk)
+            print(f"STRING PPI network saved to {file_path}")
+        else:
+            print(f"Error downloading STRING PPI network: {response.status_code}")
+            print("If this persists, consider using cached files or manual download.")
+            return
+    except requests.exceptions.SSLError as e:
+        print(f"SSL error downloading STRING PPI: {e}")
+        if file_path.exists():
+            print(f"Using cached STRING PPI at {file_path}.")
+        else:
+            print("No cached STRING PPI found; skipping due to SSL error.")
+            return
+    except requests.exceptions.RequestException as e:
+        print(f"Network error downloading STRING PPI: {e}")
+        if file_path.exists():
+            print(f"Using cached STRING PPI at {file_path}.")
+        else:
+            print("No cached STRING PPI found; skipping due to network error.")
+            return
+
+    # Download STRING mapping
+    mapping_url = "https://stringdb-static.org/download/protein.info.v11.5/9606.protein.info.v11.5.txt.gz"
+    print(f"Downloading STRING mapping from {mapping_url}...")
+    try:
+        response = requests.get(mapping_url, stream=True, timeout=60)
+        if response.status_code == 200:
             with open(mapping_path, "wb") as f:
                 for chunk in tqdm(response.iter_content(chunk_size=1024)):
                     if chunk:
                         f.write(chunk)
-
             print(f"STRING mapping saved to {mapping_path}")
         else:
             print(f"Error downloading STRING mapping: {response.status_code}")
-    else:
-        print(f"Error downloading STRING PPI network: {response.status_code}")
+    except requests.exceptions.SSLError as e:
+        print(f"SSL error downloading STRING mapping: {e}")
+        if mapping_path.exists():
+            print(f"Using cached STRING mapping at {mapping_path}.")
+        else:
+            print("No cached STRING mapping found; skipping due to SSL error.")
+    except requests.exceptions.RequestException as e:
+        print(f"Network error downloading STRING mapping: {e}")
+        if mapping_path.exists():
+            print(f"Using cached STRING mapping at {mapping_path}.")
+        else:
+            print("No cached STRING mapping found; skipping due to network error.")
 
 
 if __name__ == "__main__":
