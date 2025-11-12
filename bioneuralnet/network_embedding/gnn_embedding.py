@@ -3,7 +3,7 @@ import json
 import pandas as pd
 import networkx as nx
 import numpy as np
-from typing import Optional,Union
+from typing import Optional, Union, List
 from datetime import datetime
 from pathlib import Path
 import tempfile
@@ -148,6 +148,8 @@ class GNNEmbedding:
         self.data = None
         self.embeddings = None
         self.tune = tune
+        self.train_losses: List[float] = []
+        self.train_epochs: List[int] = []
 
         if output_dir is None:
             self.temp_dir_obj = tempfile.TemporaryDirectory()
@@ -519,6 +521,8 @@ class GNNEmbedding:
         data = data.to(self.device)
         model = model.to(self.device)
         model.train()
+        self.train_losses.clear()
+        self.train_epochs.clear()
 
         optimizer = optim.Adam(model.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         loss_fn = nn.MSELoss()
@@ -557,6 +561,8 @@ class GNNEmbedding:
             else:
                 counter += 1
 
+            self.train_losses.append(float(loss.item()))
+            self.train_epochs.append(int(epoch))
             if epoch % 100 == 0 or epoch == 1 or epoch == self.num_epochs:
                 self.logger.info(f"Epoch [{epoch}/{self.num_epochs}] | Loss: {loss.item():.4f} | EarlyStop: {counter}/{patience}")
 
