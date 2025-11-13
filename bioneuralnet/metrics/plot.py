@@ -6,6 +6,7 @@ from bioneuralnet.utils import get_logger
 from .correlation import cluster_correlation
 import networkx as nx
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 from sklearn.manifold import TSNE
 
 # try:
@@ -507,7 +508,7 @@ def plot_multiple_metrics(
     """
     logger.info(f"Plotting multiple metrics: {list(metrics.keys())}")
     n = len(metrics)
-    fig, axes = plt.subplots(1, n, figsize=(5 * n, 5), sharey=True)
+    fig, axes = plt.subplots(1, n, figsize=(5 * n, 5.5), sharey=True)
     if n == 1:
         axes = [axes]
 
@@ -534,28 +535,39 @@ def plot_multiple_metrics(
         total = 0.7
         width = total / len(sublabels)
 
+        group_colors = []
+        for i in range(len(groups)):
+            group_colors.append(cm.tab10(i))
+
+        lower_err = errs[:, 0]
+        upper_err = np.maximum(0, np.minimum(errs[:, 0], 1.0 - means[:, 0]))
+        asymmetric_err = np.array([lower_err, upper_err])
+
         for i in range(len(sublabels)):
             x = ind + i * width
             y = means[:, i]
-            yerr = errs[:, i]
-
-            bars = ax.bar(x, y, width, yerr=yerr, capsize=3,color=["#4E79A7", "#F28E2B"], label=sublabels[i])
-            for bar in bars:
+            yerr = asymmetric_err 
+            bars = ax.bar(x, y, width, yerr=yerr, capsize=4, color=group_colors, alpha=0.95, linewidth=0)
+            
+            for j, bar in enumerate(bars):
                 height = bar.get_height()
                 bar_x = bar.get_x() + bar.get_width() / 2
-                bar_y = height + 0.01
-                ax.text(bar_x, bar_y, f"{height:.2f}", ha='center', va='bottom', fontsize=8)
+                label_y = means[j, i]
+                error_height = asymmetric_err[1, j] 
+                bar_y = label_y + error_height + 0.01 
+                
+                ax.text(bar_x, bar_y, f"{height:.3f}", ha='center', va='bottom', fontsize=9, fontweight="bold")
 
         ax.set_xticks(ind + total / 2 - width / 2)
-        ax.set_xticklabels(groups, fontsize=11)
+        ax.set_xticklabels(groups, fontsize=11, rotation=25, ha="right")
 
         title = title_map.get(metric, metric) if title_map else metric
         ylabel = ylabel_map.get(metric, metric) if ylabel_map else metric
 
         ax.set_title(title, fontsize=14, pad=12)
         ax.set_ylabel(ylabel, fontsize=12)
-        if "Accuracy" in ylabel or "F1" in ylabel:
-            ax.set_ylim(0, 1.3)
+        
+        ax.set_ylim(0.60, 1.05)
         ax.grid(True, axis="y", linestyle="--", alpha=0.3)
 
     plt.tight_layout(pad=2.0)

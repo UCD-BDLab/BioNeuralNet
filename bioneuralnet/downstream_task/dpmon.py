@@ -501,7 +501,7 @@ def run_hyperparameter_tuning(
 
         result = tune.run(
             tune_train_n,
-            resources_per_trial={"cpu": 1, "gpu": gpu_resources},
+            resources_per_trial={"cpu": 2, "gpu": gpu_resources},
             config=pipeline_configs,
             num_samples=10,
             verbose=0,

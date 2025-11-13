@@ -54,7 +54,7 @@ class DatasetLoader:
 
         elif self.dataset_name == "brca":
             self.data["mirna"] = pd.read_csv(folder / "mirna.csv", index_col=0)
-            self.data["pam50"] = pd.read_csv(folder / "pam50.csv", index_col=0)
+            self.data["target"] = pd.read_csv(folder / "target.csv", index_col=0)
             self.data["clinical"] = pd.read_csv(folder / "clinical.csv", index_col=0)
             self.data["rna"] = pd.read_csv(folder / "rna.csv", index_col=0)
             self.data["meth"] = pd.read_csv(folder / "meth.csv", index_col=0)
@@ -68,6 +68,14 @@ class DatasetLoader:
 
         elif self.dataset_name == "kipan":
             self.data["mirna"] = pd.read_csv(folder / "mirna.csv", index_col=0)
+            self.data["target"] = pd.read_csv(folder / "target.csv", index_col=0)
+            self.data["clinical"] = pd.read_csv(folder / "clinical.csv", index_col=0)
+            self.data["rna"] = pd.read_csv(folder / "rna.csv", index_col=0)
+            self.data["meth"] = pd.read_csv(folder / "meth.csv", index_col=0)
+
+        elif self.dataset_name == "paad":
+            self.data["cnv_amp"] = pd.read_csv(folder / "cnv_amp.csv", index_col=0)
+            self.data["cnv_del"] = pd.read_csv(folder / "cnv_del.csv", index_col=0)
             self.data["target"] = pd.read_csv(folder / "target.csv", index_col=0)
             self.data["clinical"] = pd.read_csv(folder / "clinical.csv", index_col=0)
             self.data["rna"] = pd.read_csv(folder / "rna.csv", index_col=0)
