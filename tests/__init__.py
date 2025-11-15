@@ -7,6 +7,7 @@ from .test_preprocess import *
 from .test_data_utils import *
 from .test_correlation_metrics import *
 from .test_dataset_loader import *
+from .test_leiden import *
 
 #from .test_metrics import *
 #from .test_utils import *
