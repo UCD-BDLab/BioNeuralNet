@@ -1,0 +1,659 @@
+Patient_ID,years_to_birth,vital_status,days_to_death,days_to_last_followup,tumor_tissue_site,pathologic_stage,pathology_T_stage,pathology_N_stage,pathology_M_stage,gender,date_of_initial_pathologic_diagnosis,days_to_last_known_alive,radiation_therapy,karnofsky_performance_score,histological_type,number_pack_years_smoked,year_of_tobacco_smoking_onset,race,ethnicity
+TCGA-2K-A9WE,53,0,,214,kidney,stage ii,t2b,nx,m0,male,2013,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-2Z-A9J1,71,0,,2298,kidney,stage i,t1a,n0,mx,male,2008,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-2Z-A9J2,71,0,,1795,kidney,stage i,t1a,nx,mx,female,2008,,no,,kidney papillary renal cell carcinoma,30,,white,not hispanic or latino
+TCGA-2Z-A9J3,67,1,1771,,kidney,stage ii,t2,nx,mx,male,2008,,no,,kidney papillary renal cell carcinoma,,1959,white,not hispanic or latino
+TCGA-2Z-A9J5,80,0,,3050,kidney,stage ii,t2,nx,mx,male,2006,,no,,kidney papillary renal cell carcinoma,32,,white,not hispanic or latino
+TCGA-2Z-A9J6,60,0,,1731,kidney,stage i,t1a,nx,mx,male,2009,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-2Z-A9J7,63,1,139,,kidney,stage iv,t2,nx,m1,male,2007,,yes,,kidney papillary renal cell carcinoma,25,1984,white,not hispanic or latino
+TCGA-2Z-A9J8,50,0,,2790,kidney,stage i,t1b,nx,mx,male,2007,,no,,kidney papillary renal cell carcinoma,60,1977,white,not hispanic or latino
+TCGA-2Z-A9J9,77,0,,2294,kidney,stage i,t1a,nx,mx,male,2006,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-2Z-A9JD,66,0,,1060,kidney,stage i,t1a,nx,mx,male,2009,,no,,kidney papillary renal cell carcinoma,40,1961,white,not hispanic or latino
+TCGA-2Z-A9JE,59,0,,1728,kidney,stage i,t1a,nx,mx,male,2010,,no,100,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-2Z-A9JG,64,0,,1662,kidney,stage i,t1a,nx,mx,male,2010,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-2Z-A9JI,38,0,,1567,kidney,stage iii,t3a,nx,mx,male,2010,,no,,kidney papillary renal cell carcinoma,23,1984,white,not hispanic or latino
+TCGA-2Z-A9JJ,69,0,,1213,kidney,stage i,t1a,nx,m0,female,2011,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-2Z-A9JK,50,0,,1186,kidney,stage iii,t3a,nx,mx,male,2011,,no,100,kidney papillary renal cell carcinoma,60,,white,not hispanic or latino
+TCGA-2Z-A9JL,47,0,,1006,kidney,stage i,t1a,nx,mx,male,2012,,no,100,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-2Z-A9JM,28,0,,934,kidney,stage i,t1a,nx,mx,male,2012,,no,,kidney papillary renal cell carcinoma,16,,white,not hispanic or latino
+TCGA-2Z-A9JN,50,0,,740,kidney,stage i,t1a,nx,mx,female,2012,,no,100,kidney papillary renal cell carcinoma,50,1994,black or african american,not hispanic or latino
+TCGA-2Z-A9JO,56,0,,949,kidney,stage i,t1b,n0,mx,female,2012,,no,,kidney papillary renal cell carcinoma,11.25,1975,black or african american,not hispanic or latino
+TCGA-2Z-A9JP,63,0,,893,kidney,stage i,t1a,nx,mx,male,2011,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-2Z-A9JQ,66,0,,778,kidney,stage i,t1a,nx,mx,male,2012,,no,,kidney papillary renal cell carcinoma,40,,white,not hispanic or latino
+TCGA-2Z-A9JR,57,0,,161,kidney,stage i,t1a,nx,mx,male,2012,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-2Z-A9JS,74,1,492,,kidney,stage i,t1a,nx,mx,male,2012,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-2Z-A9JT,71,0,,684,kidney,stage i,t1a,nx,mx,male,2012,,no,90,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-3Z-A93Z,69,0,,385,kidney,stage i,t1a,n0,m0,male,2013,,no,100,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-4A-A93W,66,0,,4,kidney,stage i,t1a,n0,m0,female,2013,,no,100,kidney papillary renal cell carcinoma,12.5,1943,white,not hispanic or latino
+TCGA-4A-A93X,58,0,,390,kidney,stage iv,t3a,n1,mx,male,2013,,no,90,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-4A-A93Y,63,0,,352,kidney,stage ii,t2b,n0,m0,female,2013,,no,100,kidney papillary renal cell carcinoma,22.5,1987,black or african american,not hispanic or latino
+TCGA-5P-A9JU,81,0,,373,kidney,stage iii,t3a,n0,m0,male,2012,,no,10,kidney papillary renal cell carcinoma,6,,white,not hispanic or latino
+TCGA-5P-A9JV,49,0,,2043,kidney,,t1a,nx,,male,2005,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-5P-A9JW,64,0,,3241,kidney,,t1a,nx,mx,male,2006,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-5P-A9JY,79,1,1508,,kidney,,t2,nx,mx,male,2006,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-5P-A9JZ,51,0,,2744,kidney,,t1b,nx,,female,2006,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-5P-A9K0,75,0,,677,kidney,,t1a,nx,mx,male,2007,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-5P-A9K2,62,0,,2392,kidney,,t1b,nx,mx,male,2007,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-5P-A9K3,59,1,471,,kidney,,t2,nx,mx,male,2007,,no,,kidney papillary renal cell carcinoma,50,,white,not hispanic or latino
+TCGA-5P-A9K4,54,0,,2184,kidney,,t1b,nx,mx,male,2008,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-5P-A9K6,64,0,,1914,kidney,,t1a,nx,mx,male,2009,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-5P-A9K8,51,0,,1309,kidney,,t3a,nx,mx,female,2010,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-5P-A9K9,59,1,589,,kidney,,t3a,n2,mx,female,2011,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-5P-A9KA,61,0,,395,kidney,,t1a,nx,mx,male,2013,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-5P-A9KC,51,0,,377,kidney,,t1b,nx,mx,female,2013,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-5P-A9KE,70,0,,824,kidney,,t1b,nx,m0,male,2011,,no,,kidney papillary renal cell carcinoma,60,,white,not hispanic or latino
+TCGA-5P-A9KF,53,0,,845,kidney,,t1a,n0,mx,male,2011,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-5P-A9KH,77,0,,2051,kidney,,t1a,nx,mx,male,2005,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-6D-AA2E,68,0,,362,kidney,stage i,t1b,nx,mx,female,2013,,no,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-A3-3357,62,0,,2688,kidney,stage ii,t2,n0,m0,male,2005,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-A3-3358,57,0,,1307,kidney,stage i,t1a,n0,m0,female,2005,1307,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-A3-3367,72,0,,2270,kidney,stage i,t1b,n0,m0,male,2006,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-A3-3370,48,0,,2274,kidney,stage i,t1b,n0,m0,female,2006,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-A3-3373,54,0,,1621,kidney,stage i,t1b,n0,m0,female,2007,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-A3-3376,51,1,1696,,kidney,stage i,t1a,n0,m0,male,2006,,no,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-A3-3385,46,0,,1993,kidney,stage i,t1a,n0,m0,female,2007,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-A3-3387,49,0,,617,kidney,stage i,t1a,n0,m0,male,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-A3-A6NI,47,0,,1018,kidney,stage i,t1a,nx,mx,male,2011,,no,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-A3-A6NJ,57,0,,468,kidney,stage i,t1a,nx,mx,female,2012,,no,100,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-A3-A6NL,49,0,,689,kidney,stage i,t1b,nx,mx,female,2012,,no,90,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-A3-A6NN,78,0,,3,kidney,stage i,t1a,nx,mx,male,2012,,no,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-A3-A8CQ,59,0,,3,kidney,stage i,t1a,nx,mx,female,2011,,,90,kidney clear cell renal carcinoma,9,,black or african american,not hispanic or latino
+TCGA-A3-A8OU,74,0,,0,kidney,stage i,t1a,nx,mx,female,2011,,,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-A3-A8OV,75,0,,340,kidney,stage i,t1a,nx,mx,male,2011,,no,,kidney clear cell renal carcinoma,65,1946,black or african american,not hispanic or latino
+TCGA-A3-A8OW,37,0,,323,kidney,stage iii,t3a,nx,mx,male,2011,,no,,kidney clear cell renal carcinoma,10,2001,black or african american,not hispanic or latino
+TCGA-A3-A8OX,65,0,,0,kidney,stage i,t1a,nx,mx,female,2012,,,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-A4-7286,42,0,,554,kidney,,t3a,nx,,male,2011,,no,90,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-A4-7287,75,1,597,,kidney,stage i,t1,nx,mx,female,2011,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-A4-7288,71,0,,1857,kidney,,t1a,nx,mx,female,2008,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-A4-7583,60,0,,3,kidney,stage i,t1,n0,m0,male,2011,,,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-A4-7584,59,0,,650,kidney,stage i,t1a,nx,mx,male,2011,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-A4-7585,67,1,1070,,kidney,stage iii,t3a,n0,m0,male,2007,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-A4-7732,55,0,,582,kidney,,t2a,nx,mx,male,2011,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-A4-7734,53,0,,27,kidney,stage i,t1a,nx,mx,female,2011,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-A4-7828,74,0,,238,kidney,stage i,t1a,nx,m0,female,2011,,no,40,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-A4-7915,35,0,,7,kidney,stage ii,t2b,n0,mx,female,2011,,,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-A4-7996,61,0,,506,kidney,stage i,t1a,nx,mx,female,2011,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-A4-7997,67,0,,927,kidney,stage i,t1b,nx,m0,male,2011,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-A4-8098,73,0,,896,kidney,stage i,t1a,nx,mx,male,2011,,no,80,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-A4-8310,58,0,,780,kidney,stage iii,t3a,nx,mx,male,2012,,no,80,kidney papillary renal cell carcinoma,40,,white,not hispanic or latino
+TCGA-A4-8311,60,0,,729,kidney,stage i,t1a,nx,mx,male,2012,,no,100,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-A4-8312,60,0,,708,kidney,stage i,t1,nx,mx,male,2012,,no,90,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-A4-8515,47,0,,709,kidney,stage i,t1a,nx,mx,male,2012,,no,,kidney papillary renal cell carcinoma,,,american indian or alaska native,not hispanic or latino
+TCGA-A4-8516,62,0,,23,kidney,stage iii,t3a,nx,mx,male,2012,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-A4-8517,71,0,,597,kidney,stage i,t1a,nx,mx,male,2012,,no,80,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-A4-8518,48,0,,600,kidney,stage i,t1a,nx,mx,male,2012,,no,80,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-A4-8630,59,0,,436,kidney,stage i,t1b,nx,mx,female,2012,,no,100,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-A4-A48D,84,0,,379,kidney,stage i,t1b,nx,mx,male,2012,,no,80,kidney papillary renal cell carcinoma,20,1975,black or african american,not hispanic or latino
+TCGA-A4-A4ZT,71,0,,516,kidney,stage i,t1b,nx,mx,female,2012,,no,80,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-A4-A57E,59,1,258,,kidney,stage iv,t2a,n0,m1,male,2011,,no,90,kidney papillary renal cell carcinoma,50,1968,white,not hispanic or latino
+TCGA-A4-A5DU,45,0,,496,kidney,stage i,t1a,nx,mx,female,2012,,no,90,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-A4-A5XZ,65,0,,479,kidney,stage ii,t2a,nx,mx,female,2012,,no,80,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-A4-A5Y0,61,0,,252,kidney,stage i,t1b,nx,mx,female,2012,,no,,kidney papillary renal cell carcinoma,120,1966,white,not hispanic or latino
+TCGA-A4-A5Y1,75,1,395,,kidney,stage iii,t1b,n1,mx,male,2012,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-A4-A6HP,66,0,,379,kidney,stage i,t1a,nx,mx,male,2013,,no,70,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-A4-A772,39,0,,0,kidney,stage i,t1b,nx,mx,male,2013,,,,kidney papillary renal cell carcinoma,,,white,hispanic or latino
+TCGA-A4-A7UZ,71,0,,0,kidney,stage iii,t3a,n1,mx,male,2013,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-AK-3425,68,0,,3343,kidney,stage i,t1,n0,m0,male,2000,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-AK-3428,62,0,,3728,kidney,stage iii,t3b,n0,m0,male,2004,,no,100,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-AK-3431,62,1,2241,,kidney,stage ii,t2,nx,m0,female,2004,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-AK-3433,48,0,,3409,kidney,stage ii,t2,n0,m0,female,2004,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-AK-3434,72,0,,2087,kidney,stage i,t1b,nx,m0,male,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-AK-3440,58,0,,2865,kidney,stage i,t1a,nx,m0,male,2005,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-AK-3445,69,0,,2392,kidney,stage iii,t3a,nx,m0,male,2006,,no,,kidney clear cell renal carcinoma,40,1966,white,not hispanic or latino
+TCGA-AK-3450,85,0,,1779,kidney,stage i,t1a,n0,m0,female,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-AK-3453,58,0,,2531,kidney,stage ii,t2,nx,m0,female,2006,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-AK-3454,84,0,,874,kidney,stage i,t1b,nx,m0,male,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-AK-3458,48,0,,1168,kidney,stage i,t1b,nx,m0,male,2007,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-AK-3460,58,0,,2508,kidney,stage i,t1a,nx,m0,male,2007,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-AK-3461,72,0,,2217,kidney,stage i,t1a,nx,m0,male,2007,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-AL-7173,72,0,,2060,kidney,stage iv,t3,n2,m0,female,2008,,no,,kidney papillary renal cell carcinoma,50,1958,white,not hispanic or latino
+TCGA-AL-A5DJ,54,1,1498,,kidney,stage iii,t3a,nx,mx,female,2009,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-AT-A5NU,77,0,,67,kidney,stage i,t1a,nx,mx,male,2011,,,,kidney papillary renal cell carcinoma,,,white,hispanic or latino
+TCGA-B0-4688,46,1,101,,kidney,stage iv,t4,n0,m1,male,2008,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4690,65,1,43,,kidney,stage iv,t4,n0,m1,male,2008,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4691,55,1,139,,kidney,stage iv,t2,n0,m1,male,2009,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4693,72,1,77,,kidney,stage iii,t3a,n0,m0,female,2009,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4694,72,1,106,,kidney,stage iii,t3b,nx,m0,male,2009,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4696,58,1,866,,kidney,stage iii,t3a,n0,m0,male,2001,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4697,46,1,578,,kidney,stage iv,t3b,nx,m1,female,2003,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4698,75,1,42,,kidney,stage iv,t4,nx,m0,male,2003,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4699,74,1,110,,kidney,stage iv,t4,n0,m1,male,2004,110,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4700,60,1,1980,,kidney,stage iv,t4,nx,m1,male,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4701,66,1,238,,kidney,stage iv,t3a,n0,m1,female,2005,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4703,51,1,182,,kidney,stage iv,t3a,n0,m1,male,2005,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4706,61,1,65,,kidney,stage iii,t3a,nx,m0,male,2007,26,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4707,63,1,600,,kidney,stage iii,t3a,nx,m0,male,2008,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4710,75,0,,1755,kidney,stage iii,t3a,n0,m0,female,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4712,76,1,1337,,kidney,stage iv,t3a,nx,m1,male,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4713,76,1,202,,kidney,stage iii,t3b,nx,m0,female,2010,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4714,81,1,99,,kidney,stage iv,t3b,nx,m1,male,2010,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4718,57,0,,1778,kidney,stage iii,t3a,nx,m0,male,2010,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4810,47,1,478,,kidney,stage iii,t3a,n1,m0,male,2001,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4811,48,1,1417,,kidney,stage iii,t3a,n0,m0,male,2001,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4813,68,1,18,,kidney,stage iii,t3b,nx,m0,male,2001,18,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4814,58,1,168,,kidney,stage iv,t4,n0,m1,male,2001,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4815,65,1,1588,,kidney,stage iii,t3a,nx,m0,male,2001,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4816,49,1,1371,,kidney,stage ii,t2,n0,m0,male,2002,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4817,81,1,1019,,kidney,stage iii,t3c,n0,m0,male,2002,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4818,68,1,510,,kidney,stage ii,t2,nx,m0,female,2002,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4819,60,1,183,,kidney,stage iv,t3b,nx,m1,female,2002,6,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4821,68,1,1230,,kidney,stage iii,t3b,n0,m0,female,2002,,,,kidney clear cell renal carcinoma,,,asian,not hispanic or latino
+TCGA-B0-4822,78,1,1111,,kidney,stage ii,t2,nx,m0,male,2002,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4823,88,1,454,,kidney,stage i,t1a,n0,m0,male,2002,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4824,49,1,1657,,kidney,stage i,t1a,n0,m0,female,2002,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4827,77,1,885,,kidney,stage iii,t3b,n0,m0,female,2002,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4828,79,1,307,,kidney,stage iv,t2,nx,m1,male,2003,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4841,63,1,204,,kidney,stage iv,t2,nx,m1,male,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4842,73,1,1724,,kidney,stage iii,t3a,n0,m0,female,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4843,57,1,320,,kidney,stage iii,t3a,n0,m0,male,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4844,60,1,313,,kidney,stage iv,t3a,nx,m1,male,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4845,70,1,1986,,kidney,stage iv,t3a,nx,m1,male,2003,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4846,52,1,1200,,kidney,stage iv,t3a,n0,m1,male,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4847,60,1,793,,kidney,stage iv,t3a,nx,m1,male,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4848,54,1,883,,kidney,stage iii,t3b,nx,m0,male,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4849,51,1,69,,kidney,stage iii,t3a,nx,m0,male,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4852,78,1,1121,,kidney,stage ii,t2,n0,m0,female,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-4945,75,1,2145,,kidney,stage i,t1a,n0,m0,female,2003,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5080,63,1,342,,kidney,stage iv,t3a,n0,m1,male,2005,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5083,63,1,1045,,kidney,stage i,t1a,n0,m0,male,2005,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5092,53,1,459,,kidney,stage iv,t1a,n0,m1,female,2008,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5094,62,1,333,,kidney,stage iv,t3b,n0,m1,male,2008,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5095,81,1,245,,kidney,stage iii,t3a,n0,m0,male,2008,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5096,72,1,68,,kidney,stage iii,t3a,n1,m0,female,1998,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5097,59,0,,665,kidney,stage iii,t3b,n0,m0,female,2010,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5098,53,1,1584,,kidney,stage i,t1,nx,m0,female,1998,,,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-B0-5099,88,1,485,,kidney,stage iii,t3b,nx,m0,female,2002,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5100,72,1,1913,,kidney,stage iii,t3a,nx,m0,male,1998,,,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-B0-5102,74,1,2764,,kidney,stage i,t1,nx,m0,female,1999,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5104,90,1,2752,,kidney,stage i,t1,n0,m0,female,2002,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5106,64,1,1598,,kidney,stage i,t1a,n0,m0,male,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5107,65,1,927,,kidney,stage iv,t2,n0,m1,female,2007,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5108,54,0,,1782,kidney,stage iii,t3a,n0,m0,male,2009,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5109,69,1,587,,kidney,stage iii,t3b,n1,m0,male,2009,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5110,71,0,,2009,kidney,stage i,t1a,n0,m0,female,2009,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5113,69,0,,1175,kidney,stage iii,t3a,n0,m0,female,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5115,43,0,,1604,kidney,stage iv,t2,n0,m1,male,2009,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5116,52,0,,1274,kidney,stage iii,t3b,n0,m0,male,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5117,40,0,,1608,kidney,stage i,t1b,nx,m0,male,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5119,61,0,,1552,kidney,stage i,t1b,n0,m0,female,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5120,72,0,,1169,kidney,stage i,t1a,n0,m0,female,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5121,56,0,,1485,kidney,stage i,t1b,n0,m0,male,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5399,46,0,,1411,kidney,stage i,t1b,n0,m0,male,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5400,59,0,,1733,kidney,stage iii,t3b,n0,m0,female,2008,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5402,64,0,,1290,kidney,stage iv,t4,nx,m0,male,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5690,53,0,,3392,kidney,stage i,t1b,nx,m0,female,2004,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5691,66,0,,3431,kidney,stage i,t1a,n0,m0,female,2002,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5692,66,0,,3944,kidney,stage iii,t3b,n0,m0,female,2004,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5693,47,0,,4074,kidney,stage i,t1b,nx,m0,female,2003,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5694,71,1,480,,kidney,stage iii,t3a,n0,m0,male,2008,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5695,61,0,,2150,kidney,stage i,t1b,n0,m0,female,2007,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5696,69,0,,2609,kidney,stage iii,t3a,n0,m0,male,2007,,no,,kidney clear cell renal carcinoma,,,white,hispanic or latino
+TCGA-B0-5697,50,0,,2630,kidney,stage i,t1a,n0,m0,male,2007,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5698,77,0,,3631,kidney,stage i,t1b,n0,m0,male,2005,,no,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-B0-5699,53,0,,3841,kidney,stage i,t1,n0,m0,male,2003,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5700,77,0,,1790,kidney,stage i,t1a,n0,m0,male,2009,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5701,65,0,,2461,kidney,stage iii,t3b,n0,m0,male,2007,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5702,71,0,,2172,kidney,stage i,t1b,n0,m0,male,2007,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5703,73,0,,2246,kidney,stage i,t1b,n0,m0,male,2009,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5705,65,0,,4537,kidney,stage i,t1,n0,m0,female,2002,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5706,45,0,,3205,kidney,stage ii,t2,n0,m0,male,2004,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5707,39,0,,3744,kidney,stage i,t1a,n0,m0,female,2004,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5709,62,0,,3974,kidney,stage iii,t3a,nx,m0,female,2003,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5710,57,0,,2430,kidney,stage i,t1b,n0,m0,male,2008,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5711,50,0,,3989,kidney,stage iii,t3b,nx,m0,male,2004,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5712,68,0,,2722,kidney,stage iv,t2,n0,m1,female,2004,,,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-B0-5713,75,0,,2782,kidney,stage iii,t3b,n0,m0,female,2006,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B0-5812,53,0,,3834,kidney,stage i,t1b,nx,m0,male,2003,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B1-5398,73,0,,1251,kidney,stage iii,t3b,n0,m0,male,2010,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-B1-7332,60,0,,1141,kidney,stage ii,t2a,nx,mx,female,2011,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-B1-A47M,79,0,,659,kidney,stage iii,t3a,nx,mx,male,2011,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-B1-A47N,62,0,,1110,kidney,stage i,t1a,nx,mx,male,2012,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-B1-A47O,54,0,,842,kidney,stage i,t1b,n0,mx,female,2012,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-B1-A654,43,0,,616,kidney,stage i,t1a,nx,m0,female,2012,,no,,kidney papillary renal cell carcinoma,10,1992,black or african american,not hispanic or latino
+TCGA-B1-A655,77,0,,510,kidney,stage i,t1a,n0,m0,female,2012,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-B1-A656,64,0,,618,kidney,stage i,t1a,n0,m0,male,2012,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-B1-A657,54,0,,641,kidney,stage i,t1b,n0,m0,male,2012,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-B2-3924,73,0,,1092,kidney,stage i,t1b,nx,m0,male,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B2-4101,52,0,,648,kidney,stage ii,t2a,nx,m0,male,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B2-5633,56,0,,963,kidney,stage i,t1b,n0,m0,male,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B2-5635,74,0,,755,kidney,stage i,t1a,nx,m0,male,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B2-5636,79,0,,919,kidney,stage i,t1a,nx,m0,male,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B2-5639,46,1,1003,,kidney,stage iv,t3,nx,m1,male,2010,,yes,70,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B2-5641,79,0,,656,kidney,stage i,t1a,n0,m0,male,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B2-A4SR,61,0,,507,kidney,stage ii,t2a,nx,m0,male,2012,,no,,kidney clear cell renal carcinoma,46,1966,black or african american,not hispanic or latino
+TCGA-B3-8121,48,0,,379,kidney,stage i,t1,nx,mx,female,2011,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-B3-A6W5,43,0,,309,kidney,stage i,t1,nx,mx,male,2013,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-B4-5377,68,0,,365,kidney,stage iv,t3,n0,m1,female,2010,,no,90,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B4-5378,62,0,,175,kidney,stage i,t1,n0,m0,male,2010,,no,90,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B4-5832,65,0,,155,kidney,stage iii,t3b,n0,m0,male,2010,,no,80,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B4-5834,59,0,,38,kidney,stage i,t1,n0,m0,male,2010,,no,90,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B4-5835,64,0,,16,kidney,stage i,t1,n0,m0,female,2010,,no,100,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B4-5836,61,0,,141,kidney,stage i,t1b,n0,m0,female,2010,,no,90,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B4-5838,52,0,,166,kidney,stage iv,t3,n1,m0,male,2010,,no,80,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B4-5843,45,0,,11,kidney,stage i,t1,n0,m0,male,2010,,no,90,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B4-5844,61,0,,7,kidney,stage ii,t2,n0,m0,female,2010,,no,80,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B8-4146,41,0,,511,kidney,stage i,t1b,nx,m0,female,2009,,no,,kidney clear cell renal carcinoma,20,,white,not hispanic or latino
+TCGA-B8-4153,74,0,,762,kidney,stage iii,t3a,nx,m0,male,2010,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B8-4621,63,0,,788,kidney,stage i,t1b,n0,m0,male,2010,,no,,kidney clear cell renal carcinoma,40,,black or african american,not hispanic or latino
+TCGA-B8-4622,57,0,,1525,kidney,stage iv,t3a,n0,m1,male,2010,,no,90,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B8-5158,56,0,,1218,kidney,stage iii,t3a,n1,m0,male,2010,,no,80,kidney clear cell renal carcinoma,10,1996,white,not hispanic or latino
+TCGA-B8-5159,61,0,,722,kidney,stage i,t1a,n0,m0,female,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B8-5162,62,0,,36,kidney,stage ii,t2a,nx,m0,male,2010,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B8-5163,63,0,,822,kidney,stage iii,t3a,n0,m0,female,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B8-5164,65,0,,26,kidney,stage iii,t3a,n0,m0,male,2010,,,,kidney clear cell renal carcinoma,40,,white,not hispanic or latino
+TCGA-B8-5165,43,0,,737,kidney,stage i,t1a,n0,m0,male,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B8-5545,42,0,,1525,kidney,stage i,t1a,n0,m0,male,2010,,no,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-B8-5546,38,0,,505,kidney,stage i,t1b,n0,m0,female,2010,,,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-B8-5549,53,0,,194,kidney,stage i,t1b,n0,m0,male,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B8-5550,71,0,,1476,kidney,stage iii,t3a,n0,m0,male,2010,,no,,kidney clear cell renal carcinoma,20,1970,white,not hispanic or latino
+TCGA-B8-5551,65,0,,16,kidney,stage i,t1b,n0,m0,female,2010,,,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-B8-5552,41,0,,1046,kidney,stage i,t1b,nx,m0,female,2010,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B8-5553,67,0,,435,kidney,stage i,t1b,n0,m0,female,2010,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-B8-A54D,69,0,,830,kidney,stage iii,t3a,nx,mx,male,2011,,no,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-B8-A54E,62,0,,909,kidney,stage i,t1b,nx,mx,female,2011,,no,,kidney clear cell renal carcinoma,50,,black or african american,hispanic or latino
+TCGA-B8-A54F,49,0,,519,kidney,stage i,t1a,nx,mx,female,2012,,no,,kidney clear cell renal carcinoma,30,,black or african american,not hispanic or latino
+TCGA-B8-A54G,50,0,,53,kidney,stage i,t1a,nx,mx,male,2012,,no,,kidney clear cell renal carcinoma,7,,black or african american,not hispanic or latino
+TCGA-B8-A54H,69,0,,256,kidney,stage ii,t2a,n0,mx,female,2012,,no,,kidney clear cell renal carcinoma,,,black or african american,
+TCGA-B8-A54I,48,0,,150,kidney,stage i,t1b,nx,mx,male,2012,,no,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-B8-A54J,60,0,,528,kidney,stage ii,t2a,nx,mx,male,2012,,no,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-B8-A54K,61,0,,469,kidney,stage i,t1a,nx,mx,male,2012,,no,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-B8-A7U6,54,0,,495,kidney,stage i,t1a,nx,,female,2013,,no,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-B8-A8YJ,60,0,,431,kidney,stage i,t1b,nx,,female,2013,,no,,kidney clear cell renal carcinoma,10,,black or african american,
+TCGA-B9-5155,71,0,,665,kidney,stage iii,t3a,nx,,male,2010,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-B9-5156,51,0,,1338,kidney,,t1a,nx,,male,2010,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-B9-7268,59,0,,671,kidney,stage ii,t2,n0,m0,male,2011,,no,,kidney papillary renal cell carcinoma,3,,white,not hispanic or latino
+TCGA-B9-A44B,70,0,,361,kidney,stage iii,t3b,nx,,male,2012,,no,,kidney papillary renal cell carcinoma,15,,black or african american,not hispanic or latino
+TCGA-B9-A5W7,47,0,,585,kidney,stage i,t1a,nx,,male,2012,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-B9-A5W8,50,0,,524,kidney,stage ii,t2b,nx,m0,male,2012,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-B9-A5W9,40,0,,5,kidney,stage i,t1b,nx,mx,male,2012,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-B9-A69E,71,0,,452,kidney,stage iii,t3a,nx,,male,2013,,no,,kidney papillary renal cell carcinoma,185,1951,white,not hispanic or latino
+TCGA-B9-A8YH,52,0,,532,kidney,stage i,t1a,nx,mx,male,2013,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-B9-A8YI,79,0,,374,kidney,stage i,t1b,nx,mx,male,2013,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-BP-4177,65,0,,1670,kidney,stage i,t1a,nx,m0,male,2005,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-BP-4760,69,0,,2361,kidney,stage i,t1a,nx,m0,male,2004,,,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-BP-4770,73,1,329,,kidney,stage iv,t4,n0,m0,female,2005,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-4782,55,0,,354,kidney,stage i,t1a,nx,m0,female,2005,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-4795,74,0,,620,kidney,stage i,t1a,n0,m0,female,2007,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-4801,57,0,,1124,kidney,stage i,t1a,nx,m0,male,2007,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-4993,58,0,,177,kidney,stage i,t1a,nx,m0,male,2007,177,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5010,63,1,878,,kidney,stage iii,t3a,n0,m0,male,2007,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-BP-5168,75,1,1463,,kidney,stage i,t1a,nx,m0,male,2002,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5169,70,0,,193,kidney,stage i,t1b,n0,m0,male,2004,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5170,55,0,,2412,kidney,stage i,t1a,nx,m0,male,2004,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5173,75,1,62,,kidney,stage i,t1a,nx,m0,male,2004,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5174,45,0,,2257,kidney,stage i,t1a,nx,m0,female,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-BP-5175,60,0,,932,kidney,stage i,t1a,nx,m0,male,2004,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5176,78,1,1590,,kidney,stage i,t1a,nx,m0,female,2004,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5177,46,0,,293,kidney,stage i,t1a,nx,m0,female,2004,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5178,71,1,1912,,kidney,stage iv,t3a,nx,m1,male,2004,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5180,53,0,,2263,kidney,stage i,t1a,nx,m0,male,2004,1892,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5181,58,0,,1495,kidney,stage i,t1b,nx,m0,female,2006,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5182,56,0,,1165,kidney,stage i,t1a,n0,m0,male,2007,1172,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-BP-5183,57,0,,1291,kidney,stage iii,t3a,nx,m0,male,2007,,,,kidney clear cell renal carcinoma,,,white,hispanic or latino
+TCGA-BP-5184,54,0,,1133,kidney,stage i,t1a,nx,m0,male,2007,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5185,56,0,,1132,kidney,stage i,t1a,nx,m0,male,2007,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5186,50,0,,693,kidney,stage i,t1a,n0,m0,female,2007,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5187,54,0,,406,kidney,stage i,t1a,nx,m0,male,2007,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5189,60,1,822,,kidney,stage i,t1b,nx,m0,male,2007,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-BP-5190,61,0,,1011,kidney,stage i,t1a,nx,m0,male,2007,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-BP-5191,79,0,,967,kidney,stage iii,t3a,n0,m0,male,2007,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-BP-5192,59,0,,714,kidney,stage i,t1a,nx,m0,male,2007,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5194,39,0,,408,kidney,stage i,t1a,nx,m0,male,2008,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5195,75,0,,749,kidney,stage i,t1a,nx,m0,male,2008,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-BP-5196,53,0,,1018,kidney,stage i,t1a,nx,m0,male,2008,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5198,72,0,,603,kidney,stage iii,t3b,n0,m0,male,2008,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5199,58,0,,1355,kidney,stage ii,t2,n0,m0,male,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-BP-5200,44,0,,1063,kidney,stage ii,t2,nx,m0,male,2008,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BP-5201,63,0,,951,kidney,stage iv,t3b,n0,m1,male,2008,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-BP-5202,75,0,,29,kidney,stage iii,t3a,nx,m0,male,2008,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-BQ-5875,66,0,,2639,kidney,stage iii,t3a,nx,m0,female,2004,,,,kidney papillary renal cell carcinoma,,,white,
+TCGA-BQ-5876,75,0,,586,kidney,stage i,t1a,nx,m0,male,2004,,,,kidney papillary renal cell carcinoma,,,white,
+TCGA-BQ-5877,60,1,270,,kidney,stage iv,t3a,n1,m1,male,2004,,,,kidney papillary renal cell carcinoma,,,black or african american,
+TCGA-BQ-5878,79,0,,1938,kidney,stage iii,t3a,n1,m0,female,2005,,,,kidney papillary renal cell carcinoma,,,white,
+TCGA-BQ-5879,32,1,697,,kidney,stage iii,t3b,n1,m0,female,2005,,,,kidney papillary renal cell carcinoma,,,white,
+TCGA-BQ-5880,79,1,1314,,kidney,stage iii,t3a,n1,m0,male,2006,,,,kidney papillary renal cell carcinoma,,,white,
+TCGA-BQ-5881,69,0,,1454,kidney,stage i,t1a,nx,m0,male,2006,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-BQ-5882,54,1,658,,kidney,stage iii,t3b,n0,m0,male,2007,,,,kidney papillary renal cell carcinoma,,,,
+TCGA-BQ-5883,79,0,,1242,kidney,stage i,t1a,nx,m0,female,2007,,,,kidney papillary renal cell carcinoma,,,black or african american,
+TCGA-BQ-5884,59,0,,792,kidney,stage i,t1a,nx,m0,female,2008,,,,kidney papillary renal cell carcinoma,,,black or african american,
+TCGA-BQ-5885,63,0,,921,kidney,stage iii,t3,n0,m0,male,2008,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-BQ-5886,75,0,,792,kidney,stage iii,t3a,nx,m0,male,2009,,,,kidney papillary renal cell carcinoma,,,white,
+TCGA-BQ-5887,54,0,,771,kidney,stage iii,t3a,n0,m0,male,2009,,,,kidney papillary renal cell carcinoma,,,white,
+TCGA-BQ-5888,74,0,,403,kidney,stage i,t1a,n0,m0,female,2009,,,,kidney papillary renal cell carcinoma,,,white,
+TCGA-BQ-5889,63,1,329,,kidney,stage iv,t3b,n1,m1,male,2009,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-BQ-5890,69,0,,233,kidney,stage iii,t3a,n0,m0,male,2009,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-BQ-5891,57,0,,29,kidney,stage iii,t3b,n0,m0,female,2009,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-BQ-5892,51,0,,364,kidney,stage i,t1b,n0,m0,male,2010,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-BQ-5893,61,1,241,,kidney,stage iv,t3a,n1,m1,male,2010,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-BQ-5894,42,0,,84,kidney,stage iv,t3b,n1,m1,male,2010,,,,kidney papillary renal cell carcinoma,,,,hispanic or latino
+TCGA-BQ-7044,73,0,,3760,kidney,stage iii,t3a,nx,m0,male,2000,,,,kidney papillary renal cell carcinoma,,,white,
+TCGA-BQ-7045,78,1,1468,,kidney,stage i,t1b,n0,m0,male,2001,,,,kidney papillary renal cell carcinoma,,,black or african american,
+TCGA-BQ-7046,61,0,,2948,kidney,stage i,t1a,nx,m0,male,2002,,,,kidney papillary renal cell carcinoma,,,white,
+TCGA-BQ-7048,64,0,,2839,kidney,stage iii,t3a,n0,m0,male,2003,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-BQ-7049,45,1,1364,,kidney,stage i,t1a,nx,m0,female,2005,,,,kidney papillary renal cell carcinoma,,,white,
+TCGA-BQ-7050,53,0,,1864,kidney,stage i,t1a,n0,m0,female,2006,,,,kidney papillary renal cell carcinoma,,,white,hispanic or latino
+TCGA-BQ-7051,74,0,,1533,kidney,stage ii,t2,n0,m0,male,2007,,,,kidney papillary renal cell carcinoma,,,white,
+TCGA-BQ-7053,57,0,,1516,kidney,stage iii,t3,nx,m0,female,2007,,,,kidney papillary renal cell carcinoma,,,black or african american,hispanic or latino
+TCGA-BQ-7055,73,0,,799,kidney,stage i,t1a,nx,m0,male,2008,,,,kidney papillary renal cell carcinoma,,,white,
+TCGA-BQ-7056,75,0,,612,kidney,stage iii,t3b,n0,m0,female,2008,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-BQ-7058,81,1,343,,kidney,stage iii,t3,,m0,male,2010,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-BQ-7059,71,0,,232,kidney,stage i,t1b,nx,m0,male,2010,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-BQ-7060,53,0,,214,kidney,stage i,t1a,nx,m0,male,2011,,,,kidney papillary renal cell carcinoma,,,american indian or alaska native,not hispanic or latino
+TCGA-BQ-7061,83,0,,218,kidney,stage i,t1b,nx,m0,female,2011,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-BQ-7062,64,0,,116,kidney,stage i,t1a,nx,m0,male,2011,,,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-CJ-4869,49,0,,2554,kidney,stage iii,t2,n1,m0,male,2004,,,,kidney clear cell renal carcinoma,,,white,hispanic or latino
+TCGA-CJ-4882,57,0,,1883,kidney,stage iii,t3a,nx,m0,male,2005,,,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-CJ-4897,79,0,,3341,kidney,stage iii,t3a,nx,m0,female,2005,,no,,kidney clear cell renal carcinoma,,,white,hispanic or latino
+TCGA-CJ-4901,47,0,,1450,kidney,stage iii,t3b,nx,m0,male,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-4902,61,0,,1520,kidney,stage iii,t3a,nx,m0,male,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-4903,50,0,,1560,kidney,stage i,t1b,nx,m0,male,2006,1559,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-4904,60,0,,3302,kidney,stage iv,t3a,n0,m1,female,2006,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-4905,62,0,,1496,kidney,stage i,t1a,nx,m0,female,2006,1496,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-4907,58,0,,1499,kidney,stage iii,t3b,nx,m0,male,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-4908,38,0,,1531,kidney,stage i,t1a,nx,m0,male,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-4912,61,0,,1657,kidney,stage ii,t2,nx,m0,male,2006,,,,kidney clear cell renal carcinoma,,,white,hispanic or latino
+TCGA-CJ-4916,69,0,,1373,kidney,stage iii,t3a,nx,m0,female,2007,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-4918,64,1,93,,kidney,stage iv,t3a,n0,m1,male,2005,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-4920,64,1,139,,kidney,stage i,t1b,nx,m0,female,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-4923,63,1,572,,kidney,stage iv,t3a,nx,m1,female,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-5671,51,0,,3987,kidney,stage i,t1a,nx,m0,male,2004,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-5672,84,1,2190,,kidney,stage i,t1a,nx,m0,male,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-5675,70,0,,3936,kidney,stage ii,t2a,nx,m0,male,2004,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-5676,47,0,,4067,kidney,stage iii,t3b,nx,m0,male,2004,,no,,kidney clear cell renal carcinoma,,,white,hispanic or latino
+TCGA-CJ-5677,54,1,782,,kidney,stage iv,t3a,nx,m1,female,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-5678,62,1,574,,kidney,stage iv,t2b,n0,m1,male,2003,,,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-CJ-5679,73,1,679,,kidney,stage iii,t3b,nx,m0,male,2003,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-5680,65,1,768,,kidney,stage iv,t3a,nx,m1,female,2003,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-5681,44,1,552,,kidney,stage iv,t3a,nx,m1,female,2003,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-5682,60,0,,3736,kidney,stage iv,t3a,nx,m1,male,2004,,yes,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-5683,78,0,,1889,kidney,stage i,t1b,nx,m0,male,2004,1889,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-5684,61,0,,2231,kidney,stage iii,t3a,nx,m0,male,2005,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-5686,59,0,,2038,kidney,stage i,t1b,nx,m0,female,2005,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-5689,90,1,1620,,kidney,stage i,t1b,nx,m0,male,2005,,,,kidney clear cell renal carcinoma,,,white,hispanic or latino
+TCGA-CJ-6027,77,1,3615,,kidney,stage i,t1a,nx,m0,male,2003,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-6028,58,1,1625,,kidney,stage iv,t3a,nx,m1,male,2003,,,90,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-6030,65,1,2299,,kidney,stage i,t1a,n0,m0,male,2003,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-6031,54,0,,1906,kidney,stage i,t1b,nx,m0,male,2003,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CJ-6032,63,0,,3639,kidney,stage ii,t2,nx,m0,female,2004,,no,,kidney clear cell renal carcinoma,,,white,hispanic or latino
+TCGA-CJ-6033,54,1,224,,kidney,stage iv,t3a,n0,m1,female,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CW-5580,73,1,1964,,kidney,stage iv,t3a,nx,m1,female,2003,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CW-5581,44,0,,2799,kidney,stage i,t1b,nx,m0,male,2003,2799,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CW-5583,51,0,,2489,kidney,stage i,t1a,nx,m0,female,2003,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-CW-5584,74,1,164,,kidney,stage iii,t3b,n1,m0,male,2003,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CW-5585,51,0,,2609,kidney,stage iv,t3b,n0,m1,male,2003,2609,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CW-5587,62,0,,2226,kidney,stage iii,t3b,n0,m0,female,2003,2226,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CW-5588,78,0,,2017,kidney,stage i,t1a,nx,m0,female,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CW-5589,52,0,,2378,kidney,stage i,t1a,nx,m0,male,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CW-5590,51,1,1075,,kidney,stage iv,t3a,nx,m1,male,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CW-5591,56,0,,2271,kidney,stage iv,t3a,n0,m1,male,2004,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CW-6087,61,1,41,,kidney,stage iv,t3a,n1,m1,male,2003,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CW-6088,60,0,,3222,kidney,stage i,t1b,n0,m0,male,2003,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CW-6090,68,0,,2552,kidney,stage i,t1b,nx,m0,male,2003,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-CW-6093,73,0,,3146,kidney,stage i,t1a,nx,m0,male,2004,,no,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CW-6097,32,1,571,,kidney,stage iii,t3a,nx,m0,male,2004,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-CZ-4853,82,0,,774,kidney,stage i,t1a,nx,m0,male,2005,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-CZ-4856,62,0,,18,kidney,stage i,t1b,n0,m0,female,2005,,,90,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CZ-4859,59,0,,1787,kidney,stage i,t1,n0,m0,female,2005,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-CZ-4863,51,0,,1928,kidney,stage iii,t3b,n0,m0,female,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CZ-4864,86,1,2830,,kidney,stage ii,t2,n0,m0,male,2002,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CZ-4865,70,1,166,,kidney,stage i,t1a,nx,m0,female,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CZ-4866,79,0,,3267,kidney,stage i,t1,nx,m0,female,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CZ-5451,74,0,,1929,kidney,stage ii,t2,n0,m0,male,2006,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-CZ-5452,69,0,,1789,kidney,stage ii,t2,n0,m0,male,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CZ-5453,67,1,2419,,kidney,stage ii,t2,nx,m0,male,2006,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-CZ-5454,63,1,722,,kidney,stage iv,t2,n0,m1,male,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CZ-5455,63,1,561,,kidney,stage iv,t3b,nx,m1,male,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CZ-5456,57,0,,2422,kidney,stage ii,t2,n0,m0,male,2006,,,90,kidney clear cell renal carcinoma,,,white,
+TCGA-CZ-5457,62,0,,2754,kidney,stage iii,t3a,nx,m0,male,2006,,,100,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CZ-5458,43,0,,2789,kidney,stage iii,t3a,nx,m0,male,2006,,,100,kidney clear cell renal carcinoma,,,white,
+TCGA-CZ-5459,63,0,,1683,kidney,stage iii,t3b,nx,m0,male,2006,1515,,,kidney clear cell renal carcinoma,,,white,
+TCGA-CZ-5460,55,0,,2873,kidney,stage iv,t3b,nx,m1,male,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CZ-5461,52,1,330,,kidney,stage iv,t1b,nx,m1,male,2006,317,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CZ-5462,83,1,311,,kidney,stage iv,t1b,nx,m1,male,2007,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-CZ-5463,76,0,,662,kidney,stage ii,t2,nx,m0,male,2007,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-CZ-5464,69,0,,2128,kidney,stage iv,t3b,nx,m1,male,2007,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-CZ-5465,76,1,2564,,kidney,stage iii,t3b,nx,m0,female,2007,,,100,kidney clear cell renal carcinoma,,,,
+TCGA-CZ-5466,67,0,,685,kidney,stage iii,t3a,nx,m0,male,2007,,,,kidney clear cell renal carcinoma,,,,
+TCGA-CZ-5467,86,1,73,,kidney,stage iii,t3a,n0,m0,female,2007,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CZ-5468,84,1,59,,kidney,stage iv,t3b,nx,m1,male,2007,45,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CZ-5469,41,1,946,,kidney,stage ii,t2,n0,m0,male,2007,,,90,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CZ-5470,72,0,,386,kidney,stage ii,t2,n0,m0,female,2008,0,,,kidney clear cell renal carcinoma,,,,
+TCGA-CZ-5982,59,0,,2439,kidney,stage i,t1a,nx,m0,female,2005,,,100,kidney clear cell renal carcinoma,,,white,
+TCGA-CZ-5984,51,0,,2067,kidney,stage i,t1b,n0,m0,male,2005,,,,kidney clear cell renal carcinoma,,,white,
+TCGA-CZ-5985,58,0,,1997,kidney,stage ii,t2,n0,m0,male,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CZ-5986,61,0,,373,kidney,stage i,t1,n0,m0,male,2006,373,,,kidney clear cell renal carcinoma,,,white,
+TCGA-CZ-5987,60,1,445,,kidney,stage iv,t3b,nx,m1,male,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-CZ-5988,38,0,,693,kidney,stage i,t1b,n0,m0,male,2006,693,,,kidney clear cell renal carcinoma,,,white,
+TCGA-CZ-5989,60,0,,1905,kidney,stage ii,t2,n0,m0,male,2006,,,,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-DV-5565,59,0,,1329,kidney,stage i,t1a,nx,m0,male,2007,,,100,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-DV-5566,67,0,,1398,kidney,stage i,t1a,nx,m0,female,2007,,,100,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-DV-5567,40,0,,2004,kidney,stage i,t1a,nx,m0,female,2008,,no,90,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-DV-5568,26,0,,370,kidney,stage i,t1a,nx,m0,male,2009,,,100,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-DV-5569,29,0,,355,kidney,stage i,t1a,nx,m0,female,2009,,,90,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-DV-5573,41,0,,1130,kidney,stage i,t1a,nx,m0,male,2008,,,100,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-DV-5574,37,0,,2016,kidney,stage i,t1a,nx,m0,male,2008,,no,100,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-DV-5575,52,0,,1729,kidney,stage i,t1a,nx,m0,female,2007,,,90,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-DV-5576,55,1,727,,kidney,stage i,t1a,nx,m0,female,2008,,,100,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-DV-A4VX,59,1,1626,,kidney,stage iv,t3b,n0,mx,male,2008,,no,0,kidney clear cell renal carcinoma,40,,black or african american,not hispanic or latino
+TCGA-DV-A4VZ,53,0,,365,kidney,stage i,t1a,nx,mx,male,2007,,no,90,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-DV-A4W0,55,0,,2470,kidney,stage i,t1b,nx,mx,male,2008,,no,100,kidney clear cell renal carcinoma,33,1968,black or african american,not hispanic or latino
+TCGA-DW-5560,38,0,,1486,kidney,stage i,t1b,nx,m0,female,2009,,no,100,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-DW-5561,51,0,,414,kidney,stage i,t1a,nx,m0,male,2008,,,100,kidney papillary renal cell carcinoma,36,1971,black or african american,not hispanic or latino
+TCGA-DW-7834,53,0,,3950,kidney,stage i,t1,nx,mx,male,2001,,,80,kidney papillary renal cell carcinoma,80,,white,not hispanic or latino
+TCGA-DW-7836,55,0,,1093,kidney,stage i,t1a,nx,mx,male,2008,,,100,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-DW-7837,43,0,,1142,kidney,stage i,t1b,nx,mx,male,2007,,,100,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-DW-7838,66,0,,744,kidney,stage i,t1b,nx,mx,male,2009,,,90,kidney papillary renal cell carcinoma,45,,white,not hispanic or latino
+TCGA-DW-7839,58,0,,419,kidney,stage i,t1b,nx,mx,female,2010,,,100,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-DW-7840,60,0,,114,kidney,stage i,t1b,nx,mx,male,2011,,,100,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-DW-7841,61,0,,445,kidney,stage i,t1b,nx,mx,male,2010,,,80,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-DW-7842,52,0,,92,kidney,stage i,t1a,nx,mx,male,2011,,,90,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-DW-7963,43,0,,1240,kidney,stage i,t1b,n0,mx,male,2010,,no,100,kidney papillary renal cell carcinoma,3.5,1984,black or african american,not hispanic or latino
+TCGA-DZ-6131,31,0,,2429,kidney,stage iii,t3a,n0,mx,male,2003,,,,kidney papillary renal cell carcinoma,,,white,
+TCGA-DZ-6132,69,0,,2460,kidney,stage i,t1a,nx,mx,male,2003,,,,kidney papillary renal cell carcinoma,,,,
+TCGA-DZ-6133,66,1,1557,,kidney,stage i,t1a,nx,mx,female,2004,,,,kidney papillary renal cell carcinoma,,,white,
+TCGA-DZ-6134,69,0,,1856,kidney,stage i,t1a,nx,mx,male,2005,,,,kidney papillary renal cell carcinoma,,,white,
+TCGA-DZ-6135,45,0,,2269,kidney,stage i,t1a,nx,mx,male,2006,,no,,kidney papillary renal cell carcinoma,,,,
+TCGA-EU-5904,47,0,,551,kidney,stage i,t1,nx,m0,female,2009,,,90,kidney clear cell renal carcinoma,,,white,
+TCGA-EU-5905,67,0,,119,kidney,stage i,t1,nx,m0,female,2010,,,100,kidney clear cell renal carcinoma,,,white,
+TCGA-EU-5906,55,0,,206,kidney,stage i,t1b,nx,m0,male,2010,,,90,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-EU-5907,81,0,,127,kidney,stage iii,t3a,nx,m0,male,2010,,,100,kidney clear cell renal carcinoma,,,white,not hispanic or latino
+TCGA-EV-5901,47,0,,1040,kidney,stage i,t1,nx,m0,female,2010,,,90,kidney papillary renal cell carcinoma,,,white,
+TCGA-EV-5902,58,0,,578,kidney,stage i,t1,nx,m0,male,2010,,,90,kidney papillary renal cell carcinoma,,,white,
+TCGA-EV-5903,57,0,,757,kidney,stage i,t1a,nx,m0,male,2010,,,90,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-F9-A4JJ,35,1,325,,kidney,stage iii,t3a,nx,mx,female,2012,,no,,kidney papillary renal cell carcinoma,,,black or african american,
+TCGA-F9-A7Q0,37,0,,398,kidney,stage i,t1b,nx,m0,female,2013,,,80,kidney papillary renal cell carcinoma,,,asian,not hispanic or latino
+TCGA-F9-A7VF,75,0,,73,kidney,stage i,t1a,nx,m0,female,2013,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-F9-A8NY,38,0,,36,kidney,stage iv,t4,n1,m1,female,2013,,,,kidney papillary renal cell carcinoma,,,asian,not hispanic or latino
+TCGA-F9-A97G,79,0,,13,kidney,stage iii,t3,n0,m0,male,2013,,,,kidney papillary renal cell carcinoma,15,1970,asian,not hispanic or latino
+TCGA-G6-A5PC,54,1,242,,kidney,stage iv,t1b,n0,m1,female,2012,,no,,kidney clear cell renal carcinoma,30,,black or african american,not hispanic or latino
+TCGA-G6-A8L6,55,1,313,,kidney,stage iv,t2a,nx,mx,male,2013,,no,90,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-G6-A8L7,81,0,,2133,kidney,stage i,t1b,n0,mx,female,2008,,no,80,kidney clear cell renal carcinoma,40,1965,black or african american,not hispanic or latino
+TCGA-G6-A8L8,62,1,1091,,kidney,stage i,t1b,nx,mx,female,2008,,no,60,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-G7-6789,53,1,122,,kidney,stage iv,t3a,n2,mx,female,2004,,,0,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-G7-6790,57,0,,1575,kidney,stage i,t1a,nx,mx,male,2007,,,100,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-G7-6792,40,0,,2765,kidney,stage i,t1b,nx,mx,male,2007,,no,90,kidney papillary renal cell carcinoma,21,,black or african american,not hispanic or latino
+TCGA-G7-6793,60,1,336,,kidney,stage iv,t3a,n2,mx,female,2007,,,50,kidney papillary renal cell carcinoma,30,1965,white,not hispanic or latino
+TCGA-G7-6795,56,0,,1194,kidney,stage i,t1a,n0,mx,male,2008,,,90,kidney papillary renal cell carcinoma,20,1970,white,not hispanic or latino
+TCGA-G7-6796,58,0,,2173,kidney,stage i,t1a,nx,mx,male,2008,,no,90,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-G7-6797,46,0,,765,kidney,stage iii,t1a,nx,mx,male,2010,,,90,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-G7-7501,55,1,624,,kidney,stage iii,t3a,n1,mx,female,2011,,no,20,kidney papillary renal cell carcinoma,17,1978,black or african american,not hispanic or latino
+TCGA-G7-7502,83,0,,786,kidney,stage i,t1b,nx,mx,male,2011,,no,90,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-G7-A4TM,40,0,,768,kidney,stage i,t1a,nx,mx,male,2011,,no,90,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-G7-A8LB,70,0,,547,kidney,stage iv,t2a,nx,mx,male,2013,,no,100,kidney papillary renal cell carcinoma,46,1958,white,not hispanic or latino
+TCGA-G7-A8LC,61,0,,702,kidney,stage i,t1a,nx,mx,male,2013,,no,100,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-G7-A8LD,71,1,514,,kidney,stage iii,t3a,n1,mx,male,2012,,no,90,kidney papillary renal cell carcinoma,28,1967,white,not hispanic or latino
+TCGA-G7-A8LE,62,0,,2453,kidney,stage i,t1a,nx,mx,male,2008,,no,100,kidney papillary renal cell carcinoma,40,1965,white,not hispanic or latino
+TCGA-GK-A6C7,76,0,,61,kidney,stage i,t1a,nx,mx,female,2012,,no,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-GL-6846,52,0,,5925,kidney,stage iv,t4,n1,mx,male,1996,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-GL-7773,63,0,,393,kidney,stage i,t1a,nx,mx,male,2011,,no,,kidney papillary renal cell carcinoma,34,1993,white,not hispanic or latino
+TCGA-GL-7966,28,0,,112,kidney,stage iii,t3,n1,mx,female,2011,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-GL-8500,63,0,,841,kidney,stage i,t1b,nx,mx,male,2011,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-GL-A4EM,61,0,,32,kidney,stage i,t1b,nx,mx,male,2011,,,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-GL-A59R,79,0,,378,kidney,stage iii,t3c,n0,mx,male,2012,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-GL-A59T,46,0,,546,kidney,stage i,t1b,nx,mx,male,2012,,no,,kidney papillary renal cell carcinoma,5,,white,not hispanic or latino
+TCGA-GL-A9DC,66,0,,392,kidney,stage i,t1b,n0,mx,female,2013,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-GL-A9DD,69,0,,341,kidney,stage i,t1a,nx,mx,male,2013,,no,,kidney papillary renal cell carcinoma,20,1956,white,not hispanic or latino
+TCGA-GL-A9DE,74,0,,496,kidney,stage i,t1b,nx,mx,male,2013,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-HE-7128,,0,,,kidney,stage i,t1,nx,mx,male,,,,,kidney papillary renal cell carcinoma,,,,
+TCGA-HE-7129,,0,,2492,kidney,stage ii,t2,nx,m0,male,,,no,,kidney papillary renal cell carcinoma,,,,
+TCGA-HE-7130,,0,,1770,kidney,stage iii,t3,nx,m0,female,,,no,,kidney papillary renal cell carcinoma,,,,
+TCGA-HE-A5NF,58,0,,2582,kidney,stage i,t1a,nx,,male,,,no,,kidney papillary renal cell carcinoma,,,,
+TCGA-HE-A5NH,62,0,,791,kidney,stage i,t1a,nx,,male,,,no,,kidney papillary renal cell carcinoma,,,,
+TCGA-HE-A5NI,73,0,,360,kidney,stage i,t1a,nx,m0,male,,,no,,kidney papillary renal cell carcinoma,50,1961,,
+TCGA-HE-A5NJ,58,0,,1726,kidney,,t1b,nx,m0,male,,,no,,kidney papillary renal cell carcinoma,7,,,
+TCGA-HE-A5NK,82,0,,2228,kidney,,t1b,nx,m0,male,,,no,,kidney papillary renal cell carcinoma,35,,,
+TCGA-HE-A5NL,51,0,,767,kidney,stage i,t1a,nx,mx,male,,,no,,kidney papillary renal cell carcinoma,,,,
+TCGA-IA-A40U,56,0,,511,kidney,stage iii,t3b,n0,mx,male,2011,,no,90,kidney papillary renal cell carcinoma,10,1991,white,not hispanic or latino
+TCGA-IA-A40X,49,0,,608,kidney,stage i,t1a,nx,mx,female,2011,,no,100,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-IA-A40Y,60,0,,62,kidney,stage iii,t3a,n1,mx,female,2011,,no,90,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-IA-A83S,81,1,2609,,kidney,,tx,nx,mx,male,2003,,,,kidney papillary renal cell carcinoma,65,,white,not hispanic or latino
+TCGA-IA-A83T,80,1,2684,,kidney,,tx,nx,mx,male,2005,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-IA-A83V,63,1,2941,,kidney,stage i,t1b,nx,mx,male,2002,,,,kidney papillary renal cell carcinoma,40,,white,not hispanic or latino
+TCGA-IA-A83W,70,1,2043,,kidney,stage i,t1,n0,m0,male,2003,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-IZ-8195,82,0,,677,kidney,stage ii,t2a,nx,mx,male,2012,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-IZ-8196,50,0,,649,kidney,stage i,t1a,nx,mx,male,2012,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-IZ-A6M8,69,0,,497,kidney,stage i,t1a,nx,mx,male,2013,,no,,kidney papillary renal cell carcinoma,15,,black or african american,not hispanic or latino
+TCGA-IZ-A6M9,63,0,,376,kidney,stage i,t1a,nx,mx,male,2013,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-J7-6720,42,0,,388,kidney,stage i,t1,n0,m0,male,2010,,no,,kidney papillary renal cell carcinoma,,,asian,not hispanic or latino
+TCGA-J7-8537,37,1,321,,kidney,stage iii,t3,n1,m0,female,2011,,no,80,kidney papillary renal cell carcinoma,,,asian,not hispanic or latino
+TCGA-J7-A8I2,75,0,,307,kidney,stage i,t1b,n0,m0,male,2013,,no,,kidney papillary renal cell carcinoma,,,asian,not hispanic or latino
+TCGA-KL-8323,57,1,1158,,kidney,stage iii,t3b,nx,m0,female,2000,,no,,kidney chromophobe,,,white,
+TCGA-KL-8324,67,0,,4676,kidney,stage ii,t2,nx,m0,female,2000,,no,,kidney chromophobe,1,,white,
+TCGA-KL-8325,56,1,725,,kidney,stage ii,t2,nx,m0,female,2000,,no,,kidney chromophobe,,,white,
+TCGA-KL-8326,69,0,,3322,kidney,stage iii,t3a,n0,m0,male,2001,,no,,kidney chromophobe,,,white,
+TCGA-KL-8327,46,0,,4169,kidney,stage i,t1b,n0,m0,female,2001,,no,,kidney chromophobe,,,white,
+TCGA-KL-8328,60,0,,3127,kidney,stage ii,t2b,n0,m0,male,2003,,no,,kidney chromophobe,,,white,
+TCGA-KL-8329,57,0,,2752,kidney,stage i,t1b,n0,m0,female,2003,,no,,kidney chromophobe,,,asian,
+TCGA-KL-8330,44,0,,3304,kidney,stage ii,t2b,n0,m0,female,2003,,no,,kidney chromophobe,35,1977,black or african american,not hispanic or latino
+TCGA-KL-8331,48,0,,3010,kidney,stage ii,t2,n0,m0,female,2004,,no,,kidney chromophobe,,,white,
+TCGA-KL-8332,55,0,,2582,kidney,stage i,t1b,n0,m0,male,2004,,no,,kidney chromophobe,,,white,
+TCGA-KL-8333,69,0,,2991,kidney,stage ii,t2,n0,m0,male,2005,,no,,kidney chromophobe,,,white,
+TCGA-KL-8334,37,0,,2949,kidney,stage iii,t3a,n0,m0,female,2005,,no,,kidney chromophobe,,,white,
+TCGA-KL-8335,67,0,,2815,kidney,stage iii,t3a,n0,m0,male,2005,,no,,kidney chromophobe,27,1961,white,
+TCGA-KL-8336,51,1,920,,kidney,stage iv,t3b,n2,m0,female,2006,,no,,kidney chromophobe,,,white,
+TCGA-KL-8337,26,0,,1364,kidney,stage ii,t2,n0,m0,male,2006,,no,,kidney chromophobe,,,black or african american,
+TCGA-KL-8338,51,0,,2633,kidney,stage iii,t3a,n0,m0,male,2006,,no,,kidney chromophobe,,,white,
+TCGA-KL-8339,67,1,855,,kidney,stage iv,t3a,n1,m1,male,2006,,no,,kidney chromophobe,,,white,
+TCGA-KL-8340,34,0,,2024,kidney,stage ii,t2,n0,m0,male,2006,,no,,kidney chromophobe,,,white,
+TCGA-KL-8341,41,1,754,,kidney,stage iv,t3b,n2,m0,male,2006,,no,,kidney chromophobe,10,1986,asian,
+TCGA-KL-8342,45,0,,2248,kidney,stage ii,t2b,n0,m0,female,2006,,no,,kidney chromophobe,,,white,
+TCGA-KL-8343,72,1,2172,,kidney,stage iii,t3,n0,m0,male,2007,,no,,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KL-8344,51,0,,876,kidney,stage iii,t3a,n0,m0,male,2007,,no,,kidney chromophobe,,,white,
+TCGA-KL-8345,75,0,,1665,kidney,stage iii,t3a,n0,m0,male,2008,,no,,kidney chromophobe,6,1949,white,
+TCGA-KL-8346,62,0,,1897,kidney,stage ii,t2b,n0,m0,male,2008,,no,,kidney chromophobe,,,white,
+TCGA-KM-8438,45,0,,4622,kidney,stage ii,t2,n0,mx,female,2000,,no,100,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KM-8439,30,0,,708,kidney,stage i,t1b,nx,mx,male,2011,,no,100,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KM-8440,37,0,,1366,kidney,stage iii,t3a,nx,mx,male,2009,,no,100,kidney chromophobe,,,black or african american,not hispanic or latino
+TCGA-KM-8441,61,0,,876,kidney,stage i,t1b,nx,mx,female,2011,,no,90,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KM-8442,38,0,,1437,kidney,stage ii,t2,nx,mx,male,2009,,no,90,kidney chromophobe,,,,hispanic or latino
+TCGA-KM-8443,57,0,,1520,kidney,stage ii,t2,n0,mx,male,2009,,no,100,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KM-8476,47,0,,3745,kidney,stage i,t1,nx,mx,male,2002,,no,100,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KM-8477,56,0,,1553,kidney,stage i,t1a,nx,mx,male,2005,,no,90,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KM-8639,67,0,,953,kidney,stage i,t1a,nx,mx,male,2005,,no,100,kidney chromophobe,20,1965,white,not hispanic or latino
+TCGA-KN-8418,41,0,,3935,kidney,stage ii,t2,n0,,female,2002,,no,,kidney chromophobe,,,white,
+TCGA-KN-8419,43,0,,714,kidney,stage ii,t2,n0,,male,2004,,no,,kidney chromophobe,,,black or african american,not hispanic or latino
+TCGA-KN-8421,47,0,,2674,kidney,stage ii,t2,n0,,female,2004,,no,,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KN-8422,28,0,,775,kidney,stage i,t1a,n0,,female,2005,,no,,kidney chromophobe,,,white,
+TCGA-KN-8423,44,0,,788,kidney,stage i,t1b,n0,,male,2005,,no,,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KN-8424,42,0,,1983,kidney,stage i,t1b,n0,,female,2005,,no,,kidney chromophobe,,,white,
+TCGA-KN-8425,53,0,,3179,kidney,stage i,t1b,n0,,male,2005,,no,,kidney chromophobe,,,white,
+TCGA-KN-8426,50,0,,108,kidney,stage iv,t3a,nx,m1,male,2006,,no,,kidney chromophobe,,,white,
+TCGA-KN-8427,54,0,,30,kidney,stage iv,t4,n1,,male,2006,,no,,kidney chromophobe,,,white,
+TCGA-KN-8428,71,1,1590,,kidney,stage ii,t2,n0,,male,2006,,no,,kidney chromophobe,48,,white,not hispanic or latino
+TCGA-KN-8429,38,0,,2650,kidney,stage iii,t3a,n0,,female,2006,,no,100,kidney chromophobe,,,white,
+TCGA-KN-8430,75,1,,,kidney,stage i,t1b,n0,,male,2007,,no,,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KN-8431,35,0,,588,kidney,stage ii,t2,nx,,female,2007,,no,,kidney chromophobe,,,,
+TCGA-KN-8432,86,0,,76,kidney,stage ii,t2b,nx,,female,2010,,no,,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KN-8433,46,0,,341,kidney,stage iii,t3a,nx,,female,2008,,no,,kidney chromophobe,24,1984,white,not hispanic or latino
+TCGA-KN-8434,65,0,,1797,kidney,stage ii,t2,nx,,female,2009,,no,100,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KN-8435,59,0,,3498,kidney,stage ii,t2,nx,,male,2004,,no,,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KN-8436,62,0,,1288,kidney,stage ii,t2,nx,,male,2009,,no,,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KN-8437,42,0,,3068,kidney,stage i,t1a,nx,,female,2006,,no,,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KO-8403,49,0,,3208,kidney,stage i,t1a,nx,,male,2005,,no,,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KO-8404,78,1,325,,kidney,stage iv,t4,nx,,male,2005,,no,,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KO-8405,29,0,,3056,kidney,stage iii,t3a,n0,m0,male,2005,,no,,kidney chromophobe,,,white,hispanic or latino
+TCGA-KO-8406,17,0,,3145,kidney,stage i,t1,n0,m0,female,2005,,no,,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KO-8407,42,0,,2820,kidney,stage ii,t2,n0,m0,male,2005,,no,,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KO-8408,47,1,507,,kidney,stage iii,t3a,n1,,male,2004,,no,,kidney chromophobe,75,1971,white,not hispanic or latino
+TCGA-KO-8409,69,0,,3180,kidney,stage ii,t2b,n0,m0,male,2004,,no,,kidney chromophobe,3,1997,white,not hispanic or latino
+TCGA-KO-8410,74,0,,3136,kidney,stage i,t1b,n0,m0,female,2004,,no,,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KO-8411,58,0,,3958,kidney,stage i,t1b,nx,m0,male,2004,,no,100,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KO-8413,46,0,,3038,kidney,stage i,t1,n0,m0,male,2006,,no,100,kidney chromophobe,,,white,hispanic or latino
+TCGA-KO-8414,50,0,,3212,kidney,stage ii,t2,n0,m0,female,2006,,no,,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KO-8415,44,0,,2939,kidney,stage i,t1,n0,m0,female,2007,,no,,kidney chromophobe,,,white,hispanic or latino
+TCGA-KO-8416,41,0,,2752,kidney,stage iii,t3a,n0,m0,male,2007,,no,,kidney chromophobe,27,,white,not hispanic or latino
+TCGA-KO-8417,30,0,,2815,kidney,stage i,t1,n0,m0,female,2007,,no,,kidney chromophobe,,,white,not hispanic or latino
+TCGA-KV-A6GD,85,0,,560,kidney,stage i,t1b,nx,m0,male,2013,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-KV-A6GE,65,0,,885,kidney,stage i,t1a,nx,mx,male,2011,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-KV-A74V,40,0,,347,kidney,stage i,t1a,n0,m0,male,2013,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-MH-A55W,50,0,,1043,kidney,stage i,t1b,nx,mx,male,2011,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-MH-A55Z,65,0,,845,kidney,stage i,t1b,nx,mx,male,2011,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-MH-A560,62,0,,924,kidney,stage i,t1a,nx,mx,male,2011,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-MH-A561,66,0,,841,kidney,stage i,t1a,nx,mx,male,2012,,no,,kidney papillary renal cell carcinoma,,,white,hispanic or latino
+TCGA-MH-A562,57,0,,616,kidney,stage i,t1a,nx,mx,male,2012,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-MH-A854,62,0,,536,kidney,stage i,t1b,nx,mx,female,2013,,no,,kidney papillary renal cell carcinoma,10,1992,black or african american,not hispanic or latino
+TCGA-MH-A855,52,0,,369,kidney,stage ii,t2b,nx,mx,female,2013,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-MH-A856,54,0,,947,kidney,stage i,t1a,nx,m0,male,2012,,no,,kidney papillary renal cell carcinoma,15,1982,white,hispanic or latino
+TCGA-MH-A857,63,0,,890,kidney,stage i,t1a,nx,m0,male,2012,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-MM-A563,41,0,,591,kidney,,t3,nx,mx,male,2012,,no,,kidney clear cell renal carcinoma,14,1999,black or african american,not hispanic or latino
+TCGA-MM-A564,68,0,,607,kidney,stage ii,t2a,nx,mx,male,2012,,no,,kidney clear cell renal carcinoma,,,black or african american,not hispanic or latino
+TCGA-MM-A84U,58,0,,700,kidney,stage i,t1a,nx,mx,female,2013,,no,,kidney clear cell renal carcinoma,,1996,black or african american,not hispanic or latino
+TCGA-MW-A4EC,72,0,,498,kidney,stage i,t1a,nx,mx,female,2012,,no,,kidney clear cell renal carcinoma,,,black or african american,hispanic or latino
+TCGA-O9-A75Z,44,0,,471,kidney,stage i,t1a,nx,mx,male,2013,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-P4-A5E6,67,0,,3035,kidney,stage iii,t1b,n1,mx,male,2004,,no,,kidney papillary renal cell carcinoma,,1950,black or african american,not hispanic or latino
+TCGA-P4-A5E7,74,0,,2649,kidney,stage i,t1b,nx,mx,female,2004,,no,,kidney papillary renal cell carcinoma,24,,white,not hispanic or latino
+TCGA-P4-A5E8,57,1,1306,,kidney,stage iii,t2a,n1,m0,male,2004,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-P4-A5EA,54,1,201,,kidney,stage iii,t3a,n1,mx,female,2007,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-P4-A5EB,83,0,,3015,kidney,stage i,t1b,nx,mx,male,2006,,no,,kidney papillary renal cell carcinoma,18,,white,not hispanic or latino
+TCGA-P4-A5ED,51,0,,2816,kidney,stage i,t1a,nx,mx,male,2005,,no,,kidney papillary renal cell carcinoma,,,white,hispanic or latino
+TCGA-P4-AAVK,74,0,,1590,kidney,stage iii,t3a,n1,mx,male,2010,,no,100,kidney papillary renal cell carcinoma,,1951,white,hispanic or latino
+TCGA-P4-AAVL,85,1,487,,kidney,stage iii,t3b,n0,mx,male,2010,,no,,kidney papillary renal cell carcinoma,,,white,hispanic or latino
+TCGA-P4-AAVM,69,0,,1539,kidney,stage i,t1a,nx,mx,male,2010,,no,,kidney papillary renal cell carcinoma,,,white,hispanic or latino
+TCGA-P4-AAVO,69,0,,2400,kidney,stage i,t1b,nx,mx,male,2008,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-PJ-A5Z8,60,0,,600,kidney,stage i,t1a,nx,m0,female,2013,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-PJ-A5Z9,80,0,,540,kidney,stage i,t1b,nx,mx,female,2012,,no,,kidney papillary renal cell carcinoma,25,1960,white,not hispanic or latino
+TCGA-Q2-A5QZ,61,0,,428,kidney,stage iii,t3a,nx,mx,female,2012,,no,100,kidney papillary renal cell carcinoma,15,1998,black or african american,not hispanic or latino
+TCGA-SX-A71R,51,0,,1457,kidney,stage i,t1a,n0,m0,male,2010,,no,100,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-SX-A71S,66,0,,1504,kidney,stage i,t1,nx,m0,female,2010,,no,100,kidney papillary renal cell carcinoma,20,1970,white,not hispanic or latino
+TCGA-SX-A71U,57,0,,1357,kidney,stage i,t1a,nx,m0,male,2011,,no,100,kidney papillary renal cell carcinoma,15,1996,white,not hispanic or latino
+TCGA-SX-A71V,80,0,,876,kidney,stage i,t1,nx,m0,male,2011,,no,100,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-SX-A71W,66,0,,1076,kidney,stage i,t1b,nx,m0,male,2012,,no,100,kidney papillary renal cell carcinoma,14,1961,white,not hispanic or latino
+TCGA-SX-A7SL,74,0,,823,kidney,stage i,t1a,nx,m0,male,2012,,no,100,kidney papillary renal cell carcinoma,45,1967,,
+TCGA-SX-A7SM,60,1,363,,kidney,stage iv,t3a,n1,m1,male,2012,,no,100,kidney papillary renal cell carcinoma,40,1973,black or african american,not hispanic or latino
+TCGA-SX-A7SN,52,0,,578,kidney,stage i,t1b,nx,m0,male,2012,,no,100,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-SX-A7SO,64,0,,1257,kidney,stage i,t1b,nx,m0,male,2011,,no,100,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-SX-A7SP,66,1,496,,kidney,stage i,t1b,n0,m0,female,2012,,no,100,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-SX-A7SQ,48,0,,1266,kidney,stage i,t1,nx,m0,male,2010,,no,100,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-SX-A7SR,66,0,,805,kidney,stage ii,t2a,nx,m0,male,2012,,no,100,kidney papillary renal cell carcinoma,50,1962,white,not hispanic or latino
+TCGA-SX-A7SS,67,0,,1615,kidney,stage i,t1,n0,m0,male,2010,,no,100,kidney papillary renal cell carcinoma,50,1959,white,not hispanic or latino
+TCGA-SX-A7SU,47,0,,1331,kidney,stage i,t1,nx,m0,male,2010,,no,100,kidney papillary renal cell carcinoma,,,,hispanic or latino
+TCGA-T7-A92I,47,0,,356,kidney,stage i,t1a,nx,mx,female,2013,,no,90,kidney clear cell renal carcinoma,26,1987,black or african american,not hispanic or latino
+TCGA-UN-AAZ9,76,0,,548,kidney,stage i,t1b,n0,mx,female,2013,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-UZ-A9PJ,78,1,797,,kidney,stage i,t1a,nx,mx,male,,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-UZ-A9PK,71,0,,3571,kidney,stage i,t1,nx,mx,male,,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-UZ-A9PL,59,0,,3152,kidney,stage ii,t2,nx,mx,male,,,no,100,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-UZ-A9PM,62,0,,3811,kidney,stage ii,t2,n0,mx,male,,,no,,kidney papillary renal cell carcinoma,20,1984,white,not hispanic or latino
+TCGA-UZ-A9PN,54,1,1136,,kidney,stage iii,t3,nx,mx,male,,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-UZ-A9PO,80,0,,1911,kidney,stage i,t1a,nx,mx,male,,,no,,kidney papillary renal cell carcinoma,40,1950,white,not hispanic or latino
+TCGA-UZ-A9PP,60,0,,3010,kidney,stage i,t1a,nx,mx,male,,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-UZ-A9PQ,59,1,2624,,kidney,stage iii,t2,n1,mx,male,,,no,,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-UZ-A9PR,84,0,,2627,kidney,stage i,t1b,nx,mx,male,,,no,,kidney papillary renal cell carcinoma,28,1941,white,not hispanic or latino
+TCGA-UZ-A9PS,62,0,,2167,kidney,stage ii,t2,nx,mx,female,,,no,,kidney papillary renal cell carcinoma,15,1982,black or african american,not hispanic or latino
+TCGA-UZ-A9PU,77,1,933,,kidney,stage i,t1b,nx,mx,male,,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-UZ-A9PV,65,0,,1444,kidney,stage i,t1,nx,mx,male,,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-UZ-A9PX,73,0,,1981,kidney,stage i,t1,n0,mx,male,,,no,,kidney papillary renal cell carcinoma,67.5,1955,white,not hispanic or latino
+TCGA-UZ-A9PZ,65,0,,657,kidney,stage iii,t3a,nx,mx,male,,,no,100,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-UZ-A9Q0,60,0,,3368,kidney,stage i,t1,nx,mx,male,,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-UZ-A9Q1,88,0,,1562,kidney,stage i,t1b,nx,mx,female,,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-V9-A7HT,67,0,,965,kidney,stage ii,t2,nx,mx,male,2009,,no,80,kidney papillary renal cell carcinoma,,,black or african american,not hispanic or latino
+TCGA-WN-A9G9,,0,,791,kidney,stage i,t1b,nx,mx,male,2012,,no,,kidney papillary renal cell carcinoma,10,2002,white,not hispanic or latino
+TCGA-WN-AB4C,,0,,1188,kidney,stage i,t1a,nx,mx,female,2011,,no,,kidney papillary renal cell carcinoma,,2010,white,not hispanic or latino
+TCGA-Y8-A894,57,0,,567,kidney,stage i,t1a,nx,mx,female,2013,,no,,kidney papillary renal cell carcinoma,13,1987,white,not hispanic or latino
+TCGA-Y8-A895,74,0,,484,kidney,stage i,t1b,nx,mx,male,2013,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-Y8-A896,62,0,,567,kidney,stage iii,t3a,nx,mx,male,2013,,no,,kidney papillary renal cell carcinoma,50,1965,white,not hispanic or latino
+TCGA-Y8-A897,68,0,,549,kidney,stage i,t1a,n0,mx,female,2013,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-Y8-A898,69,0,,475,kidney,stage i,t1a,nx,mx,male,2013,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-Y8-A8RY,63,0,,769,kidney,stage i,t1b,nx,mx,male,2012,,no,,kidney papillary renal cell carcinoma,30,1970,white,not hispanic or latino
+TCGA-Y8-A8RZ,55,0,,205,kidney,stage i,t1,n0,mx,male,2013,,no,,kidney papillary renal cell carcinoma,20,1973,white,not hispanic or latino
+TCGA-Y8-A8S0,58,0,,183,kidney,stage i,t1a,nx,mx,male,2013,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino
+TCGA-Y8-A8S1,61,0,,404,kidney,stage i,t1a,nx,mx,male,2013,,no,,kidney papillary renal cell carcinoma,,,white,not hispanic or latino

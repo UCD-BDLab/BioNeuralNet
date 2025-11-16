@@ -1,7 +1,7 @@
 Installation
 ============
 
-BioNeuralNet is fully compatible with Python 3.10 or higher and supports Windows, macOS, and Linux platforms. Follow these steps to install BioNeuralNet along with necessary dependencies.
+BioNeuralNet is fully compatible with Python 3.10, 3.11 and 3.12 and supports Windows, macOS, and Linux platforms. Follow these steps to install BioNeuralNet along with necessary dependencies.
 
 1. **Install BioNeuralNet via pip**
 
@@ -59,6 +59,6 @@ Next Steps
 
 After installation, explore our step-by-step tutorials:
 
-- :doc:`tutorials/index`
+- :doc:`notebooks/index`
 - :doc:`Quick_Start`
-- :doc:`TCGA-BRCA_Dataset`
+

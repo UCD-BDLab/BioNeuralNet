@@ -5,6 +5,7 @@ matplotlib
 scikit-learn
 networkx
 python-louvain
+pydantic
 ray[tune]
 statsmodels
 # torch
