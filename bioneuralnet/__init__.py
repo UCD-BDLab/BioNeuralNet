@@ -8,6 +8,7 @@ Key Features:
     - **Subject Representation**: Combine network-derived embeddings with raw omics data to produce enriched subject-level profiles.
     - **Correlated Clustering**: BioNeuralNet includes internal modules for performing correlated clustering on complex networks to identify functional modules and informative biomarkers.
     - **Downstream Prediction**: Execute end-to-end pipelines (DPMON) for disease phenotype prediction using network information.
+    - **Graph Mining**: Implement graph mining algorithms for network analysis.
     - **External Integration**: Easily interface with external tools (WGCNA, SmCCNet, Node2Vec, among others.) for network construction, visualization, and advanced analysis.
     - **Evaluation Metrics**: Evaluate the quality of embeddings, clustering results, and network performance using a variety of metrics and visualizations.
     - **Data Handling**: Streamline data preprocessing, filtering, and conversion tasks to ensure seamless integration with the BioNeuralNet framework.
@@ -24,6 +25,7 @@ Modules:
     - `downstream_task`: Contains pipelines for disease prediction (e.g., DPMON).
     - `metrics`: Provides tools for evaluating embeddings, cluster comparison, plotting functions, and network performance.
     - `clustering`: Implements clustering algorithms for network analysis.
+    - `graph_mining`: Implements graph mining algorithms for network analysis.
     - `external_tools`: Wraps external packages (e.g.WGCNA and SmCCNet) for quick integration.
     - `utils`: Utilities for configuration, logging, file handling, converting .Rdata files to dataframes, and variance filtering.
     - `datasets`: Contains example (synthetic) datasets for testing and demonstration purposes.
