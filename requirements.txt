@@ -8,5 +8,7 @@ python-louvain
 pydantic
 ray[tune]
 statsmodels
+leidenalg
+igraph
 # torch
 # torch_geometric
