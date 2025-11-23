@@ -56,10 +56,10 @@ TCGA_BRCA_DATA/
 !bioneuralnet/utils/
 !bioneuralnet/utils/rdata_to_df.R
 
-# Allowing .csv files in datasets/example1 and its subdirectories
+# Allowing .csv files in datasets/example and its subdirectories
 !bioneuralnet/datasets/
-!bioneuralnet/datasets/example1/
-!bioneuralnet/datasets/example1/**/*.csv
+!bioneuralnet/datasets/example/
+!bioneuralnet/datasets/example/**/*.csv
 
 !bioneuralnet/datasets/
 !bioneuralnet/datasets/monet/
@@ -72,8 +72,8 @@ TCGA_BRCA_DATA/
 !bioneuralnet/datasets/kipan/
 !bioneuralnet/datasets/kipan/**/*.csv
 
-!bioneuralnet/datasets/gbmlgg/
-!bioneuralnet/datasets/gbmlgg/**/*.csv
+!bioneuralnet/datasets/lgg/
+!bioneuralnet/datasets/lgg/**/*.csv
 
 
 feature_testing
@@ -140,3 +140,5 @@ dpmon_results
 dpmon_results_GAT_FINAL
 dpmon_results_GCN_FINAL
 dpmon_results_SAGE_FINAL
+dpmon_results_GIN_FINAL
+TCGA-Notebooks-data

@@ -2,17 +2,18 @@ import os
 import re
 import statistics
 import tempfile
+import shutil
 import pandas as pd
+import numpy as np
 import networkx as nx
 from typing import Optional, List
 from pathlib import Path
-
+from typing import Optional, List, Tuple
 try:
     import torch
     import torch.nn as nn
     import torch.optim as optim
     from torch_geometric.data import Data
-    from torch_geometric.transforms import RandomNodeSplit
 except ModuleNotFoundError:
     raise ImportError(
         "DPMON (Disease Prediction using Multi-Omics Networks) requires PyTorch Geometric. "
@@ -20,45 +21,55 @@ except ModuleNotFoundError:
         "https://bioneuralnet.readthedocs.io/en/latest/installation.html"
     )
 
-
 from ray import train
 from ray import tune
 from ray.tune import Checkpoint
 from ray.tune import CLIReporter
+from ray.tune.stopper import TrialPlateauStopper
 from ray.tune.schedulers import ASHAScheduler
+from sklearn.model_selection import train_test_split,StratifiedKFold,RepeatedStratifiedKFold
+from sklearn.preprocessing import label_binarize
+from scipy.stats import pointbiserialr
+from sklearn.metrics import f1_score, roc_auc_score, recall_score,average_precision_score, matthews_corrcoef
 
 from bioneuralnet.utils import get_logger
+from bioneuralnet.utils.reproducibility import set_seed
 from bioneuralnet.network_embedding.gnn_models import GCN, GAT, SAGE, GIN
 
 logger= get_logger(__name__)
 
 class DPMON:
-    """
-    DPMON (Disease Prediction using Multi-Omics Networks): An end-to-end pipeline for disease prediction using multi-omics networks.
+    """DPMON (Disease Prediction using Multi-Omics Networks) end-to-end pipeline for multi-omics disease prediction.
 
-        Instead of node-level MSE regression, DPMON aggregates node embeddings with patient-level omics data.
-        A downstream classification head (e.g., softmax layer with CrossEntropyLoss) is applied for sample-level disease prediction.
-        This end-to-end approach leverages both local (node-level) and global (patient-level) network information
+    Instead of node-level MSE regression, DPMON aggregates node embeddings with patient-level omics data and feeds them to a downstream classification head (e.g., a softmax layer with CrossEntropyLoss) for sample-level disease prediction. This end-to-end setup leverages both local (node-level) and global (patient-level) network information.
 
     Attributes:
 
-        adjacency_matrix (pd.DataFrame): The adjacency matrix of the network.
-        omics_list (List[pd.DataFrame]): A list of omics datasets.
-        phenotype_data (pd.DataFrame): A DataFrame containing the disease phenotype.
-        clinical_data (Optional[pd.DataFrame]): A DataFrame containing clinical data.
-        model (str): The GNN model to use (GCN, GAT, SAGE, GIN). Default='GAT'.
-        gnn_hidden_dim (int): The hidden dimension of the GNN. Default=16.
-        layer_num (int): The number of GNN layers. Default=5.
-        nn_hidden_dim1 (int): The hidden dimension of the first NN layer. Default=8.
-        nn_hidden_dim2 (int): The hidden dimension of the second NN layer. Default=8.
-        num_epochs (int): The number of training epochs. Default=100.
-        repeat_num (int): The number of training repeats. Default=5.
-        lr (float): The learning rate. Default=1e-1.
-        weight_decay (float): The weight decay. Default=1e-4.
-        tune (bool): Whether to perform hyperparameter tuning. Default=False.
-        gpu (bool): Whether to use GPU. Default=False.
-        cuda (int): The CUDA device ID. Default=0.
-        output_dir (Optional[str]): The output directory. Default=None.
+        adjacency_matrix (pd.DataFrame): Adjacency matrix of the feature-level network; index/columns are feature names.
+        omics_list (List[pd.DataFrame] | pd.DataFrame): List of omics data matrices or a single merged omics DataFrame (samples x features).
+        phenotype_data (pd.DataFrame | pd.Series): Phenotype labels used for supervision.
+        clinical_data (Optional[pd.DataFrame]): Optional clinical covariates (samples x clinical features); may be None.
+        phenotype_col (str): Column name in phenotype_data that stores the target labels.
+        model (str): GNN backbone; one of {"GCN", "GAT", "SAGE", "GIN"}.
+        gnn_hidden_dim (int): Hidden dimension size of GNN layers.
+        gnn_layer_num (int): Number of stacked GNN layers.
+        gnn_dropout (float): Dropout rate applied within the GNN.
+        gnn_activation (str): Non-linear activation used in GNN layers (e.g., "relu").
+        dim_reduction (str): Dimensionality reduction strategy for omics input (e.g., "ae" for autoencoder).
+        ae_encoding_dim (int): Encoding dimension of the autoencoder bottleneck if dim_reduction="ae".
+        nn_hidden_dim1 (int): Hidden dimension of the first fully connected layer in the downstream classifier.
+        nn_hidden_dim2 (int): Hidden dimension of the second fully connected layer in the downstream classifier.
+        num_epochs (int): Number of training epochs per run.
+        repeat_num (int): Number of repeated training runs (for repeated train/test splits or repeated CV).
+        n_folds (int): Number of folds to use when cv=True.
+        lr (float): Learning rate for the optimizer.
+        weight_decay (float): L2 weight decay (regularization) coefficient.
+        tune (bool): If True, perform hyperparameter tuning before final training.
+        gpu (bool): If True, use GPU if available.
+        cv (bool): If True, use K-fold cross-validation; otherwise use repeated train/test splits.
+        cuda (int): CUDA device index to use when gpu=True.
+        seed (int): Random seed for reproducibility.
+        output_dir (Path): Directory where logs, checkpoints, and results are written.
     """
     def __init__(
         self,
@@ -67,26 +78,52 @@ class DPMON:
         phenotype_data: pd.DataFrame,
         clinical_data: Optional[pd.DataFrame] = None,
         model: str = "GAT",
+        phenotype_col: str = "phenotype",
         gnn_hidden_dim: int = 16,
-        layer_num: int = 5,
-        nn_hidden_dim1: int = 8,
+        gnn_layer_num: int = 4,
+        gnn_dropout: float = 0.1,
+        gnn_activation: str = "relu",
+        dim_reduction: str = "ae",
+        ae_encoding_dim: int = 8,
+        nn_hidden_dim1: int = 16,
         nn_hidden_dim2: int = 8,
         num_epochs: int = 100,
-        repeat_num: int = 5,
+        repeat_num: int = 1,
+        n_folds: int = 5,
         lr: float = 1e-1,
         weight_decay: float = 1e-4,
         tune: bool = False,
         gpu: bool = False,
+        cv: bool = False,
         cuda: int = 0,
+        seed: int = 1804,
         output_dir: Optional[str] = None,
     ):
-
         if adjacency_matrix.empty:
             raise ValueError("Adjacency matrix cannot be empty.")
-        if not omics_list or any(df.empty for df in omics_list):
-            raise ValueError("All provided omics data files must be non-empty.")
-        if phenotype_data.empty or "phenotype" not in phenotype_data.columns:
-            raise ValueError(f"Phenotype data must have column a phenotype column.")
+
+        if isinstance(omics_list, list):
+            if not omics_list or any(df.empty for df in omics_list):
+                raise ValueError("All provided omics data files must be non-empty.")
+            self.combined_omics_input = pd.concat(omics_list, axis=1)
+        elif isinstance(omics_list, pd.DataFrame):
+            if omics_list.empty:
+                raise ValueError("Provided omics DataFrame cannot be empty.")
+            self.combined_omics_input = omics_list
+        else:
+            raise TypeError("omics_list must be a pandas DataFrame or a list of DataFrames.")
+
+        if isinstance(phenotype_data, pd.DataFrame):
+            if phenotype_data.empty or phenotype_col not in phenotype_data.columns:
+                raise ValueError(f"Phenotype DataFrame must have a '{phenotype_col}' column.")
+            self.phenotype_series = phenotype_data[phenotype_col]
+        elif isinstance(phenotype_data, pd.Series):
+            if phenotype_data.empty:
+                raise ValueError("Phenotype Series cannot be empty.")
+            self.phenotype_series = phenotype_data
+        else:
+            raise TypeError("phenotype_data must be a pandas DataFrame or Series.")
+
         if clinical_data is not None and clinical_data.empty:
             logger.warning(
                 "Clinical data provided is empty => treating as None => random features."
@@ -97,18 +134,26 @@ class DPMON:
         self.omics_list = omics_list
         self.phenotype_data = phenotype_data
         self.clinical_data = clinical_data
+        self.phenotype_col = phenotype_col
         self.model = model
         self.gnn_hidden_dim = gnn_hidden_dim
-        self.layer_num = layer_num
+        self.gnn_layer_num = gnn_layer_num
+        self.gnn_dropout = gnn_dropout
+        self.gnn_activation = gnn_activation
+        self.dim_reduction = dim_reduction
+        self.ae_encoding_dim = ae_encoding_dim
         self.nn_hidden_dim1 = nn_hidden_dim1
         self.nn_hidden_dim2 = nn_hidden_dim2
         self.num_epochs = num_epochs
         self.repeat_num = repeat_num
+        self.n_folds = n_folds
         self.lr = lr
         self.weight_decay = weight_decay
         self.tune = tune
         self.gpu = gpu
         self.cuda = cuda
+        self.seed = seed
+        self.cv = cv
 
         if output_dir is None:
             self.output_dir = Path(os.getcwd()) / "dpmon"
@@ -117,115 +162,89 @@ class DPMON:
 
         self.output_dir.mkdir(parents=True, exist_ok=True)
         logger.info(f"Output directory set to: {self.output_dir}")
+        logger.info(f"Initialized DPMON with model: {self.model}")
 
+    def run(self) -> Tuple[pd.DataFrame, object, torch.Tensor | None]:
+        """Execute the DPMON pipeline.
 
-        logger.info("Initialized DPMON with the provided parameters.")
+        This method aligns the graph and omics features, optionally performs hyperparameter tuning, and then trains and evaluates the chosen GNN model using either K-fold cross-validation (cv=True) or repeated train/test splits (cv=False). It returns prediction outputs, a metrics/config object, and optionally the learned embeddings.
 
-    def run(self) -> pd.DataFrame:
+        Returns:
+
+            Tuple[pd.DataFrame, object, torch.Tensor | None]: A tuple (predictions_df, metrics, embeddings) where:
+                predictions_df (pd.DataFrame): If cv=False, per-sample predictions with actual vs predicted labels; if cv=True, aggregated CV performance or fold-level results depending on the backend
+                metrics (object): Dictionary or configuration object containing evaluation metrics and, when tuning is enabled, information about the selected hyperparameters.
+                embeddings (torch.Tensor | None): Learned embedding tensor (e.g., node or sample embeddings) if produced by the training routine, otherwise None.
         """
-        Execute the DPMON pipeline for disease prediction.
-
-        **Steps:**
-
-        1. **Combining Omics and Phenotype Data**:
-           - Merges the provided omics datasets and ensures that the phenotype (`phenotype`) column is included.
-
-        2. **Tuning or Training**:
-           - **Tuning**: If `tune=True`, performs hyperparameter tuning using Ray Tune and returns an empty DataFrame.
-           - **Training**: If `tune=False`, runs standard training to generate predictions.
-
-        3. **Predictions**:
-           - If training is performed, returns a DataFrame of predictions with 'Actual' and 'Predicted' columns.
-
-        **Returns**: pd.DataFrame
-
-            - If `tune=False`, a DataFrame containing disease phenotype predictions for each sample.
-            - If `tune=True`, returns an empty DataFrame since no predictions are generated.
-
-        **Raises**:
-
-            - **ValueError**: If the input data is improperly formatted or missing.
-            - **Exception**: For any unforeseen errors encountered during preprocessing, tuning, or training.
-
-        **Notes**:
-
-            - DPMON relies on internally-generated embeddings (via GNNs), node correlations, and a downstream neural network.
-            - Ensure that the adjacency matrix and omics data are properly aligned and that clinical/phenotype data match the sample indices.
-
-        **Example**:
-
-        .. code-block:: python
-
-            dpmon = DPMON(adjacency_matrix, omics_list, phenotype_data, clinical_data, model='GCN')
-            predictions = dpmon.run()
-            print(predictions.head())
-        """
-        logger.info("Starting DPMON run.")
+        set_seed(self.seed)
+        logger.info(f"Random seed set to: {self.seed}")
 
         dpmon_params = {
             "model": self.model,
+            "phenotype_col": self.phenotype_col,
             "gnn_hidden_dim": self.gnn_hidden_dim,
-            "layer_num": self.layer_num,
+            "gnn_layer_num": self.gnn_layer_num,
+            "gnn_dropout":self.gnn_dropout,
+            "gnn_activation":self.gnn_activation,
+            "dim_reduction": self.dim_reduction,
+            "ae_encoding_dim": self.ae_encoding_dim,
             "nn_hidden_dim1": self.nn_hidden_dim1,
             "nn_hidden_dim2": self.nn_hidden_dim2,
             "num_epochs": self.num_epochs,
+            "n_folds": self.n_folds,
             "repeat_num": self.repeat_num,
             "lr": self.lr,
             "weight_decay": self.weight_decay,
             "gpu": self.gpu,
             "cuda": self.cuda,
             "tune": self.tune,
+            "seed": self.seed,
+            "cv": self.cv,
         }
 
-        # Combine omics datasets
-        combined_omics = pd.concat(self.omics_list, axis=1)
-        combined_omics = combined_omics[self.adjacency_matrix.columns]
+        graph_nodes = set(self.adjacency_matrix.index)
+        omics_features = set(self.combined_omics_input.columns)
+        common_features = list(graph_nodes.intersection(omics_features))
 
-        if "phenotype" not in combined_omics.columns:
+        if not common_features:
+            raise ValueError("No common features found between adjacency matrix and omics data.")
+
+        dropped_graph_nodes = len(graph_nodes) - len(common_features)
+        dropped_omics_features = len(omics_features) - len(common_features)
+
+        if dropped_graph_nodes > 0 or dropped_omics_features > 0:
+            logger.info(
+                f"Graph/omics mismatch. Aligning to {len(common_features)} common features. "
+                f"Dropped {dropped_graph_nodes} from graph and {dropped_omics_features} from omics. "
+                "To prevent this, ensure data is pre-aligned."
+            )
+
+        self.adjacency_matrix = self.adjacency_matrix.loc[common_features, common_features]
+        combined_omics = self.combined_omics_input[common_features]
+
+        phenotype_series = self.phenotype_series.rename(self.phenotype_col)
+
+        if self.phenotype_col not in combined_omics.columns:
             combined_omics = combined_omics.merge(
-                self.phenotype_data[["phenotype"]],
+                phenotype_series,
                 left_index=True,
                 right_index=True,
             )
-
-        if self.tune:
-            logger.info("Running hyperparameter tuning for DPMON.")
-            best_config_df = run_hyperparameter_tuning(
-                dpmon_params, self.adjacency_matrix, combined_omics, self.clinical_data
-            )
-            logger.info(best_config_df)
-            best_config = best_config_df.iloc[0].to_dict()
-            best_config["gnn_hidden_dim"] = int(best_config["gnn_hidden_dim"])
-            best_config["gnn_layer_num"] = int(best_config["gnn_layer_num"])
-            best_config["nn_hidden_dim1"] = int(best_config["nn_hidden_dim1"])
-            best_config["nn_hidden_dim2"] = int(best_config["nn_hidden_dim2"])
-            best_config["num_epochs"] = int(best_config["num_epochs"])
-            logger.info(f"Best tuned parameters: {best_config}")
-
-            logger.info(f"Best tuned parameters: {best_config}")
-            dpmon_params.update(best_config)
-            logger.info("Running standard training with tuned parameters.")
-            predictions = run_standard_training(
-                dpmon_params,
-                self.adjacency_matrix,
-                combined_omics,
-                self.clinical_data,
-                output_dir=self.output_dir,
-            )
-            return predictions
-
         else:
-            logger.info("Running standard training for DPMON.")
-            predictions = run_standard_training(
-                dpmon_params,
-                self.adjacency_matrix,
-                combined_omics,
-                self.clinical_data,
-                output_dir=self.output_dir,
-            )
+            logger.warning(f"Column '{self.phenotype_col}' already exists in omics data. Using existing column.")
 
-            logger.info("DPMON run completed.")
-            return predictions
+        predictions_df, metrics, embeddings = run_standard_training(
+            dpmon_params,
+            self.adjacency_matrix,
+            combined_omics,
+            self.clinical_data,
+            seed=self.seed,
+            cv=self.cv,
+            output_dir=self.output_dir
+        )
+
+        logger.info("DPMON run completed.")
+        return predictions_df, metrics, embeddings
 
 
 def setup_device(gpu, cuda):
@@ -242,10 +261,7 @@ def setup_device(gpu, cuda):
         logger.info("Using CPU")
     return device
 
-
-def slice_omics_datasets(
-    omics_dataset: pd.DataFrame, adjacency_matrix: pd.DataFrame
-) -> List[pd.DataFrame]:
+def slice_omics_datasets(omics_dataset: pd.DataFrame, adjacency_matrix: pd.DataFrame, phenotype_col: str = "phenotype") -> List[pd.DataFrame]:
     logger.debug("Slicing omics dataset based on network nodes.")
     omics_network_nodes_names = adjacency_matrix.index.tolist()
 
@@ -263,288 +279,683 @@ def slice_omics_datasets(
         logger.error(f"Nodes missing in omics data: {missing_nodes}")
         raise ValueError("Missing nodes in omics dataset.")
 
-    selected_columns = omics_network_nodes_names + ["phenotype"]
+    selected_columns = omics_network_nodes_names + [phenotype_col]
     return [omics_dataset[selected_columns]]
 
+def prepare_node_features(adjacency_matrix: pd.DataFrame, omics_datasets: List[pd.DataFrame], clinical_data: Optional[pd.DataFrame], phenotype_col: str) -> List[Data]:
+    """Build node-level features and return a PyTorch Geometric graph.
 
-def build_omics_networks_tg(
-    adjacency_matrix: pd.DataFrame,
-    omics_datasets: List[pd.DataFrame],
-    clinical_data: pd.DataFrame,
-) -> List[Data]:
+    Aligns network and omics features, constructs a NetworkX graph, and when clinical_data is provided computes Fisher Z-transformed correlations between each feature and each clinical variable as node features. The resulting feature matrix is standardized and wrapped into a PyTorch Geometric Data object with weighted edges.
+
+    Args:
+
+        adjacency_matrix (pd.DataFrame): Symmetric adjacency matrix with node names as both index and columns.
+        omics_datasets (List[pd.DataFrame]): List of omics matrices (samples x features); only the first element is used here.
+        clinical_data (Optional[pd.DataFrame]): Clinical covariates (samples x variables) used to build correlation-based node features; may be None.
+        phenotype_col (str): Column name in the first omics DataFrame that stores the phenotype and should be dropped from features if present.
+
+    Returns:
+
+        List[Data]: Single-element list containing a PyTorch Geometric Data object with standardized node features and weighted edges.
+
+    """
     logger.debug("Building PyTorch Geometric Data object from adjacency matrix.")
-    omics_network_nodes_names = adjacency_matrix.index.tolist()
 
-    G = nx.from_pandas_adjacency(adjacency_matrix)
-    node_mapping = {
-        node_name: idx for idx, node_name in enumerate(omics_network_nodes_names)
-    }
-    G = nx.relabel_nodes(G, node_mapping)
-    num_nodes = len(node_mapping)
-    logger.info(f"Number of nodes in network: {num_nodes}")
+    network_features = adjacency_matrix.columns
+    omics_data = omics_datasets[0]
+
+    if phenotype_col in omics_data.columns:
+        pheno = omics_data[phenotype_col]
+        omics_feature_df = omics_data.drop(columns=[phenotype_col])
+    else:
+        pheno = None
+        omics_feature_df = omics_data
+
+    nodes = sorted(network_features.intersection(omics_feature_df.columns))
+
+    if len(nodes) == 0:
+        raise ValueError("No common features found between the network and omics data.")
+
+    omics_filtered = omics_feature_df[nodes]
+    network_filtered = adjacency_matrix.loc[nodes, nodes]
+
+    logger.info(f"Building graph with {len(nodes)} common features.")
+    G = nx.from_pandas_adjacency(network_filtered)
 
     if clinical_data is not None and not clinical_data.empty:
-        clinical_vars = clinical_data.columns.tolist()
-        logger.debug(f"Using clinical vars for node features: {clinical_vars}")
-        omics_dataset = omics_datasets[0]
-        missing_nodes = set(omics_network_nodes_names) - set(omics_dataset.columns)
-        if missing_nodes:
-            raise ValueError("Missing nodes for correlation computation.")
-        node_features = []
-        for node_name in omics_network_nodes_names:
-            correlations = []
-            for var in clinical_vars:
-                corr_value = abs(
-                    omics_dataset[node_name].corr(clinical_data[var].astype("float64"))
-                )
-                correlations.append(corr_value)
-            node_features.append(correlations)
-        x = torch.tensor(node_features, dtype=torch.float)
-    else:
-        x = torch.randn((num_nodes, 10), dtype=torch.float)
-        logger.info("No clinical data provided or empty. Using random features.")
+        logger.debug("Adding clinical correlation features.")
+        clinical_cols = list(clinical_data.columns)
+        common_index = clinical_data.index.intersection(omics_filtered.index)
 
-    edge_index = torch.tensor(list(G.edges()), dtype=torch.long).t().contiguous()
+        if common_index.empty:
+            raise ValueError("No common indices between omics_filtered and clinical_data in fold.")
+
+        node_features_dict = {}
+        for node in nodes:
+            vec = pd.to_numeric(omics_filtered[node].loc[common_index], errors="coerce")
+            vec = vec.dropna()
+
+            corr_vector = {}
+            for cvar in clinical_cols:
+                clinical_series = clinical_data[cvar].loc[common_index]
+
+                common_valid = vec.index.intersection(clinical_series.index)
+                vec_aligned = vec.loc[common_valid]
+                clinical_aligned = clinical_series.loc[common_valid]
+
+                if (clinical_aligned.nunique() <= 1 or vec_aligned.nunique() <= 1 or len(vec_aligned) < 2):
+                    corr_vector[cvar] = 0.0
+                    continue
+
+                vec_is_binary = vec_aligned.nunique() == 2
+                clinical_is_binary = clinical_aligned.nunique() == 2
+
+                try:
+                    if vec_is_binary and clinical_is_binary:
+                        corr_val = matthews_corrcoef(vec_aligned, clinical_aligned)
+                    elif vec_is_binary or clinical_is_binary:
+                        corr_val, _ = pointbiserialr(clinical_aligned, vec_aligned)
+                        if pd.isna(corr_val):
+                            corr_val = 0.0
+                    else:
+                        corr_val = vec_aligned.corr(clinical_aligned)
+                        if pd.isna(corr_val):
+                            corr_val = 0.0
+                except Exception as e:
+                    logger.debug(f"Correlation failed for {node}-{cvar}: {e}")
+                    corr_val = 0.0
+
+                if pd.isna(corr_val) or corr_val == 0.0:
+                    z = 0.0
+                else:
+                    r_clip = np.clip(corr_val, -0.999999, 0.999999)
+                    z = np.arctanh(r_clip)
+
+                corr_vector[cvar] = z
+
+            node_features_dict[node] = corr_vector
+
+        node_features_df = pd.DataFrame.from_dict(node_features_dict, orient="index")
+        logger.info(f"Built feature matrix with clinical correlations shape: {node_features_df.shape}")
+
+    node_features_df = node_features_df.fillna(0.0)
+
+    std_vals = node_features_df.std()
+    std_vals = std_vals.replace(0, 1e-8)
+    node_features_df = (node_features_df - node_features_df.mean()) / std_vals
+
+    x = torch.tensor(node_features_df.values, dtype=torch.float)
+
+    node_mapping = {}
+    for i, name in enumerate(nodes):
+        node_mapping[name] = i
+
+    G_mapped = nx.relabel_nodes(G, node_mapping)
+
+    edges_list = []
+    for u, v in G_mapped.edges():
+        edges_list.append((u, v))
+
+    edge_index = torch.tensor(edges_list, dtype=torch.long).t().contiguous()
     edge_index = torch.cat([edge_index, edge_index.flip(0)], dim=1)
 
-    edge_weight = torch.tensor(
-        [data.get("weight", 1.0) for _, _, data in G.edges(data=True)],
-        dtype=torch.float,
-    )
+    weights = []
+    for _, _, data_attr in G_mapped.edges(data=True):
+        weights.append(data_attr.get("weight", 1.0))
+
+    edge_weight = torch.tensor(weights, dtype=torch.float)
     edge_weight = torch.cat([edge_weight, edge_weight], dim=0)
 
     data = Data(x=x, edge_index=edge_index, edge_attr=edge_weight)
-    num_val_nodes = 10 if num_nodes >= 30 else 5
-    num_test_nodes = 12 if num_nodes >= 30 else 5
-    transform = RandomNodeSplit(num_val=num_val_nodes, num_test=num_test_nodes)
-    data = transform(data)
 
     return [data]
 
-
-def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinical_data, output_dir):
+def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinical_data, seed, cv=False, output_dir=None):
+    phenotype_col = dpmon_params["phenotype_col"]
     device = setup_device(dpmon_params["gpu"], dpmon_params["cuda"])
-    omics_dataset = slice_omics_datasets(combined_omics, adjacency_matrix)
-    omics_networks_tg = build_omics_networks_tg(adjacency_matrix, omics_dataset, clinical_data)
+    omics_dataset = slice_omics_datasets(combined_omics, adjacency_matrix, phenotype_col)
+    omics_dataset = omics_dataset[0]
 
-    accuracies = []
-    best_accuracy = 0
-    best_predictions_df = None
+    if not cv:
+        logger.info(f"Running in standard mode (cv=False) with {dpmon_params['repeat_num']} repeats.")
+        test_accuracies = []
+        all_predictions_list = []
+        best_accuracy = 0.0
+        best_model_state = None
+        best_predictions_df = None
 
-    for omics_data, omics_network in zip(omics_dataset, omics_networks_tg):
+        X = omics_dataset.drop([phenotype_col], axis=1)
+        Y = omics_dataset[phenotype_col]
+        X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.3, random_state=seed, stratify=Y)
+
+        if clinical_data is None:
+            clinical_data_full = pd.DataFrame(index=X.index)
+        else:
+            clinical_data_full = clinical_data.reindex(X.index)
+
+        clinical_train = clinical_data_full.loc[X_train.index]
+
+        logger.info("Building 'clean' graph features for standard run using train split")
+        omics_train_fold_list = [X_train.join(y_train.rename(phenotype_col))]
+
+        omics_network_tg = prepare_node_features(
+            adjacency_matrix,
+            omics_train_fold_list,
+            clinical_train,
+            phenotype_col
+        )[0].to(device)
+
+        X_train_tensor = torch.FloatTensor(X_train.values).to(device)
+        y_train_tensor = torch.LongTensor(y_train.values).to(device)
+        X_test_tensor = torch.FloatTensor(X_test.values).to(device)
+        y_test_tensor = torch.LongTensor(y_test.values).to(device)
+
+        train_labels_dict = {
+            "labels": y_train_tensor,
+            "omics_network": omics_network_tg
+        }
+
         for i in range(dpmon_params["repeat_num"]):
             logger.info(f"Training iteration {i+1}/{dpmon_params['repeat_num']}")
 
             model = NeuralNetwork(
                 model_type=dpmon_params["model"],
-                gnn_input_dim=omics_network.x.shape[1],
+                gnn_input_dim=omics_network_tg.x.shape[1],
                 gnn_hidden_dim=dpmon_params["gnn_hidden_dim"],
-                gnn_layer_num=dpmon_params["layer_num"],
-                ae_encoding_dim=1,
-                nn_input_dim=omics_data.drop(["phenotype"], axis=1).shape[1],
+                gnn_layer_num=dpmon_params["gnn_layer_num"],
+                dim_reduction=dpmon_params["dim_reduction"],
+                ae_encoding_dim=dpmon_params["ae_encoding_dim"],
+                nn_input_dim=X_train_tensor.shape[1],
                 nn_hidden_dim1=dpmon_params["nn_hidden_dim1"],
                 nn_hidden_dim2=dpmon_params["nn_hidden_dim2"],
-                nn_output_dim=omics_data["phenotype"].nunique(),
+                nn_output_dim=Y.nunique(),
+                gnn_dropout=dpmon_params["gnn_dropout"],
+                gnn_activation=dpmon_params["gnn_activation"]
             ).to(device)
 
             criterion = nn.CrossEntropyLoss()
-            optimizer = optim.Adam(
-                model.parameters(),
-                lr=dpmon_params["lr"],
-                weight_decay=dpmon_params["weight_decay"],
+            optimizer = optim.Adam(model.parameters(), lr=dpmon_params["lr"], weight_decay=dpmon_params["weight_decay"])
+
+            model = train_model(
+                model, criterion, optimizer,
+                X_train_tensor, train_labels_dict, dpmon_params["num_epochs"]
             )
 
-            train_features = torch.FloatTensor(omics_data.drop(["phenotype"], axis=1).values).to(device)
-            train_labels = {
-                "labels": torch.LongTensor(omics_data["phenotype"].values.copy()).to(device),
-                "omics_network": omics_network.to(device),
-            }
-
-            accuracy = train_model(model, criterion, optimizer, train_features, train_labels, dpmon_params["num_epochs"])
-            accuracies.append(accuracy)
-
-            # Save model
-            model_path = os.path.join(output_dir, f"dpm_model_iter_{i+1}.pth")
-            torch.save(model.state_dict(), model_path)
-            logger.info(f"Model saved to {model_path}")
-
-            # Evaluate model
             model.eval()
+
             with torch.no_grad():
-                predictions, _ = model(train_features, omics_network.to(device))
+                predictions, _, _ = model(X_test_tensor, omics_network_tg)
                 _, predicted = torch.max(predictions, 1)
-                predictions_df = pd.DataFrame(
-                    {"Actual": omics_data["phenotype"].values, "Predicted": predicted.cpu().numpy()}
+
+                accuracy = (predicted == y_test_tensor).sum().item() / len(y_test_tensor)
+                test_accuracies.append(accuracy)
+                logger.info(f"Iteration {i+1} Test Accuracy: {accuracy:.4f}")
+
+                if accuracy > best_accuracy:
+                        best_accuracy = accuracy
+                        best_model_state = model.state_dict()
+
+                        best_predictions_df = pd.DataFrame({
+                            "Actual": y_test_tensor.cpu().numpy(),
+                            "Predicted": predicted.cpu().numpy(),
+                            "Iteration": i + 1
+                        })
+
+                all_predictions_list.append(
+                    pd.DataFrame({
+                        "Actual": y_test_tensor.cpu().numpy(),
+                        "Predicted": predicted.cpu().numpy(),
+                        "Iteration": i + 1
+                    })
                 )
 
-            if accuracy > best_accuracy:
-                best_accuracy = accuracy
-                best_predictions_df = predictions_df
+        if output_dir and best_model_state is not None:
+            model_save_path = os.path.join(output_dir, "best_model_standard_run.pt")
 
-    if accuracies:
-        avg_accuracy = sum(accuracies) / len(accuracies)
-        std_accuracy = statistics.stdev(accuracies) if len(accuracies) > 1 else 0.0
-        logger.info(f"Best Accuracy: {best_accuracy:.4f}")
-        logger.info(f"Average Accuracy across {len(accuracies)} models: {avg_accuracy:.4f}")
-        logger.info(f"Standard Deviation across all models: {std_accuracy:.4f}")
-        logger.info(f"Returning best model predictions and average accuracy (predictions, avg_accuracy).")
+            try:
+                torch.save(best_model_state, model_save_path)
+                logger.info(f"Successfully saved best model state to: {model_save_path}")
+            except Exception as e:
+                logger.error(f"Failed to save best model: {e}")
 
-    return best_predictions_df, avg_accuracy
+        return best_predictions_df, all_predictions_list, None
 
-def run_hyperparameter_tuning(
-    dpmon_params, adjacency_matrix, combined_omics, clinical_data
-):
-    device = setup_device(dpmon_params["gpu"], dpmon_params["cuda"])
+    else:
+        n_folds = dpmon_params["n_folds"]
+        logger.info(f"Running in Cross-Validation mode (cv=True) with {n_folds} folds.")
 
-    omics_dataset = slice_omics_datasets(combined_omics, adjacency_matrix)
-    omics_networks_tg = build_omics_networks_tg(
-        adjacency_matrix, omics_dataset, clinical_data
-    )
+        #these are to track the best model across folds and then save it
+        best_global_fold_accuracy = 0.0
+        best_global_model_state = None
+        best_global_embeddings = None
 
-    pipeline_configs = {
-        "gnn_layer_num": tune.choice([2, 4, 8, 16, 32, 64, 128]),
-        "gnn_hidden_dim": tune.choice([4, 8, 16, 32, 64, 128]),
-        "lr": tune.loguniform(1e-4, 1e-1),
-        "weight_decay": tune.loguniform(1e-4, 1e-1),
-        "nn_hidden_dim1": tune.choice([4, 8, 16, 32, 64, 128]),
-        "nn_hidden_dim2": tune.choice([4, 8, 16, 32, 64, 128]),
-        "num_epochs": tune.choice([16, 64, 256, 512, 1024,2048, 4096, 8192]),
-    }
+        cv_predictions_list = []
+        fold_accuracies = []
+        fold_f1_macros = []
+        fold_f1_weighteds = []
+        fold_auprs = []
+        fold_aucs = []
+        fold_recalls = []
 
-    reporter = CLIReporter(metric_columns=["loss", "accuracy", "training_iteration"])
-    scheduler = ASHAScheduler(
-        metric="loss", mode="min", grace_period=1, reduction_factor=2
-    )
-    gpu_resources = 1 if dpmon_params["gpu"] else 0
+        X = omics_dataset.drop([phenotype_col], axis=1)
+        Y = omics_dataset[phenotype_col]
 
-    best_configs = []
+        if clinical_data is None:
+            clinical_data_full = pd.DataFrame(index=X.index)
+        else:
+            clinical_data_full = clinical_data.reindex(X.index)
 
-    for omics_data, omics_network_tg in zip(omics_dataset, omics_networks_tg):
-        logger.info(
-            f"Starting hyperparameter tuning for dataset shape: {omics_data.shape}"
-        )
 
-        def tune_train_n(config):
+        repeat_num_val = dpmon_params.get("repeat_num", 1)
+        total_splits = n_folds * repeat_num_val
+
+        if repeat_num_val > 1:
+            skf = RepeatedStratifiedKFold(
+                n_splits=n_folds,
+                n_repeats=repeat_num_val,
+                random_state=seed
+            )
+            logger.info(f"CV Setup: Repeated K-Fold ({n_folds}x{repeat_num_val} = {total_splits} splits total).")
+        else:
+            # Fallback to single Stratified K-Fold
+            skf = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=seed)
+            logger.info(f"CV Setup: Standard {n_folds}-fold split.")
+
+        for fold, (train_index, test_index) in enumerate(skf.split(X, Y)):
+            current_repeat = fold // n_folds + 1
+            current_fold = fold % n_folds + 1
+
+            if repeat_num_val > 1:
+                logger.info(f"Starting Repeat {current_repeat}/{repeat_num_val}, Fold {current_fold}/{n_folds} (Total Split {fold + 1}/{total_splits})")
+            else:
+                logger.info(f"Starting Fold {current_fold}/{n_folds}")
+
+            X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+            y_train, y_test = Y.iloc[train_index], Y.iloc[test_index]
+
+            if dpmon_params['tune']:
+                best_config = run_hyperparameter_tuning(
+                    X_train, y_train,
+                    adjacency_matrix,
+                    clinical_data_full.iloc[train_index],
+                    dpmon_params
+                )
+                dpmon_params.update(best_config)
+                logger.info(f"Fold {fold+1} best config: {best_config}")
+
+            clinical_train = clinical_data_full.iloc[train_index]
+            logger.info(f"Building graph features for Fold {fold+1} using train split only")
+
+            omics_train_fold_list = [X_train.join(y_train.rename(phenotype_col))]
+
+            omics_network_tg = prepare_node_features(
+                adjacency_matrix,
+                omics_train_fold_list,
+                clinical_train,
+                phenotype_col
+            )[0].to(device)
+
+            X_train_tensor = torch.FloatTensor(X_train.values).to(device)
+            y_train_tensor = torch.LongTensor(y_train.values).to(device)
+            X_test_tensor = torch.FloatTensor(X_test.values).to(device)
+            y_test_tensor = torch.LongTensor(y_test.values).to(device)
+
+            train_labels_dict = {
+                "labels": y_train_tensor,
+                "omics_network": omics_network_tg
+            }
+
             model = NeuralNetwork(
                 model_type=dpmon_params["model"],
                 gnn_input_dim=omics_network_tg.x.shape[1],
-                gnn_hidden_dim=config["gnn_hidden_dim"],
-                gnn_layer_num=config["gnn_layer_num"],
-                ae_encoding_dim=1,
-                nn_input_dim=omics_data.drop(["phenotype"], axis=1).shape[1],
-                nn_hidden_dim1=config["nn_hidden_dim1"],
-                nn_hidden_dim2=config["nn_hidden_dim2"],
-                nn_output_dim=omics_data["phenotype"].nunique(),
+                gnn_hidden_dim=dpmon_params["gnn_hidden_dim"],
+                gnn_layer_num=dpmon_params["gnn_layer_num"],
+                ae_encoding_dim=dpmon_params["ae_encoding_dim"],
+                nn_input_dim=X_train_tensor.shape[1],
+                nn_hidden_dim1=dpmon_params["nn_hidden_dim1"],
+                nn_hidden_dim2=dpmon_params["nn_hidden_dim2"],
+                nn_output_dim=Y.nunique(),
+                gnn_dropout=dpmon_params["gnn_dropout"],
+                gnn_activation=dpmon_params["gnn_activation"],
+                dim_reduction=dpmon_params["dim_reduction"],
             ).to(device)
 
             criterion = nn.CrossEntropyLoss()
-            optimizer = optim.Adam(
-                model.parameters(), lr=config["lr"], weight_decay=config["weight_decay"]
-            )
+            optimizer = optim.Adam(model.parameters(), lr=dpmon_params["lr"], weight_decay=dpmon_params["weight_decay"])
 
-            train_features = torch.FloatTensor(
-                omics_data.drop(["phenotype"], axis=1).values
-            ).to(device)
-            train_labels = {
-                "labels": torch.LongTensor(omics_data["phenotype"].values.copy()).to(
-                    device
-                ),
-                "omics_network": omics_network_tg.to(device),
-            }
-
-            for epoch in range(config["num_epochs"]):
-                model.train()
-                optimizer.zero_grad()
-                outputs, _ = model(train_features, train_labels["omics_network"])
-                loss = criterion(outputs, train_labels["labels"])
-                loss.backward()
-                optimizer.step()
-
-                _, predicted = torch.max(outputs, 1)
-                total = train_labels["labels"].size(0)
-                correct = (predicted == train_labels["labels"]).sum().item()
-                accuracy = correct / total
-
-                metrics = {"loss": loss.item(), "accuracy": accuracy}
-                with tempfile.TemporaryDirectory() as tempdir:
-                    torch.save(
-                        {"epoch": epoch, "model_state": model.state_dict()},
-                        os.path.join(tempdir, "checkpoint.pt"),
-                    )
-                    train.report(
-                        metrics=metrics, checkpoint=Checkpoint.from_directory(tempdir)
-                    )
-
+            model = train_model(model, criterion, optimizer,X_train_tensor, train_labels_dict, dpmon_params["num_epochs"])
             model.eval()
+            logger.info(f"Evaluating model for Fold {fold+1} on test set")
             with torch.no_grad():
-                outputs, _ = model(train_features, train_labels["omics_network"])
-                loss = criterion(outputs, train_labels["labels"])
-                _, predicted = torch.max(outputs, 1)
-                total = train_labels["labels"].size(0)
-                correct = (predicted == train_labels["labels"]).sum().item()
-                accuracy = correct / total
-                metrics = {"loss": loss.item(), "accuracy": accuracy}
-                with tempfile.TemporaryDirectory() as tempdir:
-                    torch.save(
-                        {
-                            "epoch": config["num_epochs"],
-                            "model_state": model.state_dict(),
-                        },
-                        os.path.join(tempdir, "checkpoint.pt"),
-                    )
-                    train.report(
-                        metrics=metrics, checkpoint=Checkpoint.from_directory(tempdir)
-                    )
+                predictions, _, node_emb = model(X_test_tensor, omics_network_tg)
+                _, predicted = torch.max(predictions, 1)
+                probs = torch.softmax(predictions, dim=1)
 
-        def short_dirname_creator(trial):
-            return f"T{trial.trial_id}"
+                y_test_np = y_test_tensor.cpu().numpy()
+                predicted_np = predicted.cpu().numpy()
+                probs_np = probs.cpu().numpy()
 
-        result = tune.run(
-            tune_train_n,
-            resources_per_trial={"cpu": 2, "gpu": gpu_resources},
-            config=pipeline_configs,
-            num_samples=10,
-            verbose=0,
-            scheduler=scheduler,
-            name="tune_dp",
-            progress_reporter=reporter,
-            trial_dirname_creator=short_dirname_creator,
-            checkpoint_score_attr="min-loss",
+                accuracy = (predicted == y_test_tensor).sum().item() / len(y_test_tensor)
+                f1_ma = f1_score(y_test_np, predicted_np, average='macro', zero_division=0)
+                f1_wt = f1_score(y_test_np, predicted_np, average='weighted', zero_division=0)
+                recall = recall_score(y_test_np, predicted_np, average='macro', zero_division=0)
+
+                try:
+                    n_classes = probs_np.shape[1]
+                    unique_classes = np.unique(y_test_np)
+
+                    # binary
+                    if n_classes == 2:
+                        # Ususinge probability of positive
+                        auc_score = roc_auc_score(y_test_np, probs_np[:, 1])
+                        aupr = average_precision_score(y_test_np, probs_np[:, 1])
+                        logger.debug(f"Binary | AUC: {auc_score:.4f}, AUPR: {aupr:.4f}")
+
+                    else:
+                        auc_score = roc_auc_score(y_test_np, probs_np, multi_class='ovr', average='macro')
+                        y_test_bin = label_binarize(y_test_np, classes=range(n_classes))
+
+                        aupr_scores = []
+                        for i in range(n_classes):
+                            # checking if class exists in test set
+                            if np.sum(y_test_bin[:, i]) > 0:
+                                ap = average_precision_score(y_test_bin[:, i], probs_np[:, i])
+                                aupr_scores.append(ap)
+
+                        aupr = np.mean(aupr_scores) if aupr_scores else 0.0
+                        logger.debug(f"Multiclass | AUC: {auc_score:.4f}, AUPR: {aupr:.4f}")
+
+                except Exception as e:
+                    logger.error(f"Could not calculate AUC/AUPR: {e}")
+                    import traceback
+                    logger.error(traceback.format_exc())
+                    auc_score = 0.0
+                    aupr = 0.0
+
+                fold_predictions = {
+                    'accuracy': accuracy,
+                    'f1_ma': f1_ma,
+                    'f1_wt': f1_wt,
+                    'aupr': aupr,
+                    'auc': auc_score,
+                    'recall': recall
+                }
+
+                if accuracy > best_global_fold_accuracy:
+                    best_global_fold_accuracy = accuracy
+                    best_global_model_state = model.state_dict()
+                    best_global_embeddings = node_emb.detach().cpu()
+
+
+                if fold_predictions:
+                    fold_accuracies.append(fold_predictions['accuracy'])
+                    fold_f1_macros.append(fold_predictions['f1_ma'])
+                    fold_f1_weighteds.append(fold_predictions['f1_wt'])
+                    fold_auprs.append(fold_predictions['aupr'])
+                    fold_aucs.append(fold_predictions['auc'])
+                    fold_recalls.append(fold_predictions['recall'])
+
+                logger.info(f"Fold {fold+1} results:")
+                logger.info(f"Accuracy: {accuracy:.4f}")
+                logger.info(f"F1 Macro: {f1_ma:.4f}")
+                logger.info(f"F1 Weighted: {f1_wt:.4f}")
+                logger.info(f"Recall: {recall:.4f}")
+                logger.info(f"AUC: {auc_score:.4f}")
+                logger.info(f"AUPR: {aupr:.4f}\n")
+
+                if dpmon_params['gpu']:
+                    torch.cuda.empty_cache()
+
+                    logger.debug(f"Clearing cuda cache for fold {fold+1} \n")
+
+        avg_acc = statistics.mean(fold_accuracies) if fold_accuracies else 0.0
+        std_acc = statistics.stdev(fold_accuracies) if len(fold_accuracies) > 1 else 0.0
+        avg_f1_ma = statistics.mean(fold_f1_macros) if fold_f1_macros else 0.0
+        std_f1_ma = statistics.stdev(fold_f1_macros) if len(fold_f1_macros) > 1 else 0.0
+        avg_f1_wt = statistics.mean(fold_f1_weighteds) if fold_f1_weighteds else 0.0
+        std_f1_wt = statistics.stdev(fold_f1_weighteds) if len(fold_f1_weighteds) > 1 else 0.0
+        avg_aupr = statistics.mean(fold_auprs) if fold_auprs else 0.0
+        std_aupr = statistics.stdev(fold_auprs) if len(fold_auprs) > 1 else 0.0
+        avg_auc = statistics.mean(fold_aucs) if fold_aucs else 0.0
+        std_auc = statistics.stdev(fold_aucs) if len(fold_aucs) > 1 else 0.0
+        avg_recall = statistics.mean(fold_recalls) if fold_recalls else 0.0
+        std_recall = statistics.stdev(fold_recalls) if len(fold_recalls) > 1 else 0.0
+
+        metrics_df = pd.DataFrame({
+            'Metric': ['Accuracy', 'F1 Macro', 'F1 Weighted', 'Recall', 'AUC', 'AUPR'],
+            'Average': [avg_acc, avg_f1_ma, avg_f1_wt, avg_recall, avg_auc, avg_aupr],
+            'StdDev': [std_acc, std_f1_ma, std_f1_wt, std_recall, std_auc, std_aupr]
+        })
+
+        #final_cv_predictions_df = pd.concat(cv_predictions_list, ignore_index=True)
+        if output_dir and best_global_model_state is not None:
+            model_save_path = os.path.join(output_dir, "best_cv_model.pt")
+            try:
+                torch.save(best_global_model_state, model_save_path)
+                logger.info(f"Successfully saved global best CV model state to: {model_save_path}")
+            except Exception as e:
+                logger.error(f"Failed to save best CV model: {e}")
+
+        if output_dir and best_global_embeddings is not None:
+            emb_save_path = os.path.join(output_dir, "best_cv_model_embds.pt")
+            try:
+                torch.save(best_global_embeddings, emb_save_path)
+                logger.info(f"Successfully saved global best CV model state to: {emb_save_path}")
+            except Exception as e:
+                logger.error(f"Failed to save best CV model: {e}")
+
+
+        logger.info("Cross-Validation Results:\n")
+        logger.info(f"Avg Accuracy: {avg_acc:.4f} +/- {std_acc:.4f}")
+        logger.info(f"Avg F1 Macro: {avg_f1_ma:.4f} +/- {std_f1_ma:.4f}")
+        logger.info(f"Avg F1 Weighted: {avg_f1_wt:.4f} +/- {std_f1_wt:.4f}")
+        logger.info(f"Avg Recall: {avg_recall:.4f} +/- {std_recall:.4f}")
+        logger.info(f"Avg AUC: {avg_auc:.4f} +/- {std_auc:.4f}")
+        logger.info(f"Avg AUPR: {avg_aupr:.4f} +/- {std_aupr:.4f}")
+
+        return pd.DataFrame(), metrics_df, best_global_embeddings
+
+def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data, dpmon_params):
+    device = setup_device(dpmon_params["gpu"], dpmon_params["cuda"])
+    phenotype_col = dpmon_params["phenotype_col"]
+    combined_omics_fold = X_train.join(y_train.rename(phenotype_col))
+    omics_dataset = slice_omics_datasets(combined_omics_fold, adjacency_matrix, phenotype_col)
+    omics_train_fold_list = [omics_dataset[0]]
+
+    omics_network_tg = prepare_node_features(
+        adjacency_matrix,
+        omics_train_fold_list,
+        clinical_data,
+        phenotype_col
+    )[0].to(device)
+
+    pipeline_configs = {
+        "gnn_layer_num": tune.choice([1, 2, 3, 4]),
+        "gnn_hidden_dim": tune.choice([64, 128, 256, 512]),
+        "lr": tune.loguniform(1e-5, 3e-3),
+        "weight_decay": tune.loguniform(1e-5, 1e-2),
+        "nn_hidden_dim1": tune.choice([128, 256, 512]),
+        "nn_hidden_dim2": tune.choice([32, 64, 128]),
+        "ae_encoding_dim": tune.choice([4, 8, 16]),
+        "num_epochs": tune.choice([512, 1024, 2048]),
+        "gnn_dropout": tune.choice([0.0, 0.1, 0.2, 0.3, 0.4, 0.5]),
+        "gnn_activation": tune.choice(["relu", "elu"]),
+        "dim_reduction": tune.choice(["ae","linear", "mlp"]),
+    }
+
+    stopper = TrialPlateauStopper(
+        metric="val_loss",
+        mode="min",
+        num_results=20,
+        metric_threshold=0.002,
+        grace_period=30,
+    )
+
+    reporter = CLIReporter(metric_columns=["train_loss", "val_loss", "val_accuracy", "training_iteration"])
+    scheduler = ASHAScheduler(
+        metric="val_loss",
+        mode="min",
+        grace_period=30,
+        reduction_factor=2
+    )
+    gpu_resources = 1 if dpmon_params["gpu"] else 0
+    best_configs = []
+
+    omics_data = omics_dataset[0]
+    logger.info(f"Starting hyperparameter tuning for dataset shape: {omics_data.shape}")
+
+    X = omics_data.drop([phenotype_col], axis=1)
+    Y = omics_data[phenotype_col]
+
+    X_train, X_val, y_train, y_val = train_test_split(X, Y, test_size=0.3, random_state=dpmon_params["seed"], stratify=Y)
+    X_train_tensor = torch.FloatTensor(X_train.values).to(device)
+    y_train_tensor = torch.LongTensor(y_train.values).to(device)
+    X_val_tensor = torch.FloatTensor(X_val.values).to(device)
+    y_val_tensor = torch.LongTensor(y_val.values).to(device)
+
+    omics_network_tg_dev = omics_network_tg.to(device)
+
+    def tune_train_n(config):
+        gnn_input_dim = omics_network_tg.x.shape[1]
+        nn_input_dim = X.shape[1]
+        nn_output_dim = Y.nunique()
+
+        model = NeuralNetwork(
+            model_type=dpmon_params["model"],
+            gnn_hidden_dim=config["gnn_hidden_dim"],
+            gnn_layer_num=config["gnn_layer_num"],
+            gnn_activation=config["gnn_activation"],
+            dim_reduction=config["dim_reduction"],
+            gnn_input_dim=gnn_input_dim,
+            gnn_dropout=config["gnn_dropout"],
+            ae_encoding_dim=config["ae_encoding_dim"],
+            nn_input_dim=nn_input_dim,
+            nn_hidden_dim1=config["nn_hidden_dim1"],
+            nn_hidden_dim2=config["nn_hidden_dim2"],
+            nn_output_dim=nn_output_dim,
+
+        ).to(device)
+
+        criterion = nn.CrossEntropyLoss()
+        optimizer = optim.Adam(
+            model.parameters(), lr=config["lr"], weight_decay=config["weight_decay"]
         )
 
-        best_trial = result.get_best_trial("loss", "min", "last")
-        logger.info("Best trial config: {}".format(best_trial.config))
-        logger.info("Best trial final loss: {}".format(best_trial.last_result["loss"]))
-        logger.info("Best trial final accuracy: {}".format(best_trial.last_result["accuracy"]))
-        best_configs.append(best_trial.config)
+        for epoch in range(config["num_epochs"]):
+            model.train()
+            optimizer.zero_grad()
+            outputs, _, _ = model(X_train_tensor, omics_network_tg_dev)
+            train_loss = criterion(outputs, y_train_tensor)
+            train_loss.backward()
+            optimizer.step()
 
-    best_configs_df = pd.DataFrame(best_configs)
-    return best_configs_df
+            model.eval()
+            val_loss = 0.0
+            val_accuracy = 0.0
+            with torch.no_grad():
+                val_outputs, _, _ = model(X_val_tensor, omics_network_tg_dev)
+                val_loss_obj = criterion(val_outputs, y_val_tensor)
+                val_loss = val_loss_obj.item()
 
+                _, predicted = torch.max(val_outputs, 1)
+                total = y_val_tensor.size(0)
+                correct = (predicted == y_val_tensor).sum().item()
+                val_accuracy = correct / total
 
-def train_model(model, criterion, optimizer, train_data, train_labels, epoch_num):
+            metrics = {
+                "loss": val_loss,
+                "val_loss": val_loss,
+                "val_accuracy": val_accuracy,
+                "train_loss": train_loss.item()
+            }
+
+            with tempfile.TemporaryDirectory() as tempdir:
+                torch.save(
+                    {"epoch": epoch, "model_state": model.state_dict()},
+                    os.path.join(tempdir, "checkpoint.pt"),
+                )
+                train.report(
+                    metrics=metrics, checkpoint=Checkpoint.from_directory(tempdir)
+                )
+
+    def short_dirname_creator(trial):
+        return f"T{trial.trial_id}"
+
+    result = tune.run(
+        tune_train_n,
+        resources_per_trial={"cpu": 1, "gpu": 0.06} , #1 and 0.05
+        config=pipeline_configs,
+        num_samples=40, #50
+        verbose=0,
+        scheduler=scheduler,
+        stop=stopper,
+        name="tune_dp",
+        progress_reporter=reporter,
+        trial_dirname_creator=short_dirname_creator,
+        checkpoint_score_attr="min-val_loss",
+    )
+
+    best_trial = result.get_best_trial("val_loss", "min", "last")
+    logger.debug("Best trial config: {}".format(best_trial.config))
+    logger.debug("Best trial final val_loss: {}".format(best_trial.last_result["val_loss"]))
+    logger.debug("Best trial final val_accuracy: {}".format(best_trial.last_result["val_accuracy"]))
+    best_configs.append(best_trial.config)
+
+    try:
+        tune_dir = os.path.expanduser("~/ray_results/tune_dp")
+        if os.path.exists(tune_dir):
+            shutil.rmtree(tune_dir)
+            logger.debug(f"Cleaned up tuning directory: {tune_dir}")
+    except Exception as e:
+        logger.warning(f"Could not clean up tuning directory: {e}")
+
+    return best_trial.config
+
+def train_model(model, criterion, optimizer, train_features, train_labels, epoch_num):
+    network = train_labels["omics_network"]
+    labels = train_labels["labels"]
+
     model.train()
     for epoch in range(epoch_num):
         optimizer.zero_grad()
-        outputs, _ = model(train_data, train_labels["omics_network"])
-        loss = criterion(outputs, train_labels["labels"])
+        outputs, _, _ = model(train_features, network)
+        loss = criterion(outputs, labels)
+
         loss.backward()
         optimizer.step()
 
-        if (epoch + 1) % 10 == 0 or epoch == 0:
+        if (epoch + 1) % 100 == 0 or epoch == 0:
             logger.debug(f"Epoch [{epoch+1}/{epoch_num}], Loss: {loss.item():.4f}")
 
-    model.eval()
-    with torch.no_grad():
-        predictions, _ = model(train_data, train_labels["omics_network"])
-        _, predicted = torch.max(predictions, 1)
-        accuracy = (predicted == train_labels["labels"]).sum().item() / len(train_labels["labels"])
-        logger.info(f"Training Accuracy: {accuracy:.4f}")
-
-    return accuracy
-
+    return model
 
 class NeuralNetwork(nn.Module):
+    """Core DPMON model combining GNN feature weighting and sample-level prediction.
+
+    A graph neural network first computes node embeddings on the feature graph. An autoencoder then compresses these embeddings, and a projection module maps them to scalar feature weights. These weights re-scale the sample-level omics matrix, and a downstream MLP takes the reweighted features to produce logits for the prediction task.
+
+    The forward pass returns a tuple containing:
+
+    1. Predictions (logits).
+    2. Reweighted omics dataset.
+    3. Original node embeddings from the GNN.
+
+    Args:
+
+        model_type (str): GNN backbone type ("GCN", "GAT", "SAGE", "GIN").
+        gnn_input_dim (int): Input dimension for the GNN nodes.
+        gnn_hidden_dim (int): Hidden dimension for GNN layers.
+        gnn_layer_num (int): Number of GNN layers.
+        ae_encoding_dim (int): Target dimension for the autoencoder compression.
+        nn_input_dim (int): Input dimension for the downstream predictor.
+        nn_hidden_dim1 (int): First hidden layer dimension of the predictor.
+        nn_hidden_dim2 (int): Second hidden layer dimension of the predictor.
+        nn_output_dim (int): Output dimension (e.g., number of classes).
+        gnn_dropout (float): Dropout probability for the GNN.
+        gnn_activation (str): Activation function for the GNN ("relu", etc.).
+        dim_reduction (str): Reduction strategy ("ae", "linear", "mlp").
+
+    """
     def __init__(
         self,
         model_type,
@@ -556,6 +967,9 @@ class NeuralNetwork(nn.Module):
         nn_hidden_dim1,
         nn_hidden_dim2,
         nn_output_dim,
+        gnn_dropout: float = 0.2,
+        gnn_activation: str = "relu",
+        dim_reduction: str = "ae",
     ):
         super(NeuralNetwork, self).__init__()
 
@@ -565,6 +979,8 @@ class NeuralNetwork(nn.Module):
                 hidden_dim=gnn_hidden_dim,
                 layer_num=gnn_layer_num,
                 final_layer="none",
+                dropout=gnn_dropout,
+                activation=gnn_activation,
             )
         elif model_type == "GAT":
             self.gnn = GAT(
@@ -572,6 +988,8 @@ class NeuralNetwork(nn.Module):
                 hidden_dim=gnn_hidden_dim,
                 layer_num=gnn_layer_num,
                 final_layer="none",
+                dropout=gnn_dropout,
+                activation=gnn_activation,
             )
         elif model_type == "SAGE":
             self.gnn = SAGE(
@@ -579,6 +997,8 @@ class NeuralNetwork(nn.Module):
                 hidden_dim=gnn_hidden_dim,
                 layer_num=gnn_layer_num,
                 final_layer="none",
+                dropout=gnn_dropout,
+                activation=gnn_activation,
             )
         elif model_type == "GIN":
             self.gnn = GIN(
@@ -587,68 +1007,137 @@ class NeuralNetwork(nn.Module):
                 output_dim=gnn_hidden_dim,
                 layer_num=gnn_layer_num,
                 final_layer="none",
+                dropout=gnn_dropout,
+                activation=gnn_activation,
             )
         else:
             raise ValueError(f"Unsupported GNN model type: {model_type}")
 
-        self.autoencoder = Autoencoder(
-            input_dim=gnn_hidden_dim, encoding_dim=ae_encoding_dim
-        )
-        self.dim_averaging = DimensionAveraging()
+        if dim_reduction == "ae":
+            self.autoencoder = AutoEncoder(input_dim=gnn_hidden_dim, encoding_dim=1)
+            self.projection = nn.Identity()
+
+        elif dim_reduction == "linear":
+            self.autoencoder = AutoEncoder(input_dim=gnn_hidden_dim, encoding_dim=ae_encoding_dim)
+            self.projection = ScalarProjection(encoding_dim=ae_encoding_dim)
+
+        elif dim_reduction == "mlp":
+            self.autoencoder = AutoEncoder(input_dim=gnn_hidden_dim, encoding_dim=ae_encoding_dim)
+            self.projection = MLPProjection(encoding_dim=ae_encoding_dim, hidden_dim=8)
+
+        else:
+            raise ValueError(f"Unsupported dim_reduction: {dim_reduction}. Use 'ae', 'linear', or 'mlp'")
+
         self.predictor = DownstreamTaskNN(
             nn_input_dim, nn_hidden_dim1, nn_hidden_dim2, nn_output_dim
         )
 
     def forward(self, omics_dataset, omics_network_tg):
-        omics_network_nodes_embedding = self.gnn(omics_network_tg)
-        omics_network_nodes_embedding_ae = self.autoencoder(
-            omics_network_nodes_embedding
-        )
-        omics_network_nodes_embedding_avg = self.dim_averaging(
-            omics_network_nodes_embedding_ae
-        )
+        """Performs the forward pass of the DPMON network.
+
+        Args:
+
+            omics_dataset (torch.Tensor): The raw sample-level omics data [Samples x Features].
+            omics_network_tg (Data): The PyG graph data object representing the feature network.
+
+        Returns:
+
+            tuple: (predictions, reweighted_omics, node_embeddings)
+        """
+        # we get node embeddings from the GNN
+        omics_network_nodes_embedding = self.gnn.get_embeddings(omics_network_tg)
+
+        # dim reduction of the embeddings
+        omics_network_nodes_embedding_ae = self.autoencoder(omics_network_nodes_embedding)
+
+        # then project to scallar weights
+        feature_weights = self.projection(omics_network_nodes_embedding_ae)
+
+        # reweight the original Omics Data (Element-wise multiplication)
+        # transpose weights to match [Features x 1] -> broadcast to [Samples x Features]
         omics_dataset_with_embeddings = torch.mul(
             omics_dataset,
-            omics_network_nodes_embedding_avg.expand(
-                omics_dataset.shape[1], omics_dataset.shape[0]
-            ).t(),
+            feature_weights.expand(omics_dataset.shape[1], omics_dataset.shape[0]).t()
         )
+
+        # Lasly we predict using the Downstream MLP
         predictions = self.predictor(omics_dataset_with_embeddings)
-        return predictions, omics_dataset_with_embeddings
+
+        return predictions, omics_dataset_with_embeddings, omics_network_nodes_embedding
 
 
-class Autoencoder(nn.Module):
-    def __init__(self, input_dim, encoding_dim):
-        super(Autoencoder, self).__init__()
+class AutoEncoder(nn.Module):
+    """Compresses high-dimensional node embeddings into a lower-dimensional latent space.
+
+    Args:
+
+        input_dim (int): Input feature dimension.
+        encoding_dim (int): Output latent dimension.
+
+    """
+    def __init__(self, input_dim: int, encoding_dim: int):
+        super(AutoEncoder, self).__init__()
+
+        # the intermediate layer is roughly half input
+        hidden_dim = max(input_dim // 2, encoding_dim * 2)
+
         self.encoder = nn.Sequential(
-            nn.Linear(input_dim, 8),
+            nn.Linear(input_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(8, 4),
-            nn.ReLU(),
-            nn.Linear(4, encoding_dim),
-        )
-        self.decoder = nn.Sequential(
-            nn.Linear(encoding_dim, 4),
-            nn.ReLU(),
-            nn.Linear(4, 8),
-            nn.ReLU(),
-            nn.Linear(8, input_dim),
+            nn.Linear(hidden_dim, encoding_dim),
         )
 
     def forward(self, x):
-        x = self.encoder(x)
-        return x
+        return self.encoder(x)
 
 
-class DimensionAveraging(nn.Module):
-    def __init__(self):
-        super(DimensionAveraging, self).__init__()
+class ScalarProjection(nn.Module):
+    """Linear projection mapping encoded features to scalar importance weights.
+
+    Args:
+
+        encoding_dim (int): Dimension of the input encoded features.
+
+    """
+    def __init__(self, encoding_dim):
+        super(ScalarProjection, self).__init__()
+        self.proj = nn.Linear(encoding_dim, 1)
 
     def forward(self, x):
-        return torch.mean(x, dim=1, keepdim=True)
+        return self.proj(x)
+
+
+class MLPProjection(nn.Module):
+    """Non-linear projection mapping encoded features to scalar importance weights using an MLP.
+
+    Args:
+
+        encoding_dim (int): Dimension of the input encoded features.
+        hidden_dim (int): Hidden layer size for the projection MLP.
+
+    """
+    def __init__(self, encoding_dim, hidden_dim=8):
+        super(MLPProjection, self).__init__()
+        self.mlp = nn.Sequential(
+            nn.Linear(encoding_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, 1)
+        )
+    def forward(self, x):
+        return self.mlp(x)
 
 
 class DownstreamTaskNN(nn.Module):
+    """Multilayer Perceptron for the final downstream prediction task.
+
+    Args:
+
+        input_size (int): Number of input features (omics features).
+        hidden_dim1 (int): Size of the first hidden layer.
+        hidden_dim2 (int): Size of the second hidden layer.
+        output_dim (int): Size of the output layer (num_classes or 1 for regression).
+
+    """
     def __init__(self, input_size, hidden_dim1, hidden_dim2, output_dim):
         super(DownstreamTaskNN, self).__init__()
         self.fc1 = nn.Linear(input_size, hidden_dim1)
@@ -658,7 +1147,6 @@ class DownstreamTaskNN(nn.Module):
         self.bn2 = nn.BatchNorm1d(hidden_dim2)
         self.relu2 = nn.ReLU()
         self.fc3 = nn.Linear(hidden_dim2, output_dim)
-        self.softmax = nn.Softmax(dim=1)
 
     def forward(self, x):
         x = self.fc1(x)
@@ -668,5 +1156,4 @@ class DownstreamTaskNN(nn.Module):
         x = self.bn2(x)
         x = self.relu2(x)
         x = self.fc3(x)
-        x = self.softmax(x)
         return x

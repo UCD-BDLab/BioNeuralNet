@@ -9,14 +9,6 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from sklearn.manifold import TSNE
 
-# try:
-#     import networkx as nx
-#     import matplotlib.pyplot as plt
-#     from sklearn.manifold import TSNE
-
-# except ImportError:
-#     raise ImportError("Please install the required packages for plotting: pip install matplotlib")
-
 logger = get_logger(__name__)
 
 def plot_variance_distribution(df: pd.DataFrame, bins: int = 50):
@@ -24,7 +16,7 @@ def plot_variance_distribution(df: pd.DataFrame, bins: int = 50):
     Compute the variance for each feature (column) in the DataFrame and plot
     a histogram of these variances.
 
-    Parameters:
+    Args:
 
         df (pd.DataFrame): Input data.
         bins (int): Number of bins for the histogram.
@@ -49,7 +41,7 @@ def plot_variance_by_feature(df: pd.DataFrame):
     """
     Plot the variance for each feature against its index or name.
 
-    Parameters:
+    Args:
 
         df (pd.DataFrame): Input data.
 
@@ -173,7 +165,7 @@ def plot_embeddings(embeddings, node_labels=None):
     """
     Plot the embeddings in 2D space using t-SNE.
 
-    Parameters:
+    Args:
 
         embeddings (array-like): High-dimensional embedding data.
         node_labels (array-like or DataFrame, optional): Labels for the nodes to color the points.
@@ -220,7 +212,7 @@ def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show
     Plots a network graph from an adjacency matrix with improved visualization.
     Also adds a summary table mapping node indexes to actual gene names.
 
-    Parameters:
+    Args:
 
         adjacency_matrix (pd.DataFrame): The adjacency matrix of the network.
         weight_threshold (float): Minimum weight to keep an edge (default: 0.0).
@@ -346,138 +338,149 @@ def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show
 
     return mapping_df
 
-def compare_clusters(louvain_clusters: list, smccnet_clusters: list, pheno: pd.DataFrame, omics_merged: pd.DataFrame, label1: str = "Hybrid Louvain", label2: str = "SmCCNet"):
-    """
-    Compare clusters from two methods by computing the correlation for each induced subnetwork.
-    Both inputs are expected to be lists of pandas DataFrames. If the lists have different lengths,
-    only the first min(n, m) clusters are compared.
+def compare_clusters(clusters1: list, clusters2: list, pheno: pd.DataFrame, label1: str = "Method 1", label2: str = "Method 2") -> pd.DataFrame:
+    """Compare two cluster sets via phenotype correlation.
 
-    Parameters:
+    Clusters for each method are sorted by size (number of columns), the top min(len(clusters1), len(clusters2)) are paired by rank, and phenotype correlation is computed for each using ``cluster_correlation``.
+    A line plot of correlation vs. cluster index is displayed for both methods.
 
-        louvain_clusters (list of pd.DataFrame): Each DataFrame represents an induced subnetwork (e.g. from Hybrid Louvain).
-        smccnet_clusters (list of pd.DataFrame): Each DataFrame represents an induced subnetwork (e.g. from SMCCNET).
-        pheno (pd.DataFrame): Phenotype data (the first column is used).
-        omics_merged (pd.DataFrame): Full omics data (used to re-index SMCCNet clusters).
-        label1 (str): Label for the first method.
-        label2 (str): Label for the second method.
+    Args:
+
+        clusters1 (list[pd.DataFrame]): Clusters for the first method; one DataFrame per cluster (samples x features).
+        clusters2 (list[pd.DataFrame]): Clusters for the second method; same format as ``clusters1``.
+        pheno (pd.DataFrame): Phenotype data; the first column is used as the target.
+        label1 (str): Label for the first method (used in legend and result columns).
+        label2 (str): Label for the second method (used in legend and result columns).
 
     Returns:
 
-        pd.DataFrame: Results table with cluster indices, sizes, and phenotype correlations.
+        pd.DataFrame: One row per paired cluster with cluster index, sizes and correlations for both methods.
 
-    Plots:
-
-        A line plot comparing the correlation of PC1 vs phenotype for each method.
-        Louvain and SMCCNet curves are shown with their cluster sizes annotated.
     """
-
-    smccnet_clusters_fixed = []
-
+    # sizes for method 1
+    clusters1_sizes = []
     i = 0
-    while i < len(smccnet_clusters):
-        cluster_df = smccnet_clusters[i]
-        valid_genes = []
-
-        j = 0
-        while j < len(cluster_df.index):
-            gene = cluster_df.index[j]
-            if gene in omics_merged.columns:
-                valid_genes.append(gene)
-            j += 1
-
-        if len(valid_genes) > 0:
-            sample_level_data = omics_merged[valid_genes]
-            smccnet_clusters_fixed.append(sample_level_data)
+    while i < len(clusters1):
+        df = clusters1[i]
+        size = df.shape[1]
+        clusters1_sizes.append((i, size))
         i += 1
 
-    louvain_sizes = []
+    # sizes for method 2
+    clusters2_sizes = []
     i = 0
-    while i < len(louvain_clusters):
-        df = louvain_clusters[i]
+    while i < len(clusters2):
+        df = clusters2[i]
         size = df.shape[1]
-        louvain_sizes.append((i, size))
-        i += 1
-
-    smccnet_sizes = []
-    i = 0
-    while i < len(smccnet_clusters_fixed):
-        df = smccnet_clusters_fixed[i]
-        size = df.shape[1]
-        smccnet_sizes.append((i, size))
+        clusters2_sizes.append((i, size))
         i += 1
 
     def get_size(pair):
         return pair[1]
 
-    louvain_sizes.sort(key=get_size, reverse=True)
-    smccnet_sizes.sort(key=get_size, reverse=True)
+    clusters1_sizes.sort(key=get_size, reverse=True)
+    clusters2_sizes.sort(key=get_size, reverse=True)
 
-    if len(louvain_sizes) < len(smccnet_sizes):
-        k = len(louvain_sizes)
+    if len(clusters1_sizes) < len(clusters2_sizes):
+        k = len(clusters1_sizes)
     else:
-        k = len(smccnet_sizes)
+        k = len(clusters2_sizes)
 
-    top_louvain_indices = []
+    # top indices for each method
+    top_idx1 = []
     i = 0
     while i < k:
-        top_louvain_indices.append(louvain_sizes[i][0])
+        top_idx1.append(clusters1_sizes[i][0])
         i += 1
 
-    top_smccnet_indices = []
+    top_idx2 = []
     i = 0
     while i < k:
-        top_smccnet_indices.append(smccnet_sizes[i][0])
+        top_idx2.append(clusters2_sizes[i][0])
         i += 1
 
-    top_louvain_clusters = []
+    # top clusters for each method
+    top_clusters1 = []
     i = 0
-    while i < len(top_louvain_indices):
-        idx = top_louvain_indices[i]
-        top_louvain_clusters.append(louvain_clusters[idx])
+    while i < len(top_idx1):
+        idx = top_idx1[i]
+        top_clusters1.append(clusters1[idx])
         i += 1
 
-    top_smccnet_clusters = []
+    top_clusters2 = []
     i = 0
-    while i < len(top_smccnet_indices):
-        idx = top_smccnet_indices[i]
-        top_smccnet_clusters.append(smccnet_clusters_fixed[idx])
+    while i < len(top_idx2):
+        idx = top_idx2[i]
+        top_clusters2.append(clusters2[idx])
         i += 1
 
-    louvain_clusters = top_louvain_clusters
-    smccnet_clusters_fixed = top_smccnet_clusters
+    clusters1 = top_clusters1
+    clusters2 = top_clusters2
 
+    # compute correlations
     results = []
 
-    for i, (df_louvain, df_smccnet) in enumerate(zip(louvain_clusters, smccnet_clusters_fixed), start=1):
-        size_louvain, corr_louvain = cluster_correlation(df_louvain, pheno)
-        size_smccnet, corr_smccnet = cluster_correlation(df_smccnet, pheno)
+    for i, (df1, df2) in enumerate(zip(clusters1, clusters2), start=1):
+        size1, corr1 = cluster_correlation(df1, pheno)
+        size2, corr2 = cluster_correlation(df2, pheno)
 
-        if corr_louvain is not None and corr_smccnet is not None:
-            results.append((f"Cluster_{i}", size_louvain, corr_louvain, size_smccnet, corr_smccnet))
+        if corr1 is not None and corr2 is not None:
+            results.append((f"Cluster_{i}", size1, corr1, size2, corr2))
 
-    df_results = pd.DataFrame(results, columns=["Cluster", "Louvain Size", "Louvain Correlation",
-                                                "SMCCNET Size", "SMCCNET Correlation"])
+    col_size1 = f"{label1} Size"
+    col_corr1 = f"{label1} Correlation"
+    col_size2 = f"{label2} Size"
+    col_corr2 = f"{label2} Correlation"
 
+    df_results = pd.DataFrame(results,columns=["Cluster", col_size1, col_corr1, col_size2, col_corr2])
+
+    # plotting
     fig, ax = plt.subplots(figsize=(10, 5))
 
-    ax.plot(df_results.index + 1, df_results["Louvain Correlation"], marker="o", linestyle="-",
-            label=label1, color="blue")
-    ax.plot(df_results.index + 1, df_results["SMCCNET Correlation"], marker="s", linestyle="--",
-            label=label2, color="red")
+    ax.plot(
+        df_results.index + 1,
+        df_results[col_corr1],
+        marker="o",
+        linestyle="-",
+        label=label1,
+        color="blue",
+    )
+    ax.plot(
+        df_results.index + 1,
+        df_results[col_corr2],
+        marker="s",
+        linestyle="--",
+        label=label2,
+        color="red",
+    )
 
     for i, row in df_results.iterrows():
-        ax.text(i + 1, row["Louvain Correlation"] + 0.05,
-                f"{row['Louvain Size']}", ha="center", fontsize=10,
-                color="blue", fontweight="bold", bbox=dict(facecolor="white", alpha=0.7, edgecolor="none"))
+        ax.text(
+            i + 1,
+            row[col_corr1] + 0.05,
+            f"{row[col_size1]}",
+            ha="center",
+            fontsize=10,
+            color="blue",
+            fontweight="bold",
+            bbox=dict(facecolor="white", alpha=0.7, edgecolor="none"),
+        )
 
-        ax.text(i + 1, row["SMCCNET Correlation"] + 0.05,
-                f"{row['SMCCNET Size']}", ha="center", fontsize=10,
-                color="red", fontweight="bold", bbox=dict(facecolor="white", alpha=0.7, edgecolor="none"))
+        ax.text(
+            i + 1,
+            row[col_corr2] + 0.05,
+            f"{row[col_size2]}",
+            ha="center",
+            fontsize=10,
+            color="red",
+            fontweight="bold",
+            bbox=dict(facecolor="white", alpha=0.7, edgecolor="none"),
+        )
 
     ax.set_xticks(range(1, len(df_results) + 1))
     ax.set_xlabel("Cluster Index")
     ax.set_ylabel("Correlation")
-    ax.set_title(f"Cluster correlation:{label1} vs {label2}")
+    ax.set_title(f"Cluster correlation: {label1} vs {label2}")
     ax.legend()
     ax.grid(True)
     fig.tight_layout(pad=3)
@@ -546,16 +549,16 @@ def plot_multiple_metrics(
         for i in range(len(sublabels)):
             x = ind + i * width
             y = means[:, i]
-            yerr = asymmetric_err 
+            yerr = asymmetric_err
             bars = ax.bar(x, y, width, yerr=yerr, capsize=4, color=group_colors, alpha=0.95, linewidth=0)
-            
+
             for j, bar in enumerate(bars):
                 height = bar.get_height()
                 bar_x = bar.get_x() + bar.get_width() / 2
                 label_y = means[j, i]
-                error_height = asymmetric_err[1, j] 
-                bar_y = label_y + error_height + 0.01 
-                
+                error_height = asymmetric_err[1, j]
+                bar_y = label_y + error_height + 0.01
+
                 ax.text(bar_x, bar_y, f"{height:.3f}", ha='center', va='bottom', fontsize=9, fontweight="bold")
 
         ax.set_xticks(ind + total / 2 - width / 2)
@@ -566,8 +569,8 @@ def plot_multiple_metrics(
 
         ax.set_title(title, fontsize=14, pad=12)
         ax.set_ylabel(ylabel, fontsize=12)
-        
-        ax.set_ylim(0.60, 1.05)
+
+        ax.set_ylim(0.30, 1.05)
         ax.grid(True, axis="y", linestyle="--", alpha=0.3)
 
     plt.tight_layout(pad=2.0)

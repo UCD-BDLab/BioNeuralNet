@@ -8,7 +8,7 @@
 [![Documentation](https://img.shields.io/badge/docs-read%20the%20docs-blue.svg)](https://bioneuralnet.readthedocs.io/en/latest/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17503083.svg)](https://doi.org/10.5281/zenodo.17503083)
 
-## Welcome to BioNeuralNet 1.1.4
+## Welcome to BioNeuralNet 1.2.0
 
 ![BioNeuralNet Logo](assets/LOGO_WB.png)
 
@@ -172,7 +172,7 @@ from bioneuralnet.downstream_task import DPMON
 from bioneuralnet.datasets import DatasetLoader
 
 # Load the dataset and access individual omics modalities
-example = DatasetLoader("example1")
+example = DatasetLoader("example")
 omics_genes = example.data["X1"]
 omics_proteins = example.data["X2"]
 phenotype = example.data["Y"]

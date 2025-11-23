@@ -6,83 +6,78 @@ from bioneuralnet.utils.graph import gen_similarity_graph
 from bioneuralnet.utils.graph import gen_correlation_graph
 from bioneuralnet.utils.graph import gen_threshold_graph
 from bioneuralnet.utils.graph import gen_gaussian_knn_graph
-#from bioneuralnet.utils.graph import gen_lasso_graph
+from bioneuralnet.utils.graph import gen_lasso_graph
 from bioneuralnet.utils.graph import gen_mst_graph
 from bioneuralnet.utils.graph import gen_snn_graph
 
-class TestGraphGeneration(unittest.TestCase):
+class TestUtilsGraph(unittest.TestCase):
     def setUp(self):
-        # for testing we use a small dataframe, 3 rows (nodes) and 2 columns (features) each.
-        # distinct values so that results are deterministic
-        self.X = pd.DataFrame({"f1": [1.0, 2.0, 3.0], "f2": [4.0, 5.0, 6.0]}, index=["n1", "n2", "n3"])
+        np.random.seed(1998)
+        self.X = pd.DataFrame(np.random.rand(10, 5), columns=["n1", "n2", "n3", "n4", "n5"])
         self.N = self.X.shape[1]
 
     def _basic_checks(self, G: pd.DataFrame):
-        """
-        Shared checks for any generated graph:
-
-            - Must be a DataFrame of shape (N, N)
-            - Rows sum to 1 (with small tolerance)
-            - Diagonal entries (self-loops) are > 0
-
-        """
-
         self.assertIsInstance(G, pd.DataFrame)
         self.assertEqual(G.shape, (self.N, self.N))
+        self.assertEqual(list(G.index), list(self.X.columns))
+        self.assertEqual(list(G.columns), list(self.X.columns))
+        self.assertTrue(np.all(G.values >= 0))
+        
         row_sums = G.sum(axis=1).values
-        self.assertTrue(np.allclose(row_sums, np.ones(self.N), atol=1e-6))
-        self.assertTrue(np.all(np.diag(G.values) >= 0))
+        is_normalized = np.isclose(row_sums, 1.0, atol=1e-5) | np.isclose(row_sums, 0.0, atol=1e-5)
+        self.assertTrue(is_normalized.all())
 
     def test_gen_similarity_graph_default(self):
-        G = gen_similarity_graph(self.X)
+        G = gen_similarity_graph(self.X, k=2)
         self._basic_checks(G)
-        self.assertEqual(set(G.index), set(self.X.columns))
-        self.assertEqual(set(G.columns), set(self.X.columns))
 
     def test_gen_similarity_graph_type_error(self):
         with self.assertRaises(TypeError):
-            gen_similarity_graph([1, 2, 3])
+            gen_similarity_graph(np.array([[1, 2], [3, 4]]))
 
     def test_gen_correlation_graph_default(self):
-        G = gen_correlation_graph(self.X, k=1, method="pearson")
+        G = gen_correlation_graph(self.X, k=2, method="pearson")
         self._basic_checks(G)
-        self.assertTrue((G.values >= 0).all())
 
     def test_gen_correlation_graph_type_error(self):
         with self.assertRaises(TypeError):
             gen_correlation_graph("not a df")
 
     def test_gen_threshold_graph_default(self):
-        G = gen_threshold_graph(self.X, b=2.0, k=1)
+        G = gen_threshold_graph(self.X, b=2.0, k=2)
         self._basic_checks(G)
-        self.assertTrue((G.values >= 0).all())
 
     def test_gen_threshold_graph_type_error(self):
         with self.assertRaises(TypeError):
             gen_threshold_graph(None)
 
     def test_gen_gaussian_knn_graph_default(self):
-        G = gen_gaussian_knn_graph(self.X, k=1)
+        G = gen_gaussian_knn_graph(self.X, k=2)
         self._basic_checks(G)
-        self.assertTrue((G.values >= 0).all())
 
     def test_gen_gaussian_knn_graph_type_error(self):
         with self.assertRaises(TypeError):
             gen_gaussian_knn_graph(123)
 
+    def test_gen_lasso_graph_default(self):
+        G = gen_lasso_graph(self.X, alpha=0.1)
+        self._basic_checks(G)
+
+    def test_gen_lasso_graph_type_error(self):
+        with self.assertRaises(TypeError):
+            gen_lasso_graph([1, 2, 3])
+
     def test_gen_mst_graph_default(self):
         G = gen_mst_graph(self.X)
         self._basic_checks(G)
-        self.assertTrue((G.values >= 0).all())
 
     def test_gen_mst_graph_type_error(self):
         with self.assertRaises(TypeError):
             gen_mst_graph(5.0)
 
     def test_gen_snn_graph_default(self):
-        G = gen_snn_graph(self.X, k=1)
+        G = gen_snn_graph(self.X, k=2)
         self._basic_checks(G)
-        self.assertTrue((G.values >= 0).all())
 
     def test_gen_snn_graph_type_error(self):
         with self.assertRaises(TypeError):

@@ -40,6 +40,7 @@ class GNNEmbedding:
     GNNEmbedding Class for Generating Graph Neural Network (GNN) Based Embeddings.
 
     Attributes:
+
         adjacency_matrix : pd.DataFrame
         omics_data : pd.DataFrame
         phenotype_data : pd.DataFrame
@@ -55,6 +56,7 @@ class GNNEmbedding:
         gpu : bool
         seed : Optional[int]
         tune : Optional[bool]
+
     """
 
     def __init__(

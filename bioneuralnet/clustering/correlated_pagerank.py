@@ -1,7 +1,8 @@
 from typing import List, Tuple, Dict, Any,Optional
 import pandas as pd
-import networkx as nx
 import numpy as np
+import networkx as nx
+import torch
 import os
 
 from sklearn.preprocessing import StandardScaler
@@ -12,9 +13,8 @@ from ray import tune
 from ray.tune import CLIReporter
 from ray.air import session
 from ray.tune.schedulers import ASHAScheduler
-import torch
 
-from ..utils.logger import get_logger
+from bioneuralnet.utils import set_seed, get_logger
 
 class CorrelatedPageRank:
     """
@@ -29,6 +29,7 @@ class CorrelatedPageRank:
         max_iter (int): Maximum number of iterations for PageRank convergence.
         tol (float): Tolerance for convergence.
         k (float): Weighting factor for composite correlation-conductance score.
+
     """
 
     def __init__(
@@ -56,6 +57,7 @@ class CorrelatedPageRank:
             max_iter (int, optional): Maximum iterations for PageRank. Defaults to 100.
             tol (float, optional): Tolerance for convergence. Defaults to 1e-6.
             k (float, optional): Weighting factor for composite score. Defaults to 0.9.
+
         """
         self.G = graph
         self.B = omics_data
@@ -80,19 +82,14 @@ class CorrelatedPageRank:
         self._validate_inputs()
 
         if seed is not None:
-            torch.manual_seed(seed)
-            np.random.seed(seed)
-            if torch.cuda.is_available():
-                torch.cuda.manual_seed_all(seed)
-                torch.backends.cudnn.deterministic = True
-                torch.backends.cudnn.benchmark = False
+            set_seed(seed)
 
         self.seed = seed
         self.gpu = gpu
         self.results: dict[str, float] = {}
 
         self.device = torch.device("cuda" if gpu and torch.cuda.is_available() else "cpu")
-        self.logger.info(f"Initialized Correlated Louvain. device={self.device}")
+        self.logger.info(f"Initialized Correlated PageRank. device={self.device}")
 
 
     def _validate_inputs(self):
@@ -121,19 +118,31 @@ class CorrelatedPageRank:
             self.logger.error(f"Input validation error: {e}")
             raise
 
-    def phen_omics_corr(self, nodes: List[Any]= []) -> Tuple[float, str]:
-        """
-        Calculates the Pearson correlation between the PCA of omics data and phenotype.
+    def phen_omics_corr(self, nodes: List[Any] = []) -> Tuple[float, str]:
+        """Compute correlation between PC1 of omics for given nodes and the phenotype.
 
-        Args:
-            nodes (List[Any]): List of node identifiers to include in the calculation.
-
-        Returns:
-            Tuple[float, str]: Correlation coefficient and formatted correlation with p-value.
+        Nodes not present as columns in the omics matrix are ignored. If there are
+        fewer than two valid columns, fewer than two samples, or any numerical
+        error occurs, a neutral correlation of 0.0 with p-value '1.0' is returned.
         """
         try:
+            valid_cols = []
+            for n in nodes:
+                if n in self.B.columns:
+                    valid_cols.append(n)
+                else:
+                    n_str = str(n)
+                    if n_str in self.B.columns:
+                        valid_cols.append(n_str)
 
-            B_sub = self.B[nodes]
+            if len(valid_cols) < 2:
+                return 0.0, "0 (1.0)"
+
+            B_sub = self.B[valid_cols]
+
+            if B_sub.shape[0] < 2:
+                return 0.0, "0 (1.0)"
+
             scaler = StandardScaler()
             scaled = scaler.fit_transform(B_sub)
 
@@ -141,15 +150,32 @@ class CorrelatedPageRank:
             g1 = pca.fit_transform(scaled).flatten()
             g2 = self.Y
 
+            if isinstance(g2, pd.Series):
+                common_idx = B_sub.index.intersection(g2.index)
+                if len(common_idx) < 2:
+                    return 0.0, "0 (1.0)"
+                g1 = g1[: len(common_idx)]
+                g2 = g2.loc[common_idx].values
+            else:
+                if len(g1) != len(g2):
+                    n = min(len(g1), len(g2))
+                    if n < 2:
+                        return 0.0, "0 (1.0)"
+                    g1 = g1[:n]
+                    g2 = g2[:n]
+
             corr, pvalue = pearsonr(g1, g2)
+            if not np.isfinite(corr):
+                return 0.0, "0 (1.0)"
+
             corr = round(corr, 2)
             p_value = format(pvalue, ".3g")
             corr_pvalue = f"{corr} ({p_value})"
             return corr, corr_pvalue
 
         except Exception as e:
-            self.logger.error(f"Error in phen_omics_corr: {e}")
-            raise
+            self.logger.error(f"Error in phen_omics_corr (falling back to 0): {e}")
+            return 0.0, "0 (1.0)"
 
     def sweep_cut(
         self, p: Dict[Any, float] = {}) -> Tuple[List[Any], int, float, float, float, str]:
@@ -241,42 +267,57 @@ class CorrelatedPageRank:
             raise
 
     def generate_weighted_personalization(self, nodes: List[Any] = []) -> Dict[Any, float]:
-        """
-        Generates a weighted personalization vector for PageRank.
-
-        Args:
-            nodes (List[Any]): List of node identifiers to consider.
-
-        Returns:
-            Dict[Any, float]: Personalization vector with weights for each node.
-        """
+        """Build a personalization vector for PageRank based on each node's impact on phenotype-omics correlation."""
         try:
             total_corr, _ = self.phen_omics_corr(nodes)
             corr_contribution = []
 
-            for i in range(len(nodes)):
-                nodes_excl = nodes[:i] + nodes[i + 1 :]
+            i = 0
+            while i < len(nodes):
+                nodes_excl = nodes[:i] + nodes[i + 1:]
                 if not nodes_excl:
                     contribution = 0.0
                 else:
                     corr_excl, _ = self.phen_omics_corr(nodes_excl)
                     contribution = abs(corr_excl) - abs(total_corr)
                 corr_contribution.append(contribution)
+                i += 1
 
-            max_contribution = max(corr_contribution, key=abs) if corr_contribution else 1
-            if max_contribution == 0:
-                max_contribution = 1
+            total_abs = 0.0
+            i = 0
+            while i < len(corr_contribution):
+                total_abs += abs(corr_contribution[i])
+                i += 1
 
-            weighted_personalization = {
-                node: self.alpha * (corr_contribution[i] / max_contribution)
-                for i, node in enumerate(nodes)
-            }
-            return weighted_personalization
+            personalization = {}
+
+            # flat (no node changes the correlation)
+            if total_abs == 0.0 or len(nodes) == 0:
+                if len(nodes) == 0:
+                    return {}
+                uniform_weight = 1.0 / float(len(nodes))
+                for node in nodes:
+                    personalization[node] = uniform_weight
+                return personalization
+
+            # normalize absolute contributions to sum to 1
+            i = 0
+            while i < len(nodes):
+                w = abs(corr_contribution[i]) / total_abs
+                personalization[nodes[i]] = w
+                i += 1
+
+            return personalization
 
         except Exception as e:
             self.logger.error(f"Error in generate_weighted_personalization: {e}")
-            raise
-
+            if nodes:
+                uniform_weight = 1.0 / float(len(nodes))
+                fallback = {}
+                for node in nodes:
+                    fallback[node] = uniform_weight
+                return fallback
+            return {}
 
     def run_pagerank_clustering(self, seed_nodes: List[Any] = []) -> Dict[str, Any]:
         """
@@ -446,7 +487,7 @@ class CorrelatedPageRank:
             "alpha": tune.grid_search([0.8, 0.85, 0.9, 0.95]),
             "k": tune.grid_search([0.5, 0.6, 0.7, 0.8]),
             "max_iter": tune.choice([100, 500, 1000]),
-            "tol": tune.loguniform(1e-3, 1e-5),
+            "tol": tune.loguniform(1e-5, 1e-3),
         }
         scheduler = ASHAScheduler(
             metric="quality",
