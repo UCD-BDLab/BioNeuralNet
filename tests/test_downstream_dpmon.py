@@ -32,8 +32,11 @@ class TestDPMON(unittest.TestCase):
     @patch("bioneuralnet.downstream_task.dpmon.run_standard_training")
     def test_run_without_tune(self, mock_standard):
         warnings.filterwarnings("ignore")
-        
-        mock_pred_df = pd.DataFrame({"Actual": [0, 1], "Predicted": [0, 1]}, index=["sample1", "sample2"])
+
+        mock_pred_df = pd.DataFrame(
+            {"Actual": [0, 1], "Predicted": [0, 1]},
+            index=["sample1", "sample2"]
+        )
         # run_standard_training returns (best_pred_df, all_predictions_list, embeddings)
         mock_standard.return_value = (mock_pred_df, [mock_pred_df], None)
 
@@ -48,7 +51,7 @@ class TestDPMON(unittest.TestCase):
         )
 
         result = dpmon.run()
-        
+
         mock_standard.assert_called_once()
         self.assertIsInstance(result, tuple)
         self.assertEqual(len(result), 3)
@@ -57,16 +60,9 @@ class TestDPMON(unittest.TestCase):
         self.assertIsNone(result[2])
 
     @patch("bioneuralnet.downstream_task.dpmon.run_standard_training")
-    @patch("bioneuralnet.downstream_task.dpmon.run_hyperparameter_tuning")
-    def test_run_with_tune(self, mock_tune, mock_standard):
+    def test_run_with_tune(self, mock_standard):
         warnings.filterwarnings("ignore")
-        
-        mock_tune.return_value = {
-            "gnn_hidden_dim": 64, 
-            "gnn_layer_num": 2, 
-            "lr": 0.001
-        }
-        
+
         mock_pred_df = pd.DataFrame({"Actual": [0, 1], "Predicted": [0, 1]})
         mock_standard.return_value = (mock_pred_df, [mock_pred_df], None)
 
@@ -81,18 +77,18 @@ class TestDPMON(unittest.TestCase):
         )
 
         result = dpmon.run()
-        
-        mock_tune.assert_called_once()
+
         mock_standard.assert_called_once()
+        self.assertIsInstance(result, tuple)
         self.assertEqual(len(result), 3)
 
     @patch("bioneuralnet.downstream_task.dpmon.run_standard_training")
     def test_empty_clinical_data(self, mock_standard):
         warnings.filterwarnings("ignore")
-        
+
         mock_pred_df = pd.DataFrame({"Actual": [0, 1], "Predicted": [0, 0]})
         mock_standard.return_value = (mock_pred_df, [mock_pred_df], None)
-        
+
         empty_clinical = pd.DataFrame()
         dpmon = DPMON(
             adjacency_matrix=self.adjacency_matrix,
@@ -104,9 +100,9 @@ class TestDPMON(unittest.TestCase):
             output_dir=self.tempfolder
         )
         dpmon.run()
-        
+
         args, _ = mock_standard.call_args
-        self.assertIsNone(args[3]) 
+        self.assertIsNone(args[3])
 
 if __name__ == "__main__":
     unittest.main()

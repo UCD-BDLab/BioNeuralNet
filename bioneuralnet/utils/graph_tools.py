@@ -10,12 +10,12 @@ from .graph import gen_similarity_graph, gen_correlation_graph, gen_threshold_gr
 from .logger import get_logger
 logger = get_logger(__name__)
 
+# while computing eigenvector centrality, ignore warnings about k >= N - 1. This does not break the functionality.
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
-    message=r"k >= N - 1 for N \* N square matrix.*"
+    message=r".*k >= N - 1.*"
 )
-
 
 def graph_analysis(network: pd.DataFrame, graph_name: str, omics_list: Optional[List[pd.DataFrame]] = None) -> None:
     """Analyze and log basic topology and small components of a graph.
@@ -31,7 +31,7 @@ def graph_analysis(network: pd.DataFrame, graph_name: str, omics_list: Optional[
     Returns:
 
         None: Metrics are logged via the configured logger and no value is returned.
-        
+
     """
     G = nx.from_pandas_adjacency(network)
 
@@ -174,7 +174,7 @@ def repair_graph_connectivity(adj_df: pd.DataFrame, epsilon: float = 1e-6, selec
     Returns:
 
         pd.DataFrame: Augmented adjacency matrix in which all components are connected through newly added edges.
-        
+
     """
     adj = adj_df.values.copy()
     np.fill_diagonal(adj, 0)
@@ -329,11 +329,11 @@ def find_optimal_graph(omics_data: pd.DataFrame, y_labels, methods: list = ['cor
         trials (int | None): Optional limit on the number of configurations taken from the full parameter grid.
         omics_list (list[pd.DataFrame] | None): Optional list of omics blocks aligned to columns of omics_data and forwarded to repair_graph_connectivity.
         centrality_mode (str): Centrality measure used for proxy feature weighting; one of "eigenvector" or "degree".
-        
+
     Returns:
 
         tuple[pd.DataFrame | None, dict | None, pd.DataFrame]: Best repaired graph (or None if all runs fail), parameter dictionary for the best configuration (or None), and a DataFrame summarizing scores and settings for all evaluated graphs.
-        
+
     """
     y_vec = y_labels.values if isinstance(y_labels, pd.Series) else np.asarray(y_labels)
 
@@ -463,7 +463,7 @@ def _find_optimal_epsilon(adj_df: pd.DataFrame, n_eps: int = 10) -> List[float]:
     Returns:
 
         list[float]: Sorted list of unique epsilon values to try when repairing connectivity.
-        
+
     """
     try:
         A = adj_df.values.copy().astype(float)
@@ -525,7 +525,7 @@ def _feature_proxy(adj_df: pd.DataFrame, X_df: pd.DataFrame, y, cv, mode: str = 
     Returns:
 
         tuple[float, float]: Mean and standard deviation of the weighted F1 score (in percent) across CV folds.
-        
+
     """
     G_nx = nx.from_pandas_adjacency(adj_df)
 
@@ -562,4 +562,3 @@ def _feature_proxy(adj_df: pd.DataFrame, X_df: pd.DataFrame, y, cv, mode: str = 
     std_score = float(np.std(scores) * 100.0)
 
     return mean_score, std_score
-

@@ -164,10 +164,6 @@ def gen_correlation_graph(X: pd.DataFrame, k: Optional[int] = 15, method: str = 
             mask = S >= threshold
             mask.fill_diagonal_(False)
         else:
-            if k is None:
-                raise ValueError(
-                    "k must be an integer when per_node is False and threshold is None."
-                )
             k_global = min(k * N, N * N - N)
             flat_off_diag = S[~torch.eye(N, dtype=torch.bool, device=device)].reshape(-1)
             thresh_val = torch.kthvalue(

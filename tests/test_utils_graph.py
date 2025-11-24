@@ -9,26 +9,47 @@ from bioneuralnet.utils.graph import gen_gaussian_knn_graph
 from bioneuralnet.utils.graph import gen_lasso_graph
 from bioneuralnet.utils.graph import gen_mst_graph
 from bioneuralnet.utils.graph import gen_snn_graph
+from bioneuralnet.datasets import DatasetLoader
+
 
 class TestUtilsGraph(unittest.TestCase):
     def setUp(self):
-        np.random.seed(1998)
-        self.X = pd.DataFrame(np.random.rand(10, 5), columns=["n1", "n2", "n3", "n4", "n5"])
+        example = DatasetLoader("example")
+        X1 = example["X1"]
+        X2 = example["X2"]
+
+        if not isinstance(X1, pd.DataFrame):
+            raise TypeError("X1 from example dataset must be a DataFrame")
+        if not isinstance(X2, pd.DataFrame):
+            raise TypeError("X2 from example dataset must be a DataFrame")
+
+        # A small subset of features to keep tests light
+        X1_small = X1.iloc[:, 0:15]
+        X2_small = X2.iloc[:, 0:15]
+
+        X_concat = pd.concat([X1_small, X2_small], axis=1)
+        self.X = X_concat
         self.N = self.X.shape[1]
 
     def _basic_checks(self, G: pd.DataFrame):
         self.assertIsInstance(G, pd.DataFrame)
         self.assertEqual(G.shape, (self.N, self.N))
-        self.assertEqual(list(G.index), list(self.X.columns))
-        self.assertEqual(list(G.columns), list(self.X.columns))
-        self.assertTrue(np.all(G.values >= 0))
-        
+
+        expected_cols = list(self.X.columns)
+        self.assertEqual(list(G.index), expected_cols)
+        self.assertEqual(list(G.columns), expected_cols)
+
+        values = G.values
+        self.assertTrue(np.all(values >= 0))
+
         row_sums = G.sum(axis=1).values
-        is_normalized = np.isclose(row_sums, 1.0, atol=1e-5) | np.isclose(row_sums, 0.0, atol=1e-5)
+        close_to_one = np.isclose(row_sums, 1.0, atol=1e-5)
+        close_to_zero = np.isclose(row_sums, 0.0, atol=1e-5)
+        is_normalized = close_to_one | close_to_zero
         self.assertTrue(is_normalized.all())
 
     def test_gen_similarity_graph_default(self):
-        G = gen_similarity_graph(self.X, k=2)
+        G = gen_similarity_graph(self.X, k=3)
         self._basic_checks(G)
 
     def test_gen_similarity_graph_type_error(self):
@@ -36,7 +57,17 @@ class TestUtilsGraph(unittest.TestCase):
             gen_similarity_graph(np.array([[1, 2], [3, 4]]))
 
     def test_gen_correlation_graph_default(self):
-        G = gen_correlation_graph(self.X, k=2, method="pearson")
+        G = gen_correlation_graph(
+            self.X,
+            k=3,
+            method="pearson",
+            signed=True,
+            normalize=True,
+            mutual=False,
+            per_node=True,
+            threshold=None,
+            self_loops=False,
+        )
         self._basic_checks(G)
 
     def test_gen_correlation_graph_type_error(self):
@@ -44,7 +75,14 @@ class TestUtilsGraph(unittest.TestCase):
             gen_correlation_graph("not a df")
 
     def test_gen_threshold_graph_default(self):
-        G = gen_threshold_graph(self.X, b=2.0, k=2)
+        G = gen_threshold_graph(
+            self.X,
+            b=4.0,
+            k=3,
+            mutual=False,
+            self_loops=False,
+            normalize=True,
+        )
         self._basic_checks(G)
 
     def test_gen_threshold_graph_type_error(self):
@@ -52,7 +90,13 @@ class TestUtilsGraph(unittest.TestCase):
             gen_threshold_graph(None)
 
     def test_gen_gaussian_knn_graph_default(self):
-        G = gen_gaussian_knn_graph(self.X, k=2)
+        G = gen_gaussian_knn_graph(
+            self.X,
+            k=3,
+            mutual=False,
+            self_loops=True,
+            normalize=True,
+        )
         self._basic_checks(G)
 
     def test_gen_gaussian_knn_graph_type_error(self):
@@ -76,12 +120,13 @@ class TestUtilsGraph(unittest.TestCase):
             gen_mst_graph(5.0)
 
     def test_gen_snn_graph_default(self):
-        G = gen_snn_graph(self.X, k=2)
+        G = gen_snn_graph(self.X, k=3)
         self._basic_checks(G)
 
     def test_gen_snn_graph_type_error(self):
         with self.assertRaises(TypeError):
             gen_snn_graph("oops, not a df")
+
 
 if __name__ == "__main__":
     unittest.main()
