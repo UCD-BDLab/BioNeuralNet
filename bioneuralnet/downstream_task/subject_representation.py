@@ -26,11 +26,22 @@ from sklearn.metrics import accuracy_score, r2_score, mean_squared_error
 
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
-from ..utils.logger import get_logger
+from bioneuralnet.utils import get_logger
 
 class SubjectRepresentation:
-    """
-    SubjectRepresentation Class for Integrating Network Embeddings into Omics Data.
+    """SubjectRepresentation Class for Integrating Network Embeddings into Omics Data.
+
+    This class integrates network-derived embeddings with raw omics data to create enriched subject-level profiles. It supports dimensionality reduction of embeddings (via Autoencoders or other methods) and subsequent fusion with original omics features.
+
+    Attributes:
+        omics_data (pd.DataFrame): DataFrame of omics features (columns).
+        embeddings (pd.DataFrame): DataFrame with embeddings (indexed by feature names).
+        phenotype_data (Optional[pd.DataFrame]): Optional DataFrame with phenotype labels.
+        phenotype_col (str): Name of the phenotype column.
+        reduce_method (str): Method used for dimensionality reduction (e.g., "AE").
+        seed (Optional[int]): Random seed for reproducibility.
+        tune (bool): Whether to run hyperparameter tuning.
+        output_dir (Path): Directory where results are written.
     """
 
     def __init__(
@@ -44,17 +55,17 @@ class SubjectRepresentation:
         tune: Optional[bool] = False,
         output_dir: Optional[Union[str, Path]] = None,
     ):
-        """
-        Initializes the SubjectRepresentation instance.
+        """Initializes the SubjectRepresentation instance.
 
-        Parameters:
-
-            - omics_data : pd.DataFrame of omics features (columns).
-            - embeddings : pd.DataFrame with embeddings (indexed by feature names).
-            - phenotype_data : Optional[pd.DataFrame] with phenotype labels.
-            - phenotype_col : str name of the phenotype column.
-            - reduce_method : Default reduction method (e.g., "AE").
-            - tune : Whether to run hyperparameter tuning.
+        Args:
+            omics_data (pd.DataFrame): DataFrame of omics features (columns).
+            embeddings (pd.DataFrame): DataFrame with embeddings (indexed by feature names).
+            phenotype_data (pd.DataFrame | None): Optional DataFrame with phenotype labels.
+            phenotype_col (str): Name of the phenotype column. Default is "phenotype".
+            reduce_method (str): Dimensionality reduction method (e.g., "AE"). Default is "AE".
+            seed (int | None): Random seed for reproducibility.
+            tune (bool | None): Whether to run hyperparameter tuning. Default is False.
+            output_dir (str | Path | None): Directory to write results. If None, a temp directory is used.
         """
         self.logger = get_logger(__name__)
         self.logger.info("Initializing SubjectRepresentation with provided data inputs.")
@@ -123,13 +134,12 @@ class SubjectRepresentation:
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def run(self) -> pd.DataFrame:
-        """
-        Executes the Subject Representation workflow.
-        If tuning is enabled, runs hyperparameter tuning and uses the best config to reduce embeddings.
-        Otherwise, uses the default reduction method.
-        Returns:
+        """Executes the Subject Representation workflow.
 
-            - Enhanced omics data as a DataFrame.
+        If tuning is enabled, runs hyperparameter tuning and uses the best config to reduce embeddings. Otherwise, uses the default reduction method.
+
+        Returns:
+            pd.DataFrame: Enhanced omics data as a DataFrame.
         """
         self.logger.info("Starting Subject Representation workflow.")
 
@@ -165,18 +175,18 @@ class SubjectRepresentation:
             raise
 
     def _reduce_embeddings(self, method: str, ae_params: Optional[dict[Any, Any]] = None, compressed_dim: int = 2) -> pd.DataFrame:
-        """
-        Reduces the dimensionality of the embeddings.
-        Returns a DataFrame with `compressed_dim` columns.
-        Parameters:
+        """Reduces the dimensionality of embeddings using PCA or AutoEncoder.
 
-            - method: Reduction method ("PCA", "AE").
-            - ae_params: Parameters for AutoEncoder.
-            - compressed_dim: Number of dimensions to reduce to.
+        Args:
+
+            method (str): Reduction method ("PCA" or "AE").
+            ae_params (dict | None): AutoEncoder hyperparameters (epochs, hidden_dim, lr, dropout).
+            compressed_dim (int): Target number of dimensions.
 
         Returns:
 
-            - Reduced embeddings as a DataFrame.
+            pd.DataFrame: Reduced embeddings with `compressed_dim` columns.
+
         """
         self.logger.info(f"Reducing embeddings using method='{method}' with compressed_dim={compressed_dim}.")
 
@@ -245,23 +255,18 @@ class SubjectRepresentation:
         return reduced_df
 
     def _integrate_embeddings(self, reduced: pd.DataFrame, method="multiply", alpha=2.0, beta=0.5) -> pd.DataFrame:
-        """
-        Integrates the reduced embeddings with the omics data using a multiplicative approach.
+        """Integrates reduced embeddings into omics data using a weighted multiplicative approach.
 
-        With the default parameters (alpha = 2.0, beta = 0.5), each feature is updated as:
+        Formula: `enhanced = beta * raw + (1 - beta) * (alpha * normalized_weight * raw)`
 
-            enhanced = beta * raw + (1 - beta) * (alpha * normalized_weight * raw)
+        Args:
+            reduced (pd.DataFrame | pd.Series): Reduced embedding weights.
+            method (str): Integration strategy (currently only "multiply").
+            alpha (float): Scaling factor for the weighted term.
+            beta (float): Weight applied to the original raw data (0 to 1).
 
-        For example, with alpha = 2.0 and beta = 0.5:
-
-            If a features normalized weight is 1.0:
-
-                enhanced = 0.5xraw + 0.5x(2.0x1.0xraw) = 0.5xraw + raw = 1.5xraw
-            If a features normalized weight is 0.5:
-
-                enhanced = 0.5xraw + 0.5x(2.0x0.5xraw) = 0.5xraw + 0.5xraw = raw
-
-        This is so at least 50% of the final output is influenced by the computed weight
+        Returns:
+            pd.DataFrame: Enhanced omics data.
         """
         if not isinstance(reduced, (pd.DataFrame, pd.Series)):
             raise ValueError("Reduced embeddings must be a pandas DataFrame or Series.")
@@ -313,20 +318,22 @@ class SubjectRepresentation:
         return enhanced
 
     def _run_tuning(self) -> Dict[str, Any]:
-        """
-        Runs tuning for SubjectRepresentation.
+        """Orchestrates the hyperparameter tuning process.
+
+        Returns:
+            dict: The best configuration found by Ray Tune.
         """
         self.logger.info("Running tuning for SubjectRepresentation.")
         return self._run_classification_tuning()
 
     def _run_classification_tuning(self) -> Dict[str, Any]:
-        """
-        Performs hyperparameter tuning using Ray Tune.
-        The search space includes:
-        - PCA
-        - AutoEncoder (AE) parameters: epochs, hidden_dim, dropout, lr, activation.
+        """Executes Ray Tune to find optimal reduction and integration parameters.
 
-        Uses RandomForest for classification or regression depending on phenotype.
+        Uses RandomForest (Classifier or Regressor) to evaluate the quality of the
+        enhanced subject representations against the phenotype.
+
+        Returns:
+            dict: Best hyperparameter configuration.
         """
         search_config = {
             "method": tune.choice(["PCA", "AE"]),

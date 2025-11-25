@@ -50,7 +50,7 @@ Below is a **complete** Python implementation:
    from bioneuralnet.downstream_task import SubjectRepresentation
 
    # 1) Data Setup
-   Example = DatasetLoader("example1")
+   Example = DatasetLoader("example")
    omics_genes = Example.data["X1"]
    omics_proteins = Example.data["X2"]
    phenotype = Example.data["Y"]

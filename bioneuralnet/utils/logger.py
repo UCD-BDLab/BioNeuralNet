@@ -2,10 +2,9 @@ import logging
 import os
 
 def get_logger(name: str) -> logging.Logger:
-    """
-    Retrieves a global logger configured to write to 'bioneuralnet.log' at the project root.
+    """Retrieves a global logger configured to write to 'bioneuralnet.log'.
 
-    Parameters:
+    Args:
 
         name (str): Name of the logger.
 

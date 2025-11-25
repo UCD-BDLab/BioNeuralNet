@@ -7,15 +7,12 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
 from bioneuralnet.utils.logger import get_logger
-
 logger = get_logger(__name__)
 
 def omics_correlation(omics: pd.DataFrame, pheno: pd.DataFrame) -> Tuple[float, float]:
-    """
-    Compute the Pearson correlation between a group of omics data (reduced to one principal component)
-    and a phenotype.
+    """Computes the Pearson correlation between the first principal component of omics data and a phenotype.
 
-    Parameters:
+    Args:
 
         omics (pd.DataFrame): Omics data with rows as samples and columns as features.
         pheno (pd.DataFrame): Phenotype data. Expected to have a single column.
@@ -48,17 +45,16 @@ def omics_correlation(omics: pd.DataFrame, pheno: pd.DataFrame) -> Tuple[float, 
 
 
 def cluster_correlation(cluster_df: pd.DataFrame, pheno: pd.DataFrame) -> tuple:
-    """
-    Compute the Pearson correlation coefficient between PC1 of a cluster and phenotype.
+    """Computes the Pearson correlation coefficient between PC1 of a cluster and phenotype.
 
-    Parameters:
+    Args:
 
-        cluster_df: DataFrame representing a cluster of samples.
-        pheno: DataFrame representing the phenotype.
+        cluster_df (pd.DataFrame): DataFrame representing a cluster of samples.
+        pheno (pd.DataFrame): DataFrame representing the phenotype.
 
     Returns:
 
-        (cluster_size, correlation) or (size, None) if correlation fails.
+        tuple: (cluster_size, correlation) or (size, None) if correlation fails.
     """
     cluster_size = cluster_df.shape[1]
 
@@ -93,16 +89,15 @@ def cluster_correlation(cluster_df: pd.DataFrame, pheno: pd.DataFrame) -> tuple:
     return (cluster_size, corr)
 
 def louvain_to_adjacency(louvain_cluster: pd.DataFrame) -> pd.DataFrame:
-    """
-    Convert a Louvain cluster to an adjacency matrix.
+    """Converts a Louvain cluster to an adjacency matrix.
 
-    Parameters:
+    Args:
 
-        louvain_cluster: represents an induced subnetwork (from Louvain).
+        louvain_cluster (pd.DataFrame): Represents an induced subnetwork (from Louvain).
 
     Returns:
 
-        pd.DataFrame: Adjacency matrix
+        pd.DataFrame: Adjacency matrix.
     """
     adjacency_matrix = louvain_cluster.corr(method="pearson")
     np.fill_diagonal(adjacency_matrix.values, 0)
