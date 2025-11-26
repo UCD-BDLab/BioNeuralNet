@@ -37,7 +37,7 @@ BioNeuralNet **DPMON module** provides a streamlined, end-to-end framework for d
    from bioneuralnet.datasets import DatasetLoader
 
    # Step 1: Load sample data
-   example = DatasetLoader("example1")
+   example = DatasetLoader("example")
    omics_genes = example.data["X1"]
    omics_proteins = example.data["X2"]
    phenotype = example.data["Y"]

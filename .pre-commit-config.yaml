@@ -48,7 +48,7 @@ repos:
             echo "Forbidden file types detected (RData)!"
             exit 1
           fi
-          if echo "$FILES" | grep -E "\.csv$" | grep -vE "^bioneuralnet/datasets/(example1|brca|monet)/"; then
+          if echo "$FILES" | grep -E "\.csv$" | grep -vE "^bioneuralnet/datasets/(example|brca|monet)/"; then
             echo "Forbidden CSV files detected (outside allowed folders)!"
             exit 1
           fi

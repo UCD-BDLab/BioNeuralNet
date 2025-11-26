@@ -140,7 +140,7 @@ Below is a concise example demonstrating the following key steps:
    from bioneuralnet.datasets import DatasetLoader
 
    # Step 1: Load the dataset and access individual omics modalities
-   example = DatasetLoader("example1")
+   example = DatasetLoader("example")
    omics_genes = example.data["X1"]
    omics_proteins = example.data["X2"]
    phenotype = example.data["Y"]

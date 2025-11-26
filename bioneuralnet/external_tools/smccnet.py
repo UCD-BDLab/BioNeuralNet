@@ -39,6 +39,7 @@ class SmCCNet:
         ncomp_pls (int): # of components for PLS. 0 => no PLS. Default=0.
         between_shrinkage (float): Shrink factor for multi-omics correlation. Default=5.0.
         output_dir (str): Folder to write temp files. If None, uses a temporary directory.
+
     """
     def __init__(
         self,
@@ -60,6 +61,7 @@ class SmCCNet:
         Initializes the SmCCNet instance.
 
         Args:
+
             phenotype_df (pd.DataFrame): DataFrame containing phenotype data, shape [samples x 1 or more].
             omics_dfs (List[pd.DataFrame]): List of omics DataFrames.
             data_types (List[str]): List of omics data type strings (e.g. ["Genes", "miRNA"]).
@@ -71,6 +73,7 @@ class SmCCNet:
             ncomp_pls (int): # of components for PLS. 0 => no PLS. Default=0.
             between_shrinkage (float): Shrink factor for multi-omics correlation. Default=5.0.
             output_dir (str): Folder to write temp files. If None, uses a temporary directory.
+
         """
         self.logger = get_logger(__name__)
         self.rscript_path = shutil.which("Rscript")

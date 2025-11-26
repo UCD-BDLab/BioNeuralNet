@@ -12,10 +12,11 @@ recursive-include bioneuralnet/external_tools *.R *.r
 recursive-include bioneuralnet/utils *.R *.r
 
 recursive-include bioneuralnet/datasets/monet *.csv
-recursive-include bioneuralnet/datasets/example1 *.csv
+recursive-include bioneuralnet/datasets/example *.csv
 recursive-include bioneuralnet/datasets/brca *.csv
-recursive-include bioneuralnet/datasets/gbmlgg *.csv
+recursive-include bioneuralnet/datasets/lgg *.csv
 recursive-include bioneuralnet/datasets/kipan *.csv
+recursive-include bioneuralnet/datasets/paad *.csv
 
 # Include documentation source files
 prune docs
