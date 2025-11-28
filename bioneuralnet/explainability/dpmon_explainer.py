@@ -106,7 +106,7 @@ class DPMONExplainer:
 
         model.load_state_dict(model_weights)
         model.eval()
-        
+
         self.train_features = torch.FloatTensor(
             self.omics_dataset.drop(["phenotype"], axis=1).values
         ).to(device)
@@ -124,17 +124,17 @@ class DPMONExplainer:
                 return_type=return_type
             )
         )
-        
+
         if self.omics_network_tg.x != None and self.omics_network_tg.edge_index != None:
             self.expl = self.explainer(**self.omics_network_tg.to_dict(), train_features=self.train_features)
             print(self.expl.edge_mask)
             print(self.expl.node_mask)
-        
-        
-        
-            
+
+
+
+
     def visualize_feature_importance(self, path: os.PathLike):
         self.expl.visualize_feature_importance(str(path))
-    
+
     def visualize_graph(self, path: os.PathLike):
         self.expl.visualize_graph(str(path))

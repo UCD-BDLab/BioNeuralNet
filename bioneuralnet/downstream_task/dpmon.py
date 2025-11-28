@@ -221,7 +221,7 @@ class DPMON:
 
         self.adjacency_matrix = self.adjacency_matrix.loc[common_features, common_features]
         combined_omics = self.combined_omics_input[common_features]
-        
+
 
         phenotype_series = self.phenotype_series.rename(self.phenotype_col)
 
@@ -233,7 +233,7 @@ class DPMON:
             )
         else:
             logger.warning(f"Column '{self.phenotype_col}' already exists in omics data. Using existing column.")
-        
+
         self.combined_omics = combined_omics
 
         predictions_df, metrics, embeddings = run_standard_training(
@@ -435,7 +435,7 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
             clinical_data_full = pd.DataFrame(index=X.index)
         else:
             clinical_data_full = clinical_data.reindex(X.index)
-            
+
         clinical_train = clinical_data_full.loc[X_train.index]
 
         logger.info("Building 'clean' graph features for standard run using train split")
@@ -475,7 +475,7 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
                 gnn_dropout=dpmon_params["gnn_dropout"],
                 gnn_activation=dpmon_params["gnn_activation"]
             ).to(device)
-            
+
             criterion = nn.CrossEntropyLoss()
             optimizer = optim.Adam(model.parameters(), lr=dpmon_params["lr"], weight_decay=dpmon_params["weight_decay"])
 
