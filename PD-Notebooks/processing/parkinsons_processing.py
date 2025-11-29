@@ -268,31 +268,15 @@ def build_node_features(
 
         # PCA: reduce dimensionality of each gene's expression profile
         # Input: genes × samples
-        # We want to reduce the sample dimension, so we do PCA on samples × genes
-        # This finds principal components in the sample space
-        # Then we project each gene's expression vector onto these components
-        X_T = expression_df.T.values  # samples × genes
-        pca = PCA(n_components=n_components, random_state=42)
-        pca.fit(X_T)  # Fit on samples × genes
-
-        # Transform each gene's expression profile (across samples) to PCA space
-        # For each gene (column in X_T), get its projection
-        X_pca = pca.transform(X_T)  # samples × n_components
-        # Now transpose to get genes × n_components
-        # Each row is a gene, each column is a PC
-        X_pca_genes = X_pca.T  # n_components × samples
-        # Actually, we need to think about this differently
-        # X_T is samples × genes, so after transform we get samples × n_components
-        # We want genes × n_components, so we need to transpose the result
-        # But the transform gives us the projection of samples onto PCs
-        # We want the projection of genes onto PCs
-        # So we need to use the components differently
-        # Let's use the inverse: project genes onto the PC space
-        # Actually simpler: use the components to transform the gene vectors
-        components = pca.components_  # n_components × genes
+        # We want to reduce the sample dimension for each gene
+        # Fit PCA on genes × samples to find principal components in sample space
         X_genes = expression_df.values  # genes × samples
-        # Project: genes × samples @ (samples × n_components via components.T)
-        # components is n_components × genes, so components.T is genes × n_components
+        pca = PCA(n_components=n_components, random_state=42)
+        pca.fit(X_genes)  # Fit on genes × samples
+
+        # pca.components_ is (n_components, n_samples)
+        # Transform: project each gene's expression vector onto the PCs
+        # genes × samples @ (samples × n_components) = genes × n_components
         X_pca_genes = X_genes @ pca.components_.T  # genes × n_components
 
         pca_df = pd.DataFrame(
