@@ -161,7 +161,7 @@ def plot_performance(embedding_result, raw_rf_acc, title="Performance Comparison
     plt.show()
 
 
-def plot_embeddings(embeddings, node_labels=None):
+def plot_embeddings(embeddings, node_labels=None, legend_labels=None):
     """
     Plot the embeddings in 2D space using t-SNE.
 
@@ -169,6 +169,7 @@ def plot_embeddings(embeddings, node_labels=None):
 
         embeddings (array-like): High-dimensional embedding data.
         node_labels (array-like or DataFrame, optional): Labels for the nodes to color the points.
+        legend_labels (list, optional): Labels for the legend corresponding to unique node labels.
 
     """
     X = np.array(embeddings)
@@ -200,12 +201,15 @@ def plot_embeddings(embeddings, node_labels=None):
         edgecolor="k"
     )
 
+    if legend_labels is not None:
+        handles, _ = scatter.legend_elements(prop="colors")
+        ax.legend(handles, legend_labels, title="Omics Type", loc="best")
+
     ax.invert_yaxis()
     ax.set_title(f"Embeddings in 2D space from {embeddings.shape[1]}D")
 
     fig.tight_layout()
     plt.show()
-
 
 def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show_edge_weights=False, layout="kamada"):
     """
@@ -337,6 +341,38 @@ def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show
     mapping_df = mapping_df.sort_values(by="Degree", ascending=False).set_index("Index")
 
     return mapping_df
+
+def find_omics_modality(mapping_df, dfs, source_names=None):
+    """
+    Maps features in the mapping DataFrame to their omics source based on provided dataframes.
+    
+    Args:
+
+        mapping_df (pd.DataFrame): DataFrame with an "Omic" column listing feature names.
+        dfs (list[pd.DataFrame]): List of DataFrames, each representing an omics modality.
+        source_names (list[str], optional): Names corresponding to each DataFrame in `dfs`. If None, default names will be used.
+
+    Returns:
+        pd.DataFrame: Updated mapping DataFrame with an additional "Source" column.
+        
+    """
+    if not source_names:
+        source_names = []
+        for i, df in enumerate(dfs):
+            src_name = getattr(df, "name", None)
+            if src_name is None:
+                src_name = f"source_{i}"
+            source_names.append(src_name)
+
+    feature_to_source = {}
+    for src_name, df in zip(source_names, dfs):
+        for feat in df.columns:
+            feature_to_source[feat] = src_name
+
+    out = mapping_df.copy()
+    out["Source"] = out["Omic"].map(feature_to_source).fillna("Unknown")
+    return out
+
 
 def compare_clusters(clusters1: list, clusters2: list, pheno: pd.DataFrame, label1: str = "Method 1", label2: str = "Method 2") -> pd.DataFrame:
     """Compare two cluster sets via phenotype correlation.

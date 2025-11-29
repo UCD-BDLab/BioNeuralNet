@@ -158,7 +158,7 @@ def graph_analysis(network: pd.DataFrame, graph_name: str, omics_list: Optional[
         logger.warning("Could not compute clustering coefficient")
 
 
-def repair_graph_connectivity(adj_df: pd.DataFrame, epsilon: float = 1e-6, selection_mode: str = "eigen", omics_list: Optional[List[pd.DataFrame]] = None, verbose: bool = False) -> pd.DataFrame:
+def repair_graph_connectivity(adj_df: pd.DataFrame, epsilon: float = 1e-6, selection_mode: str = "eigen", self_loops: bool = False, omics_list: Optional[List[pd.DataFrame]] = None, verbose: bool = False) -> pd.DataFrame:
     """Augment an adjacency matrix to connect all components via hub-based bridging edges.
 
     The adjacency matrix is decomposed into connected components, reference hubs are identified in the largest component using eigenvector centrality or degree, and each smaller component is connected back by adding symmetric edges of weight epsilon to suitable hubs, optionally guided by omics-based correlations.
@@ -311,7 +311,11 @@ def repair_graph_connectivity(adj_df: pd.DataFrame, epsilon: float = 1e-6, selec
                 f"Local_Centroid='{local_label}' -> Global_Ref='{target_label}' (eps={epsilon:.1e})"
             )
 
-    return pd.DataFrame(adj, index=adj_df.index, columns=adj_df.columns)
+    connected_graph = pd.DataFrame(adj, index=adj_df.index, columns=adj_df.columns)
+    if self_loops:
+        np.fill_diagonal(connected_graph.values, 1.0)
+
+    return connected_graph
 
 
 def find_optimal_graph(omics_data: pd.DataFrame, y_labels, methods: list = ['correlation', 'threshold', 'similarity', 'gaussian'], seed: int = 1883, verbose: bool = True, trials: Optional[int] = None, omics_list: Optional[List[pd.DataFrame]] = None, centrality_mode="eigenvector") -> tuple[pd.DataFrame | None, dict | None, pd.DataFrame]:
@@ -335,7 +339,10 @@ def find_optimal_graph(omics_data: pd.DataFrame, y_labels, methods: list = ['cor
         tuple[pd.DataFrame | None, dict | None, pd.DataFrame]: Best repaired graph (or None if all runs fail), parameter dictionary for the best configuration (or None), and a DataFrame summarizing scores and settings for all evaluated graphs.
 
     """
-    y_vec = y_labels.values if isinstance(y_labels, pd.Series) else np.asarray(y_labels)
+    if isinstance(y_labels, pd.Series):
+        y_vec = y_labels.values
+    else:
+        y_vec = np.asarray(y_labels).ravel()
 
     scaler = StandardScaler()
     X_scaled_np = scaler.fit_transform(omics_data.values)

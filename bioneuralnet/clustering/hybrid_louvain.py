@@ -13,18 +13,18 @@ class HybridLouvain:
 
     Attributes:
 
-        G (nx.Graph): NetworkX graph object.
+        G (Union[nx.Graph, pd.DataFrame]): Input graph as a NetworkX Graph or adjacency DataFrame.
         B (pd.DataFrame): Omics data.
         Y (pd.DataFrame): Phenotype data.
         k3 (float): Weight for Correlated Louvain.
         k4 (float): Weight for Correlated Louvain.
         max_iter (int): Maximum number of iterations.
         weight (str): Edge weight parameter name.
-        tune (bool): Flag to enable tuning of parameters
+        tune (bool): Flag to enable tuning of parameters       
     """
     def __init__(
         self,
-        G: nx.Graph,
+        G: Union[nx.Graph, pd.DataFrame],
         B: pd.DataFrame,
         Y: pd.DataFrame,
         k3: float = 0.2,
@@ -42,6 +42,13 @@ class HybridLouvain:
         if seed is not None:
             set_seed(seed)
         self.logger.info("Initializing HybridLouvain...")
+
+        if isinstance(G, pd.DataFrame):
+            self.logger.info("Input G is a DataFrame; converting adjacency matrix to NetworkX graph.")
+            G = nx.from_pandas_adjacency(G)
+
+        if not isinstance(G, nx.Graph):
+            raise TypeError("G must be a networkx.Graph or a pandas DataFrame adjacency matrix.")
 
         self.G = G
         graph_nodes = set(map(str, G.nodes()))
@@ -233,7 +240,15 @@ class HybridLouvain:
             refined_nodes = pagerank_results.get("cluster_nodes", [])
             new_size = len(refined_nodes)
             all_clusters[iteration] = refined_nodes
-            self.logger.info(f"Refined subgraph size: {new_size}")
+
+            cond = pagerank_results.get("conductance", None)
+            corr = pagerank_results.get("correlation", None)
+            score = pagerank_results.get("composite_score", None)
+
+            self.logger.info(
+                f"Iteration {iteration+1}: cluster size={new_size}, "
+                f"Conductance={cond:.3f} Correlation={corr:.3f} score={score:.3f}"
+            )
 
             if new_size == prev_size or new_size <= 1:
                 self.logger.info(
