@@ -39,7 +39,6 @@ from .downstream_task import DPMON
 from .clustering import CorrelatedPageRank
 from .clustering import CorrelatedLouvain
 from .clustering import HybridLouvain
-from .clustering import Leiden
 from .datasets import DatasetLoader
 from .external_tools import SmCCNet
 
@@ -97,7 +96,6 @@ __all__: list = [
     "CorrelatedPageRank",
     "CorrelatedLouvain",
     "HybridLouvain",
-    "Leiden",
     "omics_correlation",
     "cluster_correlation",
     "louvain_to_adjacency",

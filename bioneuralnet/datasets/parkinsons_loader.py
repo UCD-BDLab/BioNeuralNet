@@ -307,5 +307,3 @@ def load_parkinsons_data(
     )
     data = loader.load()
     return data.expression, data.sample_metadata, data.gene_metadata
-
-
