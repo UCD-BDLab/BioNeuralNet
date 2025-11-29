@@ -20,10 +20,6 @@ class Leiden:
     """
     Leiden Class for Community Detection using the Leiden Algorithm.
     
-    The Leiden algorithm is an improvement over the Louvain algorithm,
-    guaranteeing well-connected communities and typically producing
-    higher quality partitions.
-    
     Attributes:
         G (nx.Graph): NetworkX graph object.
         resolution_parameter (float): Resolution parameter for modularity optimization.
