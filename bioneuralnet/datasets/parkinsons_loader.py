@@ -272,6 +272,18 @@ class ParkinsonsLoader:
             )
             return pd.DataFrame(index=index)
 
+        # Handle duplicate EnsemblGeneID values
+        # (common in annotation files due to multiple transcripts/isoforms per gene)
+        duplicates = annot["EnsemblGeneID"].duplicated()
+        if duplicates.any():
+            n_duplicates = duplicates.sum()
+            logger.info(
+                "Found %d duplicate EnsemblGeneID entries. "
+                "Keeping first occurrence for each gene.",
+                n_duplicates,
+            )
+            annot = annot.drop_duplicates(subset="EnsemblGeneID", keep="first")
+
         annot = annot.set_index("EnsemblGeneID")
         annot_aligned = annot.reindex(index)
 
