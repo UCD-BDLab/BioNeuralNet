@@ -69,33 +69,47 @@ BioNeuralNet allows you to inspect the topology of your constructed networks. Th
 .. figure:: _static/kipan_net.png
    :align: center
    :alt: Multi-Omics Network Visualization
-   :width: 90%
+   :width: 100%
 
-   *Network visualization of a highly connected gene module identified in the KIPAN dataset.*
+   *Network visualization of a highly connected gene module identified in the KIPAN dataset.* `Full Size Image <https://bioneuralnet.readthedocs.io/en/latest/_images/kipan_net.png>`_
 
 **Top Identified Biomarkers (Hub Omics)**
 
 The table below lists the top hub features identified in the network above, ranked by their degree centrality.
 
 .. list-table:: Omics with high degree
-   :widths: 50 25
+   :widths: 40 10 10 10
    :header-rows: 1
    :align: center
 
    * - Feature Name (Omic)
+     - Index
      - Degree
+     - Source
    * - INPP5J_27124
+     - 5
      - 12
+     - RNA
    * - SLC26A7_115111
+     - 26
      - 9
+     - RNA
    * - HEPACAM2_253012
+     - 12
      - 7
+     - RNA
    * - CLNK_116449
+     - 16
      - 7
+     - RNA
    * - RHCG_51458
+     - 27
      - 6
+     - RNA
    * - CLCNKB_1188
+     - 3
      - 6
+     - RNA
 
 
 Why Graph Neural Networks for Multi-Omics?
@@ -117,9 +131,9 @@ By projecting high-dimensional omics networks into latent spaces, BioNeuralNet d
 .. figure:: _static/emb_kipan.png
    :align: center
    :alt: t-SNE visualization of Network Embeddings
-   :width: 90%
+   :width: 100%
 
-   *2D projection of Network Embeddings showing distinct separation between omics modalities.*
+   *2D projection of Network Embeddings showing distinct separation between omics modalities.* `Full Size Image <https://bioneuralnet.readthedocs.io/en/latest/_images/emb_kipan.png>`_
 
 For detailed explanations of BioNeuralNet's supported GNN architectures, see :doc:`gnns`.
 

@@ -121,7 +121,7 @@ Valid ``dataset_name`` values (case-insensitive):
 - ``"kipan"``
 - ``"paad"``
 
-The :pyattr:`DatasetLoader.shape <bioneuralnet.datasets.DatasetLoader.shape>` property returns a mapping from table name to ``(n_rows, n_cols)`` for each loaded table.
+The `.shape` property returns a mapping from table name to ``(n_rows, n_cols)`` for each loaded table.
 
 Built-in Datasets
 -----------------

@@ -23,7 +23,7 @@ Modules:
 * `utils`: Utilities for logging, reproducibility, graph generation, and data processing.
 """
 
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 
 # submodules to enable direct imports such as `from bioneuralnet import utils`
 from . import utils
