@@ -11,6 +11,7 @@ bioneuralnet.metrics.plot
       cast
       cluster_correlation
       compare_clusters
+      find_omics_modality
       get_logger
       plot_embeddings
       plot_multiple_metrics

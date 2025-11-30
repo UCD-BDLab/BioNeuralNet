@@ -1,4 +1,4 @@
-﻿bioneuralnet.network\_embedding
+bioneuralnet.network\_embedding
 ===============================
 
 .. automodule:: bioneuralnet.network_embedding

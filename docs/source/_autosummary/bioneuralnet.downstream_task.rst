@@ -1,4 +1,4 @@
-﻿bioneuralnet.downstream\_task
+bioneuralnet.downstream\_task
 =============================
 
 .. automodule:: bioneuralnet.downstream_task

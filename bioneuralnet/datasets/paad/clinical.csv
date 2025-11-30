@@ -1,0 +1,178 @@
+patient,years_to_birth,vital_status,days_to_death,days_to_last_followup,tumor_tissue_site,pathologic_stage,pathology_T_stage,pathology_N_stage,pathology_M_stage,gender,date_of_initial_pathologic_diagnosis,radiation_therapy,histological_type,number_pack_years_smoked,year_of_tobacco_smoking_onset,residual_tumor,number_of_lymph_nodes,race,ethnicity
+TCGA-2J-AAB1,65,1,66,,pancreas,stage iib,t3,n1,m0,male,2012,no,pancreas-adenocarcinoma-other subtype,25,1962,r0,7,white,
+TCGA-2J-AAB4,48,0,,729,pancreas,stage iib,t2,n1,m0,male,2012,no,pancreas-adenocarcinoma-other subtype,,,r0,0,white,
+TCGA-2J-AAB6,75,1,293,,pancreas,stage iia,t3,n0,m0,male,2012,no,pancreas-adenocarcinoma ductal type,,,r0,0,white,
+TCGA-2J-AAB8,71,0,,80,pancreas,stage iib,t3,n1,m0,male,2012,,pancreas-adenocarcinoma ductal type,,,r1,3,white,
+TCGA-2J-AAB9,70,1,627,,pancreas,stage iib,t3,n1,m0,female,2012,yes,pancreas-adenocarcinoma ductal type,,,r0,6,white,
+TCGA-2J-AABA,55,1,607,,pancreas,stage iib,t3,n1,m0,male,2012,no,pancreas-adenocarcinoma ductal type,51,,r1,2,white,
+TCGA-2J-AABE,73,0,,676,pancreas,stage iia,t3,n0,m0,male,2012,yes,pancreas-adenocarcinoma ductal type,2.2,1960,r0,0,white,
+TCGA-2J-AABF,73,1,691,,pancreas,stage iib,t3,n1,m0,male,2012,yes,pancreas-adenocarcinoma ductal type,7.5,1960,r1,4,white,
+TCGA-2J-AABH,61,0,,1287,pancreas,stage iia,t3,n0,m0,male,2011,no,pancreas-adenocarcinoma-other subtype,,,r0,0,white,
+TCGA-2J-AABI,55,0,,969,pancreas,stage iia,t3,n0,m0,female,2011,yes,pancreas-adenocarcinoma-other subtype,42,1973,r0,0,white,
+TCGA-2J-AABK,71,0,,484,pancreas,stage iib,t3,n1,m0,male,2012,yes,pancreas-adenocarcinoma ductal type,,,r1,2,white,
+TCGA-2J-AABO,43,0,,440,pancreas,stage iib,t3,n1,m0,male,2013,yes,pancreas-adenocarcinoma ductal type,7.5,1993,r0,8,white,
+TCGA-2J-AABP,58,0,,463,pancreas,stage iib,t3,n1,m0,female,2013,no,pancreas-undifferentiated carcinoma,,,r0,1,white,
+TCGA-2J-AABR,60,0,,438,pancreas,stage iia,t3,n0,m0,female,2013,no,pancreas-adenocarcinoma ductal type,,,r0,0,white,
+TCGA-2J-AABT,72,0,,319,pancreas,stage iib,t3,n1,m0,female,2012,,pancreas-adenocarcinoma ductal type,,,r0,1,white,
+TCGA-2J-AABU,56,1,277,,pancreas,stage iib,t3,n1,m0,male,2012,no,pancreas-adenocarcinoma ductal type,,,r0,2,white,
+TCGA-2J-AABV,74,1,652,,pancreas,stage iib,t3,n1,m0,male,2012,no,pancreas-adenocarcinoma ductal type,30,,r1,13,white,
+TCGA-2L-AAQA,76,1,143,,pancreas,stage iib,t3,n1,mx,male,2010,no,pancreas-adenocarcinoma ductal type,30,,r1,6,white,
+TCGA-2L-AAQE,56,1,684,,pancreas,stage iib,t3,n1,m0,male,2011,no,pancreas-adenocarcinoma ductal type,30,,r0,1,white,
+TCGA-2L-AAQI,66,1,103,,pancreas,stage iib,t3,n1,mx,male,2011,no,pancreas-adenocarcinoma ductal type,,,r1,6,white,
+TCGA-2L-AAQJ,49,1,394,,pancreas,stage iii,t4,n0,mx,female,2010,no,pancreas-adenocarcinoma ductal type,,,r1,0,white,
+TCGA-2L-AAQL,82,1,292,,pancreas,stage iib,t3,n1,mx,male,2011,no,pancreas-adenocarcinoma ductal type,,,rx,3,white,
+TCGA-2L-AAQM,52,0,,1383,pancreas,stage iib,t3,n1,mx,male,2010,no,pancreas-adenocarcinoma-other subtype,,,r1,16,white,
+TCGA-3A-A9I5,57,0,,1794,pancreas,,,n0,mx,male,2009,yes,pancreas-adenocarcinoma ductal type,,,r0,0,white,not hispanic or latino
+TCGA-3A-A9I7,45,0,,1323,pancreas,stage iib,t3,n1,mx,male,2010,yes,pancreas-adenocarcinoma ductal type,,,r0,2,black or african american,not hispanic or latino
+TCGA-3A-A9I9,67,1,634,,pancreas,stage iia,t3,n0,mx,male,2011,yes,pancreas-adenocarcinoma ductal type,75,,r0,0,white,not hispanic or latino
+TCGA-3A-A9IB,69,1,224,,pancreas,stage iib,t3,n1,mx,female,2011,no,pancreas-adenocarcinoma ductal type,5,1962,r0,5,white,not hispanic or latino
+TCGA-3A-A9IC,61,1,738,,pancreas,stage iib,t3,n1,mx,female,2011,yes,pancreas-adenocarcinoma ductal type,,,r0,4,white,not hispanic or latino
+TCGA-3A-A9IH,66,0,,1021,pancreas,stage ia,t1,n0,mx,female,2012,no,pancreas-adenocarcinoma ductal type,,,r0,0,white,not hispanic or latino
+TCGA-3A-A9IJ,65,0,,1854,pancreas,stage ib,t2,n0,mx,male,2009,no,pancreas-adenocarcinoma-other subtype,25,1954,r0,0,white,not hispanic or latino
+TCGA-3A-A9IL,39,0,,2741,pancreas,stage i,t1,,mx,female,2007,no,pancreas-adenocarcinoma-other subtype,,,r0,5,white,not hispanic or latino
+TCGA-3A-A9IN,62,0,,2084,pancreas,stage ib,t2,nx,mx,female,2008,yes,pancreas-adenocarcinoma-other subtype,,,r1,,white,not hispanic or latino
+TCGA-3A-A9IO,55,0,,1942,pancreas,,tx,nx,mx,male,2009,no,pancreas-adenocarcinoma-other subtype,,,r0,,white,not hispanic or latino
+TCGA-3A-A9IR,64,0,,1542,pancreas,stage ib,t2,n0,mx,female,2010,no,pancreas-adenocarcinoma-other subtype,,1989,r0,0,white,not hispanic or latino
+TCGA-3A-A9IS,67,0,,998,pancreas,stage ib,t2,n0,mx,male,2010,no,pancreas-adenocarcinoma-other subtype,,,r0,0,white,not hispanic or latino
+TCGA-3A-A9IU,65,1,458,,pancreas,stage iib,t3,n1,mx,male,2011,no,pancreas-adenocarcinoma ductal type,,,r0,2,white,not hispanic or latino
+TCGA-3A-A9IV,59,0,,1103,pancreas,stage ib,t2,n0,mx,female,2011,no,pancreas-adenocarcinoma-other subtype,,,r0,0,white,not hispanic or latino
+TCGA-3A-A9IX,40,0,,1037,pancreas,stage ia,t1,n0,mx,male,2012,yes,pancreas-adenocarcinoma ductal type,2.3,1988,r0,0,white,not hispanic or latino
+TCGA-3A-A9IZ,47,1,308,,pancreas,stage iib,t3,n1,mx,male,2012,no,pancreas-adenocarcinoma ductal type,,,r1,3,white,hispanic or latino
+TCGA-3A-A9J0,75,0,,743,pancreas,stage iib,t3,n1,mx,male,2012,no,pancreas-adenocarcinoma ductal type,,,r0,5,white,not hispanic or latino
+TCGA-3E-AAAY,67,0,,2285,pancreas,stage iib,t3,n1,mx,male,2008,no,pancreas-adenocarcinoma ductal type,,,,5,white,not hispanic or latino
+TCGA-3E-AAAZ,71,1,2182,,pancreas,stage iia,t3,n0,mx,male,2008,,pancreas-adenocarcinoma ductal type,,,,0,white,hispanic or latino
+TCGA-F2-6879,57,1,334,,pancreas,stage iib,t3,n1,m0,male,2009,no,pancreas-adenocarcinoma-other subtype,,,r0,2,white,
+TCGA-F2-6880,70,0,,295,pancreas,stage iib,t3,n1,m0,male,2009,no,pancreas-adenocarcinoma ductal type,15,,r0,1,white,
+TCGA-F2-7273,54,1,592,,pancreas,stage iib,t3,n1,m0,male,2011,yes,pancreas-adenocarcinoma ductal type,,,r1,3,black or african american,not hispanic or latino
+TCGA-F2-7276,64,1,216,,pancreas,stage iib,t3,n1,m0,male,2011,no,pancreas-adenocarcinoma ductal type,,,r0,9,white,not hispanic or latino
+TCGA-F2-A44G,79,1,233,,pancreas,stage iib,t3,n1,m0,female,2012,yes,pancreas-adenocarcinoma ductal type,,,r1,3,white,not hispanic or latino
+TCGA-F2-A44H,65,0,,586,pancreas,stage iia,t3,n0,m0,male,2012,yes,pancreas-adenocarcinoma ductal type,,,r0,0,white,not hispanic or latino
+TCGA-F2-A7TX,77,1,95,,pancreas,stage iib,t3,n1,m0,male,2013,no,pancreas-adenocarcinoma ductal type,,,r1,7,white,
+TCGA-F2-A8YN,76,0,,517,pancreas,stage iia,t3,n0,m0,male,2013,no,pancreas-adenocarcinoma ductal type,60,,r1,0,white,not hispanic or latino
+TCGA-FB-A4P5,69,1,179,,pancreas,stage iib,t3,n1,mx,female,2012,,pancreas-adenocarcinoma ductal type,40,1968,r0,4,white,not hispanic or latino
+TCGA-FB-A545,72,1,732,,pancreas,stage iib,t3,n1,m0,female,2012,yes,pancreas-adenocarcinoma ductal type,,,,4,white,not hispanic or latino
+TCGA-FB-A5VM,74,1,498,,pancreas,stage ib,t2,n0,m0,male,2012,no,pancreas-adenocarcinoma ductal type,24,1953,r0,0,white,not hispanic or latino
+TCGA-FB-A78T,71,1,375,,pancreas,stage iib,t3,n1,m0,female,2013,no,pancreas-adenocarcinoma ductal type,2,1980,r0,4,white,not hispanic or latino
+TCGA-FB-A7DR,48,1,353,,pancreas,stage iia,t3,nx,m0,male,2012,no,pancreas-colloid (mucinous non-cystic) carcinoma,20,1993,r0,,asian,not hispanic or latino
+TCGA-FB-AAPP,71,1,485,,pancreas,stage iib,t3,n1,mx,male,2009,yes,pancreas-adenocarcinoma ductal type,,,r0,3,white,not hispanic or latino
+TCGA-FB-AAPQ,65,1,1130,,pancreas,stage iib,t3,n1,mx,male,2008,no,pancreas-adenocarcinoma ductal type,25,1983,r0,4,white,not hispanic or latino
+TCGA-FB-AAPS,62,0,,228,pancreas,stage iib,t2,n1,mx,female,2008,yes,pancreas-adenocarcinoma ductal type,10,1960,r0,1,white,not hispanic or latino
+TCGA-FB-AAPU,41,1,381,,pancreas,stage iia,t3,n0,mx,female,2008,no,pancreas-adenocarcinoma ductal type,,,r1,0,asian,not hispanic or latino
+TCGA-FB-AAPY,71,1,1059,,pancreas,stage iib,t2,n1,mx,male,2007,yes,pancreas-adenocarcinoma ductal type,25,1960,r0,2,white,not hispanic or latino
+TCGA-FB-AAPZ,54,0,,716,pancreas,stage iib,t2,n1,mx,male,2008,no,pancreas-adenocarcinoma ductal type,,,r0,1,white,not hispanic or latino
+TCGA-FB-AAQ0,68,1,473,,pancreas,stage iia,t3,n0,mx,male,2011,no,pancreas-adenocarcinoma ductal type,,,r0,0,white,not hispanic or latino
+TCGA-FB-AAQ1,49,1,123,,pancreas,stage iib,t3,n1,mx,male,2011,no,pancreas-adenocarcinoma ductal type,,,r1,3,white,not hispanic or latino
+TCGA-FB-AAQ2,81,1,153,,pancreas,stage iib,t3,n1,mx,female,2011,no,pancreas-adenocarcinoma ductal type,,,r1,2,white,not hispanic or latino
+TCGA-FB-AAQ3,65,1,31,,pancreas,stage iib,t3,n1,mx,female,2010,no,pancreas-adenocarcinoma ductal type,,,r0,1,white,not hispanic or latino
+TCGA-FB-AAQ6,85,1,244,,pancreas,stage ia,t1,n0,mx,male,2011,no,pancreas-adenocarcinoma ductal type,,,r0,0,white,not hispanic or latino
+TCGA-H6-8124,56,0,,392,pancreas,stage iib,t3,n1,m0,female,2011,yes,pancreas-adenocarcinoma ductal type,3.5,1969,r0,2,white,not hispanic or latino
+TCGA-H6-A45N,88,1,421,,pancreas,stage iib,t3,n1,mx,female,2012,no,pancreas-adenocarcinoma-other subtype,1,,,1,white,not hispanic or latino
+TCGA-H8-A6C1,53,0,,671,pancreas,stage iia,t3,n0,mx,male,2012,no,pancreas-adenocarcinoma-other subtype,30,1982,r0,0,white,not hispanic or latino
+TCGA-HV-A5A3,50,1,128,,pancreas,stage iia,t3,nx,mx,male,2012,no,pancreas-adenocarcinoma ductal type,,,,5,asian,
+TCGA-HV-A5A4,72,0,,232,pancreas,stage iia,t3,n0,mx,female,2012,no,pancreas-adenocarcinoma ductal type,,,,1,asian,
+TCGA-HV-A5A5,61,0,,289,pancreas,stage iib,t3,n1,m0,female,2012,no,pancreas-adenocarcinoma ductal type,,,,2,asian,
+TCGA-HV-A5A6,65,1,2036,,pancreas,stage iib,t3,n1b,m0,female,2001,no,pancreas-adenocarcinoma ductal type,,,r0,2,asian,
+TCGA-HV-A7OL,70,0,,252,pancreas,stage iia,t3,n0,mx,male,2012,no,pancreas-adenocarcinoma ductal type,,,r2,,asian,
+TCGA-HV-A7OP,72,0,,978,pancreas,stage iib,t3,n1,m0,male,2012,yes,pancreas-adenocarcinoma-other subtype,,,r0,7,asian,
+TCGA-HV-AA8V,50,0,,920,pancreas,stage iib,t3,n1,mx,male,2012,no,pancreas-adenocarcinoma ductal type,60,,r2,3,asian,
+TCGA-HV-AA8X,75,1,532,,pancreas,stage iib,t2,n1,mx,female,2013,no,pancreas-adenocarcinoma ductal type,,,r2,3,asian,
+TCGA-HZ-7289,77,1,661,,pancreas,stage iib,t3,n1,mx,male,2010,no,pancreas-adenocarcinoma-other subtype,,,rx,1,white,not hispanic or latino
+TCGA-HZ-7918,72,0,,969,pancreas,stage iib,t3,n1,m0,male,2011,yes,pancreas-adenocarcinoma ductal type,,,r0,11,white,not hispanic or latino
+TCGA-HZ-7919,52,1,593,,pancreas,stage iib,t3,n1,m0,female,2011,,pancreas-adenocarcinoma ductal type,,,r1,2,white,not hispanic or latino
+TCGA-HZ-7920,71,1,236,,pancreas,stage ib,t2,n0,mx,male,2011,yes,pancreas-adenocarcinoma ductal type,,,r0,0,white,not hispanic or latino
+TCGA-HZ-7922,61,0,,4,pancreas,stage iib,t3,n1,mx,female,2011,,pancreas-adenocarcinoma ductal type,,,r0,3,white,not hispanic or latino
+TCGA-HZ-7923,65,0,,314,pancreas,stage iia,t3,n0,mx,male,2011,no,pancreas-adenocarcinoma ductal type,,,r0,0,white,not hispanic or latino
+TCGA-HZ-7924,60,0,,840,pancreas,stage iia,t3,n0,mx,female,2011,no,pancreas-adenocarcinoma ductal type,,,r0,0,white,not hispanic or latino
+TCGA-HZ-7925,66,1,614,,pancreas,stage iib,t3,n1,mx,male,2011,no,pancreas-adenocarcinoma ductal type,,,r0,2,white,not hispanic or latino
+TCGA-HZ-7926,57,1,518,,pancreas,stage iib,t3,n1,mx,male,2011,,pancreas-adenocarcinoma ductal type,,,rx,2,black or african american,not hispanic or latino
+TCGA-HZ-8001,69,0,,706,pancreas,stage iii,t4,n0,mx,male,2011,no,pancreas-adenocarcinoma ductal type,,,r0,0,white,not hispanic or latino
+TCGA-HZ-8002,61,1,366,,pancreas,stage iib,t3,n1,mx,male,2011,no,pancreas-adenocarcinoma ductal type,,,r0,4,white,not hispanic or latino
+TCGA-HZ-8003,65,1,596,,pancreas,stage iib,t3,n1,mx,female,2011,no,pancreas-adenocarcinoma ductal type,,,r0,1,white,not hispanic or latino
+TCGA-HZ-8005,81,1,120,,pancreas,stage iib,t3,n1,mx,male,2012,no,pancreas-adenocarcinoma ductal type,,,r1,8,white,not hispanic or latino
+TCGA-HZ-8315,54,1,299,,pancreas,stage iia,t3,n0,mx,female,2012,,pancreas-adenocarcinoma ductal type,,,r1,0,white,not hispanic or latino
+TCGA-HZ-8317,69,1,378,,pancreas,stage iib,t3,n1,mx,female,2012,yes,pancreas-adenocarcinoma ductal type,,,r1,4,white,not hispanic or latino
+TCGA-HZ-8519,73,0,,454,pancreas,stage ia,t1,n0,mx,male,2012,yes,pancreas-adenocarcinoma-other subtype,,,r0,0,white,not hispanic or latino
+TCGA-HZ-8636,58,1,545,,pancreas,stage iv,t3,n0,m1,female,2012,,pancreas-adenocarcinoma ductal type,,,r1,0,white,not hispanic or latino
+TCGA-HZ-8637,76,1,517,,pancreas,stage iib,t3,n1,mx,female,2012,yes,pancreas-adenocarcinoma ductal type,,,r0,1,white,hispanic or latino
+TCGA-HZ-8638,84,1,151,,pancreas,stage ia,t1,n0,mx,female,2012,no,pancreas-colloid (mucinous non-cystic) carcinoma,,,r0,0,white,not hispanic or latino
+TCGA-HZ-A49G,58,0,,660,pancreas,stage iib,t2,n1,mx,female,2012,yes,pancreas-adenocarcinoma ductal type,,,r1,3,white,not hispanic or latino
+TCGA-HZ-A49H,68,0,,491,pancreas,stage iib,t3,n1,mx,female,2012,no,pancreas-adenocarcinoma ductal type,,,r0,1,white,not hispanic or latino
+TCGA-HZ-A49I,77,1,308,,pancreas,stage iib,t3,n1,mx,male,2012,yes,pancreas-adenocarcinoma ductal type,,,r1,3,white,not hispanic or latino
+TCGA-HZ-A4BH,75,0,,194,pancreas,stage iib,t3,n1b,mx,male,2011,,pancreas-adenocarcinoma ductal type,,,r1,4,white,
+TCGA-HZ-A4BK,72,0,,657,pancreas,stage iib,t3,n1,mx,male,2012,yes,pancreas-adenocarcinoma-other subtype,,,r1,2,white,not hispanic or latino
+TCGA-HZ-A77O,77,1,160,,pancreas,stage iib,t2,n1,mx,female,2013,no,pancreas-adenocarcinoma ductal type,,,r0,4,white,not hispanic or latino
+TCGA-HZ-A77P,77,0,,330,pancreas,stage iib,t3,n1,mx,male,2013,no,pancreas-adenocarcinoma-other subtype,,,r0,1,white,not hispanic or latino
+TCGA-HZ-A77Q,55,0,,33,pancreas,stage iib,t3,n1,mx,female,2013,,pancreas-adenocarcinoma-other subtype,15,1983,r0,1,white,not hispanic or latino
+TCGA-HZ-A8P0,76,0,,0,pancreas,stage iib,t3,n1,mx,male,2013,,pancreas-adenocarcinoma ductal type,20,1968,r0,15,white,not hispanic or latino
+TCGA-HZ-A8P1,81,0,,7,pancreas,stage ib,t2,n0,mx,male,2013,,pancreas-adenocarcinoma ductal type,15,1952,r0,0,white,not hispanic or latino
+TCGA-HZ-A9TJ,70,0,,603,pancreas,stage iv,t3,n0,m1,male,2013,no,pancreas-adenocarcinoma-other subtype,,,r0,0,white,not hispanic or latino
+TCGA-IB-7644,65,1,394,,pancreas,stage iv,t3,n1,m1,female,2011,no,pancreas-adenocarcinoma ductal type,30,1981,r1,3,white,not hispanic or latino
+TCGA-IB-7645,44,1,1502,,pancreas,stage iib,t3,n1,m0,female,2007,no,pancreas-adenocarcinoma ductal type,,,r0,5,,
+TCGA-IB-7646,60,1,145,,pancreas,stage iib,t3,n1,m0,male,2007,no,pancreas-adenocarcinoma ductal type,,,r1,6,white,not hispanic or latino
+TCGA-IB-7647,41,1,666,,pancreas,stage iib,t3,n1,m0,male,2008,no,pancreas-adenocarcinoma ductal type,,,r1,14,white,not hispanic or latino
+TCGA-IB-7649,73,1,467,,pancreas,stage iib,t3,n1,m0,female,2007,no,pancreas-adenocarcinoma ductal type,57,1951,r1,5,,
+TCGA-IB-7651,64,1,603,,pancreas,stage iib,t3,n1,m0,female,2009,no,pancreas-adenocarcinoma ductal type,20,1989,r0,3,white,not hispanic or latino
+TCGA-IB-7652,49,0,,1116,pancreas,stage iib,t3,n1,m0,female,2011,no,pancreas-adenocarcinoma ductal type,,,r1,1,asian,not hispanic or latino
+TCGA-IB-7654,80,1,476,,pancreas,stage iib,t2,n1,m0,male,2008,no,pancreas-adenocarcinoma ductal type,,,r0,2,white,not hispanic or latino
+TCGA-IB-7885,78,0,,1257,pancreas,stage iib,t3,n1,m0,female,2010,no,pancreas-adenocarcinoma ductal type,20,1960,r0,3,white,not hispanic or latino
+TCGA-IB-7886,80,1,123,,pancreas,stage iib,t3,n1,m0,male,2010,no,pancreas-adenocarcinoma ductal type,35,1975,r1,4,white,not hispanic or latino
+TCGA-IB-7887,62,1,110,,pancreas,stage iib,t3,n1,m0,female,2009,no,pancreas-adenocarcinoma ductal type,20,,r1,3,white,not hispanic or latino
+TCGA-IB-7888,66,1,1332,,pancreas,stage iia,t3,n0,m0,female,2008,no,pancreas-adenocarcinoma ductal type,,,r0,0,black or african american,not hispanic or latino
+TCGA-IB-7889,85,1,481,,pancreas,stage iib,t3,n1,m0,female,2011,no,pancreas-adenocarcinoma ductal type,,,r0,3,white,not hispanic or latino
+TCGA-IB-7890,73,1,598,,pancreas,stage ib,t2,n0,m0,male,2008,no,pancreas-adenocarcinoma ductal type,,,r0,0,,
+TCGA-IB-7891,49,1,913,,pancreas,stage iib,t3,n1,m0,female,2011,no,pancreas-adenocarcinoma ductal type,29,1980,r0,7,white,not hispanic or latino
+TCGA-IB-7893,64,1,117,,pancreas,stage iia,t3,n0,m0,male,2009,no,pancreas-adenocarcinoma ductal type,,,r0,0,white,not hispanic or latino
+TCGA-IB-7897,53,1,486,,pancreas,stage iib,t3,n1,m0,female,2008,no,pancreas-adenocarcinoma ductal type,,,r0,2,white,not hispanic or latino
+TCGA-IB-8126,79,0,,462,pancreas,stage iii,t4,n1,m0,female,2011,no,pancreas-adenocarcinoma ductal type,4,1957,r1,5,white,not hispanic or latino
+TCGA-IB-8127,59,0,,522,pancreas,stage iib,t3,n1,m0,male,2011,no,pancreas-adenocarcinoma ductal type,40,1971,r1,3,white,not hispanic or latino
+TCGA-IB-A5SO,71,1,365,,pancreas,stage iib,t3,n1,m0,male,2012,no,pancreas-adenocarcinoma ductal type,,,r0,3,white,
+TCGA-IB-A5SP,77,0,,482,pancreas,stage iia,t3,n0,m0,male,2011,no,pancreas-adenocarcinoma ductal type,,,r1,0,white,
+TCGA-IB-A5SQ,56,1,219,,pancreas,stage ib,t2,n0,m0,female,2012,no,pancreas-adenocarcinoma ductal type,,,r0,0,white,not hispanic or latino
+TCGA-IB-A5SS,64,1,460,,pancreas,stage iib,t3,n1,m0,female,2011,no,pancreas-adenocarcinoma ductal type,20,1991,r0,5,white,not hispanic or latino
+TCGA-IB-A5ST,64,0,,635,pancreas,stage iib,t3,n1,m0,female,2012,no,pancreas-adenocarcinoma ductal type,,,r0,2,white,not hispanic or latino
+TCGA-IB-A6UF,63,0,,666,pancreas,stage iib,t3,n1,m0,male,2012,no,pancreas-adenocarcinoma ductal type,40,1973,r1,7,white,not hispanic or latino
+TCGA-IB-A6UG,65,1,41,,pancreas,stage iib,t3,n1,m0,male,2012,no,pancreas-adenocarcinoma ductal type,33.75,1968,r1,16,white,not hispanic or latino
+TCGA-IB-A7LX,57,1,250,,pancreas,stage iib,t3,n1,mx,male,2012,no,pancreas-adenocarcinoma ductal type,,,r0,4,white,not hispanic or latino
+TCGA-IB-A7M4,81,0,,483,pancreas,stage iib,t3,n1,mx,male,2013,no,pancreas-adenocarcinoma ductal type,52,1956,r0,1,white,not hispanic or latino
+TCGA-IB-AAUM,76,0,,8,pancreas,stage iib,t2,n1,m0,male,2013,no,pancreas-adenocarcinoma ductal type,,,r0,1,white,not hispanic or latino
+TCGA-IB-AAUN,74,1,144,,pancreas,stage ib,t2,n0,m0,female,2013,no,pancreas-adenocarcinoma ductal type,,,r1,0,white,not hispanic or latino
+TCGA-IB-AAUO,64,1,239,,pancreas,stage iib,t3,n1,m0,female,2013,no,pancreas-adenocarcinoma ductal type,,,r1,5,white,not hispanic or latino
+TCGA-IB-AAUP,68,0,,431,pancreas,stage iib,t3,n1,m0,male,2013,no,pancreas-adenocarcinoma ductal type,,,r1,7,white,not hispanic or latino
+TCGA-IB-AAUQ,50,1,183,,pancreas,stage iib,t3,n1,m0,male,2013,no,pancreas-adenocarcinoma ductal type,69,1978,r1,13,white,not hispanic or latino
+TCGA-IB-AAUR,67,0,,338,pancreas,stage iib,t3,n1,m0,male,2013,no,pancreas-adenocarcinoma ductal type,,,r1,9,white,not hispanic or latino
+TCGA-IB-AAUS,84,0,,225,pancreas,stage iib,t3,n1,m0,female,2013,no,pancreas-adenocarcinoma ductal type,40,1948,r1,2,white,not hispanic or latino
+TCGA-IB-AAUT,65,0,,287,pancreas,stage iib,t2,n1,m0,male,2013,no,pancreas-colloid (mucinous non-cystic) carcinoma,15,1988,r1,7,white,not hispanic or latino
+TCGA-IB-AAUU,35,0,,245,pancreas,stage iib,t3,n1,m0,male,2013,no,pancreas-adenocarcinoma ductal type,15,,r0,2,white,not hispanic or latino
+TCGA-IB-AAUV,49,0,,404,pancreas,stage iib,t3,n1,m0,male,2013,no,pancreas-adenocarcinoma ductal type,50,1980,r0,3,white,not hispanic or latino
+TCGA-IB-AAUW,63,1,230,,pancreas,stage iib,t3,n1,m0,female,2013,no,pancreas-adenocarcinoma ductal type,,,r0,1,white,not hispanic or latino
+TCGA-L1-A7W4,48,1,278,,pancreas,stage iib,t3,n1,m0,female,2013,no,pancreas-adenocarcinoma ductal type,,,r2,2,white,not hispanic or latino
+TCGA-LB-A7SX,74,1,393,,pancreas,stage iib,t3,n1,mx,female,2013,no,pancreas-adenocarcinoma ductal type,40,1952,r1,7,black or african american,not hispanic or latino
+TCGA-LB-A8F3,64,0,,379,pancreas,stage iia,t3,n0,mx,female,2013,yes,pancreas-adenocarcinoma ductal type,,,r0,0,black or african american,not hispanic or latino
+TCGA-LB-A9Q5,63,1,313,,pancreas,stage iib,t3,n1,mx,female,2013,yes,pancreas-adenocarcinoma ductal type,0.3,1971,r0,3,white,not hispanic or latino
+TCGA-M8-A5N4,48,0,,584,pancreas,stage iia,t3,n0,m0,female,,yes,pancreas-adenocarcinoma ductal type,,,r1,0,,
+TCGA-OE-A75W,75,1,267,,pancreas,stage iia,t3,n0,m0,male,2013,yes,pancreas-adenocarcinoma ductal type,30,1956,r0,0,white,not hispanic or latino
+TCGA-PZ-A5RE,44,1,470,,pancreas,stage iib,t3,n1,mx,female,2012,yes,pancreas-adenocarcinoma ductal type,,,,3,white,not hispanic or latino
+TCGA-Q3-A5QY,58,0,,416,pancreas,stage iib,t3,n1,mx,male,2012,no,pancreas-adenocarcinoma ductal type,,,r0,4,white,not hispanic or latino
+TCGA-Q3-AA2A,64,0,,95,pancreas,stage ib,t3,n1,mx,female,2013,no,pancreas-adenocarcinoma ductal type,,,rx,9,white,not hispanic or latino
+TCGA-RB-A7B8,81,1,466,,pancreas,stage iib,t3,n1,mx,female,2013,no,pancreas-adenocarcinoma-other subtype,,,r0,8,white,not hispanic or latino
+TCGA-RB-AA9M,43,0,,286,pancreas,stage iib,t1,n1,mx,male,2013,yes,pancreas-adenocarcinoma ductal type,,,r0,1,white,not hispanic or latino
+TCGA-RL-AAAS,60,0,,9,pancreas,stage ib,t2,n0,m0,female,2013,no,pancreas-adenocarcinoma ductal type,,,r0,0,white,not hispanic or latino
+TCGA-S4-A8RM,67,0,,737,pancreas,stage iib,t3,n1,mx,male,2013,no,pancreas-adenocarcinoma ductal type,25,1966,r0,1,white,not hispanic or latino
+TCGA-S4-A8RO,75,0,,525,pancreas,stage iib,t3,n1,mx,female,2013,yes,pancreas-adenocarcinoma ductal type,,,r1,1,white,not hispanic or latino
+TCGA-S4-A8RP,77,1,702,,pancreas,stage iib,t3,n1,mx,female,2010,yes,pancreas-adenocarcinoma ductal type,26,,r0,2,white,
+TCGA-US-A774,76,1,695,,pancreas,stage iib,t3,n1,mx,female,2011,no,pancreas-adenocarcinoma ductal type,4.65,1955,r0,2,white,not hispanic or latino
+TCGA-US-A776,61,0,,1216,pancreas,stage iia,t3,n0,mx,male,2011,no,pancreas-colloid (mucinous non-cystic) carcinoma,,,r0,0,white,not hispanic or latino
+TCGA-US-A779,54,1,511,,pancreas,stage iib,t3,n1b,mx,female,2011,,pancreas-adenocarcinoma ductal type,,,r0,2,white,not hispanic or latino
+TCGA-US-A77E,73,1,430,,pancreas,stage iib,t3,n1,mx,male,2012,no,pancreas-adenocarcinoma-other subtype,,,r1,2,white,not hispanic or latino
+TCGA-US-A77G,64,1,12,,pancreas,stage iib,t3,n1,mx,male,2010,no,pancreas-adenocarcinoma ductal type,,,r0,3,white,not hispanic or latino
+TCGA-US-A77J,81,1,568,,pancreas,stage iib,t3,n1b,mx,female,2010,,pancreas-adenocarcinoma ductal type,,,r0,4,white,not hispanic or latino
+TCGA-XD-AAUG,66,0,,420,pancreas,stage iv,t3,n1,m1,female,2013,no,pancreas-adenocarcinoma ductal type,,,r0,1,white,not hispanic or latino
+TCGA-XD-AAUH,57,0,,395,pancreas,stage iib,t3,n1,m0,female,2013,yes,pancreas-adenocarcinoma ductal type,,,r2,7,white,not hispanic or latino
+TCGA-XD-AAUI,50,1,366,,pancreas,stage iib,t3,n1,mx,female,2013,no,pancreas-adenocarcinoma ductal type,,1979,r1,10,white,not hispanic or latino
+TCGA-XD-AAUL,56,0,,498,pancreas,stage iia,t3,n0,mx,male,2013,no,pancreas-adenocarcinoma ductal type,30,1984,r0,0,white,not hispanic or latino
+TCGA-XN-A8T3,67,0,,951,pancreas,stage ib,t2,n0,m0,male,2012,yes,pancreas-adenocarcinoma ductal type,,,r1,0,white,hispanic or latino
+TCGA-XN-A8T5,53,0,,720,pancreas,stage ib,t2,n0,m0,female,2012,yes,pancreas-adenocarcinoma-other subtype,15.2,1974,r1,0,white,hispanic or latino
+TCGA-YB-A89D,59,0,,350,pancreas,stage iib,t3,n1,mx,male,2013,yes,pancreas-adenocarcinoma ductal type,,,r0,4,white,not hispanic or latino
+TCGA-YH-A8SY,73,0,,388,pancreas,stage iii,t3,n1,mx,female,2011,yes,,,,,16,white,not hispanic or latino
+TCGA-YY-A8LH,61,0,,2016,pancreas,stage iib,t3,n1,mx,female,2009,yes,pancreas-adenocarcinoma ductal type,46,1963,r0,2,white,not hispanic or latino
+TCGA-Z5-AAPL,74,0,,467,pancreas,stage iia,t3,n0,m0,female,2013,no,pancreas-adenocarcinoma ductal type,,,r0,0,white,not hispanic or latino
