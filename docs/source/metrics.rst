@@ -1,153 +1,139 @@
-Metrics
-=======
+Metrics and Visualization
+=========================
 
-The metrics module includes functions that perform statistical analyses and generate visualizations. Functions from the metrics module allow users to assess and explore network-based embeddings, evaluate clustering performance, and explore the tabular data and network structure.
-The following examples and plots are from our :doc:`Quick_Start`.
+The ``metrics`` module provides a suite of tools for statistical analysis, quality control, and visualization. These functions allow users to assess data variance, explore network structures, evaluate clustering concordance, and visualize downstream performance metrics.
 
-Visualization
--------------
+To see the full code used to generate the plots below (specifically for the Kidney Cancer analysis), refer to our **TCGA KIPAN Biomarker Discovery** tutorial in :doc:`notebooks/index`.
 
-The module also contains several plotting functions:
+Performance Evaluation
+----------------------
 
-- :func:`bioneuralnet.metrics.plot.plot_network` displays the network graph from an adjacency matrix.
-- :func:`bioneuralnet.metrics.plot.plot_embeddings` visualizes high-dimensional embeddings by projecting them into a 2 dimensional space.
+BioNeuralNet provides specialized plotting functions to compare model performance (e.g., Accuracy, F1-Score) across different experiments.
 
-Example Usage
--------------
+* :func:`bioneuralnet.metrics.plot_multiple_metrics`: Visualizes multiple metrics on the same figure for comprehensive benchmarking.
+* :func:`bioneuralnet.metrics.plot_performance`: Plots a standard performance comparison.
+* :func:`bioneuralnet.metrics.plot_performance_three`: Compares three distinct metric sets side-by-side.
 
-**Network Visualization**
-Visualization of network showing labels but no edge weights.
+**Example: Benchmarking GNNs vs Baselines**
 
-.. image:: _static/plot_network.png
+The following plots demonstrate a comprehensive benchmarking analysis from our **TCGA KIPAN** case study, comparing BioNeuralNet GNN architectures (GIN, GraphSAGE, GAT, GCN) against standard baseline models across six different performance metrics.
+
+.. image:: _static/metrics_plot_1.png
    :align: center
-   :alt: Network Visualization of Louvain Clusters exampleOne
+   :alt: GNNs vs Baselines: Accuracy and F1 Scores
 
-**Table Output:**
-
-+-------+-----------+--------+
-| Index |   Omic    | Degree |
-+=======+===========+========+
-|  11   | Gene_411  |   6    |
-+-------+-----------+--------+
-|  16   | Gene_7    |   5    |
-+-------+-----------+--------+
-|  24   | Gene_174  |   5    |
-+-------+-----------+--------+
-|   3   | Gene_1    |   4    |
-+-------+-----------+--------+
-|  28   | Gene_114  |   4    |
-+-------+-----------+--------+
-
-Visualization of network showing labels and edge weights.
-
-.. image:: _static/plot_network2.png
+.. image:: _static/metrics_plot_2.png
    :align: center
-   :alt: Network Visualization of Louvain Clusters exampleTwo
+   :alt: GNNs vs Baselines: Recall, AUC, and AUPR
 
-**Table Output:**
+For implementation details and parameters, refer to the API documentation: :func:`bioneuralnet.metrics.plot_multiple_metrics`.
 
-+--------+-----------+--------+
-| Index  |   Omic    | Degree |
-+========+===========+========+
-|   1    | Gene_7    |   4    |
-+--------+-----------+--------+
-|   2    | Gene_6    |   4    |
-+--------+-----------+--------+
-|   3    | Gene_1    |   4    |
-+--------+-----------+--------+
-|   4    | Gene_446  |   4    |
-+--------+-----------+--------+
-|   5    | Gene_53   |   4    |
-+--------+-----------+--------+
+Embedding Visualization
+-----------------------
 
-.. code-block:: python
+:func:`bioneuralnet.metrics.plot_embeddings` visualizes high-dimensional embeddings (e.g., from GCN or GAT models) by projecting them into a 2-dimensional space using t-SNE or UMAP.
 
-   from bioneuralnet.metrics import plot_network
-   from bioneuralnet.metrics import louvain_to_adjacency
+The example below shows embeddings from the **TCGA KIPAN** dataset, revealing distinct clusters corresponding to different omics modalities (DNA Methylation, RNA, miRNA).
 
-   cluster1 = hybrid_result[0]
-   cluster2 = hybrid_result[1]
-
-   # Convert Louvain clusters into adjacency matrices
-   louvain_adj1 = louvain_to_adjacency(cluster1)
-   louvain_adj2 = louvain_to_adjacency(cluster2)
-
-   # Plot using the converted adjacency matrices
-   cluster1_mapping = plot_network(louvain_adj1, weight_threshold=0.1, show_labels=True, show_edge_weights=False)
-   print(cluster1_mapping.head())
-   cluster2_mapping = plot_network(louvain_adj2, weight_threshold=0.01, show_labels=True, show_edge_weights=True)
-   print(cluster2_mapping.head())
-
-
-**Embeddings Visualization**
-
-Visualizing a 16 dimension embedding space projected into a 2 dimensional space.
-
-.. image:: _static/embeddings.png
+.. image:: _static/emb_kipan.png
    :align: center
-   :alt: 2D t-SNE Projection of Embeddings
+   :alt: 2D Projection of Embeddings from KIPAN Analysis
 
 .. code-block:: python
 
    from bioneuralnet.metrics import plot_embeddings
 
-   # Using our embeddings instance, we get the necessary labels for the graph.
-   node_labels = gnn._prepare_node_labels()
-   embeddings_array = embeddings.values  
-   embeddings_plot = plot_embeddings(embeddings_array, node_labels)
+   # feature(omics) embeddings colored by omics type.
+   print(f"Plotting Feature Embeddings for graph:")
+   plot_embeddings(GAT_embeddings_array, node_labels, legend_labels=["DNA_Methylation", "RNA", "miRNA"])
 
-Correlation Metrics
--------------------
+Network Visualization & Clustering
+----------------------------------
 
-- :func:`bioneuralnet.metrics.correlation.cluster_correlation` computes the Pearson correlation for a cluster of features with a phenotype. Clusters with fewer than two features or with zero variance are handled properly.
+These functions allow you to inspect the topology of your constructed networks and the modules identified by clustering algorithms.
 
-**Cluster Comparison**
-Hybrid louvain with the SmCCNet clusters.
+Network Graph
+~~~~~~~~~~~~~
 
-.. image:: _static/clusters.png
+:func:`bioneuralnet.metrics.plot_network` displays the network graph from an adjacency matrix. It allows for filtering edges by weight to focus on strong connections (hubs).
+
+.. image:: _static/kipan_net.png
    :align: center
-   :alt: clusters Graph Comparison
+   :alt: Network Visualization of Hub Genes in KIPAN
+   :width: 80%
 
 .. code-block:: python
 
-   # Lets compare hytbrid louvain with the SmCCNet clusters
-   print("Number of clusters:", len(hybrid_result))
+   from bioneuralnet.metrics import plot_network, louvain_to_adjacency
 
-   compare_clusters(hybrid_result, clusters, phenotype, merged_omics)
+   # Convert identified clusters (e.g., from Hybrid Louvain) to adjacency
+   louvain_adj = louvain_to_adjacency(cluster_result)
 
-Evaluation
-----------
+   # Visualize the top connected module, filtering weak edges
+   plot_network(
+       louvain_adj, 
+       weight_threshold=0.7, 
+       show_labels=True, 
+       show_edge_weights=True
+   )
 
-- :func:`bioneuralnet.metrics.evaluation.evaluate_rf` trains and evaluates a Random Forest model over multiple runs.
-- :func:`bioneuralnet.metrics.plot.plot_multiple_metrics` plots multiple metrics on the same figure.
+Cluster Comparison
+~~~~~~~~~~~~~~~~~~
 
-**Plotting Multiple Performance Metrics**
-Visualizing performance metrics comparison.
-
-.. image:: _static/performance.png
-   :align: center
-   :alt: plot of multiple performance metrics
+:func:`bioneuralnet.metrics.compare_clusters` allows for the visual and statistical comparison of different clustering results (e.g., comparing Hybrid Louvain results against SmCCNet results).
 
 .. code-block:: python
 
-   from bioneuralnet.metrics import evaluate_rf, plot_multiple_metrics
+   from bioneuralnet.metrics import compare_clusters
 
-   # raw omics evaluation
-   X_raw = merged_omics.values
-   y_global = phenotype.values
-   rf_acc, rd_f1w, rf_f1m = evaluate_rf(X_raw, y_global, n_estimators=100, runs=5, mode="classification")
-
-   # metrics dictionary
-   metrics = {
-      "Accuracy": {"Raw": rf_acc,"DPMON": dpmon_acc_tuple},
-      "F1-Weighted": {"Raw": rd_f1w,"DPMON": dpmon_f1w_tuple},
-      "F1-Macro": {"Raw": rf_f1m,"DPMON": dpmon_f1m_tuple}
-   }
-
-   plot_multiple_metrics(metrics)
+   # Compare Hybrid Louvain results with SmCCNet clusters
+   compare_clusters(hybrid_result, smccnet_clusters, phenotype, merged_omics)
 
 
-Further Information
--------------------
+Correlation & Data Quality
+--------------------------
 
-For more details on each function and its parameters, see the metrics reference: https://bioneuralnet.readthedocs.io/en/latest/_autosummary/bioneuralnet.metrics.html
+These utilities help validate input data quality and quantify relationships between features and phenotypes.
+
+Feature & Cluster Correlation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* :func:`bioneuralnet.metrics.omics_correlation`: Computes correlation between raw omics features.
+* :func:`bioneuralnet.metrics.cluster_correlation`: Computes the Pearson correlation for a specific cluster of features against a phenotype.
+
+.. code-block:: python
+
+   from bioneuralnet.metrics import cluster_correlation
+
+   # Calculate correlation of a specific cluster with the phenotype
+   score = cluster_correlation(cluster_features, phenotype_data)
+
+Data Variance
+~~~~~~~~~~~~~
+
+BioNeuralNet includes tools to inspect the variance within your omics datasets, which is crucial for feature selection.
+
+* :func:`bioneuralnet.metrics.plot_variance_distribution`: Plots the distribution of variances across all features.
+* :func:`bioneuralnet.metrics.plot_variance_by_feature`: Visualizes variance for individual features, helping to identify low-information features.
+
+.. code-block:: python
+
+   from bioneuralnet.metrics import plot_variance_distribution, plot_variance_by_feature
+
+   # Visualize the distribution of variance in the dataset
+   plot_variance_distribution(omics_df)
+
+   # Inspect specific feature variances to guide filtering
+   plot_variance_by_feature(omics_df, top_n=20)
+
+
+Utilities
+---------
+
+* :func:`bioneuralnet.metrics.louvain_to_adjacency`: A helper function that converts the output of Louvain clustering algorithms into an adjacency matrix format suitable for plotting with ``plot_network``.
+
+Reference
+---------
+
+For more details on each function and its parameters, see the full API reference: 
+.. `bioneuralnet.metrics API <https://bioneuralnet.readthedocs.io/en/latest/_autosummary/bioneuralnet.metrics.html>`_

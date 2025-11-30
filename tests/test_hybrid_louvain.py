@@ -68,8 +68,7 @@ class TestHybridLouvain(unittest.TestCase):
         fake_pagerank = MagicMock()
 
         def fake_pr_run(best_seed):
-            # Return the same nodes as the refined cluster
-            return {"cluster_nodes": best_seed}
+            return {"cluster_nodes": best_seed,"conductance": 0.5,"correlation": 0.8,"composite_score": 0.6}
 
         fake_pagerank.run.side_effect = fake_pr_run
         mock_page_rank_cls.return_value = fake_pagerank
@@ -113,7 +112,8 @@ class TestHybridLouvain(unittest.TestCase):
         mock_louvain_cls.return_value = fake_louvain
 
         fake_pagerank = MagicMock()
-        fake_pagerank.run.side_effect = lambda best_seed: {"cluster_nodes": best_seed}
+
+        fake_pagerank.run.side_effect = lambda best_seed: {"cluster_nodes": best_seed,"conductance": 0.1,"correlation": 0.1,"composite_score": 0.1}
         mock_page_rank_cls.return_value = fake_pagerank
 
         hybrid = HybridLouvain(G=self.G, B=self.B, Y=self.Y)
@@ -136,7 +136,6 @@ class TestHybridLouvain(unittest.TestCase):
 
         mock_louvain_cls.assert_called()
         mock_page_rank_cls.assert_called()
-
 
 if __name__ == "__main__":
     unittest.main()

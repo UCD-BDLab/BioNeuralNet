@@ -74,16 +74,23 @@ class CorrelatedLouvain:
         self.tune = tune
 
         self.logger.info(
+            f"CorrelatedLouvain(k3={self.K3}, k4={self.K4}, "
+            f"nodes={self.G.number_of_nodes()}, edges={self.G.number_of_edges()}, "
+            f"features={self.B.shape[1] if self.B is not None else 0})"
+        )
+
+        self.logger.debug(
             f"Initialized CorrelatedLouvain with k3 = {self.K3}, k4 = {self.K4}, "
         )
         if self.B is not None:
-            self.logger.info(f"Original omics data shape: {self.B.shape}")
+            self.logger.debug(f"Original omics data shape: {self.B.shape}")
 
-        self.logger.info(f"Original graph has {self.G.number_of_nodes()} nodes.")
+        self.logger.debug(f"Original graph has {self.G.number_of_nodes()} nodes.")
 
         if self.B is not None:
-            self.logger.info(f"Final omics data shape: {self.B.shape}")
-        self.logger.info(
+            self.logger.debug(f"Final omics data shape: {self.B.shape}")
+
+        self.logger.debug(
             f"Graph has {self.G.number_of_nodes()} nodes and {self.G.number_of_edges()} edges."
         )
 
@@ -95,7 +102,7 @@ class CorrelatedLouvain:
 
         self.clusters: dict[Any, Any] = {}
         self.device = torch.device("cuda" if gpu and torch.cuda.is_available() else "cpu")
-        self.logger.info(f"Initialized Correlated Louvain. device={self.device}")
+        self.logger.debug(f"Initialized Correlated Louvain. device={self.device}")
 
     def _compute_community_cohesion(self, nodes) -> float:
         """Compute average absolute pairwise correlation of omics features within a community.
@@ -131,12 +138,12 @@ class CorrelatedLouvain:
         Drops columns that are completely zero.
         """
         try:
-            self.logger.info(
+            self.logger.debug(
                 f"Computing community correlation for {len(nodes)} nodes..."
             )
             node_cols = [str(n) for n in nodes if str(n) in self.B.columns]
             if not node_cols:
-                self.logger.info(
+                self.logger.debug(
                     "No valid columns found for these nodes; returning (0.0, 1.0)."
                 )
                 return 0.0, 1.0
@@ -144,15 +151,15 @@ class CorrelatedLouvain:
             zero_mask = (B_sub == 0).all(axis=0)
             num_zero_columns = int(zero_mask.sum())
             if num_zero_columns > 0:
-                self.logger.info(
+                self.logger.debug(
                     f"WARNING: {num_zero_columns} columns are all zeros in community subset."
                 )
             B_sub = B_sub.loc[:, ~zero_mask]
             if B_sub.shape[1] == 0:
-                self.logger.info("All columns dropped; returning (0.0, 1.0).")
+                self.logger.debug("All columns dropped; returning (0.0, 1.0).")
                 return 0.0, 1.0
 
-            self.logger.info(
+            self.logger.debug(
                 f"B_sub shape: {B_sub.shape}, first few columns: {node_cols[:5]}"
             )
             scaler = StandardScaler()
@@ -167,7 +174,7 @@ class CorrelatedLouvain:
             corr, pvalue = pearsonr(pc1, target)
             return corr, pvalue
         except Exception as e:
-            self.logger.info(f"Error in _compute_community_correlation: {e}")
+            self.logger.error(f"Error in _compute_community_correlation: {e}")
             raise
 
     def _quality_correlated(self, partition) -> float:
@@ -180,7 +187,7 @@ class CorrelatedLouvain:
 
         # Unsupervised mode: Y is None
         if self.Y is None:
-            self.logger.info("Phenotype data not provided; using unsupervised cohesion.")
+            self.logger.debug("Phenotype data not provided; using unsupervised cohesion.")
 
             if self.B is None:
                 return Q
@@ -195,14 +202,14 @@ class CorrelatedLouvain:
 
             avg_cohesion = np.mean(community_cohesions) if community_cohesions else 0.0
             quality = self.K3 * Q + self.K4 * avg_cohesion
-            self.logger.info(
+            self.logger.debug(
                 f"Computed quality (unsupervised): Q = {Q:.4f}, avg_cohesion = {avg_cohesion:.4f}, combined = {quality:.4f}"
             )
             return quality
 
         # Supervised mode: Y is provided
         if self.B is None:
-            self.logger.info(
+            self.logger.debug(
                 "Omics data not provided; returning standard modularity."
             )
             return Q
@@ -265,6 +272,12 @@ class CorrelatedLouvain:
             quality = self._quality_correlated(partition)
             self.logger.info(f"Final quality: {quality:.4f}")
             self.partition = partition
+
+            n_clusters = len(set(partition.values()))
+            self.logger.info(
+                f"CorrelatedLouvain found {n_clusters} communities "
+                f"(nodes={self.G.number_of_nodes()})"
+            )
 
         if as_dfs:
             self.logger.info("Raw partition output:", self.partition)

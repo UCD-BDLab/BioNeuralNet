@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import re
 import statistics
@@ -25,16 +27,18 @@ from ray import train
 from ray import tune
 from ray.tune import Checkpoint
 from ray.tune import CLIReporter
+from ray.tune.error import TuneError
 from ray.tune.stopper import TrialPlateauStopper
 from ray.tune.schedulers import ASHAScheduler
+from ray.tune.search.basic_variant import BasicVariantGenerator
 from sklearn.model_selection import train_test_split,StratifiedKFold,RepeatedStratifiedKFold
 from sklearn.preprocessing import label_binarize
 from scipy.stats import pointbiserialr
 from sklearn.metrics import f1_score, roc_auc_score, recall_score,average_precision_score, matthews_corrcoef
 
 from bioneuralnet.utils import get_logger
-from bioneuralnet.utils.reproducibility import set_seed
-from bioneuralnet.network_embedding.gnn_models import GCN, GAT, SAGE, GIN
+from bioneuralnet.utils import set_seed
+from bioneuralnet.network_embedding import GCN, GAT, SAGE, GIN
 
 logger= get_logger(__name__)
 
@@ -69,6 +73,7 @@ class DPMON:
         cv (bool): If True, use K-fold cross-validation; otherwise use repeated train/test splits.
         cuda (int): CUDA device index to use when gpu=True.
         seed (int): Random seed for reproducibility.
+        seed_trials (bool): If True, use a fixed seed for hyperparameter sampling to ensure reproducibility across trials.
         output_dir (Path): Directory where logs, checkpoints, and results are written.
     """
     def __init__(
@@ -97,6 +102,7 @@ class DPMON:
         cv: bool = False,
         cuda: int = 0,
         seed: int = 1804,
+        seed_trials: bool = False,
         output_dir: Optional[str] = None,
     ):
         if adjacency_matrix.empty:
@@ -153,6 +159,7 @@ class DPMON:
         self.gpu = gpu
         self.cuda = cuda
         self.seed = seed
+        self.seed_trials = seed_trials
         self.cv = cv
 
         if output_dir is None:
@@ -199,6 +206,7 @@ class DPMON:
             "cuda": self.cuda,
             "tune": self.tune,
             "seed": self.seed,
+            "seed_trials": self.seed_trials,
             "cv": self.cv,
         }
 
@@ -308,10 +316,8 @@ def prepare_node_features(adjacency_matrix: pd.DataFrame, omics_datasets: List[p
     omics_data = omics_datasets[0]
 
     if phenotype_col in omics_data.columns:
-        pheno = omics_data[phenotype_col]
         omics_feature_df = omics_data.drop(columns=[phenotype_col])
     else:
-        pheno = None
         omics_feature_df = omics_data
 
     nodes = sorted(network_features.intersection(omics_feature_df.columns))
@@ -532,7 +538,6 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
         best_global_model_state = None
         best_global_embeddings = None
 
-        cv_predictions_list = []
         fold_accuracies = []
         fold_f1_macros = []
         fold_f1_weighteds = []
@@ -645,7 +650,6 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
 
                 try:
                     n_classes = probs_np.shape[1]
-                    unique_classes = np.unique(y_test_np)
 
                     # binary
                     if n_classes == 2:
@@ -781,7 +785,7 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
         "nn_hidden_dim2": tune.choice([32, 64, 128]),
         "ae_encoding_dim": tune.choice([4, 8, 16]),
         "num_epochs": tune.choice([512, 1024, 2048]),
-        "gnn_dropout": tune.choice([0.0, 0.1, 0.2, 0.3, 0.4, 0.5]),
+        "gnn_dropout": tune.choice([0.2, 0.3, 0.4, 0.5, 0.6]),
         "gnn_activation": tune.choice(["relu", "elu"]),
         "dim_reduction": tune.choice(["ae","linear", "mlp"]),
     }
@@ -801,7 +805,7 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
         grace_period=30,
         reduction_factor=2
     )
-    gpu_resources = 1 if dpmon_params["gpu"] else 0
+
     best_configs = []
 
     omics_data = omics_dataset[0]
@@ -884,19 +888,63 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
     def short_dirname_creator(trial):
         return f"T{trial.trial_id}"
 
-    result = tune.run(
-        tune_train_n,
-        resources_per_trial={"cpu": 1, "gpu": 0.06} , #1 and 0.05
-        config=pipeline_configs,
-        num_samples=40, #50
-        verbose=0,
-        scheduler=scheduler,
-        stop=stopper,
-        name="tune_dp",
-        progress_reporter=reporter,
-        trial_dirname_creator=short_dirname_creator,
-        checkpoint_score_attr="min-val_loss",
-    )
+    cpu_per_trial = 2
+    use_gpu = bool(dpmon_params.get("gpu", False)) and torch.cuda.is_available()
+    if dpmon_params.get("gpu", False) and not torch.cuda.is_available():
+        logger.warning("gpu=True but CUDA is not available; Ray Tune will run on CPU only (gpu_per_trial=0.0).")
+
+    gpu_per_trial = 0.05 if use_gpu else 0.0
+
+    num_samples = 50
+    max_retries = 5
+
+    seed_trials = dpmon_params.get("seed_trials", False)
+
+    if seed_trials:
+        logger.debug(f"seed_trials=True: Using FIXED seed {dpmon_params['seed']} for hyperparameter sampling.")
+    else:
+        logger.debug("seed_trials=False: Using RANDOM hyperparameter sampling.")
+
+    for attempt in range(max_retries):
+        try:
+            if seed_trials:
+                search_alg = BasicVariantGenerator(random_state=np.random.RandomState(dpmon_params["seed"]))
+            else:
+                search_alg = None
+
+            result = tune.run(
+                tune_train_n,
+                search_alg=search_alg,
+                resources_per_trial={"cpu": cpu_per_trial, "gpu": gpu_per_trial},
+                config=pipeline_configs,
+                num_samples=num_samples,
+                verbose=0,
+                scheduler=scheduler,
+                stop=stopper,
+                name="tune_dp",
+                progress_reporter=reporter,
+                trial_dirname_creator=short_dirname_creator,
+                checkpoint_score_attr="min-val_loss",
+            )
+            break
+        except TuneError as e:
+            msg = str(e)
+            if "Trials did not complete" not in msg and "OutOfMemoryError" not in msg:
+                raise
+
+            new_num_samples = max(1, num_samples // 2)
+            if new_num_samples == num_samples:
+                raise
+
+            logger.warning(
+                f"Ray Tune failed with a likely resource / OOM error (attempt {attempt + 1}). "
+                f"Reducing num_samples from {num_samples} to {new_num_samples} "
+                f"(cpu_per_trial={cpu_per_trial}, gpu_per_trial={gpu_per_trial})."
+            )
+            num_samples = new_num_samples
+
+    else:
+        raise RuntimeError("Hyperparameter tuning failed after reducing resources several times.")
 
     best_trial = result.get_best_trial("val_loss", "min", "last")
     logger.debug("Best trial config: {}".format(best_trial.config))

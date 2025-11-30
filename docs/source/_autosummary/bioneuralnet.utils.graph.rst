@@ -22,4 +22,5 @@ bioneuralnet.utils.graph
    .. autosummary::
    
       GraphicalLasso
+      StandardScaler
    
