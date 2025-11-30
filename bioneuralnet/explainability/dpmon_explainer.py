@@ -26,7 +26,7 @@ class NeuralNetworkWrapper(nn.Module):
     """A wrapper class for formatting DPMON Neural Network IO in a form pytorch_geometric requires"""
 
     def __init__(self, nn: NeuralNetwork):
-        """_summary_
+        """Create NeuralNetworkWrapper instance
 
         Args:
             nn (NeuralNetwork): _description_
