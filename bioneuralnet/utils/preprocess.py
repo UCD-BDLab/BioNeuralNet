@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pandas as pd
 import numpy as np
 import networkx as nx
@@ -415,7 +417,7 @@ def select_top_k_correlation(X: pd.DataFrame, y: pd.Series | None = None, top_k:
 def select_top_randomforest(X: pd.DataFrame, y: pd.Series, top_k: int = 1000, seed: int = 119) -> pd.DataFrame:
     """Select top-k features using RandomForest feature importances.
 
-    Non-numeric columns are rejected, the remaining data are cleaned and zero-variance features removed, a RandomForest classifier or regressor is fitted depending on y, and the top_k most important features are selected based on feature_importances_.
+    Non-numeric columns are rejected, the remaining data are cleaned and zero-variance features removed, a RandomForest classifier or regressor is fitted depending on y, and the top_k most important features are selected based on ``feature_importances_``.
 
     Args:
 

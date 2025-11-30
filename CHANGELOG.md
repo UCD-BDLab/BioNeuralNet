@@ -197,6 +197,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Left to Do
 - **(DONE)Test Suite Completion**: Refactor remaining tests (`gnn_embedding`, `subject_representation`, `hybrid_louvain`) to align with new `utils` imports and other major changes.
-- **Documentation**: Update ReadTheDocs API reference and `README.md` to reflect the split `utils` submodules and new `graph_tools`. All jupyter notebook examples will need to be updates.
+- **(DONE)Documentation**: Update ReadTheDocs API reference and `README.md` to reflect the split `utils` submodules and new `graph_tools`. All jupyter notebook examples will need to be updates.
 - **(DONE)Release Prep**: Bump version to `1.2.0` in `setup.py`.
 - **(DONE)Errors**: Errors with tests and doc-build are expected. They will be addresed in following smaller versions `1.2.1` and so on.
+

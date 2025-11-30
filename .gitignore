@@ -75,6 +75,9 @@ TCGA_BRCA_DATA/
 !bioneuralnet/datasets/lgg/
 !bioneuralnet/datasets/lgg/**/*.csv
 
+!bioneuralnet/datasets/paad/
+!bioneuralnet/datasets/paad/**/*.csv
+
 
 feature_testing
 
@@ -89,6 +92,7 @@ env.bak/
 venv.bak/
 .venv/
 bioneuralnet-env/
+.localenv/
 
 # IDE and editor directories
 .vscode/

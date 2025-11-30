@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import re
 import statistics
@@ -24,6 +26,7 @@ except ModuleNotFoundError:
 from ray import train
 from ray import tune
 from ray.tune import Checkpoint
+#from bioneuralnet.utils.ray_compatability import train, tune, Checkpoint
 from ray.tune import CLIReporter
 from ray.tune.error import TuneError
 from ray.tune.stopper import TrialPlateauStopper
@@ -35,8 +38,8 @@ from scipy.stats import pointbiserialr
 from sklearn.metrics import f1_score, roc_auc_score, recall_score,average_precision_score, matthews_corrcoef
 
 from bioneuralnet.utils import get_logger
-from bioneuralnet.utils.reproducibility import set_seed
-from bioneuralnet.network_embedding.gnn_models import GCN, GAT, SAGE, GIN
+from bioneuralnet.utils import set_seed
+from bioneuralnet.network_embedding import GCN, GAT, SAGE, GIN
 
 logger= get_logger(__name__)
 

@@ -1,21 +1,17 @@
 Notebooks
 =========
 
-This collection of demonstration notebooks establishes a robust and reproducible benchmark for multi-omics classification using the **BioNeuralNet framework**.
+This collection of demonstration notebooks provides a reproducible benchmarkfor multi-omics classification and subgraph detection using the **BioNeuralNet framework**.
 
-These workflows provide a comprehensive, step-by-step guide to:
+Each workflow walks through:
 
-* **Feature Selection** and data preprocessing.
-* **Hyperparameter Optimization** for Graph Neural Networks (GNNs).
-* **Downstream Tasks** including disease prediction with DPMON.
+* **Feature selection** and data preprocessing.
+* **Network construction** (similarity graphs and phenotype-aware networks).
+* **Hyperparameter optimization** for Graph Neural Networks (GNNs).
+* **Downstream tasks**, including disease prediction with DPMON.
+* **Subgraph detection and biomarker modules** in selected cohorts.
 
-This documentation also includes dedicated guides for the framework's supporting utilities:
-
-* **Dataset Loading**: Access the 5 included example datasets (TCGA-BRCA, TCGA-GBMLGG, TCGA-KIPAN, etc.).
-* **Network Construction**: Demonstrates techniques for building omics networks.
-
-.. note::
-   The **TCGA-BRCA** notebook reflects an older version of the framework. The **TCGA-GBMLGG** and **TCGA-KIPAN** notebooks demonstrate the latest, end-to-end workflow.
+The TCGA notebooks showcase the full end-to-end pipeline on multiple cancers (BRCA, LGG, KIPAN, PAAD). The biomarker notebook focuses on phenotype-associated subgraphs and driver modules derived from these analyses.
 
 The following notebooks are included in this guide:
 
@@ -23,7 +19,7 @@ The following notebooks are included in this guide:
    :maxdepth: 1
 
    TCGA-BRCA.ipynb
-   TCGA-GBMLGG.ipynb
+   TCGA-LGG.ipynb
    TCGA-KIPAN.ipynb
-   datasets.ipynb
-   network_construction.ipynb
+   TCGA-PAAD.ipynb
+   TCGA-Biomarkers.ipynb

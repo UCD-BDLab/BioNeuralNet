@@ -12,6 +12,7 @@ bioneuralnet.clustering.correlated\_louvain
       get_logger
       original_modularity
       pearsonr
+      set_seed
    
    .. rubric:: Classes
 

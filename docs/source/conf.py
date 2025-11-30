@@ -2,7 +2,12 @@ import os
 import sys
 from importlib import metadata
 
+#sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 sys.path.insert(0, os.path.abspath("../../"))
+
+# CONF_DIR = os.path.dirname(__file__)
+# PROJECT_ROOT = os.path.abspath(os.path.join(CONF_DIR, "..", ".."))
+# sys.path.insert(0, PROJECT_ROOT)
 
 try:
     release = metadata.version("bioneuralnet")
