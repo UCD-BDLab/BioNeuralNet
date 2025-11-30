@@ -206,12 +206,14 @@ BioNeuralNet allows you to inspect the topology of your constructed networks. Th
 
 The top hub features (by degree centrality) in the network above include:
 
-  - INPP5J\_27124 (degree 12)
-  - SLC26A7\_115111 (degree 9)
-  - HEPACAM2\_253012 (degree 7)
-  - CLNK\_116449 (degree 7)
-  - RHCG\_51458 (degree 6)
-  - CLCNKB\_1188 (degree 6)
+| Feature Name (Omic) | Index | Degree | Source |
+| :--- | :---: | :---: | :---: |
+| INPP5J_27124 | 5 | 12 | RNA |
+| SLC26A7_115111 | 26 | 9 | RNA |
+| HEPACAM2_253012 | 12 | 7 | RNA |
+| CLNK_116449 | 16 | 7 | RNA |
+| RHCG_51458 | 27 | 6 | RNA |
+| CLCNKB_1188 | 3 | 6 | RNA |
 
 **Network Embeddings**
 
