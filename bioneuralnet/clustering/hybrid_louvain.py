@@ -20,7 +20,7 @@ class HybridLouvain:
         k4 (float): Weight for Correlated Louvain.
         max_iter (int): Maximum number of iterations.
         weight (str): Edge weight parameter name.
-        tune (bool): Flag to enable tuning of parameters       
+        tune (bool): Flag to enable tuning of parameters
     """
     def __init__(
         self,

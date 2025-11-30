@@ -201,3 +201,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **(DONE)Release Prep**: Bump version to `1.2.0` in `setup.py`.
 - **(DONE)Errors**: Errors with tests and doc-build are expected. They will be addresed in following smaller versions `1.2.1` and so on.
 
+## [1.2.1] - 2025-11-30
+
+### Dependencies
+- **Strict Versioning**: Enforced specific version requirements to avoid conflicts with external libraries.
+  - `pandas>=2.2.3`
+  - `numpy>=1.26.4`
+  - `scipy>=1.13.1`
+  - `matplotlib>=3.10.3`
+  - `scikit-learn>=1.6.1`
+  - `statsmodels>=0.14.4`
+  - `networkx>=3.4.2`
+  - `python-louvain>=0.16`
+  - `pydantic>=2.5`
+  - `ray[tune,train]>=2.46.0`
+
+### Improvements and Fixes
+- **DPMON Dynamic Sampling**: Added support for dynamic sampling in Ray Tune trials.
+    - The system now automatically handles execution errors (e.g., Out of Memory (OOM), segmentation faults) by iteratively halving `num_trials` (starting at 50). It will attempt to recover up to 5 times before aborting.
+
+### Documentation
+- **Installation Guide**: Significantly expanded the installation guide to include CUDA versioning details and specific instructions for different Operating Systems.
+- **System Requirements**: Added a dedicated section outlining system prerequisites.
+- **General Updates**: performed a major overhaul of the documentation to align with recent architectural changes.
+- **README**: Updated `README.md` to synchronize with `index.rst` and reflect the latest library state.
+
+### Testing
+- **Test Suite Restoration**: Re-enabled and patched all unit tests to ensure compatibility with the new namespace hierarchy and utility structures.

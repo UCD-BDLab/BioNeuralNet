@@ -112,7 +112,7 @@ class TestHybridLouvain(unittest.TestCase):
         mock_louvain_cls.return_value = fake_louvain
 
         fake_pagerank = MagicMock()
-        
+
         fake_pagerank.run.side_effect = lambda best_seed: {"cluster_nodes": best_seed,"conductance": 0.1,"correlation": 0.1,"composite_score": 0.1}
         mock_page_rank_cls.return_value = fake_pagerank
 

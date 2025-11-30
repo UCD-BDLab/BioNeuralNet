@@ -8,12 +8,11 @@
 [![Documentation](https://img.shields.io/badge/docs-read%20the%20docs-blue.svg)](https://bioneuralnet.readthedocs.io/en/latest/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17503083.svg)](https://doi.org/10.5281/zenodo.17503083)
 
-## Welcome to BioNeuralNet 1.2.0
+## Welcome to BioNeuralNet 1.2.1
 
-![BioNeuralNet Logo](assets/LOGO_WB.png)
+![BioNeuralNet Logo](assets/LOGO_TB.png)
 
-**BioNeuralNet** is a flexible, modular Python framework developed to facilitate end-to-end network-based multi-omics analysis using **Graph Neural Networks (GNNs)**. It addresses the complexities associated with multi-omics data, such as high dimensionality, sparsity, and intricate molecular interactions, by converting biological networks into meaningful, low-dimensional embeddings suitable for downstream tasks.
-
+**BioNeuralNet** is a flexible and modular Python framework tailored for **end-to-end network-based multi-omics data analysis**. It leverages **Graph Neural Networks (GNNs)** to learn biologically meaningful low-dimensional representations from multi-omics networks, converting complex molecular interactions into versatile embeddings suitable for downstream tasks.
 
 ![BioNeuralNet Workflow](assets/BioNeuralNet.png)
 
@@ -64,72 +63,170 @@ For complete documentation, tutorials, and examples, please visit our Read the D
 - [8. License](#9-License)
 - [9. Contact](#10-Contact)
 - [10. References](#11-References)
+- [11. Citation](#11-Citation)
 
 ## 1. Installation
 
-BioNeuralNet is available as a package on the Python Package Index (PyPI), making it easy to install and integrate into your workflows.
+BioNeuralNet is available as a package on the Python Package Index (PyPI), making it easy to install and integrate into your workflows. BioNeuralNet is tested with Python `3.10`, `3.11`, and `3.12` and supports Linux, macOS, and Windows.
+
+For detailed, up-to-date system requirements (including recommended CPU/GPU configurations, CUDA/PyG compatibility tables, and troubleshooting), see the **Installation Guide** in the documentation:
+**[https://bioneuralnet.readthedocs.io/en/latest/installation.html](https://bioneuralnet.readthedocs.io/en/latest/installation.html)**
 
 ### 1.1. Install BioNeuralNet
+
+Install the core BioNeuralNet package (including graph embeddings, DPMON, and clustering):
+
 ```bash
 pip install bioneuralnet
 ```
+
 **PyPI Project Page:** [https://pypi.org/project/bioneuralnet/](https://pypi.org/project/bioneuralnet/)
->**Requirements:** BioNeuralNet is tested and supported on Python versions `3.10`, `3.11`, and `3.12`. Functionality on other versions is not guaranteed.
 
-## 1.2. Install PyTorch and PyTorch Geometric
-BioNeuralNet relies on PyTorch for GNN computations. Install PyTorch separately:
+> **Requirements:** BioNeuralNet is tested and supported on Python versions `3.10`, `3.11`, and `3.12`. Functionality on other versions is not guaranteed.
 
-- **PyTorch (CPU):**
-  ```bash
-  pip install torch torchvision torchaudio
-  ```
+A typical environment includes:
 
-- **PyTorch Geometric:**
-  ```bash
-  pip install torch_geometric
-  ```
+  - Linux, macOS, or Windows
+  - At least 8 GB RAM (16 GB+ recommended for moderate datasets)
+  - Optional GPU (e.g., NVIDIA with ≥ 6 GB VRAM or Apple Silicon using Metal/MPS) for faster GNN and DPMON training
 
-For GPU acceleration, please refer to:
-- [PyTorch Installation Guide](https://pytorch.org/get-started/locally/)
-- [PyTorch Geometric Installation Guide](https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html)
+For advanced setups (multi-GPU, clusters, external R tools like SmCCNet), please refer to the [installation documentation](https://bioneuralnet.readthedocs.io/en/latest/installation.html).
 
+### 1.2. Install PyTorch and PyTorch Geometric
+
+BioNeuralNet relies on PyTorch and PyTorch Geometric for GNN computations (embeddings and DPMON). These are **not automatically pinned** because CPU/GPU builds and CUDA versions vary by system, so you should install them separately.
+
+  - **Basic installation (CPU-only or simple environments):**
+
+    ```bash
+    pip install torch
+    pip install torch_geometric
+    ```
+
+For GPU acceleration and environment-specific wheels:
+
+  - [PyTorch Installation Guide](https://pytorch.org/get-started/locally/)
+  - [PyTorch Geometric Installation Guide](https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html)
+
+On Apple Silicon (M1/M2/M3), PyTorch can use the **Metal (MPS)** backend instead of CUDA (see the official PyTorch/Apple guides).
+
+For example tested configurations, CUDA/PyG compatibility matrices, Ray installation for hyperparameter tuning, and troubleshooting steps, see the **Installation** section of the documentation:
+**[https://bioneuralnet.readthedocs.io/en/latest/installation.html](https://bioneuralnet.readthedocs.io/en/latest/installation.html)**
 
 ## 2. BioNeuralNet Core Features
 
-BioNeuralNet is a flexible, modular Python framework developed to facilitate end-to-end network-based multi-omics analysis using **Graph Neural Networks (GNNs)**. It addresses the complexities associated with multi-omics data, such as high dimensionality, sparsity, and intricate molecular interactions, by converting biological networks into meaningful, low-dimensional embeddings suitable for downstream tasks.
+BioNeuralNet is a flexible and modular Python framework tailored for **end-to-end network-based multi-omics data analysis**. It leverages **Graph Neural Networks (GNNs)** to learn biologically meaningful low-dimensional representations from multi-omics networks, converting complex molecular interactions into versatile embeddings suitable for downstream tasks.
 
 **BioNeuralNet Provides:**
 
-- **[Graph construction](https://bioneuralnet.readthedocs.io/en/latest/utils.html#graph-generation):**
+  - **[Graph construction](https://bioneuralnet.readthedocs.io/en/latest/utils.html#graph-generation):**
 
-  - **Similarity graphs:** k-NN (cosine/Euclidean), RBF, mutual information.
+      - **Similarity graphs:** k-NN (cosine/Euclidean), RBF, mutual information.
+      - **Correlation graphs:** Pearson, Spearman; optional soft-thresholding.
+      - **Phenotype-aware graphs:** SmCCNet integration (R) for sparse multiple canonical-correlation networks.
+      - **Gaussian kNN graphs:** kNN-based graphs with Gaussian kernel weighting.
 
-  - **Correlation graphs:** Pearson, Spearman; optional soft-thresholding.
+    **Example: constructing multiple network types and running basic graph analysis**
 
-  - **Phenotype-aware graphs:** SmCCNet integration (R) for sparse multiple canonical-correlation networks.
+    ```python
+    import pandas as pd
+    from bioneuralnet.utils import (
+        gen_threshold_graph,
+        gen_correlation_graph,
+        gen_similarity_graph,
+        gen_gaussian_knn_graph,
+    )
+    from bioneuralnet.utils import graph_analysis
 
-- **[Preprocessing Utilities](https://bioneuralnet.readthedocs.io/en/latest/utils.html#graph-generation):**
+    # dna_meth, rna, and mirna are preprocessed omics DataFrames with matching samples
+    omics_brca = pd.concat([dna_meth, rna, mirna], axis=1)
 
-  - **RData conversion to pandas DataFrame:** Converts an RData file to CSV and loads it into a pandas DataFrame.
+    # Threshold-based graph
+    threshold_10 = gen_threshold_graph(omics_brca, b=6.2, k=10)
 
-  - **Top‑k variance‑based filtering:** Cleans data and selects the top‑k numeric features by variance.
+    # Correlation graph (unsigned Pearson)
+    correlation_10 = gen_correlation_graph(
+        omics_brca,
+        k=10,
+        method="pearson",
+        signed=False,
+    )
 
-  - **Random forest feature selection:** Fits a RandomForest and returns the top‑k features by importance.
+    # Similarity graph (cosine-based kNN)
+    similarity_10 = gen_similarity_graph(
+        omics_brca,
+        k=10,
+        metric="cosine",
+    )
 
-  - **ANOVA F‑test feature selection:** Runs an ANOVA F‑test with FDR correction and selects significant features.
+    # Gaussian kNN graph
+    gaussian_15 = gen_gaussian_knn_graph(
+        omics_brca,
+        k=15,
+        sigma=None,
+    )
 
-  - **Network pruning by edge‑weight threshold:** Removes edges below a weight threshold and drops isolated nodes.
+    # Network-level summary statistics
+    graph_analysis(threshold_10,  name="threshold_10")
+    graph_analysis(correlation_10, name="correlation_10")
+    graph_analysis(similarity_10,  name="similarity_10")
+    graph_analysis(gaussian_15,    name="gaussian_15")
+    ```
 
+  - **[Preprocessing Utilities](https://bioneuralnet.readthedocs.io/en/latest/utils.html#graph-generation):**
 
-- **[GNN Embeddings](https://bioneuralnet.readthedocs.io/en/latest/gnns.html):** Transform complex biological networks into versatile embeddings, capturing both structural relationships and molecular interactions.
+      - **RData conversion to pandas DataFrame:** Converts an RData file to CSV and loads it into a pandas DataFrame.
+      - **Top-k variance-based filtering:** Cleans data and selects the top-k numeric features by variance.
+      - **Random forest feature selection:** Fits a RandomForest and returns the top-k features by importance.
+      - **ANOVA F-test feature selection:** Runs an ANOVA F-test with FDR correction and selects significant features.
+      - **Network pruning by edge-weight threshold:** Removes edges below a weight threshold and drops isolated nodes.
+      - **Missing data handling:** Utilities such as `impute_omics` and `impute_omics_knn` for incomplete multi-omics matrices.
 
-- **[Downstream Tasks](https://bioneuralnet.readthedocs.io/en/latest/downstream_tasks.html):**
+  - **[GNN Embeddings](https://bioneuralnet.readthedocs.io/en/latest/gnns.html):**
 
-  - **[Subject representation](https://bioneuralnet.readthedocs.io/en/latest/downstream_tasks.html#enhanced-subject-representation):** Integrate phenotype or clinical variables to enhance the biological relevance of the embeddings.
+      - Transform complex biological networks into versatile embeddings, capturing both structural relationships and molecular interactions.
 
-  - **[Disease Prediction](https://bioneuralnet.readthedocs.io/en/latest/downstream_tasks.html#enhanced-subject-representation):** Utilize network-derived embeddings for accurate and scalable predictive modeling of diseases and phenotypes.
+  - **[Downstream Tasks](https://bioneuralnet.readthedocs.io/en/latest/downstream_tasks.html):**
 
-- **Interoperability:** Outputs structured as **Pandas DataFrames**, ensuring compatibility with common Python tools and seamless integration into existing bioinformatics pipelines.
+      - **[Subject representation](https://bioneuralnet.readthedocs.io/en/latest/downstream_tasks.html#enhanced-subject-representation):** Integrate phenotype or clinical variables to enhance the biological relevance of the embeddings.
+      - **[Disease Prediction](https://bioneuralnet.readthedocs.io/en/latest/downstream_tasks.html#enhanced-subject-representation):** Utilize network-derived embeddings for accurate and scalable predictive modeling of diseases and phenotypes (e.g., via DPMON).
+
+  - **Interoperability:**
+
+      - Outputs structured as **Pandas DataFrames**, ensuring compatibility with common Python tools and seamless integration into existing bioinformatics pipelines.
+
+**Visualizing Multi-Omics Networks**
+
+BioNeuralNet allows you to inspect the topology of your constructed networks. The visualization below, from our **TCGA Kidney Cancer (KIPAN)** analysis, highlights a module of highly interacting genes and proteins.
+
+![Network visualization](assets/kipan_net.png)
+*Network visualization of a highly connected gene module identified in the KIPAN dataset.*
+
+**Top Identified Biomarkers (Hub Omics)**
+
+The top hub features (by degree centrality) in the network above include:
+
+  - INPP5J\_27124 (degree 12)
+  - SLC26A7\_115111 (degree 9)
+  - HEPACAM2\_253012 (degree 7)
+  - CLNK\_116449 (degree 7)
+  - RHCG\_51458 (degree 6)
+  - CLCNKB\_1188 (degree 6)
+
+**Network Embeddings**
+
+By projecting high-dimensional omics networks into latent spaces, BioNeuralNet distills complex, nonlinear molecular relationships into compact vectorized representations. The t-SNE projection below reveals distinct clusters corresponding to different omics modalities (e.g., DNA methylation, RNA, miRNA).
+
+![Network embedding](assets/emb_kipan.png)
+*2D projection of network embeddings showing distinct separation between omics modalities.*
+
+**Key Considerations for Robust Analysis**
+
+  - **Network topology sensitivity:** Performance is inherently tied to the quality of the constructed network. Compare multiple strategies (e.g., correlation vs similarity vs Gaussian kNN).
+  - **Feature selection impact:** Results depend heavily on input features. Different preselection strategies (Top-k variance, ANOVA-F, Random Forest) can reveal complementary biology.
+  - **Handling missing data:** Incomplete multi-omics data are common; use built-in imputation utilities where appropriate.
+  - **Computational scalability:** Extremely large networks may require more aggressive feature reduction or subgraph detection to stay efficient.
+  - **Interpretability scope:** BioNeuralNet emphasizes network-level interpretability (key modules and hub features); fine-grained node-level explanations remain an active research area.
 
 BioNeuralNet emphasizes usability, reproducibility, and adaptability, making advanced network-based multi-omics analyses accessible to researchers working in precision medicine and systems biology.
 
@@ -139,32 +236,34 @@ Traditional machine learning methods often struggle with the complexity and high
 
 BioNeuralNet supports several state-of-the-art GNN architectures optimized for biological applications:
 
-- **Graph Convolutional Networks (GCN):** Aggregate biological signals from neighboring molecules, effectively modeling local interactions such as gene co-expression or regulatory relationships.
+  - **Graph Convolutional Networks (GCN):** Aggregate biological signals from neighboring molecules, effectively modeling local interactions such as gene co-expression or regulatory relationships.
+  - **Graph Attention Networks (GAT):** Use attention mechanisms to dynamically prioritize important molecular interactions, highlighting the most biologically relevant connections.
+  - **GraphSAGE:** Facilitate inductive learning, enabling the model to generalize embeddings to previously unseen molecular data, thereby enhancing predictive power and scalability.
+  - **Graph Isomorphism Networks (GIN):** Provide powerful and expressive graph embeddings, accurately distinguishing subtle differences in molecular interaction patterns.
 
-- **Graph Attention Networks (GAT):** Use attention mechanisms to dynamically prioritize important molecular interactions, highlighting the most biologically relevant connections.
-
-- **GraphSAGE:** Facilitate inductive learning, enabling the model to generalize embeddings to previously unseen molecular data, thereby enhancing predictive power and scalability.
-
-- **Graph Isomorphism Networks (GIN):** Provide powerful and expressive graph embeddings, accurately distinguishing subtle differences in molecular interaction patterns.
+By projecting high-dimensional omics networks into latent spaces, BioNeuralNet distills complex, nonlinear molecular relationships into compact vectorized representations that can be used for visualization, clustering, and predictive modeling.
 
 For detailed explanations of BioNeuralNet's supported GNN architectures and their biological relevance, see [GNN Embeddings](https://bioneuralnet.readthedocs.io/en/latest/gnns.html)
 
 ## 4. Example: Network-Based Multi-Omics Analysis for Disease Prediction
 
-- **Data Preparation:**
-   - Load your multi-omics data (e.g., transcriptomics, proteomics) along with phenotype and clinical covariates.
+  - **Data Preparation:**
 
-- **Network Construction:**
-   - Here, we construct the multi-omics network using an external R package, **SmCCNet** [1](1)
-   - BioNeuralNet provides convenient wrappers for external tools (like SmCCNet) through `bioneuralnet.external_tools`. Note: R must be installed for these wrappers.
+      - Load your multi-omics data (e.g., transcriptomics, proteomics) along with phenotype and clinical covariates.
 
-- **Disease Prediction with DPMON:**
-   - **DPMON** [2](2) integrates omics data and network structures to predict disease phenotypes.
-   - It provides an end-to-end pipeline, complete with built-in hyperparameter tuning, and outputs predictions directly as pandas DataFrames for easy interoperability.
+  - **Network Construction:**
+
+      - Here, we construct the multi-omics network using an external R package, **SmCCNet**
+      - BioNeuralNet provides convenient wrappers for external tools (like SmCCNet) through `bioneuralnet.external_tools`. Note: R must be installed for these wrappers.
+
+  - **Disease Prediction with DPMON:**
+
+      - **DPMON** integrates omics data and network structures to predict disease phenotypes.
+      - It provides an end-to-end pipeline, complete with built-in hyperparameter tuning, and outputs predictions directly as pandas DataFrames for easy interoperability.
 
 **Example Usage:**
 
-```Python
+```python
 
 import pandas as pd
 from bioneuralnet.external_tools import SmCCNet
@@ -212,8 +311,7 @@ print("Disease phenotype predictions:\n", predictions)
 For detailed examples and tutorials, visit:
 
 - [Quick Start](https://bioneuralnet.readthedocs.io/en/latest/Quick_Start.html): A quick walkthrough demonstrating the BioNeuralNet workflow from start to finish.
-
-- [TCGA-BRCA Demo](https://bioneuralnet.readthedocs.io/en/latest/TCGA-BRCA_Dataset.html): A detailed real-world example applying BioNeuralNet to breast cancer subtype prediction.
+- [Code Examples](https://bioneuralnet.readthedocs.io/en/latest/notebooks/index.html): Real-world examples of applying BioNeuralNet to different cancer types
 
 ## 6. Acknowledgments
 
@@ -232,7 +330,7 @@ BioNeuralNet integrates multiple open-source libraries. We acknowledge key depen
 
 We also acknowledge R-based tools for external network construction:
 
-- [**SmCCNet**](https://github.com/UCD-BDLab/BioNeuralNet/tree/main/bioneuralnet/external_tools/smccnet): Sparse multiple canonical correlation network.
+  - [**SmCCNet**](https://github.com/UCD-BDLab/BioNeuralNet/tree/main/bioneuralnet/external_tools/smccnet): Sparse multiple canonical correlation network.
 
 ## 7. Contributing
 
@@ -245,7 +343,7 @@ We welcome issues and pull requests! Please:
 **Developer setup:**
 
 ```bash
-git clone https://github.com/UCD-BDLab/BioNeuralNet.git
+git clone [https://github.com/UCD-BDLab/BioNeuralNet.git](https://github.com/UCD-BDLab/BioNeuralNet.git)
 cd BioNeuralNet
 pip install -r requirements-dev.txt
 pre-commit install

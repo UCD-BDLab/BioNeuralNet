@@ -345,7 +345,7 @@ def plot_network(adjacency_matrix, weight_threshold=0.0, show_labels=False, show
 def find_omics_modality(mapping_df, dfs, source_names=None):
     """
     Maps features in the mapping DataFrame to their omics source based on provided dataframes.
-    
+
     Args:
 
         mapping_df (pd.DataFrame): DataFrame with an "Omic" column listing feature names.
@@ -354,7 +354,7 @@ def find_omics_modality(mapping_df, dfs, source_names=None):
 
     Returns:
         pd.DataFrame: Updated mapping DataFrame with an additional "Source" column.
-        
+
     """
     if not source_names:
         source_names = []

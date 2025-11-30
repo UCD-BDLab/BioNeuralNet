@@ -5,10 +5,6 @@ The ``metrics`` module provides a suite of tools for statistical analysis, quali
 
 To see the full code used to generate the plots below (specifically for the Kidney Cancer analysis), refer to our **TCGA KIPAN Biomarker Discovery** tutorial in :doc:`notebooks/index`.
 
-.. contents:: Table of Contents
-   :local:
-   :depth: 2
-
 Performance Evaluation
 ----------------------
 
@@ -47,14 +43,9 @@ The example below shows embeddings from the **TCGA KIPAN** dataset, revealing di
 
    from bioneuralnet.metrics import plot_embeddings
 
-   # Retrieve embeddings from the trained GNN model
-   embeddings_array = embeddings.values  
-   
-   # Prepare labels (e.g., Omics Type or Phenotype) for coloring
-   node_labels = gnn._prepare_node_labels()
-   
-   # Generate t-SNE projection
-   plot_embeddings(embeddings_array, node_labels, title="Embeddings in 2D space")
+   # feature(omics) embeddings colored by omics type.
+   print(f"Plotting Feature Embeddings for graph:")
+   plot_embeddings(GAT_embeddings_array, node_labels, legend_labels=["DNA_Methylation", "RNA", "miRNA"])
 
 Network Visualization & Clustering
 ----------------------------------

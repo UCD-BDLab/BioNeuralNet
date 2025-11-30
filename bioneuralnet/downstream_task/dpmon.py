@@ -26,7 +26,6 @@ except ModuleNotFoundError:
 from ray import train
 from ray import tune
 from ray.tune import Checkpoint
-#from bioneuralnet.utils.ray_compatability import train, tune, Checkpoint
 from ray.tune import CLIReporter
 from ray.tune.error import TuneError
 from ray.tune.stopper import TrialPlateauStopper
@@ -803,7 +802,7 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
         grace_period=30,
         reduction_factor=2
     )
-    
+
     best_configs = []
 
     omics_data = omics_dataset[0]
