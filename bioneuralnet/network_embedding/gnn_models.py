@@ -10,7 +10,10 @@ except ModuleNotFoundError:
         "https://bioneuralnet.readthedocs.io/en/latest/installation.html"
     )
 
+from bioneuralnet.utils import set_seed
+
 def process_dropout(dropout):
+    """Convert dropout input into a valid float probability."""
     if isinstance(dropout, bool):
         return 0.5 if dropout else 0.0
     elif isinstance(dropout, float):
@@ -19,6 +22,7 @@ def process_dropout(dropout):
         raise ValueError("Dropout must be either a boolean or a float.")
 
 def get_activation(activation_choice):
+    """Retrieve the corresponding PyTorch activation function based on string name."""
     if activation_choice.lower() == "relu":
         return nn.ReLU()
     elif activation_choice.lower() == "elu":
@@ -29,13 +33,23 @@ def get_activation(activation_choice):
         raise ValueError(f"Unsupported activation function: {activation_choice}")
 
 class GCN(nn.Module):
-    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="elu", seed=None, self_loop_and_norm=None):
+    """Graph Convolutional Network implementation.
+
+    Args:
+
+        input_dim (int): Dimension of input features.
+        hidden_dim (int): Dimension of hidden layers.
+        layer_num (int): Number of GCN layers.
+        dropout (bool | float): Dropout probability.
+        final_layer (str): Type of final layer ('regression' or identity).
+        activation (str): Activation function name.
+        seed (int | None): Random seed for reproducibility.
+        self_loop_and_norm (bool | None): Whether to add self-loops and normalize.
+
+    """
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="relu", seed=None, self_loop_and_norm=None):
         if seed is not None:
-            torch.manual_seed(seed)
-            if torch.cuda.is_available():
-                torch.cuda.manual_seed_all(seed)
-                torch.backends.cudnn.deterministic = True
-                torch.backends.cudnn.benchmark = False
+            set_seed(seed)
 
         super().__init__()
         self.dropout = process_dropout(dropout)
@@ -56,8 +70,10 @@ class GCN(nn.Module):
 
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
+        edge_weight = data.edge_attr if hasattr(data, 'edge_attr') and data.edge_attr is not None else None
+
         for conv, bn in zip(self.convs, self.bns):
-            x = conv(x, edge_index)
+            x = conv(x, edge_index, edge_weight=edge_weight)
             x = bn(x)
             x = self.activation(x)
             if self.dropout > 0.0:
@@ -67,8 +83,10 @@ class GCN(nn.Module):
 
     def get_embeddings(self, data):
         x, edge_index = data.x, data.edge_index
+        edge_weight = data.edge_attr if hasattr(data, 'edge_attr') and data.edge_attr is not None else None
+
         for conv, bn in zip(self.convs, self.bns):
-            x = conv(x, edge_index)
+            x = conv(x, edge_index, edge_weight=edge_weight)
             x = bn(x)
             x = self.activation(x)
             if self.dropout > 0.0:
@@ -76,13 +94,24 @@ class GCN(nn.Module):
         return x
 
 class GAT(nn.Module):
-    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, heads=1, final_layer="regression", activation="elu", seed=None, self_loop_and_norm=None):
+    """Graph Attention Network implementation.
+
+    Args:
+
+        input_dim (int): Dimension of input features.
+        hidden_dim (int): Dimension of hidden layers.
+        layer_num (int): Number of GAT layers.
+        dropout (bool | float): Dropout probability.
+        heads (int): Number of attention heads.
+        final_layer (str): Type of final layer ('regression' or identity).
+        activation (str): Activation function name.
+        seed (int | None): Random seed for reproducibility.
+        self_loop_and_norm (bool | None): Whether to add self-loops.
+
+    """
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, heads=1, final_layer="regression", activation="relu", seed=None, self_loop_and_norm=None):
         if seed is not None:
-            torch.manual_seed(seed)
-            if torch.cuda.is_available():
-                torch.cuda.manual_seed_all(seed)
-                torch.backends.cudnn.deterministic = True
-                torch.backends.cudnn.benchmark = False
+            set_seed(seed)
 
         super().__init__()
 
@@ -125,13 +154,23 @@ class GAT(nn.Module):
         return x
 
 class SAGE(nn.Module):
-    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="elu", seed=None, self_loop_and_norm=None):
+    """GraphSAGE Network implementation.
+
+    Args:
+
+        input_dim (int): Dimension of input features.
+        hidden_dim (int): Dimension of hidden layers.
+        layer_num (int): Number of SAGE layers.
+        dropout (bool | float): Dropout probability.
+        final_layer (str): Type of final layer ('regression' or identity).
+        activation (str): Activation function name.
+        seed (int | None): Random seed for reproducibility.
+        self_loop_and_norm (bool | None): Whether to normalize.
+
+    """
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="relu", seed=None, self_loop_and_norm=None):
         if seed is not None:
-            torch.manual_seed(seed)
-            if torch.cuda.is_available():
-                torch.cuda.manual_seed_all(seed)
-                torch.backends.cudnn.deterministic = True
-                torch.backends.cudnn.benchmark = False
+            set_seed(seed)
 
         super().__init__()
 
@@ -144,7 +183,7 @@ class SAGE(nn.Module):
         for i in range(layer_num):
             in_dim = input_dim if i == 0 else hidden_dim
             if self_loop_and_norm is not None:
-                self.convs.append(SAGEConv(in_dim, hidden_dim,normalize=False))
+                self.convs.append(SAGEConv(in_dim, hidden_dim, normalize=False))
             else:
                 self.convs.append(SAGEConv(in_dim, hidden_dim))
             self.bns.append(nn.Identity())
@@ -173,14 +212,24 @@ class SAGE(nn.Module):
         return x
 
 class GIN(nn.Module):
-    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="relu", seed=None, self_loop_and_norm=None):
+    """Graph Isomorphism Network (GIN) implementation.
 
+    Args:
+
+        input_dim (int): Dimension of input features.
+        hidden_dim (int): Dimension of hidden layers.
+        layer_num (int): Number of GIN layers.
+        dropout (bool | float): Dropout probability.
+        final_layer (str): Type of final layer ('regression' or identity).
+        activation (str): Activation function name.
+        seed (int | None): Random seed for reproducibility.
+        self_loop_and_norm (bool | None): Unused in GIN, present for API consistency.
+        output_dim (int | None): Optional output dimension override.
+
+    """
+    def __init__(self, input_dim, hidden_dim, layer_num=2, dropout=True, final_layer="regression", activation="relu", seed=None, self_loop_and_norm=None, output_dim=None):
         if seed is not None:
-            torch.manual_seed(seed)
-            if torch.cuda.is_available():
-                torch.cuda.manual_seed_all(seed)
-                torch.backends.cudnn.deterministic = True
-                torch.backends.cudnn.benchmark = False
+            set_seed(seed)
 
         super().__init__()
 
@@ -192,7 +241,6 @@ class GIN(nn.Module):
         self.bns = nn.ModuleList()
         for i in range(layer_num):
             in_dim = input_dim if i == 0 else hidden_dim
-            # at each GIN layer we create an mlp
             mlp = nn.Sequential(
                 nn.Linear(in_dim, hidden_dim),
                 nn.ReLU(),

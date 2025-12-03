@@ -9,6 +9,7 @@ bioneuralnet.clustering.hybrid\_louvain
    .. autosummary::
    
       get_logger
+      set_seed
    
    .. rubric:: Classes
 

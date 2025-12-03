@@ -1,4 +1,4 @@
-﻿bioneuralnet.clustering
+bioneuralnet.clustering
 =======================
 
 .. automodule:: bioneuralnet.clustering

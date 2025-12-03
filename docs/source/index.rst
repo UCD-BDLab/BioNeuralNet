@@ -50,128 +50,103 @@ Get started quickly with these end-to-end examples demonstrating the BioNeuralNe
    `View BioNeuralNet Workflow. <https://bioneuralnet.readthedocs.io/en/latest/_images/BioNeuralNet.png>`_
 
 
-Citation
---------
-
-If you use BioNeuralNet in your research, we kindly ask that you cite our paper:
-
-   Ramos, V., Hussein, S., et al. (2025).
-   `BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool <https://arxiv.org/abs/2507.20440>`_.
-   *arXiv preprint arXiv:2507.20440* | `DOI: 10.48550/arXiv.2507.20440 <https://doi.org/10.48550/arXiv.2507.20440>`_.
-
-For your convenience, you can use the following BibTeX entry:
-
-.. code-block:: bibtex
-
-   @misc{ramos2025bioneuralnetgraphneuralnetwork,
-         title={BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool}, 
-         author={Vicente Ramos and Sundous Hussein and Mohamed Abdel-Hafiz and Arunangshu Sarkar and Weixuan Liu and Katerina J. Kechris and Russell P. Bowler and Leslie Lange and Farnoush Banaei-Kashani},
-         year={2025},
-         eprint={2507.20440},
-         archivePrefix={arXiv},
-         primaryClass={cs.LG},
-         url={https://arxiv.org/abs/2507.20440},
-         doi={10.48550/arXiv.2507.20440}
-   }
-
 What is BioNeuralNet?
 ---------------------
 
-BioNeuralNet is a flexible, modular Python framework developed to facilitate end-to-end network-based multi-omics analysis using **Graph Neural Networks (GNNs)**. It addresses the complexities associated with multi-omics data, such as high dimensionality, sparsity, and intricate molecular interactions, by converting biological networks into meaningful, low-dimensional embeddings suitable for downstream tasks.
+BioNeuralNet is a flexible and modular Python framework tailored for **end-to-end network-based multi-omics data analysis**. It leverages Graph Neural Networks (GNNs) to learn biologically meaningful low-dimensional representations from multi-omics networks, converting complex molecular interactions into versatile embeddings.
 
-BioNeuralNet provides:
+**Core Analytical Modules:**
 
-- **Network Construction**: Easily build informative networks from multi-omics datasets to capture biologically relevant molecular interactions.
-- **GNN Embeddings**: Transform complex biological networks into versatile embeddings, capturing both structural relationships and molecular interactions.
-- **Phenotype-Aware Analysis**: Integrate phenotype or clinical variables to enhance the biological relevance of the embeddings.
-- **Disease Prediction**: Utilize network-derived embeddings for accurate and scalable predictive modeling of diseases and phenotypes.
-- **Interoperability**: Outputs structured as **Pandas DataFrames**, ensuring compatibility with common Python tools and seamless integration into existing bioinformatics pipelines.
+- **Network Construction**: Build informative networks from raw tabular data using strategies like **Similarity**, **Correlation**, **Neighborhood-based**, or **Phenotype-driven** (e.g., SmCCNet) approaches.
+- **Biomarker Discovery**: Identify biological modules and key molecular interactions that drive disease phenotypes.
+- **Disease Prediction**: Implement end-to-end supervised disease classification using the **DPMON** (Disease Prediction using Multi-Omics Networks) module.
+- **Subject Representation**: Generate enhanced subject-level embeddings for stratification and clustering.
 
-BioNeuralNet emphasizes usability, reproducibility, and adaptability, making advanced network-based multi-omics analyses accessible to researchers working in precision medicine and systems biology.
+**Visualizing Multi-Omics Networks**
+
+BioNeuralNet allows you to inspect the topology of your constructed networks. The visualization below, from our **TCGA Kidney Cancer (KIPAN)** analysis, highlights a module of highly interacting genes and proteins.
+
+.. figure:: _static/kipan_net.png
+   :align: center
+   :alt: Multi-Omics Network Visualization
+   :width: 100%
+
+   *Network visualization of a highly connected gene module identified in the KIPAN dataset.* `Full Size Image <https://bioneuralnet.readthedocs.io/en/latest/_images/kipan_net.png>`_
+
+**Top Identified Biomarkers (Hub Omics)**
+
+The table below lists the top hub features identified in the network above, ranked by their degree centrality.
+
+.. list-table:: Omics with high degree
+   :widths: 40 10 10 10
+   :header-rows: 1
+   :align: center
+
+   * - Feature Name (Omic)
+     - Index
+     - Degree
+     - Source
+   * - INPP5J_27124
+     - 5
+     - 12
+     - RNA
+   * - SLC26A7_115111
+     - 26
+     - 9
+     - RNA
+   * - HEPACAM2_253012
+     - 12
+     - 7
+     - RNA
+   * - CLNK_116449
+     - 16
+     - 7
+     - RNA
+   * - RHCG_51458
+     - 27
+     - 6
+     - RNA
+   * - CLCNKB_1188
+     - 3
+     - 6
+     - RNA
+
 
 Why Graph Neural Networks for Multi-Omics?
 ------------------------------------------
 
-Traditional machine learning methods often struggle with the complexity and high dimensionality of multi-omics data, particularly their inability to effectively capture intricate molecular interactions and dependencies. BioNeuralNet overcomes these limitations by using **graph neural networks (GNNs)**, which naturally encode biological structures and relationships.
+Traditional statistical methods typically represent multi-omics data as high-dimensional tabular matrices, often overlooking the intricate relationships and interactions between biomolecular entities. BioNeuralNet overcomes these limitations by using **Graph Neural Networks (GNNs)** to explicitly model multi-omics data as biological networks.
 
-BioNeuralNet supports several state-of-the-art GNN architectures optimized for biological applications:
+BioNeuralNet supports several GNN architectures suited to different biological contexts:
 
-- **Graph Convolutional Networks (GCN)**: Aggregate biological signals from neighboring molecules, effectively modeling local interactions such as gene co-expression or regulatory relationships.
-- **Graph Attention Networks (GAT)**: Use attention mechanisms to dynamically prioritize important molecular interactions, highlighting the most biologically relevant connections.
-- **GraphSAGE**: Facilitate inductive learning, enabling the model to generalize embeddings to previously unseen molecular data, thereby enhancing predictive power and scalability.
-- **Graph Isomorphism Networks (GIN)**: Provide powerful and expressive graph embeddings, accurately distinguishing subtle differences in molecular interaction patterns.
+* **GCN**: Effective for uniformly connected graphs.
+* **GAT**: Uses attention mechanisms to highlight key biological relationships.
+* **GraphSAGE**: Designed for large or dynamic datasets.
+* **GIN**: Sensitive to subtle feature variations in molecular structures.
 
-For detailed explanations of BioNeuralNet's supported GNN architectures and their biological relevance, see :doc:`gnns`.
+**Network Embeddings**
 
-Example: Network-Based Multi-Omics Analysis for Disease Prediction
-------------------------------------------------------------------
+By projecting high-dimensional omics networks into latent spaces, BioNeuralNet distills complex, nonlinear molecular relationships into compact vectorized representations. The t-SNE projection below reveals distinct clusters corresponding to different omics modalities (e.g., DNA Methylation, RNA, miRNA).
 
-`View full-size image: Network-Based Multi-Omics Analysis for Disease Prediction <https://bioneuralnet.readthedocs.io/en/latest/_images/Overview.png>`_
-
-.. figure:: _static/Overview.png
+.. figure:: _static/emb_kipan.png
    :align: center
-   :alt: BioNeuralNet's workflow for network-based multi-omics analysis
+   :alt: t-SNE visualization of Network Embeddings
+   :width: 100%
 
-   **BioNeuralNet Workflow**: Network-Based Multi-Omics Analysis for Disease Prediction
+   *2D projection of Network Embeddings showing distinct separation between omics modalities.* `Full Size Image <https://bioneuralnet.readthedocs.io/en/latest/_images/emb_kipan.png>`_
 
-Below is a concise example demonstrating the following key steps:
+For detailed explanations of BioNeuralNet's supported GNN architectures, see :doc:`gnns`.
 
-1. **Data Preparation**:
-   
-   - Load your multi-omics data (e.g., transcriptomics, proteomics) along with phenotype and clinical covariates.
+Key Considerations for Robust Analysis
+--------------------------------------
 
-2. **Network Construction**:
-   
-   - Here, we construct the multi-omics network using an external R package, **SmCCNet** [1]_.
-   - BioNeuralNet provides convenient wrappers for external tools (like SmCCNet) through `bioneuralnet.external_tools`. Note: R must be installed for these wrappers.
+To ensure scientific rigor and optimal performance when using BioNeuralNet, users should consider the following best practices:
 
-3. **Disease Prediction with DPMON**:
-   
-   - **DPMON** [2]_ integrates omics data and network structures to predict disease phenotypes.
-   - It provides an end-to-end pipeline, complete with built-in hyperparameter tuning, and outputs predictions directly as pandas DataFrames for easy interoperability.
-
-**Example Usage**:
-
-.. code-block:: python
-
-   import pandas as pd
-   from bioneuralnet.external_tools import SmCCNet
-   from bioneuralnet.downstream_task import DPMON
-   from bioneuralnet.datasets import DatasetLoader
-
-   # Step 1: Load the dataset and access individual omics modalities
-   example = DatasetLoader("example1")
-   omics_genes = example.data["X1"]
-   omics_proteins = example.data["X2"]
-   phenotype = example.data["Y"]
-   clinical = example.data["clinical"]
-
-   # Step 2: Network Construction with SmCCNet
-   smccnet = SmCCNet(
-       phenotype_df=phenotype,
-       omics_dfs=[omics_genes, omics_proteins],
-       data_types=["Genes", "Proteins"],
-       kfold=5,
-       summarization="PCA",
-   )
-   global_network, clusters = smccnet.run()
-   print("Adjacency matrix generated.")
-
-    # Step 3: Disease Prediction using DPMON
-   dpmon = DPMON(
-       adjacency_matrix=global_network,
-       omics_list=[omics_genes, omics_proteins],
-       phenotype_data=phenotype,
-       clinical_data=clinical,
-       model="GCN",
-       repeat_num=5,
-       tune=True,
-       gpu=True, 
-       cuda=0,
-       output_dir="./output"
-   )
-   predictions, avg_accuracy = dpmon.run()
-   print("Disease phenotype predictions:\n", predictions)
+* **Network Topology Sensitivity**: Performance is inherently tied to the quality of the constructed network. We recommend comparing multiple network construction strategies (e.g., Correlation vs Similarity) within BioNeuralNet to benchmark different topologies.
+* **Feature Selection Impact**: Results depend heavily on input features. BioNeuralNet supports various preselection strategies (Top-k Variance, ANOVA-F, Random Forest), which often yield complementary biological insights.
+* **Handling Missing Data**: Incomplete multi-omics data is common. BioNeuralNet provides utilities like ``impute_omics`` and ``impute_omics_knn`` to handle missing values within modalities.
+* **Computational Scalability**: While optimized for standard omics datasets, extremely large networks may require aggressive feature reduction or subgraph detection strategies to maintain computational efficiency.
+* **Interpretability Scope**: BioNeuralNet provides network-level interpretability (identifying key modules and hub features). However, full node-level explainability remains an active area of research.
 
 Explore BioNeuralNet's Documentation
 ------------------------------------
@@ -184,7 +159,7 @@ For detailed examples and tutorials, visit:
 **Documentation Sections:**
 
 - :doc:`gnns`: Overview of supported GNN architectures (GCN, GAT, GraphSAGE, GIN) and embedding generation.
-- :doc:`clustering`: How to identify biologically relevant functional modules using correlated clustering methods.
+- :doc:`subgraph`: How to identify biologically relevant functional modules using correlated clustering methods.
 - :doc:`downstream_tasks`: Performing downstream analyses such as subject representation and phenotype prediction (DPMON).
 - :doc:`metrics`: Methods for visualization, quality evaluation, and performance benchmarking.
 - :doc:`utils`: Tools for preprocessing, feature selection, network construction, and data summarization.
@@ -217,6 +192,14 @@ We welcome contributions to BioNeuralNet! If you have ideas for new features, im
       pre-commit install
       pytest --cov=bioneuralnet
 
+Citation
+--------
+
+If you use BioNeuralNet in your research, we kindly ask that you cite our paper:
+
+   Ramos, V., Hussein, S., et al. (2025).
+   `BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool <https://arxiv.org/abs/2507.20440>`_.
+   *arXiv preprint arXiv:2507.20440* | `DOI: 10.48550/arXiv.2507.20440 <https://doi.org/10.48550/arXiv.2507.20440>`_.
 
 .. toctree::
    :maxdepth: 2
@@ -225,11 +208,13 @@ We welcome contributions to BioNeuralNet! If you have ideas for new features, im
    installation
 
    gnns
-   clustering
+   subgraph
    metrics
    utils
    downstream_tasks
+   datasets
    Quick_Start.ipynb
+   quick_start_bio
    notebooks/index
    examples/index
    external_tools/index

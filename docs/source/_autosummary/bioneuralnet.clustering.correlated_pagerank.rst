@@ -10,6 +10,7 @@ bioneuralnet.clustering.correlated\_pagerank
    
       get_logger
       pearsonr
+      set_seed
    
    .. rubric:: Classes
 

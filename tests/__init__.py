@@ -1,16 +1,25 @@
-from .test_gnn_embedding import *
-from .test_subject_representation import *
-from .test_hybrid_louvain import *
-from .test_dpmon import *
-from .test_graph_gen import *
-from .test_preprocess import *
-from .test_data_utils import *
-from .test_correlation_metrics import *
-from .test_dataset_loader import *
-from .test_leiden import *
+from . import (
+    test_gnn_embedding,
+    test_subject_representation,
+    test_hybrid_louvain,
+    test_downstream_dpmon,
+    test_utils_graph,
+    test_utils_graph_tools,
+    test_utils_preprocess,
+    test_utils_data,
+    test_correlation_metrics,
+    test_dataset_loader,
+)
 
-#from .test_metrics import *
-#from .test_utils import *
-#from .test_smccnet import *
-#from .test_correlated_louvain import *
-#from .test_correlated_pagerank import *
+__all__ = [
+    "test_gnn_embedding",
+    "test_subject_representation",
+    "test_hybrid_louvain",
+    "test_downstream_dpmon",
+    "test_utils_graph",
+    "test_utils_graph_tools",
+    "test_utils_preprocess",
+    "test_utils_data",
+    "test_correlation_metrics",
+    "test_dataset_loader",
+]

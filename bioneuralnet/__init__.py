@@ -1,143 +1,92 @@
-"""
-BioNeuralNet: A Python Package for Multi-Omics Integration and Neural Network Embeddings.
-BioNeuralNet offers a comprehensive suite of tools designed to transform complex biological data into meaningful low-dimensional representations. The framework facilitates the integration of omics data with advanced neural network embedding methods, enabling downstream applications such as clustering, subject representation, and disease prediction.
+"""BioNeuralNet: Graph Neural Network-based Multi-Omics Network Data Analysis.
+
+BioNeuralNet is a flexible and modular framework tailored for end-to-end network-based multi-omics data analysis. It leverages Graph Neural Networks (GNNs) to transform complex molecular networks into biologically meaningful low-dimensional representations, enabling diverse downstream analytical tasks.
 
 Key Features:
 
-    - **Network Embedding**: Generate lower-dimensional representations using Graph Neural Networks (GNNs).
-    - **Subject Representation**: Combine network-derived embeddings with raw omics data to produce enriched subject-level profiles.
-    - **Correlated Clustering**: BioNeuralNet includes internal modules for performing correlated clustering on complex networks to identify functional modules and informative biomarkers.
-    - **Downstream Prediction**: Execute end-to-end pipelines (DPMON) for disease phenotype prediction using network information.
-    - **External Integration**: Easily interface with external tools (WGCNA, SmCCNet, Node2Vec, among others.) for network construction, visualization, and advanced analysis.
-    - **Evaluation Metrics**: Evaluate the quality of embeddings, clustering results, and network performance using a variety of metrics and visualizations.
-    - **Data Handling**: Streamline data preprocessing, filtering, and conversion tasks to ensure seamless integration with the BioNeuralNet framework.
-    - **Example Datasets**: Access synthetic datasets for testing and demonstration purposes, enabling users to explore the package's capabilities.
-    - **Logging and Configuration**: Utilize built-in logging and configuration utilities to manage experiments, track progress, and optimize workflows.
-    - **Comprehensive Documentation**: Detailed API documentation and usage examples to guide users through the package's functionalities.
-    - **Open-Source and Extensible**: BioNeuralNet is open-source and designed to be easily extensible, allowing users to customize and enhance its capabilities.
-    - **Community Support**: Engage with the BioNeuralNet community for assistance, feedback, and collaboration on biological data analysis projects.
+* **Network Construction**: Modules to construct networks from raw tabular data using similarity, correlation, neighborhood-based, or phenotype-driven strategies (e.g., SmCCNet).
+* **Network Embedding**: Generate low-dimensional representations using advanced Graph Neural Networks, including GCN, GAT, GraphSAGE, and GIN.
+* **Subgraph Detection**: Identify biologically meaningful modules using supervised and unsupervised community detection methods like Correlated Louvain and PageRank.
+* **Downstream Tasks**: Execute specialized pipelines such as DPMON (Disease Prediction using Multi-Omics Networks) and Subject Representation for patient-level analysis.
+* **Data Handling**: Streamline data ingestion, feature selection (ANOVA, Random Forest), and preprocessing.
+* **Reproducibility**: Built-in logging, configuration, and seeding utilities to ensure reproducible research.
 
 Modules:
 
-    - `network_embedding`: Generates network embeddings via GNNs and Node2Vec.
-    - `subject_representation`: Integrates network embeddings into omics data.
-    - `downstream_task`: Contains pipelines for disease prediction (e.g., DPMON).
-    - `metrics`: Provides tools for evaluating embeddings, cluster comparison, plotting functions, and network performance.
-    - `clustering`: Implements clustering algorithms for network analysis.
-    - `external_tools`: Wraps external packages (e.g.WGCNA and SmCCNet) for quick integration.
-    - `utils`: Utilities for configuration, logging, file handling, converting .Rdata files to dataframes, and variance filtering.
-    - `datasets`: Contains example (synthetic) datasets for testing and demonstration purposes.
+* `network_embedding`: Generates network embeddings via GNN architectures.
+* `subject_representation`: Fuses network embeddings with omics data for subject profiling.
+* `downstream_task`: Contains pipelines for disease prediction (DPMON) and representation learning.
+* `clustering`: Implements correlated and hybrid clustering algorithms for module detection.
+* `external_tools`: Wraps external packages (e.g., SmCCNet) for network inference.
+* `metrics`: Provides tools for correlation analysis, performance evaluation, and plotting.
+* `datasets`: Access to synthetic and real-world (TCGA) multi-omics datasets.
+* `utils`: Utilities for logging, reproducibility, graph generation, and data processing.
 """
 
-__version__ = "1.1.4"
+__version__ = "1.2.1"
+
+# submodules to enable direct imports such as `from bioneuralnet import utils`
+from . import utils
+from . import metrics
+from . import datasets
+from . import clustering
+from . import network_embedding
+from . import downstream_task
+from . import external_tools
 
 from .network_embedding import GNNEmbedding
-from .downstream_task import SubjectRepresentation
-from .downstream_task import DPMON
-from .clustering import CorrelatedPageRank
-from .clustering import CorrelatedLouvain
-from .clustering import HybridLouvain
-from .datasets import DatasetLoader
+from .downstream_task import SubjectRepresentation, DPMON
 from .external_tools import SmCCNet
+from .datasets import DatasetLoader
 
-from .metrics import omics_correlation
-from .metrics import cluster_correlation
-from .metrics import louvain_to_adjacency
-from .metrics import evaluate_rf
-from .metrics import evaluate_model
-from .metrics import evaluate_f1m
-from .metrics import evaluate_f1w
-from .metrics import plot_performance_three
-from .metrics import plot_variance_distribution
-from .metrics import plot_variance_by_feature
-from .metrics import plot_performance
-from .metrics import plot_embeddings
-from .metrics import plot_network
-from .metrics import plot_multiple_metrics
-from .metrics import compare_clusters
+from .clustering import (
+    CorrelatedPageRank,
+    CorrelatedLouvain,
+    HybridLouvain,
+)
 
-from .utils import get_logger
-from .utils import rdata_to_df
-from .utils import variance_summary
-from .utils import zero_fraction_summary
-from .utils import expression_summary
-from .utils import correlation_summary
-from .utils import explore_data_stats
-from .utils import preprocess_clinical
-from .utils import clean_inf_nan
-from .utils import select_top_k_variance
-from .utils import select_top_k_correlation
-from .utils import select_top_randomforest
-from .utils import top_anova_f_features
-from .utils import prune_network
-from .utils import prune_network_by_quantile
-from .utils import network_remove_low_variance
-from .utils import network_remove_high_zero_fraction
-from .utils import gen_similarity_graph
-from .utils import gen_correlation_graph
-from .utils import gen_threshold_graph
-from .utils import gen_gaussian_knn_graph
-from .utils import gen_lasso_graph
-from .utils import gen_mst_graph
-from .utils import gen_snn_graph
-from .utils import impute_omics
-from .utils import impute_omics_knn
-from .utils import normalize_omics
-from .utils import set_seed
-from .utils import beta_to_m
+from .datasets import (
+    load_example,
+    load_monet,
+    load_brca,
+    load_lgg,
+    load_kipan,
+    load_paad,
+)
 
-__all__: list = [
+from .utils import (
+    set_seed,
+    get_logger,
+)
+
+__all__ = [
     "__version__",
+
+    "utils",
+    "metrics",
+    "datasets",
+    "clustering",
+    "network_embedding",
+    "downstream_task",
+    "external_tools",
+
     "GNNEmbedding",
     "SubjectRepresentation",
     "DPMON",
+    "SmCCNet",
+    "DatasetLoader",
+
     "CorrelatedPageRank",
     "CorrelatedLouvain",
     "HybridLouvain",
-    "omics_correlation",
-    "cluster_correlation",
-    "louvain_to_adjacency",
-    "evaluate_rf",
-    "plot_performance_three",
-    "plot_variance_distribution",
-    "plot_variance_by_feature",
-    "plot_performance",
-    "plot_embeddings",
-    "plot_network",
-    "compare_clusters",
-    "plot_multiple_metrics",
-    "evaluate_f1m",
-    "evaluate_f1w",
-    "get_logger",
-    "rdata_to_df",
-    "variance_summary",
-    "zero_fraction_summary",
-    "expression_summary",
-    "correlation_summary",
-    "explore_data_stats",
-    "preprocess_clinical",
-    "clean_inf_nan",
-    "select_top_k_variance",
-    "select_top_k_correlation",
-    "select_top_randomforest",
-    "top_anova_f_features",
-    "prune_network",
-    "prune_network_by_quantile",
-    "network_remove_low_variance",
-    "network_remove_high_zero_fraction",
-    "gen_similarity_graph",
-    "gen_correlation_graph",
-    "gen_threshold_graph",
-    "gen_gaussian_knn_graph",
-    "gen_lasso_graph",
-    "gen_mst_graph",
-    "gen_snn_graph",
-    "DatasetLoader",
-    "SmCCNet",
-    "evaluate_model",
-    "impute_omics",
-    "impute_omics_knn",
-    "normalize_omics",
+
+    "load_example",
+    "load_monet",
+    "load_brca",
+    "load_lgg",
+    "load_kipan",
+    "load_paad",
+
     "set_seed",
-    "beta_to_m",
+    "get_logger",
 ]

@@ -10,6 +10,7 @@ bioneuralnet.network\_embedding.gnn\_models
    
       get_activation
       process_dropout
+      set_seed
    
    .. rubric:: Classes
 

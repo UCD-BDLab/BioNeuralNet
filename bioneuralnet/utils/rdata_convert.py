@@ -3,10 +3,31 @@ import shutil
 from pathlib import Path
 import pandas as pd
 from .logger import get_logger
+
 logger = get_logger(__name__)
 
 def rdata_to_df(rdata_file: Path, csv_file: Path, Object=None) -> pd.DataFrame:
+    """Converts an RData file to a pandas DataFrame.
 
+    This function executes an external R script to load the .RData file, identify a suitable matrix, data frame, or graph object (e.g., igraph), and export it to CSV.
+
+    Args:
+
+        rdata_file (Path): Path to the input .RData file.
+        csv_file (Path): Path where the temporary CSV file should be written.
+        Object (str | None): Optional name of the specific object to extract; if None, the script attempts to auto-detect the first suitable object.
+
+    Returns:
+
+        pd.DataFrame: The converted data loaded into a pandas DataFrame.
+
+    Raises:
+
+        EnvironmentError: If 'Rscript' is not found in the system path.
+        RuntimeError: If the R script execution fails.
+        FileNotFoundError: If the resulting CSV file cannot be found.
+
+    """
     rscript = shutil.which("Rscript")
     if rscript is None:
         raise EnvironmentError("Rscript not found…")

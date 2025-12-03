@@ -49,7 +49,7 @@ Below is a **complete** Python implementation:
    from bioneuralnet.datasets import DatasetLoader
 
    # Step 1: Load your data or use one of the provided datasets
-   Example = DatasetLoader("example1")
+   Example = DatasetLoader("example")
    omics_genes = Example.data["X1"]
    omics_proteins = Example.data["X2"]
    phenotype = Example.data["Y"]

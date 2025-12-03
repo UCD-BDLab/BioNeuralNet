@@ -1,13 +1,9 @@
 import networkx as nx
 import pandas as pd
-import numpy as np
 from typing import Union, Optional
-import torch
-
 from bioneuralnet.clustering.correlated_pagerank import CorrelatedPageRank
 from bioneuralnet.clustering.correlated_louvain import CorrelatedLouvain
-
-from ..utils.logger import get_logger
+from bioneuralnet.utils import get_logger, set_seed
 
 logger = get_logger(__name__)
 
@@ -17,7 +13,7 @@ class HybridLouvain:
 
     Attributes:
 
-        G (nx.Graph): NetworkX graph object.
+        G (Union[nx.Graph, pd.DataFrame]): Input graph as a NetworkX Graph or adjacency DataFrame.
         B (pd.DataFrame): Omics data.
         Y (pd.DataFrame): Phenotype data.
         k3 (float): Weight for Correlated Louvain.
@@ -28,7 +24,7 @@ class HybridLouvain:
     """
     def __init__(
         self,
-        G: nx.Graph,
+        G: Union[nx.Graph, pd.DataFrame],
         B: pd.DataFrame,
         Y: pd.DataFrame,
         k3: float = 0.2,
@@ -41,18 +37,18 @@ class HybridLouvain:
 
     ):
         self.logger = get_logger(__name__)
-
-        if seed is not None:
-            torch.manual_seed(seed)
-            np.random.seed(seed)
-            if torch.cuda.is_available():
-                torch.cuda.manual_seed_all(seed)
-                torch.backends.cudnn.deterministic = True
-                torch.backends.cudnn.benchmark = False
-
-        self.gpu = gpu
         self.seed = seed
+        self.gpu = gpu
+        if seed is not None:
+            set_seed(seed)
         self.logger.info("Initializing HybridLouvain...")
+
+        if isinstance(G, pd.DataFrame):
+            self.logger.info("Input G is a DataFrame; converting adjacency matrix to NetworkX graph.")
+            G = nx.from_pandas_adjacency(G)
+
+        if not isinstance(G, nx.Graph):
+            raise TypeError("G must be a networkx.Graph or a pandas DataFrame adjacency matrix.")
 
         self.G = G
         graph_nodes = set(map(str, G.nodes()))
@@ -67,15 +63,6 @@ class HybridLouvain:
             )
         self.B = B.loc[:, keep_omics]
 
-        # pheno_idx = set(Y.index.astype(str))
-        # isin_mask = Y.index.astype(str).isin(graph_nodes)
-        # keep_pheno = Y.index[isin_mask]
-        # dropped_pheno = sorted(pheno_idx - graph_nodes)
-        # if dropped_pheno:
-        #     self.logger.info(
-        #         f"Dropping {len(dropped_pheno)} phenotype rows not in graph: "
-        #         f"{dropped_pheno[:5]}{'…' if len(dropped_pheno) > 5 else ''}"
-        #     )
         if isinstance(Y, pd.DataFrame):
             self.Y = Y.squeeze()
         elif isinstance(Y, pd.Series):
@@ -94,17 +81,34 @@ class HybridLouvain:
         )
 
     def run(self, as_dfs: bool = False) -> Union[dict, list]:
+        """Run the hybrid Louvain-PageRank refinement loop.
+
+        Iteratively applies CorrelatedLouvain to obtain communities, selects the most phenotype-associated community as seeds, refines it with CorrelatedPageRank, and restricts the graph to the refined cluster until convergence, subgraph size < 2, or max_iter is reached. Returns either the final partition and per-iteration clusters or a list of omics subnetworks as DataFrames.
+
+        Args:
+
+            as_dfs (bool): If True, return a list of omics subnetworks (one DataFrame per iteration); if False, return a dict with the last partition and all clusters.
+
+        Returns:
+
+            Union[dict, list]: Either {"curr": partition, "clus": all_clusters} or a list of DataFrames (clusters as omics subnetworks).
+
+        """
         iteration = 0
         prev_size = len(self.G.nodes())
         current_partition = None
         all_clusters = {}
 
         while iteration < self.max_iter:
+            if len(self.G.nodes()) < 5:
+                self.logger.info("Graph has fewer than 5 nodes; stopping iterations.")
+                break
+
             self.logger.info(
                 f"\nIteration {iteration+1}/{self.max_iter}: Running Correlated Louvain..."
             )
 
-            if self.tune:
+            if self.tune and len(self.G.nodes()) > 20:
                 self.logger.info("Tuning Correlated Louvain for current iteration...")
                 louvain_tuner = CorrelatedLouvain(
                     self.G,
@@ -155,7 +159,7 @@ class HybridLouvain:
             )
             current_partition = partition
 
-            best_corr = 0
+            best_corr = 0.0
             best_seed = None
 
             if not isinstance(partition, dict):
@@ -183,11 +187,12 @@ class HybridLouvain:
             if best_seed is None:
                 self.logger.info("No valid seed community found; stopping iterations.")
                 break
+
             self.logger.info(
                 f"Selected seed community of size {len(best_seed)} with correlation {best_corr:.4f}"
             )
 
-            if self.tune:
+            if self.tune and len(self.G.nodes()) > 20:
                 self.logger.info("Tuning Correlated PageRank for current iteration...")
                 pagerank_tuner = CorrelatedPageRank(
                     graph=self.G,
@@ -223,19 +228,34 @@ class HybridLouvain:
                 )
             else:
                 pagerank_instance = CorrelatedPageRank(
-                    graph=self.G, omics_data=self.B, phenotype_data=self.Y, tune=False, seed=self.seed, gpu=self.gpu,
+                    graph=self.G,
+                    omics_data=self.B,
+                    phenotype_data=self.Y,
+                    tune=False,
+                    seed=self.seed,
+                    gpu=self.gpu,
                 )
 
             pagerank_results = pagerank_instance.run(best_seed)
             refined_nodes = pagerank_results.get("cluster_nodes", [])
             new_size = len(refined_nodes)
             all_clusters[iteration] = refined_nodes
-            self.logger.info(f"Refined subgraph size: {new_size}")
+
+            cond = pagerank_results.get("conductance", None)
+            corr = pagerank_results.get("correlation", None)
+            score = pagerank_results.get("composite_score", None)
+
+            self.logger.info(
+                f"Iteration {iteration+1}: cluster size={new_size}, "
+                f"Conductance={cond:.3f} Correlation={corr:.3f} score={score:.3f}"
+            )
+
             if new_size == prev_size or new_size <= 1:
                 self.logger.info(
                     "Subgraph size converged or too small. Stopping iterations."
                 )
                 break
+
             prev_size = new_size
             self.G = self.G.subgraph(refined_nodes).copy()
             iteration += 1
@@ -246,8 +266,12 @@ class HybridLouvain:
             dfs = []
             for nodes in all_clusters.values():
                 if len(nodes) > 2:
-
-                    dfs.append(self.B.loc[:, nodes].copy())
+                    valid_cols = []
+                    for n in nodes:
+                        if n in self.B.columns:
+                            valid_cols.append(n)
+                    if valid_cols:
+                        dfs.append(self.B.loc[:, valid_cols].copy())
             return dfs
         else:
             return {"curr": current_partition, "clus": all_clusters}

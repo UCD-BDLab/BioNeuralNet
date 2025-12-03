@@ -1,4 +1,4 @@
-﻿bioneuralnet.metrics
+bioneuralnet.metrics
 ====================
 
 .. automodule:: bioneuralnet.metrics
@@ -10,10 +10,6 @@
    
       cluster_correlation
       compare_clusters
-      evaluate_f1m
-      evaluate_f1w
-      evaluate_model
-      evaluate_rf
       louvain_to_adjacency
       omics_correlation
       plot_embeddings
@@ -31,5 +27,4 @@
    :recursive:
 
    correlation
-   evaluation
    plot
