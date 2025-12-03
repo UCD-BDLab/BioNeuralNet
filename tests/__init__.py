@@ -9,6 +9,7 @@ from . import (
     test_utils_data,
     test_correlation_metrics,
     test_dataset_loader,
+    test_leiden,
 )
 
 __all__ = [
@@ -22,4 +23,5 @@ __all__ = [
     "test_utils_data",
     "test_correlation_metrics",
     "test_dataset_loader",
+    "test_leiden",
 ]
