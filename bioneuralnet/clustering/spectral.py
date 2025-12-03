@@ -20,21 +20,13 @@ def spectral_cluster_graph(
     as a precomputed affinity matrix.
 
     Parameters
-    G : networkx.Graph
-        Input graph. Node labels can be anything hashable.
-    n_clusters : int
-        Number of clusters to find.
+    G : networkx.Graph Input graph.
+    n_clusters : int Number of clusters to find.
     use_edge_weights : bool, default=True
-        If True, use the 'weight' attribute on edges (defaulting to 1.0
-        when missing). If False, treat the graph as unweighted.
     random_state : int or None, default=0
-        Random seed passed to scikit-learn's SpectralClustering.
-
     Returns
-    labels : np.ndarray, shape (n_nodes,)
-        Cluster label for each node, in the order of `nodes_order`.
-    nodes_order : list
-        List of nodes corresponding to `labels`.
+    labels : np.ndarray, shape (n_nodes,) Cluster label for each node, in the order of `nodes_order`.
+    nodes_order : list List of nodes corresponding to `labels`.
     """
     logger = get_logger(__name__)
 
