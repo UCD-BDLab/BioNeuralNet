@@ -38,7 +38,16 @@ def visualize_network(adjacency_matrix, node_mapping=None, title="PPI Network", 
 
     print(f"Visualizing network with {adjacency_matrix.shape[0]} nodes...")
 
-    G = nx.from_pandas_adjacency(adjacency_matrix)
+    df = adjacency_matrix
+    if not df.columns.equals(df.index):
+        common = df.index.intersection(df.columns)
+        df = df.loc[common, common]
+    n = df.shape[0]
+    if n > max_nodes:
+        print(f"Network too large, sampling {max_nodes} nodes...")
+        sampled_nodes = np.random.choice(df.index, max_nodes, replace=False)
+        df = df.loc[sampled_nodes, sampled_nodes]
+    G = nx.from_pandas_adjacency(df)
 
     if G.number_of_nodes() == 0:
         print("Graph has no nodes; skipping network visualization.")
@@ -47,11 +56,7 @@ def visualize_network(adjacency_matrix, node_mapping=None, title="PPI Network", 
         print("Graph has no edges; skipping network visualization.")
         return
 
-    if G.number_of_nodes() > max_nodes:
-        print(f"Network too large, sampling {max_nodes} nodes...")
-        nodes = list(G.nodes())
-        sampled_nodes = np.random.choice(nodes, max_nodes, replace=False)
-        G = G.subgraph(sampled_nodes)
+
 
     if node_mapping is not None:
         node_labels = {}
@@ -150,7 +155,6 @@ def visualize_feature_distribution(features_df, title="Feature Distribution"):
 
         print(f"Feature correlation heatmap saved to {VIZ_DIR / 'feature_correlation_heatmap.png'}")
 
-
 def visualize_embedding(features_df, method='tsne', title="Feature Embedding"):
     """
     Visualize the embedding of features using dimensionality reduction.
@@ -234,31 +238,23 @@ def visualize_node_feature_importance(node_features, node_mapping=None, title="N
         print("No node features to visualize")
         return
 
-    # Calculating average feature values across samples
-    sample_keys = list(node_features.keys())
-    if not sample_keys:
-        print("No node features to visualize")
-        return
-
-    first = node_features[sample_keys[0]]
+    first_key = next(iter(node_features))
+    first = node_features[first_key]
     if isinstance(first, pd.DataFrame):
         first = first.values
     elif isinstance(first, pd.Series):
         first = first.values.reshape(-1, 1)
-
     if first is None or np.size(first) == 0:
         print("Node features are empty; skipping visualization.")
         return
-
     num_nodes = first.shape[0]
     num_features = first.shape[1] if first.ndim > 1 else 1
     if num_nodes < 1 or num_features < 1:
         print("Insufficient node feature dimensions; skipping visualization.")
         return
 
-    avg_features = np.zeros((num_nodes, num_features), dtype=float)
-    count = 0
-    for sample_id, features in node_features.items():
+    mats = []
+    for _, features in node_features.items():
         arr = features
         if isinstance(arr, pd.DataFrame):
             arr = arr.values
@@ -266,65 +262,42 @@ def visualize_node_feature_importance(node_features, node_mapping=None, title="N
             arr = arr.values.reshape(-1, 1)
         if arr is None or arr.shape != (num_nodes, num_features):
             continue
-        avg_features += np.nan_to_num(arr)
-        count += 1
-    if count == 0:
+        mats.append(np.nan_to_num(arr))
+    if len(mats) == 0:
         print("No valid node feature matrices to aggregate; skipping visualization.")
         return
-    avg_features /= max(1, count)
 
-    # Calculating feature importance as variance across nodes
-    feature_importance = np.var(avg_features, axis=0)
+    X = np.stack(mats, axis=0)
+    node_importance = np.var(X, axis=0).mean(axis=1)
 
-    # Creating the plot for feature importance
-    plt.figure(figsize=(10, 6))
-    plt.bar(range(len(feature_importance)), feature_importance)
-    plt.xlabel("Feature Index")
-    plt.ylabel("Variance (Importance)")
-    plt.title(f"{title} (variance across nodes)")
-
+    plt.figure(figsize=(12, 6))
+    order = np.argsort(node_importance)[::-1]
+    k = min(50, len(order))
+    top_idx = order[:k]
+    if node_mapping is not None and hasattr(node_mapping, 'index'):
+        node_ids = list(node_mapping.index)
+        labels = [node_mapping.loc[node_ids[i], 'gene_symbol'] if i < len(node_ids) and node_ids[i] in node_mapping.index else f"Node {i}" for i in top_idx]
+    else:
+        labels = [f"Node {i}" for i in top_idx]
+    plt.bar(range(k), node_importance[top_idx])
+    plt.xticks(range(k), labels, rotation=90)
+    plt.ylabel("Variance across samples (mean over omics)")
+    plt.title(title)
     plt.tight_layout()
     filename = f"{title.lower().replace(' ', '_')}.png"
     plt.savefig(VIZ_DIR / filename, dpi=300)
     plt.close()
-
     print(f"Node feature importance visualization saved to {VIZ_DIR / filename}")
 
-    # Also creating a heatmap of top nodes by feature importance
-    node_variance = np.var(avg_features, axis=1) if avg_features.size > 0 else np.array([])
-    if node_variance.size == 0 or num_nodes == 0:
-        print("No variability across nodes; skipping top nodes heatmap.")
-        return
-    top_count = min(20, num_nodes)
-    top_nodes_idx = np.argsort(node_variance)[-top_count:]
-    if top_nodes_idx.size == 0:
-        print("No top nodes to display; skipping heatmap.")
-        return
-    top_nodes_features = avg_features[top_nodes_idx]
-    if top_nodes_features.size == 0:
-        print("Top nodes feature matrix is empty; skipping heatmap.")
-        return
-
-    # Creating labels for the heatmap
-    if node_mapping is not None and hasattr(node_mapping, 'index'):
-        node_ids = list(node_mapping.index)
-        row_labels = [node_mapping.loc[node_ids[idx], 'gene_symbol'] if idx < len(node_ids) else f"Node {idx}"
-                      for idx in top_nodes_idx]
-    else:
-        row_labels = [f"Node {idx}" for idx in top_nodes_idx]
-
+    top_nodes_features = X.mean(axis=0)[top_idx]
+    row_labels = labels
     col_labels = [f"Feature {i}" for i in range(num_features)]
-
-    # Creating the heatmap
     plt.figure(figsize=(12, 8))
     sns.heatmap(top_nodes_features, cmap='viridis', yticklabels=row_labels, xticklabels=col_labels)
-    plt.title("Top Nodes by Feature Variance")
-
-    # Saving the heatmap
+    plt.title("Top Nodes by Mean Feature")
     plt.tight_layout()
     plt.savefig(VIZ_DIR / "top_nodes_feature_heatmap.png", dpi=300)
     plt.close()
-
     print(f"Top nodes feature heatmap saved to {VIZ_DIR / 'top_nodes_feature_heatmap.png'}")
 
 
