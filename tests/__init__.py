@@ -10,6 +10,7 @@ from . import (
     test_correlation_metrics,
     test_dataset_loader,
     test_leiden,
+    test_spectral
 )
 
 __all__ = [
@@ -24,4 +25,5 @@ __all__ = [
     "test_correlation_metrics",
     "test_dataset_loader",
     "test_leiden",
+    "test_spectral",
 ]
