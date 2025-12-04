@@ -79,6 +79,8 @@ __all__ = [
     "CorrelatedPageRank",
     "CorrelatedLouvain",
     "HybridLouvain",
+    "Leiden",
+    "Spectral_Clustering",
 
     "load_example",
     "load_monet",

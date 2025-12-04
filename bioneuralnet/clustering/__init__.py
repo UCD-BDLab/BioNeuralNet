@@ -6,13 +6,13 @@ This module implements correlated community detection methods including Correlat
 from .correlated_pagerank import CorrelatedPageRank
 from .correlated_louvain import CorrelatedLouvain
 from .hybrid_louvain import HybridLouvain
-from .leiden_upd import Leiden_upd
+from .leiden import Leiden
 from .spectral import Spectral_Clustering
 
 __all__ = [
     "CorrelatedPageRank",
     "CorrelatedLouvain",
     "HybridLouvain",
-    "Leiden_upd",
+    "Leiden",
     "Spectral_Clustering",
 ]

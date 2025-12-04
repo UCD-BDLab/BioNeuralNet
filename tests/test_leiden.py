@@ -56,13 +56,13 @@ def _install_fake_leiden_modules():
 
 _install_fake_leiden_modules()
 
-from bioneuralnet.clustering.leiden_upd import Leiden_upd
+from bioneuralnet.clustering.leiden import Leiden
 
 
 def test_basic_leiden_builds_igraph_and_runs_partition():
     G = nx.path_graph(5)
     # path_graph edges have no 'weight' attribute, default 1.0 will be used
-    inst = Leiden_upd(G=G)
+    inst = Leiden(G=G)
 
     assert inst._ig_graph.vcount() == 5
     assert inst._ig_graph.ecount() == 4
@@ -78,7 +78,7 @@ def test_basic_leiden_builds_igraph_and_runs_partition():
 
 def test_run_returns_copy_when_no_refine():
     G = nx.path_graph(3)
-    inst = Leiden_upd(G=G)
+    inst = Leiden(G=G)
     out = inst.run(refine_with_kmeans=False)
     # same values, but ensure a copy (not the same object)
     assert np.array_equal(out, inst.labels_leiden_)
@@ -88,7 +88,7 @@ def test_run_returns_copy_when_no_refine():
 def test_graph_with_no_edges_sets_weights_none():
     G = nx.Graph()
     G.add_nodes_from(range(3))
-    inst = Leiden_upd(G=G)
+    inst = Leiden(G=G)
     assert inst._ig_graph.ecount() == 0
     assert inst._weights is None
     assert inst.labels_leiden_.shape[0] == 3
@@ -99,14 +99,14 @@ def test_non_finite_weight_raises_value_error():
     G.add_nodes_from([0, 1])
     G.add_edge(0, 1, weight=float("nan"))
     with pytest.raises(ValueError):
-        Leiden_upd(G=G)
+        Leiden(G=G)
 
 
 def test_negative_weight_logs_warning_but_succeeds():
     G = nx.Graph()
     G.add_nodes_from([0, 1])
     G.add_edge(0, 1, weight=-2.5)
-    inst = Leiden_upd(G=G)
+    inst = Leiden(G=G)
     # negative weight should not raise; weights attribute is set
     assert inst._weights == "weight"
 
@@ -115,12 +115,12 @@ def test_embeddings_type_and_size_validation():
     G = nx.path_graph(4)
     # wrong type
     with pytest.raises(TypeError):
-        Leiden_upd(G=G, embeddings=[1, 2, 3, 4])
+        Leiden(G=G, embeddings=[1, 2, 3, 4])
 
     # wrong size
     bad_emb = np.zeros((2, 3))
     with pytest.raises(ValueError):
-        Leiden_upd(G=G, embeddings=bad_emb)
+        Leiden(G=G, embeddings=bad_emb)
 
 
 def test_refine_with_kmeans_splits_large_community():
@@ -139,7 +139,7 @@ def test_refine_with_kmeans_splits_large_community():
         np.random.randn(n - 2 * (n // 3), 2) + np.array([0.0, 10.0]),
     ])
 
-    inst = Leiden_upd(G=G, embeddings=emb, random_state=0)
+    inst = Leiden(G=G, embeddings=emb, random_state=0)
     labels_hybrid = inst.run(refine_with_kmeans=True, max_k_per_community=3)
     assert labels_hybrid.shape[0] == n
     # should produce more than one cluster
