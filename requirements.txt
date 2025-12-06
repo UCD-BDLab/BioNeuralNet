@@ -10,5 +10,8 @@ ray[tune]
 statsmodels
 leidenalg
 igraph
-# torch
-# torch_geometric
+torch
+torch_geometric
+requests
+gprofiler-official
+types-requests
