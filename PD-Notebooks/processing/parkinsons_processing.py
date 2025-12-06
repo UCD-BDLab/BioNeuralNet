@@ -145,6 +145,133 @@ def select_hvg(
     return hvg_df
 
 
+def select_hvg_with_pd_genes(
+    expression_df: pd.DataFrame,
+    gene_metadata: pd.DataFrame,
+    n_top: int = 5000,
+    method: str = "variance",
+    min_mean: float = 0.0,
+    max_mean: float = np.inf,
+    gene_symbol_column: Optional[str] = None,
+    pd_genes_set: Optional[set] = None,
+) -> pd.DataFrame:
+    """
+    Select highly variable genes while preserving known PD-associated genes.
+
+    This function:
+    1. Selects top N HVGs normally
+    2. Identifies known PD genes in the dataset
+    3. Adds any PD genes not already in the HVG set
+    4. Returns combined gene set (HVGs + PD genes)
+
+    Parameters
+    ----------
+    expression_df : pd.DataFrame
+        Gene expression matrix (genes × samples).
+    gene_metadata : pd.DataFrame
+        Gene metadata with gene annotations (for mapping symbols to IDs).
+    n_top : int, default=5000
+        Number of top highly variable genes to select.
+    method : str, default="variance"
+        HVG selection method: "variance" or "cv".
+    min_mean : float, default=0.0
+        Minimum mean expression threshold.
+    max_mean : float, default=np.inf
+        Maximum mean expression threshold.
+    gene_symbol_column : str, optional
+        Column name in gene_metadata containing gene symbols.
+        If None, will try to find 'Symbol', 'GeneName', etc.
+    pd_genes_set : set, optional
+        Set of known PD gene symbols to preserve.
+        If None, imports from analysis.pd_validation.PD_KNOWN_GENES.
+
+    Returns
+    -------
+    pd.DataFrame
+        Filtered expression matrix containing HVGs + preserved PD genes.
+    """
+    logger.info("=" * 60)
+    logger.info("Selecting HVGs with PD gene preservation")
+    logger.info("=" * 60)
+
+    # Import PD genes if not provided
+    if pd_genes_set is None:
+        try:
+            from analysis.pd_validation import PD_KNOWN_GENES
+            pd_genes_set = PD_KNOWN_GENES
+        except ImportError:
+            logger.warning("Could not import PD_KNOWN_GENES. Skipping PD gene preservation.")
+            return select_hvg(expression_df, n_top=n_top, method=method,
+                            min_mean=min_mean, max_mean=max_mean)
+
+    # Step 1: Select top HVGs normally
+    logger.info(f"Step 1: Selecting top {n_top} HVGs...")
+    hvg_df = select_hvg(
+        expression_df,
+        n_top=n_top,
+        method=method,
+        min_mean=min_mean,
+        max_mean=max_mean,
+    )
+    hvg_gene_ids = set(hvg_df.index)
+    logger.info(f"Selected {len(hvg_gene_ids)} HVGs.")
+
+    # Step 2: Find PD genes in the dataset
+    logger.info(f"Step 2: Identifying PD genes in dataset...")
+
+    # Find gene symbol column
+    if gene_symbol_column is None:
+        possible_columns = ['Symbol', 'GeneName', 'Gene symbol', 'gene_symbol', 'gene_name']
+        for col in possible_columns:
+            if col in gene_metadata.columns:
+                gene_symbol_column = col
+                break
+
+    if gene_symbol_column is None:
+        logger.warning("Could not find gene symbol column. Skipping PD gene preservation.")
+        return hvg_df
+
+    # Create mapping: Ensembl ID -> Gene Symbol
+    id_to_symbol = {}
+    for gene_id in expression_df.index:
+        if gene_id in gene_metadata.index:
+            symbol = gene_metadata.loc[gene_id, gene_symbol_column]
+            if pd.notna(symbol) and symbol:
+                symbol_clean = str(symbol).split(';')[0].split(',')[0].strip().upper()
+                id_to_symbol[gene_id] = symbol_clean
+
+    # Find PD gene Ensembl IDs
+    pd_gene_ids = set()
+    for pd_gene_symbol in pd_genes_set:
+        pd_gene_upper = pd_gene_symbol.upper()
+        for gene_id, symbol in id_to_symbol.items():
+            if symbol == pd_gene_upper:
+                pd_gene_ids.add(gene_id)
+                break
+
+    logger.info(f"Found {len(pd_gene_ids)} known PD genes in dataset.")
+
+    # Step 3: Add PD genes not already in HVGs
+    new_pd_genes = pd_gene_ids - hvg_gene_ids
+
+    if len(new_pd_genes) > 0:
+        logger.info(f"Step 3: Adding {len(new_pd_genes)} PD genes not in HVG set...")
+
+        # Get expression for new PD genes
+        new_pd_expression = expression_df.loc[list(new_pd_genes)]
+
+        # Combine HVGs + new PD genes
+        combined_df = pd.concat([hvg_df, new_pd_expression], axis=0)
+
+        logger.info(f"Combined gene set: {len(hvg_gene_ids)} HVGs + {len(new_pd_genes)} additional PD genes = {len(combined_df)} total genes.")
+    else:
+        logger.info(f"Step 3: All PD genes already in HVG set. No additional genes added.")
+        combined_df = hvg_df
+
+    logger.info("=" * 60)
+    return combined_df
+
+
 def preprocess_for_gnn(
     expression_df: pd.DataFrame,
     log_transform: bool = True,
@@ -153,6 +280,9 @@ def preprocess_for_gnn(
     n_hvgs: int = 5000,
     normalize: bool = True,
     normalize_method: str = "standard",
+    preserve_pd_genes: bool = False,
+    gene_metadata: Optional[pd.DataFrame] = None,
+    gene_symbol_column: Optional[str] = None,
 ) -> pd.DataFrame:
     """
     Complete preprocessing pipeline for GNN input.
@@ -177,6 +307,14 @@ def preprocess_for_gnn(
     normalize_method : str, default="standard"
         Normalization method. Options: "standard" (Z-score), "minmax", "log2".
         Uses BioNeuralNet's normalize_omics function.
+    preserve_pd_genes : bool, default=False
+        Whether to preserve known PD-associated genes even if not in top HVGs.
+        Requires gene_metadata to be provided.
+    gene_metadata : pd.DataFrame, optional
+        Gene metadata DataFrame with gene annotations (required if preserve_pd_genes=True).
+    gene_symbol_column : str, optional
+        Column name in gene_metadata containing gene symbols.
+        If None, will try to find 'Symbol', 'GeneName', etc.
 
     Returns
     -------
@@ -193,8 +331,18 @@ def preprocess_for_gnn(
 
     # Step 2: HVG selection
     if select_hvgs:
-        processed = select_hvg(processed, n_top=n_hvgs, method="variance")
-        logger.info("Step 2/3: HVG selection complete.")
+        if preserve_pd_genes and gene_metadata is not None:
+            processed = select_hvg_with_pd_genes(
+                processed,
+                gene_metadata=gene_metadata,
+                n_top=n_hvgs,
+                method="variance",
+                gene_symbol_column=gene_symbol_column,
+            )
+            logger.info("Step 2/3: HVG selection with PD gene preservation complete.")
+        else:
+            processed = select_hvg(processed, n_top=n_hvgs, method="variance")
+            logger.info("Step 2/3: HVG selection complete.")
 
     # Step 3: Normalization
     if normalize:
@@ -332,6 +480,9 @@ def preprocess_pipeline(
     build_features: bool = True,
     feature_type: str = "mean_variance",
     n_pca_components: Optional[int] = None,
+    preserve_pd_genes: bool = False,
+    gene_metadata: Optional[pd.DataFrame] = None,
+    gene_symbol_column: Optional[str] = None,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Complete preprocessing pipeline: expression preprocessing + node features.
@@ -363,6 +514,14 @@ def preprocess_pipeline(
         Type of node features (see build_node_features).
     n_pca_components : int, optional
         Number of PCA components (if using PCA features).
+    preserve_pd_genes : bool, default=False
+        Whether to preserve known PD-associated genes even if not in top HVGs.
+        Requires gene_metadata to be provided.
+    gene_metadata : pd.DataFrame, optional
+        Gene metadata DataFrame with gene annotations (required if preserve_pd_genes=True).
+    gene_symbol_column : str, optional
+        Column name in gene_metadata containing gene symbols.
+        If None, will try to find 'Symbol', 'GeneName', etc.
 
     Returns
     -------
@@ -384,6 +543,9 @@ def preprocess_pipeline(
         n_hvgs=n_hvgs,
         normalize=normalize,
         normalize_method=normalize_method,
+        preserve_pd_genes=preserve_pd_genes,
+        gene_metadata=gene_metadata,
+        gene_symbol_column=gene_symbol_column,
     )
 
     # Step 2: Build node features

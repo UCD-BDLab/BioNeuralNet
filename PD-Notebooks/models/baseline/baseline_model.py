@@ -98,13 +98,13 @@ class BaselineModel:
         if self.model_type == "logistic":
             self.model = LogisticRegression(
                 random_state=random_state,
-                max_iter=1000,
+                max_iter=1000000,
                 **model_kwargs,
             )
         elif self.model_type == "mlp":
             self.model = MLPClassifier(
                 random_state=random_state,
-                max_iter=1000,
+                max_iter=1000000,
                 **model_kwargs,
             )
         else:

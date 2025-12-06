@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Dict, List
 
 import numpy as np
 import pandas as pd
@@ -102,32 +102,16 @@ def build_correlation_graph(
         Adjacency matrix (genes × genes) with correlation values as edge weights.
     """
     n_genes = expression_df.shape[0]
-    logger.info(
-        f"Building correlation graph from expression matrix of shape {expression_df.shape} "
-        f"using method='{method}', threshold={threshold}."
-    )
 
-    # Warn if too many genes
-    if n_genes > 10000:
-        logger.warning(
-            f"Large number of genes ({n_genes}). Consider using chunked computation "
-            f"or reducing the number of genes via HVG selection."
-        )
-        if chunk_size is None:
-            # Auto-set chunk size for large datasets
-            chunk_size = min(5000, n_genes // 4)
-            logger.info(f"Auto-setting chunk_size={chunk_size} for memory efficiency.")
+    if n_genes > 10000 and chunk_size is None:
+        chunk_size = min(5000, n_genes // 4)
 
-    # Memory-efficient chunked computation for large datasets
     if chunk_size is not None and n_genes > chunk_size:
-        logger.info(f"Using chunked correlation computation (chunk_size={chunk_size}).")
         adjacency = _build_correlation_graph_chunked(
             expression_df, method, threshold, use_abs, chunk_size
         )
     else:
-        # Standard full matrix computation
-        logger.info("Using full matrix correlation computation.")
-        corr_matrix = expression_df.T.corr(method=method)  # genes × genes
+        corr_matrix = expression_df.T.corr(method=method)
 
         if use_abs:
             corr_matrix = corr_matrix.abs()
@@ -140,14 +124,8 @@ def build_correlation_graph(
     if not self_loops:
         np.fill_diagonal(adjacency.values, 0.0)
 
-    # Make mutual (symmetric) if requested
     if mutual:
         adjacency = (adjacency + adjacency.T) / 2
-
-    logger.info(
-        f"Graph constructed: {adjacency.shape[0]} nodes, "
-        f"{(adjacency > 0).sum().sum() / 2:.0f} edges (threshold={threshold})."
-    )
 
     return adjacency
 
@@ -172,13 +150,10 @@ def _build_correlation_graph_chunked(
         0.0, index=gene_names, columns=gene_names, dtype=np.float32
     )
 
-    # Compute correlations in chunks
     n_chunks = (n_genes + chunk_size - 1) // chunk_size
-    logger.info(f"Computing correlations in {n_chunks} chunks...")
 
     for i in range(0, n_genes, chunk_size):
         chunk_i = expression_df.iloc[i : i + chunk_size]
-        logger.info(f"Processing chunk {i // chunk_size + 1}/{n_chunks}...")
 
         for j in range(i, n_genes, chunk_size):
             chunk_j = expression_df.iloc[j : j + chunk_size]
@@ -221,22 +196,12 @@ def adjacency_to_pyg(
     tuple[Data, list]
         (PyG Data object, list of node names)
     """
-    logger.info(
-        f"Converting adjacency matrix ({adjacency_matrix.shape}) and "
-        f"node features ({node_features.shape}) to PyTorch Geometric format."
-    )
-
     # Ensure node names match
     if node_names is None:
         node_names = adjacency_matrix.index.tolist()
 
-    # Align node features with adjacency matrix
     common_nodes = set(adjacency_matrix.index) & set(node_features.index)
     if len(common_nodes) != len(adjacency_matrix.index):
-        logger.warning(
-            f"Node mismatch: {len(adjacency_matrix.index)} nodes in adjacency, "
-            f"{len(node_features.index)} in features, {len(common_nodes)} common."
-        )
         # Filter to common nodes
         adjacency_matrix = adjacency_matrix.loc[common_nodes, common_nodes]
         node_features = node_features.loc[common_nodes]
@@ -252,7 +217,6 @@ def adjacency_to_pyg(
     # Build edge_index (2 × num_edges)
     edge_list = list(G.edges())
     if len(edge_list) == 0:
-        logger.warning("Graph has no edges! Creating empty edge_index.")
         edge_index = torch.empty((2, 0), dtype=torch.long)
         edge_weight = torch.empty((0,), dtype=torch.float)
     else:
@@ -273,15 +237,159 @@ def adjacency_to_pyg(
     feature_matrix = node_features.loc[node_names].values
     x = torch.tensor(feature_matrix, dtype=torch.float)
 
-    # Create PyG Data object
-    data = Data(x=x, edge_index=edge_index, edge_attr=edge_weight)
+    return Data(x=x, edge_index=edge_index, edge_attr=edge_weight), node_names
 
-    logger.info(
-        f"PyG Data object created: {data.num_nodes} nodes, {data.num_edges} edges, "
-        f"{data.num_node_features} features per node."
+
+def build_multiomic_graph(
+    processed_omics: Dict[str, pd.DataFrame],
+    node_features: pd.DataFrame,
+    common_genes: List[str],
+    method: str = "pearson",
+    threshold: float = 0.7,
+    use_abs: bool = True,
+    mutual: bool = True,
+    self_loops: bool = False,
+    edge_combination: str = "union",
+    chunk_size: Optional[int] = None,
+) -> GraphData:
+    """
+    Build a multi-omics gene-gene correlation graph.
+
+    Constructs separate correlation graphs for each omic, then combines them
+    using the specified edge combination strategy.
+
+    Parameters
+    ----------
+    processed_omics : dict[str, pd.DataFrame]
+        Dictionary mapping omic_type -> preprocessed expression (genes × samples)
+    node_features : pd.DataFrame
+        Node feature matrix (genes × features)
+    common_genes : list[str]
+        List of common genes across omics
+    method : str, default="pearson"
+        Correlation method
+    threshold : float, default=0.7
+        Minimum correlation threshold
+    use_abs : bool, default=True
+        Use absolute correlation
+    mutual : bool, default=True
+        Keep only mutual edges
+    self_loops : bool, default=False
+        Include self-loops
+    edge_combination : str, default="union"
+        How to combine edges from different omics:
+        - "union": Include edge if present in any omic
+        - "intersection": Include edge only if present in all omics
+        - "weighted_mean": Average edge weights across omics
+    chunk_size : int, optional
+        Chunk size for memory efficiency
+
+    Returns
+    -------
+    GraphData
+        Combined multi-omics graph
+    """
+
+    # Build separate graphs for each omic
+    omic_adjacencies = {}
+
+    for omic_type, expr_df in processed_omics.items():
+
+        # Filter to common genes
+        omic_genes = set(expr_df.index) & set(common_genes)
+        expr_filtered = expr_df.loc[list(omic_genes)]
+
+        # Build correlation graph
+        adjacency = build_correlation_graph(
+            expr_filtered,
+            method=method,
+            threshold=threshold,
+            use_abs=use_abs,
+            mutual=mutual,
+            self_loops=self_loops,
+            chunk_size=chunk_size,
+        )
+
+        omic_adjacencies[omic_type] = adjacency
+
+    # Combine adjacencies
+
+    if edge_combination == "union":
+        # Union: edge exists if present in any omic
+        combined_adj = None
+        for omic_type, adj in omic_adjacencies.items():
+            if combined_adj is None:
+                combined_adj = adj.copy()
+            else:
+                # Align indices
+                all_genes = set(combined_adj.index) | set(adj.index)
+                combined_adj = combined_adj.reindex(all_genes, fill_value=0)
+                adj_aligned = adj.reindex(all_genes, fill_value=0)
+                # Take maximum (union)
+                combined_adj = combined_adj.combine(adj_aligned, max)
+
+    elif edge_combination == "intersection":
+        # Intersection: edge exists only if present in all omics
+        combined_adj = None
+        for omic_type, adj in omic_adjacencies.items():
+            if combined_adj is None:
+                combined_adj = adj.copy()
+            else:
+                # Align indices
+                all_genes = set(combined_adj.index) & set(adj.index)
+                combined_adj = combined_adj.loc[list(all_genes), list(all_genes)]
+                adj_aligned = adj.loc[list(all_genes), list(all_genes)]
+                # Take minimum (intersection)
+                combined_adj = combined_adj.combine(adj_aligned, min)
+
+    elif edge_combination == "weighted_mean":
+        # Weighted mean: average edge weights
+        combined_adj = None
+        n_omics = len(omic_adjacencies)
+        for omic_type, adj in omic_adjacencies.items():
+            if combined_adj is None:
+                combined_adj = adj.copy() / n_omics
+            else:
+                # Align indices
+                all_genes = set(combined_adj.index) | set(adj.index)
+                combined_adj = combined_adj.reindex(all_genes, fill_value=0)
+                adj_aligned = adj.reindex(all_genes, fill_value=0)
+                # Add and average
+                combined_adj = combined_adj + adj_aligned / n_omics
+
+    else:
+        raise ValueError(
+            f"Unknown edge_combination: {edge_combination}. "
+            "Use 'union', 'intersection', or 'weighted_mean'."
+        )
+
+    # Ensure combined_adj was created
+    if combined_adj is None:
+        raise ValueError("Failed to build combined adjacency matrix. Check that processed_omics is not empty.")
+
+    # Filter to common genes and align with node features
+    if common_genes:
+        final_genes = set(combined_adj.index) & set(node_features.index) & set(common_genes)
+    else:
+        # If no common genes specified, use intersection of adj and features
+        final_genes = set(combined_adj.index) & set(node_features.index)
+
+    if not final_genes:
+        raise ValueError(
+            "No genes found in both adjacency matrix and node features. "
+            "Check that gene identifiers match between omics."
+        )
+
+    combined_adj = combined_adj.loc[list(final_genes), list(final_genes)]
+    node_features_aligned = node_features.loc[list(final_genes)]
+
+    data, node_names = adjacency_to_pyg(combined_adj, node_features_aligned)
+
+    return GraphData(
+        data=data,
+        adjacency_matrix=combined_adj,
+        node_names=node_names,
     )
-
-    return data, node_names
 
 
 def build_pd_graph(
@@ -332,25 +440,13 @@ def build_pd_graph(
     GraphData
         Container with PyG Data object, adjacency matrix, and node names.
     """
-    logger.info("=" * 60)
-    logger.info("Building PD gene-gene correlation graph.")
-    logger.info("=" * 60)
 
     # Check if expression has too many genes (memory warning)
     n_genes = expression_df.shape[0]
-    if n_genes > 10000:
-        logger.warning(
-            f"WARNING: Expression matrix has {n_genes} genes. "
-            f"This may cause memory issues. Consider using preprocessed expression "
-            f"with fewer genes (e.g., top 5000 HVGs)."
-        )
-        if chunk_size is None:
-            chunk_size = min(5000, n_genes // 4)
-            logger.info(f"Auto-enabling chunked computation (chunk_size={chunk_size}).")
+    if n_genes > 10000 and chunk_size is None:
+        chunk_size = min(5000, n_genes // 4)
 
-    # Build adjacency matrix
     if use_bioneuralnet:
-        logger.info("Using BioNeuralNet's gen_correlation_graph (kNN-based).")
         # BioNeuralNet expects samples × features, so we transpose
         # It also expects features to be nodes, so we transpose expression_df
         adjacency = gen_correlation_graph(
@@ -362,9 +458,7 @@ def build_pd_graph(
             threshold=threshold if k_neighbors is None else None,
             self_loops=self_loops,
         )
-        # Result is genes × genes (as expected)
     else:
-        logger.info("Using threshold-based correlation graph.")
         adjacency = build_correlation_graph(
             expression_df,
             method=method,
@@ -375,13 +469,7 @@ def build_pd_graph(
             chunk_size=chunk_size,
         )
 
-    # Convert to PyG format
     data, node_names = adjacency_to_pyg(adjacency, node_features)
-
-    logger.info("=" * 60)
-    logger.info("Graph construction complete!")
-    logger.info(f"Nodes: {data.num_nodes}, Edges: {data.num_edges}")
-    logger.info("=" * 60)
 
     return GraphData(
         data=data,
@@ -405,13 +493,8 @@ def save_graph(graph_data: GraphData, filepath: str | Path) -> None:
     filepath = Path(filepath)
     filepath.parent.mkdir(parents=True, exist_ok=True)
 
-    # Save PyG Data
     torch.save(graph_data.data, filepath.with_suffix(".pt"))
-    logger.info(f"Saved PyG Data to {filepath.with_suffix('.pt')}")
-
-    # Save adjacency matrix
     graph_data.adjacency_matrix.to_csv(filepath.with_suffix(".csv"))
-    logger.info(f"Saved adjacency matrix to {filepath.with_suffix('.csv')}")
 
 
 def visualize_graph(
@@ -449,20 +532,12 @@ def visualize_graph(
     matplotlib.figure.Figure
         The generated figure.
     """
-    logger.info(f"Visualizing graph with {graph_data.data.num_nodes} nodes...")
-
     adjacency = graph_data.adjacency_matrix.copy()
 
-    # Sample subgraph if too large
     if max_nodes is not None and adjacency.shape[0] > max_nodes:
-        logger.info(
-            f"Graph has {adjacency.shape[0]} nodes. Sampling {max_nodes} nodes for visualization."
-        )
-        # Sample nodes with highest degree
         degrees = (adjacency > 0).sum(axis=1).sort_values(ascending=False)
         top_nodes = degrees.head(max_nodes).index.tolist()
         adjacency = adjacency.loc[top_nodes, top_nodes]
-        logger.info(f"Visualizing subgraph with {len(top_nodes)} nodes.")
 
     # Use BioNeuralNet's plot_network function
     node_mapping = plot_network(
@@ -473,7 +548,6 @@ def visualize_graph(
         layout=layout,
     )
 
-    logger.info("Graph visualization complete.")
     return node_mapping
 
 
@@ -497,15 +571,8 @@ def load_graph(
     """
     filepath = Path(filepath)
 
-    # Load PyG Data
     data = torch.load(filepath.with_suffix(".pt"))
-    logger.info(f"Loaded PyG Data from {filepath.with_suffix('.pt')}")
-
-    # Load adjacency matrix
-    adjacency = pd.read_csv(
-        filepath.with_suffix(".csv"), index_col=0
-    )
-    logger.info(f"Loaded adjacency matrix from {filepath.with_suffix('.csv')}")
+    adjacency = pd.read_csv(filepath.with_suffix(".csv"), index_col=0)
 
     # Load node names
     if node_names_file and Path(node_names_file).exists():

@@ -32,10 +32,27 @@ project_root = Path(__file__).resolve().parents[2]
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
-# Note: Leiden clustering is not directly available in BioNeuralNet
-# We can use KMeans for embedding-based clustering, or use BioNeuralNet's
-# graph-based clustering methods (CorrelatedLouvain, HybridLouvain) separately
-LEIDEN_AVAILABLE = False
+# Import Leiden clustering from BioNeuralNet
+try:
+    from bioneuralnet.clustering import Leiden
+    import networkx as nx
+    LEIDEN_AVAILABLE = True
+    LeidenClass = Leiden
+except ImportError:
+    LEIDEN_AVAILABLE = False
+    LeidenClass = None  # type: ignore
+
+# Import CorrelatedLouvain and HybridLouvain from BioNeuralNet
+try:
+    from bioneuralnet.clustering import CorrelatedLouvain, HybridLouvain
+    CORRELATED_LOUVAIN_AVAILABLE = True
+    CorrelatedLouvainClass = CorrelatedLouvain
+    HybridLouvainClass = HybridLouvain
+except ImportError:
+    CORRELATED_LOUVAIN_AVAILABLE = False
+    CorrelatedLouvainClass = None  # type: ignore
+    HybridLouvainClass = None  # type: ignore
+
 from bioneuralnet.utils import get_logger
 
 logger = get_logger(__name__)
@@ -95,17 +112,8 @@ def reduce_embeddings(
     np.ndarray
         Reduced embeddings (num_nodes × n_components).
     """
-    logger.info(
-        f"Reducing embeddings from {embeddings.shape[1]}D to {n_components}D "
-        f"using method='{method}'."
-    )
-
     if method.lower() == "umap":
         if not UMAP_AVAILABLE:
-            logger.warning(
-                "UMAP not available. Install with: pip install umap-learn. "
-                "Falling back to t-SNE."
-            )
             method = "tsne"
 
         if UMAP_AVAILABLE:
@@ -115,9 +123,7 @@ def reduce_embeddings(
                 min_dist=min_dist,
                 random_state=random_state,
             )
-            reduced = reducer.fit_transform(embeddings)
-            logger.info("UMAP reduction complete.")
-            return reduced
+            return reducer.fit_transform(embeddings)
 
     # t-SNE fallback or explicit choice
     if method.lower() == "tsne":
@@ -134,9 +140,7 @@ def reduce_embeddings(
             random_state=random_state,
             init="pca",
         )
-        reduced = reducer.fit_transform(embeddings)
-        logger.info("t-SNE reduction complete.")
-        return reduced
+        return reducer.fit_transform(embeddings)
 
     else:
         raise ValueError(f"Unknown reduction method: {method}. Use 'umap' or 'tsne'.")
@@ -147,7 +151,14 @@ def cluster_embeddings(
     method: str = "kmeans",
     n_clusters: Optional[int] = None,
     adjacency_matrix: Optional[pd.DataFrame] = None,
+    resolution_parameter: float = 1.0,
     random_state: int = 42,
+    omics_data: Optional[pd.DataFrame] = None,
+    phenotype_data: Optional[pd.Series] = None,
+    k3: float = 0.2,
+    k4: float = 0.8,
+    max_iter: int = 3,
+    gpu: bool = False,
 ) -> ClusterResults:
     """
     Cluster nodes based on their embeddings.
@@ -157,21 +168,37 @@ def cluster_embeddings(
     embeddings : np.ndarray
         Node embeddings (num_nodes × embedding_dim).
     method : str, default="kmeans"
-        Clustering method: "kmeans" or "leiden".
+        Clustering method: "kmeans", "leiden", "correlated_louvain", or "hybrid_louvain".
     n_clusters : int, optional
         Number of clusters (for KMeans). If None, uses elbow method.
-        Ignored for Leiden.
+        Ignored for graph-based methods.
     adjacency_matrix : pd.DataFrame, optional
-        Adjacency matrix (required for Leiden clustering).
+        Adjacency matrix (required for Leiden, CorrelatedLouvain, HybridLouvain).
+    resolution_parameter : float, default=1.0
+        Resolution parameter for Leiden algorithm. Higher values lead to more communities.
+        Ignored for other methods.
     random_state : int, default=42
         Random seed for reproducibility.
+    omics_data : pd.DataFrame, optional
+        Omics data (samples × genes). Required for CorrelatedLouvain and HybridLouvain.
+        Columns should be gene IDs matching adjacency matrix nodes.
+    phenotype_data : pd.Series, optional
+        Phenotype data (condition labels). Required for CorrelatedLouvain and HybridLouvain.
+        Index should match omics_data index (sample IDs).
+    k3 : float, default=0.2
+        Weight for modularity in CorrelatedLouvain/HybridLouvain.
+    k4 : float, default=0.8
+        Weight for correlation in CorrelatedLouvain/HybridLouvain.
+    max_iter : int, default=3
+        Maximum iterations for HybridLouvain.
+    gpu : bool, default=False
+        Use GPU for CorrelatedLouvain/HybridLouvain.
 
     Returns
     -------
     ClusterResults
         Clustering results with labels and statistics.
     """
-    logger.info(f"Clustering {embeddings.shape[0]} nodes using method='{method}'.")
 
     if method.lower() == "kmeans":
         # Determine optimal number of clusters if not provided
@@ -208,18 +235,274 @@ def cluster_embeddings(
         else:
             silhouette = None
 
-        logger.info(f"KMeans clustering complete: {n_clusters} clusters.")
-
     elif method.lower() == "leiden":
-        raise NotImplementedError(
-            "Leiden clustering not directly available. "
-            "Use 'kmeans' for embedding-based clustering, or use BioNeuralNet's "
-            "graph-based clustering methods (CorrelatedLouvain, HybridLouvain) "
-            "on the adjacency matrix separately."
+        if not LEIDEN_AVAILABLE:
+            raise ImportError(
+                "Leiden clustering requires 'leidenalg' and 'igraph' packages. "
+                "Install with: pip install leidenalg igraph"
+            )
+
+        if adjacency_matrix is None:
+            raise ValueError(
+                "Leiden clustering requires an adjacency matrix. "
+                "Please provide 'adjacency_matrix' parameter."
+            )
+
+        # Convert adjacency matrix to NetworkX graph
+        G = nx.from_pandas_adjacency(adjacency_matrix)
+
+        # Run Leiden algorithm
+        if LeidenClass is None:
+            raise ImportError("Leiden clustering is not available. Install leidenalg and igraph.")
+        leiden = LeidenClass(
+            G=G,
+            resolution_parameter=resolution_parameter,
+            n_iterations=-1,
+            seed=random_state,
+        )
+        partition = leiden.run()
+
+        # Convert partition dictionary to labels array
+        # Ensure labels are in the same order as node_names/embeddings
+        node_names = list(adjacency_matrix.index)
+        labels = np.array([partition.get(node, -1) for node in node_names])
+
+        # Ensure labels are non-negative and consecutive
+        unique_labels = np.unique(labels)
+        label_mapping = {old_label: new_label for new_label, old_label in enumerate(unique_labels)}
+        labels = np.array([label_mapping[label] for label in labels])
+
+        n_clusters = len(unique_labels)
+
+        # Compute silhouette score on embeddings (if possible)
+        if embeddings.shape[0] > n_clusters and n_clusters > 1:
+            try:
+                silhouette = silhouette_score(embeddings, labels)
+            except Exception:
+                silhouette = None
+        else:
+            silhouette = None
+
+        logger.info(f"Leiden clustering complete: {n_clusters} communities detected.")
+
+    elif method.lower() in ["correlated_louvain", "correlatedlouvain"]:
+        if not CORRELATED_LOUVAIN_AVAILABLE:
+            raise ImportError(
+                "CorrelatedLouvain clustering requires BioNeuralNet clustering module. "
+                "Please ensure bioneuralnet.clustering is available."
+            )
+
+        if adjacency_matrix is None:
+            raise ValueError(
+                "CorrelatedLouvain clustering requires an adjacency matrix. "
+                "Please provide 'adjacency_matrix' parameter."
+            )
+
+        if omics_data is None:
+            raise ValueError(
+                "CorrelatedLouvain clustering requires omics data. "
+                "Please provide 'omics_data' parameter (samples × genes)."
+            )
+
+        if phenotype_data is None:
+            raise ValueError(
+                "CorrelatedLouvain clustering requires phenotype data. "
+                "Please provide 'phenotype_data' parameter."
+            )
+
+        # Convert adjacency matrix to NetworkX graph
+        G = nx.from_pandas_adjacency(adjacency_matrix)
+
+        # Ensure omics_data columns match graph nodes
+        graph_nodes = set(G.nodes())
+        omics_cols = set(omics_data.columns.astype(str))
+        common_genes = list(graph_nodes & omics_cols)
+
+        if len(common_genes) == 0:
+            raise ValueError(
+                "No common genes between adjacency matrix and omics data. "
+                "Check that gene identifiers match."
+            )
+
+        # Filter omics data to common genes
+        B_filtered = omics_data[common_genes].copy()
+
+        # Align phenotype data with omics data
+        common_samples = list(set(B_filtered.index) & set(phenotype_data.index))
+        if len(common_samples) == 0:
+            raise ValueError(
+                "No common samples between omics data and phenotype data. "
+                "Check that sample identifiers match."
+            )
+
+        B_filtered = B_filtered.loc[common_samples]
+        Y_filtered = phenotype_data.loc[common_samples]
+
+        # Filter graph to common genes
+        G_filtered = G.subgraph(common_genes).copy()
+
+        logger.info(
+            f"Running CorrelatedLouvain: {G_filtered.number_of_nodes()} nodes, "
+            f"{B_filtered.shape[0]} samples, k3={k3}, k4={k4}"
         )
 
+        # Run CorrelatedLouvain
+        if CorrelatedLouvainClass is None:
+            raise ImportError("CorrelatedLouvain clustering is not available.")
+        correlated_louvain = CorrelatedLouvainClass(
+            G=G_filtered,
+            B=B_filtered,
+            Y=Y_filtered,
+            k3=k3,
+            k4=k4,
+            weight="weight",
+            tune=False,
+            gpu=gpu,
+            seed=random_state,
+        )
+        partition_result = correlated_louvain.run()
+        # Handle union type: run() returns Union[dict, list], but we expect dict
+        if isinstance(partition_result, dict):
+            partition = partition_result
+        else:
+            # If it's a list, convert to dict (assuming list of cluster assignments)
+            raise ValueError("CorrelatedLouvain.run() returned a list, expected dict")
+
+        # Convert partition dictionary to labels array
+        node_names = list(adjacency_matrix.index)
+        labels = np.array([partition.get(node, -1) for node in node_names])
+
+        # Ensure labels are non-negative and consecutive
+        unique_labels = np.unique(labels)
+        label_mapping = {old_label: new_label for new_label, old_label in enumerate(unique_labels)}
+        labels = np.array([label_mapping[label] for label in labels])
+
+        n_clusters = len(unique_labels)
+
+        # Compute silhouette score on embeddings (if possible)
+        if embeddings.shape[0] > n_clusters and n_clusters > 1:
+            try:
+                silhouette = silhouette_score(embeddings, labels)
+            except Exception:
+                silhouette = None
+        else:
+            silhouette = None
+
+        logger.info(f"CorrelatedLouvain clustering complete: {n_clusters} communities detected.")
+
+    elif method.lower() in ["hybrid_louvain", "hybridlouvain"]:
+        if not CORRELATED_LOUVAIN_AVAILABLE:
+            raise ImportError(
+                "HybridLouvain clustering requires BioNeuralNet clustering module. "
+                "Please ensure bioneuralnet.clustering is available."
+            )
+
+        if adjacency_matrix is None:
+            raise ValueError(
+                "HybridLouvain clustering requires an adjacency matrix. "
+                "Please provide 'adjacency_matrix' parameter."
+            )
+
+        if omics_data is None:
+            raise ValueError(
+                "HybridLouvain clustering requires omics data. "
+                "Please provide 'omics_data' parameter (samples × genes)."
+            )
+
+        if phenotype_data is None:
+            raise ValueError(
+                "HybridLouvain clustering requires phenotype data. "
+                "Please provide 'phenotype_data' parameter."
+            )
+
+        # Convert adjacency matrix to NetworkX graph
+        G = nx.from_pandas_adjacency(adjacency_matrix)
+
+        # Ensure omics_data columns match graph nodes
+        graph_nodes = set(G.nodes())
+        omics_cols = set(omics_data.columns.astype(str))
+        common_genes = list(graph_nodes & omics_cols)
+
+        if len(common_genes) == 0:
+            raise ValueError(
+                "No common genes between adjacency matrix and omics data. "
+                "Check that gene identifiers match."
+            )
+
+        # Filter omics data to common genes
+        B_filtered = omics_data[common_genes].copy()
+
+        # Align phenotype data with omics data
+        common_samples = list(set(B_filtered.index) & set(phenotype_data.index))
+        if len(common_samples) == 0:
+            raise ValueError(
+                "No common samples between omics data and phenotype data. "
+                "Check that sample identifiers match."
+            )
+
+        B_filtered = B_filtered.loc[common_samples]
+        Y_filtered = phenotype_data.loc[common_samples]
+
+        # Filter graph to common genes
+        G_filtered = G.subgraph(common_genes).copy()
+
+        logger.info(
+            f"Running HybridLouvain: {G_filtered.number_of_nodes()} nodes, "
+            f"{B_filtered.shape[0]} samples, k3={k3}, k4={k4}, max_iter={max_iter}"
+        )
+
+        # Run HybridLouvain
+        if HybridLouvainClass is None:
+            raise ImportError("HybridLouvain clustering is not available.")
+        hybrid_louvain = HybridLouvainClass(
+            G=G_filtered,
+            B=B_filtered,
+            Y=Y_filtered,
+            k3=k3,
+            k4=k4,
+            max_iter=max_iter,
+            weight="weight",
+            gpu=gpu,
+            seed=random_state,
+            tune=False,
+        )
+        result_raw = hybrid_louvain.run()
+
+        # HybridLouvain returns a dict with 'curr' (current partition) and 'clus' (all clusters)
+        # Handle union type: run() returns Union[dict, list]
+        if isinstance(result_raw, dict):
+            result = result_raw
+            partition = result.get("curr", {})
+        else:
+            raise ValueError("HybridLouvain.run() returned a list, expected dict")
+
+        # Convert partition dictionary to labels array
+        node_names = list(adjacency_matrix.index)
+        labels = np.array([partition.get(node, -1) for node in node_names])
+
+        # Ensure labels are non-negative and consecutive
+        unique_labels = np.unique(labels)
+        label_mapping = {old_label: new_label for new_label, old_label in enumerate(unique_labels)}
+        labels = np.array([label_mapping[label] for label in labels])
+
+        n_clusters = len(unique_labels)
+
+        # Compute silhouette score on embeddings (if possible)
+        if embeddings.shape[0] > n_clusters and n_clusters > 1:
+            try:
+                silhouette = silhouette_score(embeddings, labels)
+            except Exception:
+                silhouette = None
+        else:
+            silhouette = None
+
+        logger.info(f"HybridLouvain clustering complete: {n_clusters} communities detected.")
+
     else:
-        raise ValueError(f"Unknown clustering method: {method}. Use 'kmeans' or 'leiden'.")
+        raise ValueError(
+            f"Unknown clustering method: {method}. "
+            "Use 'kmeans', 'leiden', 'correlated_louvain', or 'hybrid_louvain'."
+        )
 
     # Compute cluster sizes
     unique_labels, counts = np.unique(labels, return_counts=True)
@@ -231,8 +514,6 @@ def cluster_embeddings(
         silhouette_score=silhouette,
         cluster_sizes=cluster_sizes,
     )
-
-    logger.info(f"Cluster sizes: {cluster_sizes}")
 
     return results
 
@@ -273,7 +554,12 @@ def visualize_clusters(
     # Get unique clusters and assign colors
     unique_clusters = np.unique(cluster_labels)
     n_clusters = len(unique_clusters)
-    colors = plt.cm.tab20(np.linspace(0, 1, n_clusters))
+    # Use tab20 colormap if available, otherwise use default
+    try:
+        colors = plt.cm.get_cmap('tab20')(np.linspace(0, 1, n_clusters))
+    except (AttributeError, ValueError):
+        # Fallback to default colormap
+        colors = plt.cm.get_cmap('viridis')(np.linspace(0, 1, n_clusters))
 
     # Plot each cluster
     for i, cluster_id in enumerate(unique_clusters):
@@ -298,7 +584,6 @@ def visualize_clusters(
         ax.legend(bbox_to_anchor=(1.05, 1), loc="upper left", fontsize=9)
 
     plt.tight_layout()
-    logger.info("Cluster visualization generated.")
     return fig
 
 
@@ -324,7 +609,6 @@ def analyze_clusters(
     pd.DataFrame
         Cluster analysis summary with gene counts and metadata.
     """
-    logger.info("Analyzing cluster composition...")
 
     # Create cluster assignment DataFrame
     cluster_df = pd.DataFrame(
@@ -356,7 +640,6 @@ def analyze_clusters(
         cluster_stats.append(stats)
 
     summary_df = pd.DataFrame(cluster_stats)
-    logger.info(f"Cluster analysis complete. Summary:\n{summary_df}")
 
     return cluster_df, summary_df
 
@@ -369,7 +652,14 @@ def embedding_analysis_pipeline(
     reduction_method: str = "umap",
     clustering_method: str = "kmeans",
     n_clusters: Optional[int] = None,
+    resolution_parameter: float = 1.0,
     random_state: int = 42,
+    omics_data: Optional[pd.DataFrame] = None,
+    phenotype_data: Optional[pd.Series] = None,
+    k3: float = 0.2,
+    k4: float = 0.8,
+    max_iter: int = 3,
+    gpu: bool = False,
 ) -> Tuple[np.ndarray, ClusterResults, pd.DataFrame, pd.DataFrame]:
     """
     Complete embedding analysis pipeline: reduction → clustering → visualization → statistics.
@@ -381,26 +671,38 @@ def embedding_analysis_pipeline(
     node_names : list
         List of gene IDs/names.
     adjacency_matrix : pd.DataFrame, optional
-        Graph adjacency matrix (required for Leiden clustering).
+        Graph adjacency matrix (required for Leiden, CorrelatedLouvain, HybridLouvain).
     gene_metadata : pd.DataFrame, optional
         Gene metadata for cluster analysis.
     reduction_method : str, default="umap"
         Embedding reduction method: "umap" or "tsne".
     clustering_method : str, default="kmeans"
-        Clustering method: "kmeans" or "leiden".
+        Clustering method: "kmeans", "leiden", "correlated_louvain", or "hybrid_louvain".
     n_clusters : int, optional
         Number of clusters (for KMeans).
+    resolution_parameter : float, default=1.0
+        Resolution parameter for Leiden algorithm. Higher values lead to more communities.
+        Ignored for other methods.
     random_state : int, default=42
         Random seed.
+    omics_data : pd.DataFrame, optional
+        Omics data (samples × genes). Required for CorrelatedLouvain and HybridLouvain.
+    phenotype_data : pd.Series, optional
+        Phenotype data (condition labels). Required for CorrelatedLouvain and HybridLouvain.
+    k3 : float, default=0.2
+        Weight for modularity in CorrelatedLouvain/HybridLouvain.
+    k4 : float, default=0.8
+        Weight for correlation in CorrelatedLouvain/HybridLouvain.
+    max_iter : int, default=3
+        Maximum iterations for HybridLouvain.
+    gpu : bool, default=False
+        Use GPU for CorrelatedLouvain/HybridLouvain.
 
     Returns
     -------
     Tuple
         (reduced_embeddings, cluster_results, cluster_df, summary_df)
     """
-    logger.info("=" * 60)
-    logger.info("Starting embedding analysis pipeline.")
-    logger.info("=" * 60)
 
     # Step 1: Reduce embeddings
     reduced_emb = reduce_embeddings(
@@ -413,7 +715,14 @@ def embedding_analysis_pipeline(
         method=clustering_method,
         n_clusters=n_clusters,
         adjacency_matrix=adjacency_matrix,
+        resolution_parameter=resolution_parameter,
         random_state=random_state,
+        omics_data=omics_data,
+        phenotype_data=phenotype_data,
+        k3=k3,
+        k4=k4,
+        max_iter=max_iter,
+        gpu=gpu,
     )
 
     # Step 3: Analyze
@@ -424,8 +733,5 @@ def embedding_analysis_pipeline(
     # Step 4: Visualize
     visualize_clusters(reduced_emb, cluster_results.labels, node_names)
 
-    logger.info("=" * 60)
-    logger.info("Embedding analysis pipeline complete!")
-    logger.info("=" * 60)
 
     return reduced_emb, cluster_results, cluster_df, summary_df
