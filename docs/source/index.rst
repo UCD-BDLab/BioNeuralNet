@@ -38,6 +38,7 @@ Quick Start Examples
 Get started quickly with these end-to-end examples demonstrating the BioNeuralNet workflow:
 
 - :doc:`Quick_Start`
+- :doc:`quick_start_bio`
 - :doc:`notebooks/index`
 
 **BioNeuralNet Workflow Overview**
@@ -57,9 +58,9 @@ BioNeuralNet is a flexible and modular Python framework tailored for **end-to-en
 
 **Core Analytical Modules:**
 
-- **Network Construction**: Build informative networks from raw tabular data using strategies like **Similarity**, **Correlation**, **Neighborhood-based**, or **Phenotype-driven** (e.g., SmCCNet) approaches.
+- **Network Construction**: Build informative networks from raw tabular data using strategies like **Similarity**, **Correlation**, **Neighborhood-based**, or **Phenotype-driven** (e.g., SmCCNet) approaches. [1]_
 - **Biomarker Discovery**: Identify biological modules and key molecular interactions that drive disease phenotypes.
-- **Disease Prediction**: Implement end-to-end supervised disease classification using the **DPMON** (Disease Prediction using Multi-Omics Networks) module.
+- **Disease Prediction**: Implement end-to-end supervised disease classification using the **DPMON** (Disease Prediction using Multi-Omics Networks) module. [2]_
 - **Subject Representation**: Generate enhanced subject-level embeddings for stratification and clustering.
 
 **Visualizing Multi-Omics Networks**
@@ -71,7 +72,7 @@ BioNeuralNet allows you to inspect the topology of your constructed networks. Th
    :alt: Multi-Omics Network Visualization
    :width: 100%
 
-   *Network visualization of a highly connected gene module identified in the KIPAN dataset.* `Full Size Image <https://bioneuralnet.readthedocs.io/en/latest/_images/kipan_net.png>`_
+   *Network visualization of a highly connected gene module identified in the KIPAN dataset.* `See Network Full Size <https://bioneuralnet.readthedocs.io/en/latest/_images/kipan_net.png>`_
 
 **Top Identified Biomarkers (Hub Omics)**
 
@@ -133,7 +134,7 @@ By projecting high-dimensional omics networks into latent spaces, BioNeuralNet d
    :alt: t-SNE visualization of Network Embeddings
    :width: 100%
 
-   *2D projection of Network Embeddings showing distinct separation between omics modalities.* `Full Size Image <https://bioneuralnet.readthedocs.io/en/latest/_images/emb_kipan.png>`_
+   *2D projection of Network Embeddings showing distinct separation between omics modalities.* `See Embeddings Full Size <https://bioneuralnet.readthedocs.io/en/latest/_images/emb_kipan.png>`_
 
 For detailed explanations of BioNeuralNet's supported GNN architectures, see :doc:`gnns`.
 
@@ -148,12 +149,63 @@ To ensure scientific rigor and optimal performance when using BioNeuralNet, user
 * **Computational Scalability**: While optimized for standard omics datasets, extremely large networks may require aggressive feature reduction or subgraph detection strategies to maintain computational efficiency.
 * **Interpretability Scope**: BioNeuralNet provides network-level interpretability (identifying key modules and hub features). However, full node-level explainability remains an active area of research.
 
+**Feature Selection Examples**
+
+The following feature set were determined by the intersection of features identified via the **ANOVA F-test** and **Random Forest Importance**. This approach offers comprehensive filtering by balancing class-based relevance (ANOVA) with non-linear model importance (Random Forest).
+
+.. list-table:: TCGA-BRCA Feature Selection
+   :widths: 25 20 20 20 15
+   :header-rows: 1
+   :align: center
+
+   * - Omics Data Type
+     - ANOVA-F & Variance
+     - RF & Variance
+     - ANOVA-F & Random Forest (Selected)
+     - All Three Agree
+   * - **Methylation**
+     - 2,092 features
+     - 1,870 features
+     - **2,203 features**
+     - 814 features
+   * - **RNA**
+     - 2,359 features
+     - 2,191 features
+     - **2,500 features**
+     - 1,124 features
+
+.. list-table:: TCGA-LGG Feature Selection
+   :widths: 25 20 20 20 15
+   :header-rows: 1
+   :align: center
+
+   * - Omics Data Type
+     - ANOVA-F & Variance
+     - RF & Variance
+     - ANOVA-F & Random Forest (Selected)
+     - All Three Agree
+   * - **Methylation**
+     - 2,704 features
+     - 1,768 features
+     - **1,823 features**
+     - 809 features
+   * - **RNA**
+     - 2,183 features
+     - 1,977 features
+     - **2,127 features**
+     - 763 features
+
+For a full list of *BioNeuralNet* preprocessing utilties see: `Preprocessing Utilities <https://bioneuralnet.readthedocs.io/en/latest/utils.html#preprocessing-utilities>`_.
+
+The full analysis and implementation details for the tables above can be found in the :doc:`notebooks/index`.
+
 Explore BioNeuralNet's Documentation
 ------------------------------------
 
 For detailed examples and tutorials, visit:
 
 - :doc:`Quick_Start`: A quick walkthrough demonstrating the BioNeuralNet workflow from start to finish.
+- :doc:`quick_start_bio`: A user-frienfly walkthrough for members of the community without a developer background.
 - :doc:`notebooks/index`: A collection of demonstration notebooks showcasing end-to-end analyses on TCGA datasets.
 
 **Documentation Sections:**

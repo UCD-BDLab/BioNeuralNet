@@ -20,6 +20,5 @@ The following notebooks are included in this guide:
 
    TCGA-BRCA.ipynb
    TCGA-LGG.ipynb
-   TCGA-KIPAN.ipynb
    TCGA-PAAD.ipynb
    TCGA-Biomarkers.ipynb

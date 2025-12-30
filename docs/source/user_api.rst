@@ -44,7 +44,7 @@ The figure below summarizes the main BioNeuralNet modules and public objects.
    :align: center
    :alt: BioNeuralNet module and API overview
 
-   BioNeuralNet 1.2.1: core modules (utils, network\_embedding, clustering, downstream\_task, datasets, metrics, external\_tools) and their key user-facing functions and classes.
+   BioNeuralNet 1.2.0: core modules (utils, network\_embedding, clustering, downstream\_task, datasets, metrics, external\_tools) and their key user-facing functions and classes.
    `View BioNeuralNet API. <https://bioneuralnet.readthedocs.io/en/latest/_images/bioneuralnet_api.png>`_
 
 Module Reference
@@ -87,9 +87,10 @@ Example
        clinical_data=clinical_data,
        model="GAT",
    )
-   predictions, avg_accuracy = dpmon.run()
+   predictions, metrics, embeddings = dpmon.run()
    print("Disease phenotype predictions:\n", predictions)
-   print("Average accuracy:", avg_accuracy)
+   print("Result metrics:", metrics)
+   print("Generated Embeddings", embeddings)
 
 Run Methods
 -----------
