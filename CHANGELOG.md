@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.2] - 2025-12-29
+
+### Documentation
+- **Updated Index**: index now includes tables with examples for feature selection.
+- **Getting Started for Biologists**: An updated page which leverages google colab for a more user friendly walkthrough of BioNeuralNet.
+
+### Ray Tune Patch
+- **Ray tune**: Updated from `ray[tune,train]>=2.46.0` to `ray[tune,train]>=2.46.0, <2.53.0` due to an recent release on December 20, 2025 which breaks some functionality. This temporately fixes the issue.
+
+### New DPMON param: `tune_trails`
+- This parameter gives users the ability to dictate how many ray tune trials to run. This works alongside the Dynamic Sampling from `v1.2.1`.
+
 ## [1.2.1] - 2025-11-30
 
 ### Dependencies

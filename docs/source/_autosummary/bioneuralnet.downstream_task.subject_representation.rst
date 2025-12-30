@@ -21,7 +21,6 @@ bioneuralnet.downstream\_task.subject\_representation
    .. autosummary::
    
       ASHAScheduler
-      Any
       AutoEncoder
       CLIReporter
       PCA
