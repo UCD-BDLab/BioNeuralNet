@@ -69,6 +69,7 @@ class DPMON:
         lr (float): Learning rate for the optimizer.
         weight_decay (float): L2 weight decay (regularization) coefficient.
         tune (bool): If True, perform hyperparameter tuning before final training.
+        tune_trails (int): Number of trials to perform if tune=True.
         gpu (bool): If True, use GPU if available.
         cv (bool): If True, use K-fold cross-validation; otherwise use repeated train/test splits.
         cuda (int): CUDA device index to use when gpu=True.
@@ -98,6 +99,7 @@ class DPMON:
         lr: float = 1e-1,
         weight_decay: float = 1e-4,
         tune: bool = False,
+        tune_trails: int = 10,
         gpu: bool = False,
         cv: bool = False,
         cuda: int = 0,
@@ -156,6 +158,7 @@ class DPMON:
         self.lr = lr
         self.weight_decay = weight_decay
         self.tune = tune
+        self.tune_trails = tune_trails
         self.gpu = gpu
         self.cuda = cuda
         self.seed = seed
@@ -205,6 +208,7 @@ class DPMON:
             "gpu": self.gpu,
             "cuda": self.cuda,
             "tune": self.tune,
+            "tune_trials": self.tune_trails,
             "seed": self.seed,
             "seed_trials": self.seed_trials,
             "cv": self.cv,
@@ -892,8 +896,8 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
 
     gpu_per_trial = 0.05 if use_gpu else 0.0
 
-    num_samples = 50
-    max_retries = 5
+    num_samples = dpmon_params['tune_trials']
+    max_retries = 4
 
     seed_trials = dpmon_params.get("seed_trials", False)
 
@@ -916,6 +920,7 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
                 config=pipeline_configs,
                 num_samples=num_samples,
                 verbose=0,
+                log_to_file=True,
                 scheduler=scheduler,
                 stop=stopper,
                 name="tune_dp",
