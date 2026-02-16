@@ -1,520 +1,394 @@
-from typing import List, Tuple, Dict, Any,Optional
-import pandas as pd
-import numpy as np
+"""
+Correlated PageRank Clustering.
+
+This module implements a personalized PageRank algorithm combined with a 
+phenotype-aware sweep cut to detect significant subgraphs.
+
+References:
+    Abdel-Hafiz et al. (2022), "Significant Subgraph Detection in 
+    Multi-omics Networks for Disease Pathway Identification," 
+    Frontiers in Big Data.
+
+Algorithm:
+    The PageRank vector is computed as the stationary distribution of:
+    
+    .. math::
+        pr_{\\alpha}(s) = \\alpha s + (1 - \\alpha) pr_{\\alpha}(s) W
+
+    Where:
+        * :math:`\\alpha`: Teleportation (restart) probability.
+        * :math:`s`: Personalization vector (seed weights).
+        * :math:`W`: Transition matrix.
+
+    .. important::
+        The `networkx.pagerank` implementation uses a `alpha` parameter 
+        representing the **damping factor** (link-following probability). 
+        Therefore, :math:`\\text{nx_alpha} = 1 - \\alpha_{theoretical}`.
+
+Notes:
+    **Sweep Cut Optimization**
+    Nodes are sorted by PageRank-per-degree in descending order. For each 
+    prefix set :math:`S_i`, the algorithm minimizes the **Hybrid Conductance**:
+
+    .. math::
+        \\Phi_{hybrid} = k_P \\Phi + (1 - k_P) \\rho
+
+    Where:
+        * :math:`\\Phi`: Standard conductance (:math:`cut / \min(vol(S), vol(V \setminus S))`).
+        * :math:`\\rho`: Negative absolute Pearson correlation (:math:`-|\\rho|`).
+        * :math:`k_P`: Trade-off weight (Default: ~0.5).
+
+    **Personalization Vector (Seed Weighting)**
+    Teleportation probabilities for seeds are weighted by their marginal 
+    contribution to correlation:
+
+    .. math::
+        \\alpha_i = \\frac{\\rho_i}{\\max(\\rho_{seeds})} \\cdot \\alpha_{max}
+
+    Where :math:`\\rho_i = |\\rho(S)| - |\\rho(S \setminus \{i\})|`. 
+    Values where :math:`\\rho_i < 0` are clamped to 0.
+"""
+
+import logging
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 import networkx as nx
-import torch
-import os
-
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
+import numpy as np
+import pandas as pd
 from scipy.stats import pearsonr
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 
-from ray import tune
-from ray.tune import CLIReporter
-from ray.air import session
-from ray.tune.schedulers import ASHAScheduler
-
-from bioneuralnet.utils import set_seed, get_logger
+logger = logging.getLogger(__name__)
 
 class CorrelatedPageRank:
     """
-    PageRank Class for Clustering Nodes Based on Personalized PageRank.
+    Correlated PageRank clustering on a multi-omics network.
 
-    This class handles the execution of the Personalized PageRank algorithm
-    and identification of clusters based on sweep cuts.
+    Args:
 
-    Attributes:
-
-        alpha (float): Damping factor for PageRank.
-        max_iter (int): Maximum number of iterations for PageRank convergence.
-        tol (float): Tolerance for convergence.
-        k (float): Weighting factor for composite correlation-conductance score.
-
+        graph (nx.Graph): Weighted undirected NetworkX graph.
+        omics_data (pd.DataFrame): Omics matrix (n_samples x n_features), columns = node ids.
+        phenotype_data (Union[pd.DataFrame, pd.Series]): Phenotype vector aligned with rows of omics_data.
+        teleport_prob (float): Teleportation probability (alpha). Default 0.10.
+        k_P (float): Weight on conductance in combined objective (Eq. 5).
+        max_iter (int): Max iterations for PageRank power iteration.
+        tol (float): Convergence tolerance for PageRank.
+        min_cluster (int): Minimum cluster size for sweep cut consideration.
+        seed (Optional[int]): Random seed for reproducibility.
     """
 
     def __init__(
         self,
         graph: nx.Graph,
         omics_data: pd.DataFrame,
-        phenotype_data: pd.DataFrame,
-        alpha: float = 0.9,
+        phenotype_data: Union[pd.DataFrame, pd.Series],
+        teleport_prob: float = 0.10,
+        k_P: float = 0.5,
         max_iter: int = 100,
         tol: float = 1e-6,
-        k: float = 0.5,
-        tune: bool = False,
-        gpu: bool = False,
+        min_cluster: int = 2,
         seed: Optional[int] = None,
     ):
-        """
-        Initializes the PageRank instance with direct data structures.
-
-        Args:
-
-            graph (nx.Graph): NetworkX graph object representing the network.
-            omics_data (pd.DataFrame): Omics data DataFrame.
-            phenotype_data (pd.DataFrame): Phenotype data Series.
-            alpha (float, optional): Damping factor for PageRank. Defaults to 0.9.
-            max_iter (int, optional): Maximum iterations for PageRank. Defaults to 100.
-            tol (float, optional): Tolerance for convergence. Defaults to 1e-6.
-            k (float, optional): Weighting factor for composite score. Defaults to 0.9.
-
-        """
         self.G = graph
         self.B = omics_data
-        self.Y = phenotype_data.squeeze()
-        self.alpha = alpha
+
+        if isinstance(phenotype_data, pd.DataFrame):
+            self.Y = phenotype_data.squeeze()
+        elif isinstance(phenotype_data, pd.Series):
+            self.Y = phenotype_data
+        else:
+            self.Y = pd.Series(phenotype_data)
+
+        if not 0.0 <= teleport_prob <= 1.0:
+            raise ValueError(f"teleport_prob must be in [0, 1], got {teleport_prob}")
+            
+        self.teleport_prob = teleport_prob
+        self._nx_alpha = 1.0 - teleport_prob
+
+        if not 0.0 <= k_P <= 1.0:
+            raise ValueError(f"k_P must be in [0, 1], got {k_P}")
+            
+        self.k_P = k_P
         self.max_iter = max_iter
         self.tol = tol
-        self.k = k
-        self.tune = tune
-
-        self.logger = get_logger(__name__)
-        self.logger.info("Initialized PageRank with the following parameters:")
-        self.logger.info(
-            f"Graph: NetworkX Graph with {self.G.number_of_nodes()} nodes and {self.G.number_of_edges()} edges."
-        )
-        self.logger.info(f"Omics Data: DataFrame with shape {self.B.shape}.")
-        self.logger.info(f"Phenotype Data: Series with {len(self.Y)} samples.")
-        self.logger.info(f"Alpha: {self.alpha}")
-        self.logger.info(f"Max Iterations: {self.max_iter}")
-        self.logger.info(f"Tolerance: {self.tol}")
-        self.logger.info(f"K (Composite Score Weight): {self.k}")
-        self._validate_inputs()
+        self.min_cluster = min_cluster
 
         if seed is not None:
-            set_seed(seed)
+            np.random.seed(seed)
 
-        self.seed = seed
-        self.gpu = gpu
-        self.results: dict[str, float] = {}
+        self._validate_inputs()
 
-        self.device = torch.device("cuda" if gpu and torch.cuda.is_available() else "cpu")
-        self.logger.info(f"Initialized Correlated PageRank. device={self.device}")
-
+        logger.info(
+            f"CorrelatedPageRank: nodes={self.G.number_of_nodes()}, "
+            f"teleport={teleport_prob} (nx_alpha={self._nx_alpha}), k_P={k_P}"
+        )
 
     def _validate_inputs(self):
         """
-        Validates the consistency of input data structures.
+        Check input consistency across graph and omics data.
+
+        Raises:
+
+            TypeError: If graph or omics_data are not of the expected types.
         """
-        try:
-            if not isinstance(self.G, nx.Graph):
-                raise TypeError("graph must be a networkx.Graph instance.")
+        if not isinstance(self.G, nx.Graph):
+            raise TypeError("graph must be a networkx.Graph")
+            
+        if not isinstance(self.B, pd.DataFrame):
+            raise TypeError("omics_data must be a pandas DataFrame")
+            
+        graph_nodes = set(str(n) for n in self.G.nodes())
+        omics_cols = set(str(c) for c in self.B.columns)
+        missing = graph_nodes - omics_cols
+        
+        if missing:
+            logger.warning(
+                f"{len(missing)} graph nodes missing from omics columns "
+                f"(first 5: {sorted(missing)[:5]})"
+            )
 
-            if not isinstance(self.B, pd.DataFrame):
-                raise TypeError("omics_data must be a pandas DataFrame.")
-
-            if not isinstance(self.Y, pd.Series):
-                raise TypeError("phenotype_data must be a pandas Series.")
-
-            graph_nodes = set(self.G.nodes())
-            omics_nodes = set(self.B.columns)
-            phenotype_nodes = set(self.Y.index)
-
-            if not graph_nodes.issubset(omics_nodes):
-                missing = graph_nodes - omics_nodes
-                raise ValueError(f"Omics data is missing nodes: {missing}")
-
-        except Exception as e:
-            self.logger.error(f"Input validation error: {e}")
-            raise
-
-    def phen_omics_corr(self, nodes: List[Any] = []) -> Tuple[float, str]:
-        """Compute correlation between PC1 of omics for given nodes and the phenotype.
-
-        Nodes not present as columns in the omics matrix are ignored. If there are
-        fewer than two valid columns, fewer than two samples, or any numerical
-        error occurs, a neutral correlation of 0.0 with p-value '1.0' is returned.
+    def phen_omics_corr(self, nodes: List[Any]) -> Tuple[float, float]:
         """
+        Compute Pearson(PC1(omics[:, nodes]), phenotype).
+
+        Args:
+
+            nodes (List[Any]): List of node identifiers.
+
+        Returns:
+
+            Tuple[float, float]: (correlation, p_value). Returns (0.0, 1.0) on failure.
+        """
+        valid_cols = []
+        for n in nodes:
+            if n in self.B.columns:
+                valid_cols.append(n)
+            else:
+                n_str = str(n)
+                if n_str in self.B.columns:
+                    valid_cols.append(n_str)
+
+        if len(valid_cols) < 2:
+            return 0.0, 1.0
+
+        B_sub = self.B[valid_cols]
+        
+        if B_sub.shape[0] < 2:
+            return 0.0, 1.0
+
         try:
-            valid_cols = []
-            for n in nodes:
-                if n in self.B.columns:
-                    valid_cols.append(n)
-                else:
-                    n_str = str(n)
-                    if n_str in self.B.columns:
-                        valid_cols.append(n_str)
-
-            if len(valid_cols) < 2:
-                return 0.0, "0 (1.0)"
-
-            B_sub = self.B[valid_cols]
-
-            if B_sub.shape[0] < 2:
-                return 0.0, "0 (1.0)"
-
             scaler = StandardScaler()
             scaled = scaler.fit_transform(B_sub)
 
             pca = PCA(n_components=1)
-            g1 = pca.fit_transform(scaled).flatten()
-            g2 = self.Y
+            pc1 = pca.fit_transform(scaled).flatten()
 
-            if isinstance(g2, pd.Series):
-                common_idx = B_sub.index.intersection(g2.index)
+            if isinstance(self.Y, pd.Series):
+                common_idx = B_sub.index.intersection(self.Y.index)
                 if len(common_idx) < 2:
-                    return 0.0, "0 (1.0)"
-                g1 = g1[: len(common_idx)]
-                g2 = g2.loc[common_idx].values
+                    return 0.0, 1.0
+                pc1 = pc1[:len(common_idx)]
+                y_vals = self.Y.loc[common_idx].values
             else:
-                if len(g1) != len(g2):
-                    n = min(len(g1), len(g2))
-                    if n < 2:
-                        return 0.0, "0 (1.0)"
-                    g1 = g1[:n]
-                    g2 = g2[:n]
+                y_vals = np.asarray(self.Y)
+                n_limit = min(len(pc1), len(y_vals))
+                if n_limit < 2:
+                    return 0.0, 1.0
+                pc1, y_vals = pc1[:n_limit], y_vals[:n_limit]
 
-            corr, pvalue = pearsonr(g1, g2)
-            if not np.isfinite(corr):
-                return 0.0, "0 (1.0)"
-
-            corr = round(corr, 2)
-            p_value = format(pvalue, ".3g")
-            corr_pvalue = f"{corr} ({p_value})"
-            return corr, corr_pvalue
+            corr, pvalue = pearsonr(pc1, y_vals)
+            
+            return (float(corr), float(pvalue)) if np.isfinite(corr) else (0.0, 1.0)
 
         except Exception as e:
-            self.logger.error(f"Error in phen_omics_corr (falling back to 0): {e}")
-            return 0.0, "0 (1.0)"
+            logger.error(f"phen_omics_corr error: {e}")
+            return 0.0, 1.0
 
-    def sweep_cut(
-        self, p: Dict[Any, float] = {}) -> Tuple[List[Any], int, float, float, float, str]:
-        try:
-            best_cluster = set()
-            min_comp_score = float("inf")
-            best_len = 0
-            best_cond = 1.0
-            best_corr = 0.0
-            best_corr_pval = ""
-
-            degrees = dict(self.G.degree(weight="weight"))
-            vec = sorted(
-                [
-                    (p[node] / degrees[node] if degrees[node] > 0 else 0, node)
-                    for node in p.keys()
-                ],
-                reverse=True,
-            )
-
-            current_cluster = set()
-            for i, (val, node) in enumerate(vec):
-                self.logger.debug(
-                    f"Iteration {i}: Adding node {node} with norm value {val:.3f}"
-                )
-                if val == 0:
-                    continue
-
-                current_cluster.add(node)
-
-                if len(current_cluster) < len(self.G.nodes()):
-                    vol_S = sum(
-                        d for n, d in self.G.degree(current_cluster, weight="weight")
-                    )
-                    vol_T = sum(
-                        d
-                        for n, d in self.G.degree(
-                            set(self.G.nodes()) - current_cluster, weight="weight"
-                        )
-                    )
-
-                    if min(vol_S, vol_T) == 0:
-                        self.logger.warning(
-                            f"Skipping iteration {i} due to zero volume (vol_S={vol_S}, vol_T={vol_T})."
-                        )
-                        continue
-
-                    cluster_cond = nx.conductance(
-                        self.G, current_cluster, weight="weight"
-                    )
-                    cluster_corr, corr_pvalue = self.phen_omics_corr(
-                        list(current_cluster)
-                    )
-                    composite_score = (1 - self.k) * cluster_cond + self.k * (
-                        -abs(cluster_corr)
-                    )
-
-                    self.logger.debug(
-                        f"Cluster size={len(current_cluster)}, cond={cluster_cond:.3f}, "
-                        f"corr={cluster_corr:.3f}, composite={composite_score:.3f}"
-                    )
-
-                    # cluster must be larger than 10 nodes
-                    if len(current_cluster) >= 5 and composite_score < min_comp_score:
-                        min_comp_score = composite_score
-                        best_cluster = set(current_cluster)
-                        best_len = len(current_cluster)
-                        best_cond = cluster_cond
-                        best_corr = cluster_corr
-                        best_corr_pval = corr_pvalue
-
-            if best_cluster:
-                return (
-                    list(best_cluster),
-                    best_len,
-                    round(best_cond, 3),
-                    round(best_corr, 3),
-                    round(min_comp_score, 3),
-                    best_corr_pval,
-                )
-            else:
-                self.logger.warning(
-                    "No valid sweep cut found. Returning empty cluster."
-                )
-                return [], 0, 0.0, 0.0, 0.0, "0 (1.0)"
-
-        except Exception as e:
-            self.logger.error(f"Error in sweep_cut: {e}")
-            raise
-
-    def generate_weighted_personalization(self, nodes: List[Any] = []) -> Dict[Any, float]:
-        """Build a personalization vector for PageRank based on each node's impact on phenotype-omics correlation."""
-        try:
-            total_corr, _ = self.phen_omics_corr(nodes)
-            corr_contribution = []
-
-            i = 0
-            while i < len(nodes):
-                nodes_excl = nodes[:i] + nodes[i + 1:]
-                if not nodes_excl:
-                    contribution = 0.0
-                else:
-                    corr_excl, _ = self.phen_omics_corr(nodes_excl)
-                    contribution = abs(corr_excl) - abs(total_corr)
-                corr_contribution.append(contribution)
-                i += 1
-
-            total_abs = 0.0
-            i = 0
-            while i < len(corr_contribution):
-                total_abs += abs(corr_contribution[i])
-                i += 1
-
-            personalization = {}
-
-            # flat (no node changes the correlation)
-            if total_abs == 0.0 or len(nodes) == 0:
-                if len(nodes) == 0:
-                    return {}
-                uniform_weight = 1.0 / float(len(nodes))
-                for node in nodes:
-                    personalization[node] = uniform_weight
-                return personalization
-
-            # normalize absolute contributions to sum to 1
-            i = 0
-            while i < len(nodes):
-                w = abs(corr_contribution[i]) / total_abs
-                personalization[nodes[i]] = w
-                i += 1
-
-            return personalization
-
-        except Exception as e:
-            self.logger.error(f"Error in generate_weighted_personalization: {e}")
-            if nodes:
-                uniform_weight = 1.0 / float(len(nodes))
-                fallback = {}
-                for node in nodes:
-                    fallback[node] = uniform_weight
-                return fallback
-            return {}
-
-    def run_pagerank_clustering(self, seed_nodes: List[Any] = []) -> Dict[str, Any]:
+    def sweep_cut(self, pr_scores: Dict[Any, float]) -> Dict[str, Any]:
         """
-        Executes the PageRank clustering algorithm.
+        Identify the best cluster via sweep cut on PageRank scores.
 
         Args:
-            seed_nodes (List[Any]): List of seed node identifiers for personalization.
+
+            pr_scores (Dict[Any, float]): Mapping of nodes to PageRank scores.
 
         Returns:
-            Dict[str, Any]: Dictionary containing clustering results.
+
+            Dict: Best cluster details including nodes, conductance, and composite score.
+        """
+        degrees = dict(self.G.degree(weight="weight"))
+
+        vec = sorted(
+            [
+                (pr_scores[nd] / degrees[nd] if degrees[nd] > 0 else 0.0, nd)
+                for nd in pr_scores
+            ],
+            reverse=True,
+        )
+
+        best_result = {
+            "cluster_nodes": [],
+            "cluster_size": 0,
+            "conductance": 1.0,
+            "correlation": 0.0,
+            "correlation_pvalue": 1.0,
+            "composite_score": float("inf"),
+        }
+
+        all_nodes = set(self.G.nodes())
+        current_cluster = set()
+
+        for val, node in vec:
+            if val == 0:
+                continue
+
+            current_cluster.add(node)
+            complement = all_nodes - current_cluster
+
+            if len(current_cluster) >= len(all_nodes) or len(complement) == 0:
+                continue
+
+            if len(current_cluster) < self.min_cluster:
+                continue
+
+            vol_S = sum(d for _, d in self.G.degree(current_cluster, weight="weight"))
+            vol_T = sum(d for _, d in self.G.degree(complement, weight="weight"))
+            
+            if min(vol_S, vol_T) == 0:
+                continue
+
+            cond = nx.conductance(self.G, current_cluster, weight="weight")
+            corr, pval = self.phen_omics_corr(list(current_cluster))
+            composite = self.k_P * cond + (1.0 - self.k_P) * (-abs(corr))
+
+            if composite < best_result["composite_score"]:
+                best_result = {
+                    "cluster_nodes": list(current_cluster),
+                    "cluster_size": len(current_cluster),
+                    "conductance": round(cond, 4),
+                    "correlation": round(corr, 4),
+                    "correlation_pvalue": pval,
+                    "composite_score": round(composite, 4),
+                }
+
+        if not best_result["cluster_nodes"]:
+            logger.warning("Sweep cut found no valid cluster.")
+
+        return best_result
+
+    def generate_weighted_personalization(
+        self,
+        nodes: List[Any],
+        alpha_max: Optional[float] = None,
+    ) -> Dict[Any, float]:
+        """
+        Build personalization vector based on each node's correlation contribution.
+
+        Args:
+
+            nodes (List[Any]): Seed node list.
+            alpha_max (Optional[float]): Maximum teleportation weight.
+
+        Returns:
+
+            Dict[Any, float]: Personalization mapping {node: weight}.
+        """
+        if not nodes:
+            return {}
+
+        if alpha_max is None:
+            alpha_max = self.teleport_prob
+
+        total_corr, _ = self.phen_omics_corr(nodes)
+        abs_total = abs(total_corr)
+
+        contributions = []
+        for i in range(len(nodes)):
+            nodes_excl = nodes[:i] + nodes[i + 1:]
+            if not nodes_excl:
+                contributions.append(0.0)
+                continue
+                
+            corr_excl, _ = self.phen_omics_corr(nodes_excl)
+            rho_i = abs_total - abs(corr_excl)
+            contributions.append(rho_i)
+
+        floor = 1e-4 * alpha_max
+        clamped = [max(c, floor) for c in contributions]
+        max_contrib = max(clamped)
+
+        if max_contrib > 0:
+            personalization = {
+                nodes[i]: (clamped[i] / max_contrib) * alpha_max
+                for i in range(len(nodes))
+            }
+        else:
+            uniform = 1.0 / len(nodes)
+            personalization = {nd: uniform for nd in nodes}
+
+        return personalization
+
+    def run(self, seed_nodes: List[Any]) -> Dict[str, Any]:
+        """
+        Execute Correlated PageRank clustering.
+
+        Args:
+
+            seed_nodes (List[Any]): Nodes to use as the teleport set.
+
+        Returns:
+
+            Dict: Cluster performance and node list.
         """
         if not seed_nodes:
-            self.logger.error("No seed nodes provided for PageRank clustering.")
-            raise ValueError("Seed nodes list cannot be empty.")
+            raise ValueError("seed_nodes cannot be empty.")
 
-        if not set(seed_nodes).issubset(set(self.G.nodes())):
-            missing = set(seed_nodes) - set(self.G.nodes())
-            self.logger.error(f"Seed nodes not in graph: {missing}")
+        graph_nodes = set(self.G.nodes())
+        missing = set(seed_nodes) - graph_nodes
+        
+        if missing:
             raise ValueError(f"Seed nodes not in graph: {missing}")
 
+        personalization = self.generate_weighted_personalization(seed_nodes)
+        
+        logger.info(
+            f"Personalization: {len(personalization)} nodes, "
+            f"max_weight={max(personalization.values()):.4f}, "
+            f"min_weight={min(personalization.values()):.4f}"
+        )
+
         try:
-            personalization = self.generate_weighted_personalization(seed_nodes)
-            self.logger.info(
-                f"Generated personalization vector for seed nodes: {seed_nodes}"
+            pr_scores = nx.pagerank(
+                self.G,
+                alpha=self._nx_alpha,
+                personalization=personalization,
+                max_iter=self.max_iter,
+                tol=self.tol,
+                weight="weight",
+            )
+        except nx.exception.PowerIterationFailedConvergence:
+            logger.warning(f"PageRank did not converge; retrying with {self.max_iter * 2} iters.")
+            pr_scores = nx.pagerank(
+                self.G,
+                alpha=self._nx_alpha,
+                personalization=personalization,
+                max_iter=self.max_iter * 2,
+                tol=self.tol,
+                weight="weight",
             )
 
-            try:
-                p = nx.pagerank(
-                    self.G,
-                    alpha=self.alpha,
-                    personalization=personalization,
-                    max_iter=self.max_iter,
-                    tol=self.tol,
-                    weight="weight",
-                )
-            except nx.exception.PowerIterationFailedConvergence as e:
-                self.logger.warning(
-                    f"PageRank did not converge in {self.max_iter} iterations. Retrying with increased max_iter."
-                )
-                # retry with doubled iterations
-                p = nx.pagerank(
-                    self.G,
-                    alpha=self.alpha,
-                    personalization=personalization,
-                    max_iter=self.max_iter * 2,
-                    tol=self.tol,
-                    weight="weight",
-                )
+        logger.info("PageRank computation completed.")
+        results = self.sweep_cut(pr_scores)
 
-            self.logger.info("PageRank computation completed.")
-
-            nodes, n, cond, corr, min_corr, pval = self.sweep_cut(p)
-            if not nodes:
-                self.logger.warning("Sweep cut did not identify any cluster.")
-            else:
-                self.logger.info(
-                    f"Sweep cut resulted in cluster of size {n} with conductance {cond} and correlation {corr}."
-                )
-
-            results = {
-                "cluster_nodes": nodes,
-                "cluster_size": n,
-                "conductance": cond,
-                "correlation": corr,
-                "composite_score": min_corr,
-                "correlation_pvalue": pval,
-            }
-
-            return results
-
-        except Exception as e:
-            self.logger.error(f"Error in run_pagerank_clustering: {e}")
-            raise
-
-
-    def run(self, seed_nodes: List[Any] = []) -> Dict[str, Any]:
-        """
-        Executes the correlated PageRank clustering pipeline.
-
-        **Steps:**
-
-        1. **Initializing Clustering**:
-            - Receives a list of seed nodes to personalize the PageRank algorithm.
-            - Prepares the input graph and relevant parameters for clustering.
-
-        2. **PageRank Execution**:
-            - Applies the PageRank algorithm with personalization based on the seed nodes.
-            - Computes node scores and determines cluster memberships.
-
-        3. **Result Compilation**:
-            - Compiles clustering results, including cluster sizes and node memberships, into a dictionary.
-            - Logs the successful completion of the clustering process.
-
-        **Args**:
-            seed_nodes (List[Any]):
-                - A list of node identifiers used as seed nodes for personalized PageRank.
-                - These nodes influence the clustering process by biasing the algorithm.
-
-        **Returns**: Dict[str, Any]
-
-            - A dictionary containing the clustering results. Keys may include:
-                - `clusters`: Lists of nodes grouped into clusters.
-                - `scores`: PageRank scores for each node.
-                - `metadata`: Additional metrics or details about the clustering process.
-
-        **Raises**:
-
-            - ValueError: If the input graph is empty or seed nodes are invalid.
-            - Exception: For any unexpected errors during clustering execution.
-
-        **Notes**:
-
-            - Seed nodes strongly influence the clustering outcome; select them carefully based on prior knowledge or experimental goals.
-            - The PageRank algorithm requires a well-defined and connected graph to produce meaningful results.
-            - Results are sensitive to the alpha (damping factor) and other hyperparameters.
-
-        """
-        if self.tune:
-            best_config = self.run_tuning(num_samples=10)
-            self.logger.info("Tuning completed successfully.")
-            return {"best_config": best_config}
-        try:
-            results = self.run_pagerank_clustering(seed_nodes)
-            self.logger.info("PageRank clustering completed successfully.")
-            return results
-        except Exception as e:
-            self.logger.error(f"Error in run method: {e}")
-            raise
-
-    def get_quality(self) -> float:
-        """
-        Returns the composite score (or correlation) from the latest clustering run.
-        """
-        if hasattr(self, "results"):
-            #  return the composite score
-            return self.results.get("composite_score", 0.0)
+        if results["cluster_nodes"]:
+            logger.info(
+                f"Sweep cut: size={results['cluster_size']}, "
+                f"cond={results['conductance']}, "
+                f"corr={results['correlation']}, "
+                f"composite={results['composite_score']}"
+            )
         else:
-            # run clustering on all nodes and then return the score.
-            self.results = self.run_pagerank_clustering(seed_nodes=list(self.G.nodes()))
-            return self.results.get("composite_score", 0.0)
+            logger.warning("Sweep cut found no valid cluster.")
 
-    def _tune_helper(self, config):
-        alpha = config["alpha"]
-        max_iter = config["max_iter"]
-        tol = config["tol"]
-        k = config["k"]
-
-        tuned_instance = CorrelatedPageRank(
-            graph=self.G,
-            omics_data=self.B,
-            phenotype_data=self.Y,
-            alpha=alpha,
-            max_iter=max_iter,
-            tol=tol,
-            k=k,
-            gpu=(self.device.type == "cuda"),
-            seed=self.seed,
-            tune=False,
-        )
-        #  tuning uses all nodes as seed nodes.
-        tuned_instance.run_pagerank_clustering(seed_nodes=list(self.G.nodes()))
-        quality = tuned_instance.get_quality()
-        session.report({"quality": quality})
-
-    def run_tuning(self, num_samples: int = 10) -> Dict[str, Any]:
-        search_config = {
-            "alpha": tune.grid_search([0.8, 0.85, 0.9, 0.95]),
-            "k": tune.grid_search([0.5, 0.6, 0.7, 0.8]),
-            "max_iter": tune.choice([100, 500, 1000]),
-            "tol": tune.loguniform(1e-5, 1e-3),
-        }
-        scheduler = ASHAScheduler(
-            metric="quality",
-            mode="max",
-            grace_period=1,
-            reduction_factor=2,
-        )
-        reporter = CLIReporter(metric_columns=["quality", "training_iteration"])
-
-        def short_dirname_creator(trial):
-            return f"_{trial.trial_id}"
-
-        resources = {"cpu": 1, "gpu": 1} if self.device.type == "cuda" else {"cpu": 1, "gpu": 0}
-
-        analysis = tune.run(
-            tune.with_parameters(self._tune_helper),
-            config=search_config,
-            verbose=0,
-            num_samples=num_samples,
-            scheduler=scheduler,
-            progress_reporter=reporter,
-            storage_path=os.path.expanduser("~/pr"),
-            trial_dirname_creator=short_dirname_creator,
-            resources_per_trial=resources,
-            name="l",
-        )
-
-        best_config = analysis.get_best_config(metric="quality", mode="max")
-        self.logger.info(f"Best hyperparameters found: {best_config}")
-        return best_config
+        return results

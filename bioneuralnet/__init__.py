@@ -1,6 +1,6 @@
 """BioNeuralNet: Graph Neural Network-based Multi-Omics Network Data Analysis.
 
-BioNeuralNet is a flexible and modular framework tailored for end-to-end network-based multi-omics data analysis. It leverages Graph Neural Networks (GNNs) to transform complex molecular networks into biologically meaningful low-dimensional representations, enabling diverse downstream analytical tasks.
+BioNeuralNet is a modular framework tailored for end-to-end network-based multi-omics data analysis. It leverages Graph Neural Networks (GNNs) to transform complex molecular networks into biologically meaningful low-dimensional representations, enabling diverse downstream analytical tasks.
 
 Key Features:
 
@@ -17,26 +17,25 @@ Modules:
 * `subject_representation`: Fuses network embeddings with omics data for subject profiling.
 * `downstream_task`: Contains pipelines for disease prediction (DPMON) and representation learning.
 * `clustering`: Implements correlated and hybrid clustering algorithms for module detection.
-* `external_tools`: Wraps external packages (e.g., SmCCNet) for network inference.
 * `metrics`: Provides tools for correlation analysis, performance evaluation, and plotting.
 * `datasets`: Access to synthetic and real-world (TCGA) multi-omics datasets.
 * `utils`: Utilities for logging, reproducibility, graph generation, and data processing.
 """
 
-__version__ = "1.2.1"
+__version__ = "1.2.2"
 
 # submodules to enable direct imports such as `from bioneuralnet import utils`
 from . import utils
 from . import metrics
+from . import network
 from . import datasets
 from . import clustering
 from . import network_embedding
 from . import downstream_task
-from . import external_tools
 
 from .network_embedding import GNNEmbedding
+from .network import auto_pysmccnet
 from .downstream_task import SubjectRepresentation, DPMON
-from .external_tools import SmCCNet
 from .datasets import DatasetLoader
 
 from .clustering import (
@@ -61,23 +60,24 @@ from .utils import (
 
 __all__ = [
     "__version__",
-
+    
     "utils",
     "metrics",
     "datasets",
     "clustering",
     "network_embedding",
     "downstream_task",
-    "external_tools",
+    "network",
 
     "GNNEmbedding",
     "SubjectRepresentation",
+    "auto_pysmccnet",
     "DPMON",
-    "SmCCNet",
+    
     "DatasetLoader",
-
     "CorrelatedPageRank",
     "CorrelatedLouvain",
+    
     "HybridLouvain",
 
     "load_example",

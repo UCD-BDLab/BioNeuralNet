@@ -1,369 +1,388 @@
+"""
+Correlated Louvain Community Detection.
+
+This module extends the standard Louvain algorithm by incorporating an 
+absolute phenotype-correlation objective into the modularity maximization 
+process.
+
+References:
+    Abdel-Hafiz et al. (2022), "Significant Subgraph Detection in 
+    Multi-omics Networks for Disease Pathway Identification," 
+    Frontiers in Big Data.
+
+Notes:
+    **Hybrid Modularity Objective**
+    The algorithm optimizes connectivity and phenotype correlation 
+    simultaneously using the following weighted objective function:
+
+    .. math::
+        Q_{hybrid} = k_L Q + (1 - k_L) \rho
+
+    Where:
+        * :math:`Q`: Standard modularity (internal connectivity).
+        * :math:`\\rho`: Absolute Pearson correlation of the community's 
+          first principal component (PC1) with phenotype :math:`Y`.
+        * :math:`k_L`: User-defined weight on modularity (Suggested: 0.2).
+
+Algorithm:
+    The hierarchical loop and Phase 2 (network aggregation) remain 
+    identical to the standard Louvain method. The modification occurs 
+    exclusively in **Phase 1 (Local Optimization)**.
+
+    When evaluating the movement of node :math:`v` from community :math:`D` 
+    to community :math:`C`, the gain is calculated as:
+
+    .. math::
+        \Delta_{hybrid} = k_L \Delta Q + (1 - k_L) \Delta \\rho
+
+    The correlation gain :math:`\Delta \\rho` is defined as the change in 
+    total correlation across affected communities:
+
+    .. math::
+        \Delta \\rho = [|\\rho(D \setminus \{v\})| + |\\rho(C \cup \{v\})|] - [|\\rho(D)| + |\\rho(C)|]
+"""
+
+import logging
+from typing import Any, Dict, FrozenSet, List, Optional, Set, Tuple, Union
+
 import numpy as np
-import networkx as nx
 import pandas as pd
-import torch
-import os
-from typing import Optional, Union, Any
+import networkx as nx
 
-from community.community_louvain import (
-    modularity as original_modularity,
-    best_partition,
-)
-from scipy.stats import pearsonr
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
+from .louvain import Louvain
 
-from ray import tune
-from ray.tune import CLIReporter
-from ray.air import session
-from ray.tune.schedulers import ASHAScheduler
-from bioneuralnet.utils import set_seed, get_logger
+logger = logging.getLogger(__name__)
 
-logger = get_logger(__name__)
+class CorrelatedLouvain(Louvain):
+    """
+    Correlated Louvain community detection.
 
-class CorrelatedLouvain:
-    """Correlated Louvain community detection on an omics network.
-
-    Extends standard Louvain modularity with an additional term that captures either phenotype correlation (supervised mode, when ``Y`` is provided) or omics cohesion (unsupervised mode, when only ``B`` is provided). The two terms are combined via weights ``k3`` (modularity) and ``k4`` (correlation/cohesion), and Ray Tune can optionally search over these weights.
+    Inherits from :class:`Louvain`.
 
     Args:
 
-        G (nx.Graph): Input graph with nodes corresponding to omics features.
-        B (pd.DataFrame): Omics data matrix (samples x features) whose columns correspond to graph nodes.
-        Y (Optional[pd.Series or pd.DataFrame]): Phenotype or target values for supervised correlation; if None, runs in unsupervised cohesion mode.
-        k3 (float): Weight on the standard modularity term in the combined quality score.
-        k4 (float): Weight on the correlation/cohesion term in the combined quality score.
-        weight (str): Edge attribute name in ``G`` to use as the weight (for example, "weight").
-        tune (bool): If True, enable hyperparameter tuning over ``k4`` via Ray Tune.
-        gpu (bool): If True and CUDA is available, use GPU for supported computations.
-        seed (Optional[int]): Random seed for NumPy, PyTorch, and CUDA (if available).
-
-    Attributes:
-
-        G (nx.Graph): Copy of the input graph.
-        B (pd.DataFrame): Copy of the omics data.
-        Y: Stored phenotype or target data.
-        K3 (float): Stored modularity weight.
-        K4 (float): Stored correlation or cohesion weight.
-        weight (str): Stored edge-weight attribute name.
-        tune (bool): Whether tuning mode is enabled.
-        device (torch.device): Selected compute device ("cpu" or "cuda").
-        clusters (dict): Mapping from community id to list of node identifiers.
-        partition (dict): Node-to-community mapping, populated after ``run()`` is called.
-
+        G (nx.Graph): The input graph for community detection.
+        B (pd.DataFrame): Omics data (n_samples x n_features). Column names must match nodes.
+        Y (Union[pd.Series, pd.DataFrame]): Phenotype vector aligned with rows of B.
+        k_L (float): Weight on modularity in combined objective (Eq. 9).
+        weight (str): Edge attribute name for weights.
+        max_passes (int): Maximum number of passes for Phase 1 optimization.
+        min_delta (float): Convergence tolerance for objective gain.
+        seed (Optional[int]): Random seed for reproducibility.
     """
+
     def __init__(
         self,
         G: nx.Graph,
         B: pd.DataFrame,
-        Y=None,
-        k3: float = 0.2,
-        k4: float = 0.8,
+        Y: Union[pd.Series, pd.DataFrame],
+        k_L: float = 0.2,
         weight: str = "weight",
-        tune: bool = False,
-        gpu: bool = False,
+        max_passes: int = 50,
+        min_delta: float = 1e-6,
         seed: Optional[int] = None,
     ):
-        self.logger = get_logger(__name__)
-        self.G = G.copy()
-        self.B = B.copy()
-        self.Y = Y
-        self.K3 = k3
-        self.K4 = k4
-        self.weight = weight
-        self.tune = tune
+        if not 0.0 <= k_L <= 1.0:
+            raise ValueError(f"k_L must be in [0, 1], got {k_L}")
 
-        self.logger.info(
-            f"CorrelatedLouvain(k3={self.K3}, k4={self.K4}, "
-            f"nodes={self.G.number_of_nodes()}, edges={self.G.number_of_edges()}, "
-            f"features={self.B.shape[1] if self.B is not None else 0})"
+        super().__init__(
+            G=G, 
+            weight=weight, 
+            max_passes=max_passes,
+            min_delta=min_delta, 
+            seed=seed,
         )
 
-        self.logger.debug(
-            f"Initialized CorrelatedLouvain with k3 = {self.K3}, k4 = {self.K4}, "
+        self.k_L = k_L
+        self.valid_mask = np.zeros(self.n, dtype=bool)
+        cols = []
+
+        for idx, node in enumerate(self.nodes):
+            col_name = str(node)
+            if col_name in B.columns:
+                cols.append(B[col_name].values.astype(np.float64))
+                self.valid_mask[idx] = True
+            else:
+                cols.append(np.zeros(len(B), dtype=np.float64))
+
+        omics = np.column_stack(cols)
+        mu = omics.mean(axis=0, keepdims=True)
+        sigma = omics.std(axis=0, keepdims=True)
+        sigma[sigma == 0] = 1.0
+        self.omics_z = (omics - mu) / sigma
+
+        if isinstance(Y, pd.DataFrame):
+            y_np = Y.iloc[:, 0].values.astype(np.float64)
+        elif isinstance(Y, pd.Series):
+            y_np = Y.values.astype(np.float64)
+        else:
+            y_np = np.asarray(Y, dtype=np.float64)
+
+        self.y_c = y_np - y_np.mean()
+        self.y_ss = float((self.y_c ** 2).sum())
+        self._corr_cache: Dict[FrozenSet[int], float] = {}
+
+        logger.info(
+            f"CorrelatedLouvain: n={self.n}, k_L={k_L}, "
+            f"matched_features={int(self.valid_mask.sum())}/{self.n}"
         )
-        if self.B is not None:
-            self.logger.debug(f"Original omics data shape: {self.B.shape}")
 
-        self.logger.debug(f"Original graph has {self.G.number_of_nodes()} nodes.")
-
-        if self.B is not None:
-            self.logger.debug(f"Final omics data shape: {self.B.shape}")
-
-        self.logger.debug(
-            f"Graph has {self.G.number_of_nodes()} nodes and {self.G.number_of_edges()} edges."
-        )
-
-        self.seed = seed
-        self.gpu = gpu
-
-        if seed is not None:
-            set_seed(seed)
-
-        self.clusters: dict[Any, Any] = {}
-        self.device = torch.device("cuda" if gpu and torch.cuda.is_available() else "cpu")
-        self.logger.debug(f"Initialized Correlated Louvain. device={self.device}")
-
-    def _compute_community_cohesion(self, nodes) -> float:
-        """Compute average absolute pairwise correlation of omics features within a community.
-
-        Uses columns in ``B`` matching the given nodes, drops all-zero columns, and returns the mean of the upper-triangle absolute correlation matrix; returns 0.0 if fewer than two valid features remain.
+    def _pc1_correlation(self, orig_indices: FrozenSet[int]) -> float:
         """
-        if self.B is None:
-            return 0.0
-
-        node_cols = []
-        for n in nodes:
-            name = str(n)
-            if name in self.B.columns:
-                node_cols.append(name)
-
-        if len(node_cols) < 2:
-            return 0.0
-
-        B_sub = self.B.loc[:, node_cols]
-        B_sub = B_sub.loc[:, (B_sub != 0).any(axis=0)]
-        if B_sub.shape[1] < 2:
-            return 0.0
-
-        corr_matrix = B_sub.corr().abs()
-        upper_tri = corr_matrix.where(
-            np.triu(np.ones_like(corr_matrix, dtype=bool), k=1)
-        )
-        return upper_tri.stack().mean()
-
-    def _compute_community_correlation(self, nodes) -> tuple:
-        """
-        Compute the Pearson correlation between the first principal component (PC1) of the omics data (for the given nodes) and the phenotype.
-        Drops columns that are completely zero.
-        """
-        try:
-            self.logger.debug(
-                f"Computing community correlation for {len(nodes)} nodes..."
-            )
-            node_cols = [str(n) for n in nodes if str(n) in self.B.columns]
-            if not node_cols:
-                self.logger.debug(
-                    "No valid columns found for these nodes; returning (0.0, 1.0)."
-                )
-                return 0.0, 1.0
-            B_sub = self.B.loc[:, node_cols]
-            zero_mask = (B_sub == 0).all(axis=0)
-            num_zero_columns = int(zero_mask.sum())
-            if num_zero_columns > 0:
-                self.logger.debug(
-                    f"WARNING: {num_zero_columns} columns are all zeros in community subset."
-                )
-            B_sub = B_sub.loc[:, ~zero_mask]
-            if B_sub.shape[1] == 0:
-                self.logger.debug("All columns dropped; returning (0.0, 1.0).")
-                return 0.0, 1.0
-
-            self.logger.debug(
-                f"B_sub shape: {B_sub.shape}, first few columns: {node_cols[:5]}"
-            )
-            scaler = StandardScaler()
-            scaled = scaler.fit_transform(B_sub)
-            pca = PCA(n_components=1)
-            pc1 = pca.fit_transform(scaled).flatten()
-            target = (
-                self.Y.iloc[:, 0].values
-                if isinstance(self.Y, pd.DataFrame)
-                else self.Y.values
-            )
-            corr, pvalue = pearsonr(pc1, target)
-            return corr, pvalue
-        except Exception as e:
-            self.logger.error(f"Error in _compute_community_correlation: {e}")
-            raise
-
-    def _quality_correlated(self, partition) -> float:
-        """
-        Compute the overall quality metric as:
-            Q* = k3 * Q + k4 * avg_abs_corr (supervised)
-            Q* = k3 * Q + k4 * avg_cohesion (unsupervised)
-        """
-        Q = original_modularity(partition, self.G, self.weight)
-
-        # Unsupervised mode: Y is None
-        if self.Y is None:
-            self.logger.debug("Phenotype data not provided; using unsupervised cohesion.")
-
-            if self.B is None:
-                return Q
-
-            community_cohesions = []
-            for com in set(partition.values()):
-                nodes = [n for n in self.G.nodes() if partition[n] == com]
-                if len(nodes) < 2:
-                    continue
-                cohesion = self._compute_community_cohesion(nodes)
-                community_cohesions.append(cohesion)
-
-            avg_cohesion = np.mean(community_cohesions) if community_cohesions else 0.0
-            quality = self.K3 * Q + self.K4 * avg_cohesion
-            self.logger.debug(
-                f"Computed quality (unsupervised): Q = {Q:.4f}, avg_cohesion = {avg_cohesion:.4f}, combined = {quality:.4f}"
-            )
-            return quality
-
-        # Supervised mode: Y is provided
-        if self.B is None:
-            self.logger.debug(
-                "Omics data not provided; returning standard modularity."
-            )
-            return Q
-
-        community_corrs = []
-        for com in set(partition.values()):
-            nodes = [n for n in self.G.nodes() if partition[n] == com]
-            if len(nodes) < 2:
-                continue
-            corr, _ = self._compute_community_correlation(nodes)
-            community_corrs.append(abs(corr))
-        avg_corr = np.mean(community_corrs) if community_corrs else 0.0
-        quality = self.K3 * Q + self.K4 * avg_corr
-        self.logger.info(
-            f"Computed quality (supervised): Q = {Q:.4f}, avg_corr = {avg_corr:.4f}, combined = {quality:.4f}"
-        )
-        return quality
-
-    def run(self, as_dfs: bool = False) -> Union[dict, list]:
-        """Run correlated Louvain clustering and optionally return cluster tables.
-
-        Behavior depends on the combination of ``tune`` and ``as_dfs``: if ``tune=True`` and ``as_dfs=False``, Ray Tune is used to search over ``k4`` and a dictionary with the best configuration is returned; if ``tune=True`` and ``as_dfs=True``, tuning is run first and then a standard detection using the tuned parameters returns per-cluster DataFrames; if ``tune=False``, a single correlated Louvain partition is computed and either the raw partition or per-cluster DataFrames are returned.
+        Compute |Pearson(PC1(omics[:, indices]), Y)| with caching.
 
         Args:
 
-            as_dfs (bool): If True, convert the final partition to a list of per-cluster DataFrames (one DataFrame per cluster with more than 2 nodes); if False, return the raw partition or tuning result.
+            orig_indices (FrozenSet[int]): Set of original node indices.
 
         Returns:
 
-            Union[dict, list]: If ``tune=True`` and ``as_dfs=False``, a dict of the form ``{"best_config": dict}`` with the best Ray Tune configuration; if ``as_dfs=True``, a list of ``pd.DataFrame`` objects, one per cluster with more than 2 nodes; otherwise, a partition dict mapping each node to a community id.
-
+            float: The absolute correlation value.
         """
-        if self.tune and not as_dfs:
-            self.logger.info("Tuning enabled. Running hyperparameter tuning...")
-            best_config = self.run_tuning(num_samples=10)
-            self.logger.info("Tuning completed successfully.")
-            return {"best_config": best_config}
+        if orig_indices in self._corr_cache:
+            return self._corr_cache[orig_indices]
 
-        elif self.tune and as_dfs:
-            self.logger.info("Tuning enabled and adjacency matrices output requested.")
-            best_config = self.run_tuning(num_samples=10)
-            tuned_k4 = best_config.get("k4", 0.8)
-            tuned_k3 = 1.0 - tuned_k4
-            tuned_instance = CorrelatedLouvain(
-                G=self.G,
-                B=self.B,
-                Y=self.Y,
-                k3=tuned_k3,
-                k4=tuned_k4,
-                weight=self.weight,
-                tune=False,
-                gpu=self.gpu,
-                seed=self.seed,
-            )
-            return tuned_instance.run(as_dfs=True)
+        if len(orig_indices) < 2:
+            self._corr_cache[orig_indices] = 0.0
+            return 0.0
 
-        else:
-            self.logger.info("Running standard community detection...")
-            partition = best_partition(self.G, weight=self.weight)
-            quality = self._quality_correlated(partition)
-            self.logger.info(f"Final quality: {quality:.4f}")
-            self.partition = partition
+        idx_arr = np.array(sorted(orig_indices), dtype=np.intp)
+        valid_idx = idx_arr[self.valid_mask[idx_arr]]
 
-            n_clusters = len(set(partition.values()))
-            self.logger.info(
-                f"CorrelatedLouvain found {n_clusters} communities "
-                f"(nodes={self.G.number_of_nodes()})"
-            )
+        if len(valid_idx) < 2:
+            self._corr_cache[orig_indices] = 0.0
+            return 0.0
 
-        if as_dfs:
-            self.logger.info("Raw partition output:", self.partition)
-            clusters_dfs = self.partition_to_adjacency(self.partition)
-            print(f"Returning {len(clusters_dfs)} clusters after filtering")
-            return clusters_dfs
+        sub = self.omics_z[:, valid_idx]
 
-        else:
-            return partition
+        try:
+            U, S, _ = np.linalg.svd(sub, full_matrices=False)
+            pc1 = U[:, 0] * S[0]
+            pc1_c = pc1 - pc1.mean()
+            pc1_ss = (pc1_c ** 2).sum()
 
-    def partition_to_adjacency(self, partition: dict) -> list:
+            if pc1_ss < 1e-10:
+                val = 0.0
+            else:
+                val = abs(float(
+                    (pc1_c * self.y_c).sum()
+                    / np.sqrt(pc1_ss * self.y_ss + 1e-12)
+                ))
+        except Exception:
+            val = 0.0
+
+        self._corr_cache[orig_indices] = val
+        return val
+
+    @staticmethod
+    def _collect_orig(
+        comm_id: int,
+        community: np.ndarray,
+        n2o: Dict[int, Set[int]],
+    ) -> FrozenSet[int]:
         """
-        Convert the partition dictionary into a list of adjacency matrices (DataFrames),
-        where each adjacency matrix represents a cluster with more than 2 nodes.
+        Collect all original-node indices belonging to a specific community.
+
+        Args:
+
+            comm_id (int): The ID of the community.
+            community (np.ndarray): The current community assignments.
+            n2o (Dict[int, Set[int]]): Mapping of current nodes to original indices.
+
+        Returns:
+
+            FrozenSet[int]: A frozenset of original node indices.
         """
+        s: Set[int] = set()
+        for idx in np.where(community == comm_id)[0]:
+            s.update(n2o[int(idx)])
+            
+        return frozenset(s)
 
-        for node, cl in partition.items():
-            self.clusters.setdefault(cl, []).append(node)
+    def _correlated_phase1(
+        self,
+        A: np.ndarray,
+        k: np.ndarray,
+        m: float,
+        community: np.ndarray,
+        n2o: Dict[int, Set[int]],
+    ) -> Tuple[np.ndarray, int]:
+        """
+        Optimisation phase with combined modularity + correlation objective.
 
-        self.logger.debug(f"Total detected clusters: {len(self.clusters)}")
+        Returns:
 
-        adjacency_matrices = []
-        for cl, nodes in self.clusters.items():
-            self.logger.debug(f"Cluster {cl} size: {len(nodes)}")
-            if len(nodes) > 2:
-                valid_nodes = list(set(nodes).intersection(set(self.B.columns)))
-                if valid_nodes:
-                    adjacency_matrix = self.B.loc[:, valid_nodes].fillna(0)
-                    adjacency_matrices.append(adjacency_matrix)
+            Tuple[np.ndarray, int]: Updated community array and move count.
+        """
+        n = A.shape[0]
+        total_moves = 0
+        improved = True
+        pass_num = 0
 
-        print(f"Clusters with >2 nodes: {len(adjacency_matrices)}")
+        while improved and pass_num < self.max_passes:
+            improved = False
+            pass_num += 1
+            order = np.random.permutation(n)
 
-        return adjacency_matrices
+            for node in order:
+                cur_comm = int(community[node])
+                nbr_idx = np.nonzero(A[node])[0]
+                
+                if len(nbr_idx) == 0:
+                    continue
 
-    def get_quality(self) -> float:
-        if not hasattr(self, "partition"):
-            raise ValueError("No partition computed. Call run() first.")
-        return self._quality_correlated(self.partition)
+                candidate_comms = set(int(c) for c in community[nbr_idx])
+                candidate_comms.add(cur_comm)
 
-    def _tune_helper(self, config):
-        k4 = config["k4"]
-        k3 = 1.0 - k4
-        tuned_instance = CorrelatedLouvain(
-            G=self.G,
-            B=self.B,
-            Y=self.Y,
-            k3=k3,
-            k4=k4,
-            weight=self.weight,
-            gpu=self.gpu,
-            seed=self.seed,
-            tune=False,
+                stay_dQ = Louvain._delta_Q(node, cur_comm, community, A, k, m)
+
+                cur_orig = self._collect_orig(cur_comm, community, n2o)
+                node_orig = frozenset(n2o[node])
+                corr_cur = self._pc1_correlation(cur_orig)
+                corr_cur_without = self._pc1_correlation(cur_orig - node_orig)
+
+                best_net = 0.0
+                best_comm = cur_comm
+
+                for tgt_comm in candidate_comms:
+                    if tgt_comm == cur_comm:
+                        continue
+
+                    insert_dQ = Louvain._delta_Q(node, tgt_comm, community, A, k, m)
+                    net_dQ = insert_dQ - stay_dQ
+
+                    tgt_orig = self._collect_orig(tgt_comm, community, n2o)
+                    corr_tgt = self._pc1_correlation(tgt_orig)
+                    corr_tgt_with = self._pc1_correlation(tgt_orig | node_orig)
+
+                    net_d_rho = (corr_cur_without + corr_tgt_with) - (corr_cur + corr_tgt)
+
+                    net_combined = (self.k_L * net_dQ) + ((1.0 - self.k_L) * net_d_rho)
+
+                    if net_combined > best_net + self.min_delta:
+                        best_net = net_combined
+                        best_comm = tgt_comm
+
+                if best_comm != cur_comm:
+                    best_orig = self._collect_orig(best_comm, community, n2o)
+                    for key in (cur_orig, cur_orig - node_orig, best_orig, best_orig | node_orig):
+                        self._corr_cache.pop(key, None)
+
+                    community[node] = best_comm
+                    improved = True
+                    total_moves += 1
+
+        logger.debug(f" Correlated Phase 1: {pass_num} passes, {total_moves} moves")
+        return community, total_moves
+
+    def run(self) -> Dict[Any, int]:
+        """
+        Execute the Correlated Louvain algorithm.
+
+        Returns:
+
+            Dict[Any, int]: Mapping of original nodes to community IDs.
+        """
+        self._corr_cache.clear()
+        self._history.clear()
+
+        A = self.A_orig.copy()
+        degrees = A.sum(axis=1)
+        m = A.sum() / 2.0
+        community = np.arange(self.n, dtype=np.int64)
+        n2o: Dict[int, Set[int]] = {i: {i} for i in range(self.n)}
+
+        level = 0
+        while True:
+            level += 1
+            logger.info(f"Level {level}: {A.shape[0]} nodes")
+
+            community, moves = self._correlated_phase1(A, degrees, m, community, n2o)
+            n_comms = len(np.unique(community))
+
+            self._history.append({
+                "level": level,
+                "nodes_at_level": A.shape[0],
+                "moves": moves,
+                "communities": n_comms,
+            })
+
+            if moves == 0 or n_comms >= A.shape[0]:
+                break
+
+            A, degrees, m, community, n2o = Louvain._phase2(A, community, n2o)
+            self._corr_cache.clear()
+
+            if A.shape[0] <= 1:
+                break
+
+        partition: Dict[Any, int] = {}
+        for si in range(len(community)):
+            cid = int(community[si])
+            for oi in n2o[si]:
+                partition[self.idx_to_node[oi]] = cid
+
+        remap = {old: new for new, old in enumerate(sorted(set(partition.values())))}
+        self._partition = {nd: remap[c] for nd, c in partition.items()}
+        self._modularity = self._compute_modularity()
+        self._combined_quality = self._compute_combined_quality()
+
+        logger.info(
+            f"Correlated Louvain done: {len(remap)} communities, "
+            f"Q={self._modularity:.4f}, Q*={self._combined_quality:.4f}"
         )
-        tuned_instance.run()
-        quality = tuned_instance.get_quality()
-        session.report({"quality": quality})
+        return self._partition
 
-    def run_tuning(self, num_samples=10):
-        search_config = {"k4": tune.grid_search([0.5, 0.6, 0.7, 0.8, 0.9])}
-        scheduler = ASHAScheduler(
-            metric="quality",
-            mode="max",
-            grace_period=1,
-            reduction_factor=2,
-        )
-        reporter = CLIReporter(metric_columns=["quality", "training_iteration"])
+    def _compute_combined_quality(self) -> float:
+        """
+        Compute the weighted combined quality score Q*.
 
-        def short_dirname_creator(trial):
-            return f"_{trial.trial_id}"
+        Returns:
 
-        resources = {"cpu": 1, "gpu": 1} if self.device.type == "cuda" else {"cpu": 1, "gpu": 0}
+            float: The score k_L * Q + (1 - k_L) * mean(|rho|).
+        """
+        Q = self._modularity if self._modularity is not None else 0.0
+        corrs = []
 
-        self.logger.info("Starting hyperparameter tuning...")
-        analysis = tune.run(
-            tune.with_parameters(self._tune_helper),
-            config=search_config,
-            verbose=0,
-            num_samples=num_samples,
-            scheduler=scheduler,
-            progress_reporter=reporter,
-            storage_path=os.path.expanduser("~/cl"),
-            trial_dirname_creator=short_dirname_creator,
-            resources_per_trial=resources,
-            name="l",
-        )
+        for cid, nds in self.communities.items():
+            if len(nds) < 2:
+                continue
+            idx_set = frozenset(self.node_to_idx[n] for n in nds)
+            corrs.append(self._pc1_correlation(idx_set))
 
-        best_config = analysis.get_best_config(metric="quality", mode="max")
-        self.logger.info(f"Best hyperparameters found: {best_config}")
-        return best_config
+        avg_rho = float(np.mean(corrs)) if corrs else 0.0
+        return self.k_L * Q + (1.0 - self.k_L) * avg_rho
+
+    def get_combined_quality(self) -> float:
+        """
+        Access the calculated combined quality score.
+
+        Returns:
+
+            float: The Q* score.
+        """
+        if self._combined_quality is None:
+            raise ValueError("Call run() first.")
+        return self._combined_quality
+
+    def get_top_communities(self, n: int = 1) -> List[Tuple[int, float, List[Any]]]:
+        """
+        Retrieve the top communities based on absolute correlation.
+
+        Args:
+
+            n (int): Number of top communities to return.
+
+        Returns:
+
+            List[Tuple[int, float, List[Any]]]: Community data sorted by |rho|.
+        """
+        ranked = []
+        for cid, nds in self.communities.items():
+            if len(nds) < 2:
+                continue
+            idx_set = frozenset(self.node_to_idx[nd] for nd in nds)
+            ranked.append((cid, self._pc1_correlation(idx_set), nds))
+            
+        ranked.sort(key=lambda x: x[1], reverse=True)
+        return ranked[:n]

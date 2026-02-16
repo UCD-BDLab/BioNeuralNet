@@ -1,3 +1,40 @@
+"""
+DPMON: Optimized Network Embedding and Fusion for Disease Prediction.
+
+This module implements an end-to-end Graph Neural Network (GNN) pipeline 
+integrating network topology with subject-level omics data.
+
+References:
+    Hussein, S. et al. (2024), "Learning from Multi-Omics Networks to 
+    Enhance Disease Prediction: An Optimized Network Embedding and 
+    Fusion Approach" IEEE BIBM.
+
+Algorithm:
+    The pipeline consists of three distinct phases:
+
+    Phase 1: Task-Aware Embedding Generation
+        1. Construct a multi-omics network.
+        2. Initialize node features using clinical correlation vectors.
+        3. Pass graph through a GNN (GAT/GCN/GIN).
+    
+    Phase 2: Dimensionality Reduction
+        Compress embeddings into scalar weights via AutoEncoder/MLP.
+
+    Phase 3: Fusion and Prediction
+        Fuse embeddings with subject-level data via element-wise 
+        multiplication (Feature Reweighting).
+
+Notes:
+    The embedding space is optimized dynamically using the loss function:
+    
+    .. math::
+        L_{total} = L_{classification} + \lambda L_{regularization}
+
+    The fusion acts as a **Network-Guided Attention Mechanism**, 
+    amplifying features that are topologically central.
+"""
+
+
 from __future__ import annotations
 
 import os
@@ -8,9 +45,9 @@ import shutil
 import pandas as pd
 import numpy as np
 import networkx as nx
-from typing import Optional, List
+
 from pathlib import Path
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple,Dict, Any
 try:
     import torch
     import torch.nn as nn
@@ -23,10 +60,10 @@ except ModuleNotFoundError:
         "https://bioneuralnet.readthedocs.io/en/latest/installation.html"
     )
 
-from ray import train
+import ray
 from ray import tune
-from ray.tune import Checkpoint
 from ray.tune import CLIReporter
+from ray.tune import Checkpoint
 from ray.tune.error import TuneError
 from ray.tune.stopper import TrialPlateauStopper
 from ray.tune.schedulers import ASHAScheduler
@@ -69,7 +106,7 @@ class DPMON:
         lr (float): Learning rate for the optimizer.
         weight_decay (float): L2 weight decay (regularization) coefficient.
         tune (bool): If True, perform hyperparameter tuning before final training.
-        tune_trails (int): Number of trials to perform if tune=True.
+        tune_trials (int): Number of trials to perform if tune=True.
         gpu (bool): If True, use GPU if available.
         cv (bool): If True, use K-fold cross-validation; otherwise use repeated train/test splits.
         cuda (int): CUDA device index to use when gpu=True.
@@ -83,6 +120,7 @@ class DPMON:
         omics_list: List[pd.DataFrame],
         phenotype_data: pd.DataFrame,
         clinical_data: Optional[pd.DataFrame] = None,
+        correlation_mode: str = "abs_pearson",
         model: str = "GAT",
         phenotype_col: str = "phenotype",
         gnn_hidden_dim: int = 16,
@@ -90,6 +128,7 @@ class DPMON:
         gnn_dropout: float = 0.1,
         gnn_activation: str = "relu",
         dim_reduction: str = "ae",
+        ae_architecture: str = "original",
         ae_encoding_dim: int = 8,
         nn_hidden_dim1: int = 16,
         nn_hidden_dim2: int = 8,
@@ -98,8 +137,9 @@ class DPMON:
         n_folds: int = 5,
         lr: float = 1e-1,
         weight_decay: float = 1e-4,
+        gat_heads: int = 1,
         tune: bool = False,
-        tune_trails: int = 10,
+        tune_trials: int = 20,
         gpu: bool = False,
         cv: bool = False,
         cuda: int = 0,
@@ -158,12 +198,15 @@ class DPMON:
         self.lr = lr
         self.weight_decay = weight_decay
         self.tune = tune
-        self.tune_trails = tune_trails
+        self.tune_trials = tune_trials
         self.gpu = gpu
         self.cuda = cuda
         self.seed = seed
         self.seed_trials = seed_trials
         self.cv = cv
+        self.correlation_mode = correlation_mode
+        self.ae_architecture= ae_architecture
+        self.gat_heads =gat_heads
 
         if output_dir is None:
             self.output_dir = Path(os.getcwd()) / "dpmon"
@@ -208,10 +251,12 @@ class DPMON:
             "gpu": self.gpu,
             "cuda": self.cuda,
             "tune": self.tune,
-            "tune_trials": self.tune_trails,
+            "tune_trials": self.tune_trials,
             "seed": self.seed,
             "seed_trials": self.seed_trials,
-            "cv": self.cv,
+            "correlation_mode": self.correlation_mode,
+            "ae_architecture": self.ae_architecture,
+            "gat_heads": self.gat_heads,
         }
 
         graph_nodes = set(self.adjacency_matrix.index)
@@ -294,24 +339,30 @@ def slice_omics_datasets(omics_dataset: pd.DataFrame, adjacency_matrix: pd.DataF
     selected_columns = omics_network_nodes_names + [phenotype_col]
     return [omics_dataset[selected_columns]]
 
-def prepare_node_features(adjacency_matrix: pd.DataFrame, omics_datasets: List[pd.DataFrame], clinical_data: Optional[pd.DataFrame], phenotype_col: str) -> List[Data]:
+def prepare_node_features(
+    adjacency_matrix: pd.DataFrame,
+    omics_datasets: List[pd.DataFrame],
+    clinical_data: Optional[pd.DataFrame],
+    phenotype_col: str,
+    correlation_mode: str = "abs_pearson",
+) -> List[Data]:
     """Build node-level features and return a PyTorch Geometric graph.
-
-    Aligns network and omics features, constructs a NetworkX graph, and when clinical_data is provided computes Fisher Z-transformed correlations between each feature and each clinical variable as node features. The resulting feature matrix is standardized and wrapped into a PyTorch Geometric Data object with weighted edges.
 
     Args:
 
-        adjacency_matrix (pd.DataFrame): Symmetric adjacency matrix with node names as both index and columns.
-        omics_datasets (List[pd.DataFrame]): List of omics matrices (samples x features); only the first element is used here.
-        clinical_data (Optional[pd.DataFrame]): Clinical covariates (samples x variables) used to build correlation-based node features; may be None.
-        phenotype_col (str): Column name in the first omics DataFrame that stores the phenotype and should be dropped from features if present.
+        adjacency_matrix: Symmetric adjacency matrix (node names as index/columns).
+        omics_datasets: List of omics matrices (samples x features); first element used.
+        clinical_data: Clinical covariates for correlation-based node features; may be None.
+        phenotype_col: Column name storing phenotype labels (dropped from features).
+        correlation_mode: How to compute node features from clinical correlations.
+            - "abs_pearson": Absolute Pearson correlation, no transforms = DPMON.
+            - "adaptive": Mixed correlation types + Fisher-Z + standardization.
 
     Returns:
 
-        List[Data]: Single-element list containing a PyTorch Geometric Data object with standardized node features and weighted edges.
-
+        List[Data]: Single-element list with a PyG Data object.
     """
-    logger.debug("Building PyTorch Geometric Data object from adjacency matrix.")
+    logger.debug(f"Building PyG Data object (correlation_mode={correlation_mode}).")
 
     network_features = adjacency_matrix.columns
     omics_data = omics_datasets[0]
@@ -322,7 +373,6 @@ def prepare_node_features(adjacency_matrix: pd.DataFrame, omics_datasets: List[p
         omics_feature_df = omics_data
 
     nodes = sorted(network_features.intersection(omics_feature_df.columns))
-
     if len(nodes) == 0:
         raise ValueError("No common features found between the network and omics data.")
 
@@ -332,15 +382,20 @@ def prepare_node_features(adjacency_matrix: pd.DataFrame, omics_datasets: List[p
     logger.info(f"Building graph with {len(nodes)} common features.")
     G = nx.from_pandas_adjacency(network_filtered)
 
+    self_loops = list(nx.selfloop_edges(G))
+    if self_loops:
+        G.remove_edges_from(self_loops)
+        logger.debug(f"Removed {len(self_loops)} self-loop edges.")
+
     if clinical_data is not None and not clinical_data.empty:
-        logger.debug("Adding clinical correlation features.")
         clinical_cols = list(clinical_data.columns)
         common_index = clinical_data.index.intersection(omics_filtered.index)
 
         if common_index.empty:
-            raise ValueError("No common indices between omics_filtered and clinical_data in fold.")
+            raise ValueError("No common indices between omics and clinical data.")
 
         node_features_dict = {}
+
         for node in nodes:
             vec = pd.to_numeric(omics_filtered[node].loc[common_index], errors="coerce")
             vec = vec.dropna()
@@ -348,73 +403,98 @@ def prepare_node_features(adjacency_matrix: pd.DataFrame, omics_datasets: List[p
             corr_vector = {}
             for cvar in clinical_cols:
                 clinical_series = clinical_data[cvar].loc[common_index]
-
-                common_valid = vec.index.intersection(clinical_series.index)
+                common_valid = vec.index.intersection(clinical_series.dropna().index)
                 vec_aligned = vec.loc[common_valid]
-                clinical_aligned = clinical_series.loc[common_valid]
+                clinical_aligned = clinical_series.loc[common_valid].astype("float64")
 
-                if (clinical_aligned.nunique() <= 1 or vec_aligned.nunique() <= 1 or len(vec_aligned) < 2):
+                if clinical_aligned.nunique() <= 1 or vec_aligned.nunique() <= 1 or len(vec_aligned) < 2:
                     corr_vector[cvar] = 0.0
                     continue
 
-                vec_is_binary = vec_aligned.nunique() == 2
-                clinical_is_binary = clinical_aligned.nunique() == 2
-
-                try:
-                    if vec_is_binary and clinical_is_binary:
-                        corr_val = matthews_corrcoef(vec_aligned, clinical_aligned)
-                    elif vec_is_binary or clinical_is_binary:
-                        corr_val, _ = pointbiserialr(clinical_aligned, vec_aligned)
+                if correlation_mode == "abs_pearson":
+                    # OG DPMON: abs(Pearson correlation)
+                    try:
+                        corr_val = abs(vec_aligned.corr(clinical_aligned))
                         if pd.isna(corr_val):
                             corr_val = 0.0
+                    except Exception:
+                        corr_val = 0.0
+                    corr_vector[cvar] = corr_val
+
+                elif correlation_mode == "adaptive":
+                    # OPTION 2: mixed types + Fisher-Z
+                    vec_is_binary = vec_aligned.nunique() == 2
+                    clinical_is_binary = clinical_aligned.nunique() == 2
+
+                    try:
+                        if vec_is_binary and clinical_is_binary:
+                            corr_val = matthews_corrcoef(vec_aligned, clinical_aligned)
+                        elif vec_is_binary or clinical_is_binary:
+                            corr_val, _ = pointbiserialr(clinical_aligned, vec_aligned)
+                            if pd.isna(corr_val):
+                                corr_val = 0.0
+                        else:
+                            corr_val = vec_aligned.corr(clinical_aligned)
+                            if pd.isna(corr_val):
+                                corr_val = 0.0
+                    except Exception as e:
+                        logger.debug(f"Correlation failed for {node}-{cvar}: {e}")
+                        corr_val = 0.0
+
+                    # Fisher-Z transform
+                    if pd.isna(corr_val) or corr_val == 0.0:
+                        z = 0.0
                     else:
-                        corr_val = vec_aligned.corr(clinical_aligned)
-                        if pd.isna(corr_val):
-                            corr_val = 0.0
-                except Exception as e:
-                    logger.debug(f"Correlation failed for {node}-{cvar}: {e}")
-                    corr_val = 0.0
-
-                if pd.isna(corr_val) or corr_val == 0.0:
-                    z = 0.0
+                        r_clip = np.clip(corr_val, -0.999999, 0.999999)
+                        z = np.arctanh(r_clip)
+                    corr_vector[cvar] = z
                 else:
-                    r_clip = np.clip(corr_val, -0.999999, 0.999999)
-                    z = np.arctanh(r_clip)
-
-                corr_vector[cvar] = z
+                    raise ValueError(f"Unknown correlation_mode: {correlation_mode}")
 
             node_features_dict[node] = corr_vector
 
         node_features_df = pd.DataFrame.from_dict(node_features_dict, orient="index")
-        logger.info(f"Built feature matrix with clinical correlations shape: {node_features_df.shape}")
+        node_features_df = node_features_df.fillna(0.0)
 
-    node_features_df = node_features_df.fillna(0.0)
+        if correlation_mode == "adaptive":
+            # standardize only in adaptive mode DPMON uses raw.
+            std_vals = node_features_df.std()
+            std_vals = std_vals.replace(0, 1e-8)
+            node_features_df = (node_features_df - node_features_df.mean()) / std_vals
 
-    std_vals = node_features_df.std()
-    std_vals = std_vals.replace(0, 1e-8)
-    node_features_df = (node_features_df - node_features_df.mean()) / std_vals
+        logger.info(f"Node feature matrix shape: {node_features_df.shape} (mode={correlation_mode})")
 
+    else:
+        # No clinical data -> generate random features as fallback
+        logger.warning("No clinical data provided. Using random node features.")
+        rng = np.random.default_rng(1998)
+        node_features_df = pd.DataFrame(
+            rng.standard_normal((len(nodes), 7)),
+            index=nodes,
+            columns=[f"rand_{i}" for i in range(7)],
+        )
+
+    # convert to PyG Data
     x = torch.tensor(node_features_df.values, dtype=torch.float)
 
-    node_mapping = {}
-    for i, name in enumerate(nodes):
-        node_mapping[name] = i
-
+    node_mapping = {name: i for i, name in enumerate(nodes)}
     G_mapped = nx.relabel_nodes(G, node_mapping)
 
-    edges_list = []
-    for u, v in G_mapped.edges():
-        edges_list.append((u, v))
+    edges_list = list(G_mapped.edges())
+    if not edges_list:
+        logger.warning("Graph has no edges after self-loop removal.")
+        edge_index = torch.zeros((2, 0), dtype=torch.long)
+        edge_weight = torch.zeros(0, dtype=torch.float)
+    else:
+        edge_index = torch.tensor(edges_list, dtype=torch.long).t().contiguous()
+        # Make bidirectional
+        edge_index = torch.cat([edge_index, edge_index.flip(0)], dim=1)
 
-    edge_index = torch.tensor(edges_list, dtype=torch.long).t().contiguous()
-    edge_index = torch.cat([edge_index, edge_index.flip(0)], dim=1)
-
-    weights = []
-    for _, _, data_attr in G_mapped.edges(data=True):
-        weights.append(data_attr.get("weight", 1.0))
-
-    edge_weight = torch.tensor(weights, dtype=torch.float)
-    edge_weight = torch.cat([edge_weight, edge_weight], dim=0)
+        weights = []
+        for _, _, d in G_mapped.edges(data=True):
+            weights.append(d.get("weight", 1.0))
+        edge_weight = torch.tensor(weights, dtype=torch.float)
+        edge_weight = torch.cat([edge_weight, edge_weight], dim=0)
 
     data = Data(x=x, edge_index=edge_index, edge_attr=edge_weight)
 
@@ -422,6 +502,7 @@ def prepare_node_features(adjacency_matrix: pd.DataFrame, omics_datasets: List[p
 
 def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinical_data, seed, cv=False, output_dir=None):
     phenotype_col = dpmon_params["phenotype_col"]
+    correlation_mode = dpmon_params["correlation_mode"]
     device = setup_device(dpmon_params["gpu"], dpmon_params["cuda"])
     omics_dataset = slice_omics_datasets(combined_omics, adjacency_matrix, phenotype_col)
     omics_dataset = omics_dataset[0]
@@ -452,7 +533,8 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
             adjacency_matrix,
             omics_train_fold_list,
             clinical_train,
-            phenotype_col
+            phenotype_col,
+            correlation_mode
         )[0].to(device)
 
         X_train_tensor = torch.FloatTensor(X_train.values).to(device)
@@ -475,12 +557,14 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
                 gnn_layer_num=dpmon_params["gnn_layer_num"],
                 dim_reduction=dpmon_params["dim_reduction"],
                 ae_encoding_dim=dpmon_params["ae_encoding_dim"],
+                ae_architecture=dpmon_params["ae_architecture"],
                 nn_input_dim=X_train_tensor.shape[1],
                 nn_hidden_dim1=dpmon_params["nn_hidden_dim1"],
                 nn_hidden_dim2=dpmon_params["nn_hidden_dim2"],
                 nn_output_dim=Y.nunique(),
                 gnn_dropout=dpmon_params["gnn_dropout"],
-                gnn_activation=dpmon_params["gnn_activation"]
+                gnn_activation=dpmon_params["gnn_activation"],
+                gat_heads=dpmon_params["gat_heads"]
             ).to(device)
 
             criterion = nn.CrossEntropyLoss()
@@ -534,7 +618,7 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
         n_folds = dpmon_params["n_folds"]
         logger.info(f"Running in Cross-Validation mode (cv=True) with {n_folds} folds.")
 
-        #these are to track the best model across folds and then save it
+        # these are to track the best model across folds and then save it
         best_global_fold_accuracy = 0.0
         best_global_model_state = None
         best_global_embeddings = None
@@ -566,7 +650,7 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
             )
             logger.info(f"CV Setup: Repeated K-Fold ({n_folds}x{repeat_num_val} = {total_splits} splits total).")
         else:
-            # Fallback to single Stratified K-Fold
+            # fallback to single Stratified kfold
             skf = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=seed)
             logger.info(f"CV Setup: Standard {n_folds}-fold split.")
 
@@ -601,7 +685,8 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
                 adjacency_matrix,
                 omics_train_fold_list,
                 clinical_train,
-                phenotype_col
+                phenotype_col,
+                correlation_mode
             )[0].to(device)
 
             X_train_tensor = torch.FloatTensor(X_train.values).to(device)
@@ -620,6 +705,7 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
                 gnn_hidden_dim=dpmon_params["gnn_hidden_dim"],
                 gnn_layer_num=dpmon_params["gnn_layer_num"],
                 ae_encoding_dim=dpmon_params["ae_encoding_dim"],
+                ae_architecture=dpmon_params["ae_architecture"],
                 nn_input_dim=X_train_tensor.shape[1],
                 nn_hidden_dim1=dpmon_params["nn_hidden_dim1"],
                 nn_hidden_dim2=dpmon_params["nn_hidden_dim2"],
@@ -627,6 +713,7 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
                 gnn_dropout=dpmon_params["gnn_dropout"],
                 gnn_activation=dpmon_params["gnn_activation"],
                 dim_reduction=dpmon_params["dim_reduction"],
+                gat_heads=dpmon_params["gat_heads"]
             ).to(device)
 
             criterion = nn.CrossEntropyLoss()
@@ -752,7 +839,6 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
             except Exception as e:
                 logger.error(f"Failed to save best CV model: {e}")
 
-
         logger.info("Cross-Validation Results:\n")
         logger.info(f"Avg Accuracy: {avg_acc:.4f} +/- {std_acc:.4f}")
         logger.info(f"Avg F1 Macro: {avg_f1_ma:.4f} +/- {std_f1_ma:.4f}")
@@ -763,197 +849,281 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
 
         return pd.DataFrame(), metrics_df, best_global_embeddings
 
-def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data, dpmon_params):
+def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data, dpmon_params) -> Dict[str, Any]:
+    """Run Ray Tune hyperparameter search with inner k-fold CV.
+
+    Each trial trains one model per inner fold, epoch-synchronised,
+    and reports the mean validation metrics. Asha early-stops on
+    the averaged signal, which is far more stable than a single split.
+
+    Args:
+
+        X_train: Training features for this outer fold (pd.DataFrame).
+        y_train: Training labels for this outer fold (pd.Series).
+        adjacency_matrix: Feature-level adjacency matrix.
+        clinical_data: Clinical covariates for the training fold.
+        dpmon_params: Full DPMON parameter dictionary.
+
+    Returns:
+
+        Dict with the best hyperparameter configuration.
+    """
+    #os.environ["TUNE_WARN_EXCESSIVE_EXPERIMENT_CHECKPOINT_SYNC_THRESHOLD_S"] = "0"
+    #os.environ["TUNE_DISABLE_IPY_WIDGETS"] = "1"
+
     device = setup_device(dpmon_params["gpu"], dpmon_params["cuda"])
     phenotype_col = dpmon_params["phenotype_col"]
+    correlation_mode = dpmon_params["correlation_mode"]
     combined_omics_fold = X_train.join(y_train.rename(phenotype_col))
-    omics_dataset = slice_omics_datasets(combined_omics_fold, adjacency_matrix, phenotype_col)
+    omics_dataset = slice_omics_datasets(
+        combined_omics_fold, adjacency_matrix, phenotype_col
+    )
     omics_train_fold_list = [omics_dataset[0]]
 
     omics_network_tg = prepare_node_features(
         adjacency_matrix,
         omics_train_fold_list,
         clinical_data,
-        phenotype_col
+        phenotype_col,
+        correlation_mode,
     )[0].to(device)
 
     pipeline_configs = {
-        "gnn_layer_num": tune.choice([1, 2, 3, 4]),
-        "gnn_hidden_dim": tune.choice([64, 128, 256, 512]),
+        "gnn_layer_num": tune.choice([2, 3, 4, 5]),
+        "gnn_hidden_dim": tune.choice([16, 32, 64, 128]),
         "lr": tune.loguniform(1e-5, 3e-3),
         "weight_decay": tune.loguniform(1e-5, 1e-2),
-        "nn_hidden_dim1": tune.choice([128, 256, 512]),
-        "nn_hidden_dim2": tune.choice([32, 64, 128]),
+        "nn_hidden_dim1": tune.choice([64, 128, 256]),
+        "nn_hidden_dim2":  tune.choice([16, 32, 64]),
         "ae_encoding_dim": tune.choice([4, 8, 16]),
-        "num_epochs": tune.choice([512, 1024, 2048]),
-        "gnn_dropout": tune.choice([0.2, 0.3, 0.4, 0.5, 0.6]),
+        "ae_architecture": tune.choice(["original", "dynamic"]),
+        "num_epochs": tune.choice([128, 256, 512]),
+        "gnn_dropout": tune.choice([0.4, 0.5, 0.6]),
         "gnn_activation": tune.choice(["relu", "elu"]),
-        "dim_reduction": tune.choice(["ae","linear", "mlp"]),
+        "dim_reduction": tune.choice(["ae", "linear", "mlp"]),
+        "gat_heads": tune.choice([1,2,3,4]),
     }
 
-    stopper = TrialPlateauStopper(
-        metric="val_loss",
-        mode="min",
-        num_results=20,
-        metric_threshold=0.002,
-        grace_period=30,
-    )
-
-    reporter = CLIReporter(metric_columns=["train_loss", "val_loss", "val_accuracy", "training_iteration"])
-    scheduler = ASHAScheduler(
-        metric="val_loss",
-        mode="min",
-        grace_period=30,
-        reduction_factor=2
-    )
-
-    best_configs = []
-
+    # prepare inner k-fold splits and push to ray object store
     omics_data = omics_dataset[0]
-    logger.info(f"Starting hyperparameter tuning for dataset shape: {omics_data.shape}")
-
     X = omics_data.drop([phenotype_col], axis=1)
     Y = omics_data[phenotype_col]
 
-    X_train, X_val, y_train, y_val = train_test_split(X, Y, test_size=0.3, random_state=dpmon_params["seed"], stratify=Y)
-    X_train_tensor = torch.FloatTensor(X_train.values).to(device)
-    y_train_tensor = torch.LongTensor(y_train.values).to(device)
-    X_val_tensor = torch.FloatTensor(X_val.values).to(device)
-    y_val_tensor = torch.LongTensor(y_val.values).to(device)
+    n_inner_folds = dpmon_params.get("tune_inner_folds", 3)
+    inner_cv = StratifiedKFold(
+        n_splits=n_inner_folds, shuffle=True, random_state=dpmon_params["seed"]
+    )
 
-    omics_network_tg_dev = omics_network_tg.to(device)
+    # pre-tensorise every inner fold and store in ray object store
+    # so trials fetch data zero-copy instead of re-splitting.
+    fold_data_refs = []
+    for tr_idx, val_idx in inner_cv.split(X, Y):
+        fold_tensors = {
+            "X_train": torch.FloatTensor(X.iloc[tr_idx].values),
+            "y_train": torch.LongTensor(Y.iloc[tr_idx].values),
+            "X_val": torch.FloatTensor(X.iloc[val_idx].values),
+            "y_val": torch.LongTensor(Y.iloc[val_idx].values),
+        }
+        fold_data_refs.append(ray.put(fold_tensors))
 
-    def tune_train_n(config):
-        gnn_input_dim = omics_network_tg.x.shape[1]
-        nn_input_dim = X.shape[1]
-        nn_output_dim = Y.nunique()
+    omics_network_ref = ray.put(omics_network_tg.cpu())
 
-        model = NeuralNetwork(
-            model_type=dpmon_params["model"],
-            gnn_hidden_dim=config["gnn_hidden_dim"],
-            gnn_layer_num=config["gnn_layer_num"],
-            gnn_activation=config["gnn_activation"],
-            dim_reduction=config["dim_reduction"],
-            gnn_input_dim=gnn_input_dim,
-            gnn_dropout=config["gnn_dropout"],
-            ae_encoding_dim=config["ae_encoding_dim"],
-            nn_input_dim=nn_input_dim,
-            nn_hidden_dim1=config["nn_hidden_dim1"],
-            nn_hidden_dim2=config["nn_hidden_dim2"],
-            nn_output_dim=nn_output_dim,
+    logger.info(
+        f"Inner CV: {n_inner_folds} folds  |  "
+        f"X shape: {X.shape}  |  "
+        f"Graph nodes: {omics_network_tg.x.shape}"
+    )
 
-        ).to(device)
+    # pre-compute dims (plain ints captured by closure)
+    gnn_input_dim = omics_network_tg.x.shape[1]
+    nn_input_dim = X.shape[1]
+    nn_output_dim = Y.nunique()
+    model_type = dpmon_params["model"]
+
+    # trial function trains k models epoch-sync
+    def tune_train_fn(config):
+        device_inner = setup_device(dpmon_params["gpu"], dpmon_params["cuda"])
+        omics_net = ray.get(omics_network_ref).to(device_inner)
+
+        # load every inner fold onto device
+        folds = []
+        for ref in fold_data_refs:
+            fd = ray.get(ref)
+            folds.append({
+                "X_train": fd["X_train"].to(device_inner),
+                "y_train": fd["y_train"].to(device_inner),
+                "X_val": fd["X_val"].to(device_inner),
+                "y_val": fd["y_val"].to(device_inner),
+            })
+
+        # one model + optimizer per inner fold
+        models, optimizers = [], []
+        for _ in folds:
+            m = NeuralNetwork(
+                model_type=model_type,
+                gnn_input_dim=gnn_input_dim,
+                gnn_hidden_dim=config["gnn_hidden_dim"],
+                gnn_layer_num=config["gnn_layer_num"],
+                gnn_dropout=config["gnn_dropout"],
+                gnn_activation=config["gnn_activation"],
+                dim_reduction=config["dim_reduction"],
+                ae_encoding_dim=config["ae_encoding_dim"],
+                ae_architecture=config["ae_architecture"],
+                gat_heads=config["gat_heads"],
+                nn_input_dim=nn_input_dim,
+                nn_hidden_dim1=config["nn_hidden_dim1"],
+                nn_hidden_dim2=config["nn_hidden_dim2"],
+                nn_output_dim=nn_output_dim,
+            ).to(device_inner)
+            o = optim.Adam(
+                m.parameters(),
+                lr=config["lr"],
+                weight_decay=config["weight_decay"],
+            )
+            models.append(m)
+            optimizers.append(o)
 
         criterion = nn.CrossEntropyLoss()
-        optimizer = optim.Adam(
-            model.parameters(), lr=config["lr"], weight_decay=config["weight_decay"]
-        )
 
+        # epoch-sync training across all inner folds
         for epoch in range(config["num_epochs"]):
-            model.train()
-            optimizer.zero_grad()
-            outputs, _, _ = model(X_train_tensor, omics_network_tg_dev)
-            train_loss = criterion(outputs, y_train_tensor)
-            train_loss.backward()
-            optimizer.step()
+            epoch_val_losses = []
+            epoch_val_accs   = []
+            epoch_train_losses = []
 
-            model.eval()
-            val_loss = 0.0
-            val_accuracy = 0.0
-            with torch.no_grad():
-                val_outputs, _, _ = model(X_val_tensor, omics_network_tg_dev)
-                val_loss_obj = criterion(val_outputs, y_val_tensor)
-                val_loss = val_loss_obj.item()
+            for fi, fold in enumerate(folds):
+                # train step 
+                models[fi].train()
+                optimizers[fi].zero_grad()
+                out, _, _ = models[fi](fold["X_train"], omics_net)
+                loss = criterion(out, fold["y_train"])
+                loss.backward()
+                optimizers[fi].step()
+                epoch_train_losses.append(loss.item())
 
-                _, predicted = torch.max(val_outputs, 1)
-                total = y_val_tensor.size(0)
-                correct = (predicted == y_val_tensor).sum().item()
-                val_accuracy = correct / total
+                # val step
+                models[fi].eval()
+                with torch.no_grad():
+                    val_out, _, _ = models[fi](fold["X_val"], omics_net)
+                    vl = criterion(val_out, fold["y_val"]).item()
+                    _, preds = torch.max(val_out, 1)
+                    va = (preds == fold["y_val"]).sum().item() / fold["y_val"].size(0)
 
+                epoch_val_losses.append(vl)
+                epoch_val_accs.append(va)
+
+            # report mean metrics (what ASHA sees)
             metrics = {
-                "loss": val_loss,
-                "val_loss": val_loss,
-                "val_accuracy": val_accuracy,
-                "train_loss": train_loss.item()
+                "val_loss": float(np.mean(epoch_val_losses)),
+                "val_accuracy": float(np.mean(epoch_val_accs)),
+                "train_loss": float(np.mean(epoch_train_losses)),
             }
 
-            with tempfile.TemporaryDirectory() as tempdir:
+            with tempfile.TemporaryDirectory() as tmpdir:
                 torch.save(
-                    {"epoch": epoch, "model_state": model.state_dict()},
-                    os.path.join(tempdir, "checkpoint.pt"),
+                    {"epoch": epoch, "model_state": models[0].state_dict()},
+                    os.path.join(tmpdir, "checkpoint.pt"),
                 )
-                train.report(
-                    metrics=metrics, checkpoint=Checkpoint.from_directory(tempdir)
+                tune.report(
+                    metrics=metrics,
+                    checkpoint=Checkpoint.from_directory(tmpdir),
                 )
+
+    # launch Ray Tune
+    num_samples = dpmon_params.get("tune_trials", 20)
+    seed_trials = dpmon_params.get("seed_trials", False)
+    max_retries = 4
+
+    if seed_trials:
+        logger.debug(f"seed_trials=True: fixed seed {dpmon_params['seed']}")
+    else:
+        logger.debug("seed_trials=False: random hyperparameter sampling")
+
+    scheduler = ASHAScheduler(grace_period=30, reduction_factor=2)
+    stopper = TrialPlateauStopper(
+        metric="val_loss", mode="min",
+        num_results=20, metric_threshold=0.002, grace_period=30,
+    )
 
     def short_dirname_creator(trial):
         return f"T{trial.trial_id}"
 
-    cpu_per_trial = 2
     use_gpu = bool(dpmon_params.get("gpu", False)) and torch.cuda.is_available()
     if dpmon_params.get("gpu", False) and not torch.cuda.is_available():
-        logger.warning("gpu=True but CUDA is not available; Ray Tune will run on CPU only (gpu_per_trial=0.0).")
+        logger.warning("gpu=True but CUDA not available; running on CPU.")
 
-    gpu_per_trial = 0.05 if use_gpu else 0.0
-
-    num_samples = dpmon_params['tune_trials']
-    max_retries = 4
-
-    seed_trials = dpmon_params.get("seed_trials", False)
-
-    if seed_trials:
-        logger.debug(f"seed_trials=True: Using FIXED seed {dpmon_params['seed']} for hyperparameter sampling.")
-    else:
-        logger.debug("seed_trials=False: Using RANDOM hyperparameter sampling.")
+    cpu_per_trial = 2
+    #gpu_per_trial = (0.25 * n_inner_folds) if use_gpu else 0.0
+    gpu_per_trial = 0.5 if use_gpu else 0.0
 
     for attempt in range(max_retries):
         try:
+            search_alg = None
             if seed_trials:
-                search_alg = BasicVariantGenerator(random_state=np.random.RandomState(dpmon_params["seed"]))
-            else:
-                search_alg = None
+                search_alg = BasicVariantGenerator(
+                    random_state=np.random.RandomState(dpmon_params["seed"])
+                )
 
-            result = tune.run(
-                tune_train_n,
-                search_alg=search_alg,
-                resources_per_trial={"cpu": cpu_per_trial, "gpu": gpu_per_trial},
-                config=pipeline_configs,
-                num_samples=num_samples,
-                verbose=0,
-                log_to_file=True,
-                scheduler=scheduler,
-                stop=stopper,
-                name="tune_dp",
-                progress_reporter=reporter,
-                trial_dirname_creator=short_dirname_creator,
-                checkpoint_score_attr="min-val_loss",
+            tuner = tune.Tuner(
+                tune.with_resources(
+                    tune_train_fn,
+                    resources={"cpu": cpu_per_trial, "gpu": gpu_per_trial},
+                ),
+                param_space=pipeline_configs,
+                tune_config=tune.TuneConfig(
+                    metric="val_loss",
+                    mode="min",
+                    num_samples=num_samples,
+                    scheduler=scheduler,
+                    search_alg=search_alg,
+                    trial_dirname_creator=short_dirname_creator,
+                ),
+                run_config=tune.RunConfig(
+                    name="tune_dp",
+                    verbose=0,
+                    log_to_file=True,
+                    stop=stopper,
+                    storage_path=os.path.expanduser("~/ray_results"),
+                    checkpoint_config=tune.CheckpointConfig(
+                        num_to_keep=1,
+                        checkpoint_score_attribute="val_loss",
+                        checkpoint_score_order="min",
+                    ),
+                    progress_reporter=CLIReporter(
+                    max_progress_rows=0, 
+                    print_intermediate_tables=False
+                    ),
+                    
+                ),
             )
+
+            results = tuner.fit()
             break
+
         except TuneError as e:
             msg = str(e)
             if "Trials did not complete" not in msg and "OutOfMemoryError" not in msg:
                 raise
-
             new_num_samples = max(1, num_samples // 2)
             if new_num_samples == num_samples:
                 raise
-
             logger.warning(
-                f"Ray Tune failed with a likely resource / OOM error (attempt {attempt + 1}). "
-                f"Reducing num_samples from {num_samples} to {new_num_samples} "
-                f"(cpu_per_trial={cpu_per_trial}, gpu_per_trial={gpu_per_trial})."
+                f"Ray Tune failed (attempt {attempt + 1}). "
+                f"Reducing num_samples {num_samples} -> {new_num_samples}."
             )
             num_samples = new_num_samples
-
     else:
-        raise RuntimeError("Hyperparameter tuning failed after reducing resources several times.")
+        raise RuntimeError("Hyperparameter tuning failed after max retries.")
 
-    best_trial = result.get_best_trial("val_loss", "min", "last")
-    logger.debug("Best trial config: {}".format(best_trial.config))
-    logger.debug("Best trial final val_loss: {}".format(best_trial.last_result["val_loss"]))
-    logger.debug("Best trial final val_accuracy: {}".format(best_trial.last_result["val_accuracy"]))
-    best_configs.append(best_trial.config)
+    # extract best config
+    best_result = results.get_best_result(metric="val_loss", mode="min")
+    best_config = best_result.config
 
+    logger.info(f"Best trial config: {best_config}")
+    logger.info(f"Best trial val_loss: {best_result.metrics.get('val_loss'):.4f}")
+    logger.info(f"Best trial val_accuracy: {best_result.metrics.get('val_accuracy'):.4f}")
+
+    # cleanup
     try:
         tune_dir = os.path.expanduser("~/ray_results/tune_dp")
         if os.path.exists(tune_dir):
@@ -962,7 +1132,7 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
     except Exception as e:
         logger.warning(f"Could not clean up tuning directory: {e}")
 
-    return best_trial.config
+    return best_config
 
 def train_model(model, criterion, optimizer, train_features, train_labels, epoch_num):
     network = train_labels["omics_network"]
@@ -985,30 +1155,9 @@ def train_model(model, criterion, optimizer, train_features, train_labels, epoch
 class NeuralNetwork(nn.Module):
     """Core DPMON model combining GNN feature weighting and sample-level prediction.
 
-    A graph neural network first computes node embeddings on the feature graph. An autoencoder then compresses these embeddings, and a projection module maps them to scalar feature weights. These weights re-scale the sample-level omics matrix, and a downstream MLP takes the reweighted features to produce logits for the prediction task.
-
-    The forward pass returns a tuple containing:
-
-    1. Predictions (logits).
-    2. Reweighted omics dataset.
-    3. Original node embeddings from the GNN.
-
-    Args:
-
-        model_type (str): GNN backbone type ("GCN", "GAT", "SAGE", "GIN").
-        gnn_input_dim (int): Input dimension for the GNN nodes.
-        gnn_hidden_dim (int): Hidden dimension for GNN layers.
-        gnn_layer_num (int): Number of GNN layers.
-        ae_encoding_dim (int): Target dimension for the autoencoder compression.
-        nn_input_dim (int): Input dimension for the downstream predictor.
-        nn_hidden_dim1 (int): First hidden layer dimension of the predictor.
-        nn_hidden_dim2 (int): Second hidden layer dimension of the predictor.
-        nn_output_dim (int): Output dimension (e.g., number of classes).
-        gnn_dropout (float): Dropout probability for the GNN.
-        gnn_activation (str): Activation function for the GNN ("relu", etc.).
-        dim_reduction (str): Reduction strategy ("ae", "linear", "mlp").
-
+    Handles the GAT multi-head output dimension correctly: when using GAT with heads > 1, the GNN output is hidden_dim * heads, and the autoencoder input_dim must match.
     """
+
     def __init__(
         self,
         model_type,
@@ -1020,11 +1169,14 @@ class NeuralNetwork(nn.Module):
         nn_hidden_dim1,
         nn_hidden_dim2,
         nn_output_dim,
-        gnn_dropout: float = 0.2,
+        gnn_dropout: float = 0.,
         gnn_activation: str = "relu",
         dim_reduction: str = "ae",
+        ae_architecture: str = "original",
+        gat_heads: int = 1,
     ):
-        super(NeuralNetwork, self).__init__()
+        super().__init__()
+        self.model_type = model_type
 
         if model_type == "GCN":
             self.gnn = GCN(
@@ -1035,6 +1187,8 @@ class NeuralNetwork(nn.Module):
                 dropout=gnn_dropout,
                 activation=gnn_activation,
             )
+            gnn_out_dim = gnn_hidden_dim
+
         elif model_type == "GAT":
             self.gnn = GAT(
                 input_dim=gnn_input_dim,
@@ -1043,7 +1197,11 @@ class NeuralNetwork(nn.Module):
                 final_layer="none",
                 dropout=gnn_dropout,
                 activation=gnn_activation,
+                heads=gat_heads,
             )
+            # GAT output dim = hidden_dim * heads
+            gnn_out_dim = gnn_hidden_dim * gat_heads
+
         elif model_type == "SAGE":
             self.gnn = SAGE(
                 input_dim=gnn_input_dim,
@@ -1053,6 +1211,8 @@ class NeuralNetwork(nn.Module):
                 dropout=gnn_dropout,
                 activation=gnn_activation,
             )
+            gnn_out_dim = gnn_hidden_dim
+
         elif model_type == "GIN":
             self.gnn = GIN(
                 input_dim=gnn_input_dim,
@@ -1063,97 +1223,102 @@ class NeuralNetwork(nn.Module):
                 dropout=gnn_dropout,
                 activation=gnn_activation,
             )
+            gnn_out_dim = gnn_hidden_dim
+
         else:
             raise ValueError(f"Unsupported GNN model type: {model_type}")
 
         if dim_reduction == "ae":
-            self.autoencoder = AutoEncoder(input_dim=gnn_hidden_dim, encoding_dim=1)
+            self.autoencoder = AutoEncoder(
+                input_dim=gnn_out_dim, encoding_dim=1, architecture=ae_architecture
+            )
             self.projection = nn.Identity()
 
         elif dim_reduction == "linear":
-            self.autoencoder = AutoEncoder(input_dim=gnn_hidden_dim, encoding_dim=ae_encoding_dim)
+            self.autoencoder = AutoEncoder(
+                input_dim=gnn_out_dim, encoding_dim=ae_encoding_dim, architecture=ae_architecture
+            )
             self.projection = ScalarProjection(encoding_dim=ae_encoding_dim)
 
         elif dim_reduction == "mlp":
-            self.autoencoder = AutoEncoder(input_dim=gnn_hidden_dim, encoding_dim=ae_encoding_dim)
+            self.autoencoder = AutoEncoder(
+                input_dim=gnn_out_dim, encoding_dim=ae_encoding_dim, architecture=ae_architecture
+            )
             self.projection = MLPProjection(encoding_dim=ae_encoding_dim, hidden_dim=8)
 
         else:
-            raise ValueError(f"Unsupported dim_reduction: {dim_reduction}. Use 'ae', 'linear', or 'mlp'")
+            raise ValueError(f"Unsupported dim_reduction: {dim_reduction}")
 
         self.predictor = DownstreamTaskNN(
             nn_input_dim, nn_hidden_dim1, nn_hidden_dim2, nn_output_dim
         )
 
     def forward(self, omics_dataset, omics_network_tg):
-        """Performs the forward pass of the DPMON network.
-
-        Args:
-
-            omics_dataset (torch.Tensor): The raw sample-level omics data [Samples x Features].
-            omics_network_tg (Data): The PyG graph data object representing the feature network.
-
-        Returns:
-
-            tuple: (predictions, reweighted_omics, node_embeddings)
-        """
-        # we get node embeddings from the GNN
+        # GNN embeddings
         omics_network_nodes_embedding = self.gnn.get_embeddings(omics_network_tg)
 
-        # dim reduction of the embeddings
+        # compress
         omics_network_nodes_embedding_ae = self.autoencoder(omics_network_nodes_embedding)
 
-        # then project to scallar weights
+        # project to scalar weights
         feature_weights = self.projection(omics_network_nodes_embedding_ae)
 
-        # reweight the original Omics Data (Element-wise multiplication)
-        # transpose weights to match [Features x 1] -> broadcast to [Samples x Features]
+        # reweight the original omics data (element-wise multiplication)
         omics_dataset_with_embeddings = torch.mul(
             omics_dataset,
-            feature_weights.expand(omics_dataset.shape[1], omics_dataset.shape[0]).t()
+            feature_weights.expand(omics_dataset.shape[1], omics_dataset.shape[0]).t(),
         )
 
-        # Lasly we predict using the Downstream MLP
+        # predict
         predictions = self.predictor(omics_dataset_with_embeddings)
 
         return predictions, omics_dataset_with_embeddings, omics_network_nodes_embedding
 
+"""
+DPMON AutoEncoder & NeuralNetwork
+1. AutoEncoder: support both a hardcoded 3-layer encoder (input -> 8 -> 4 encoding_dim). 
+    and a 2-layer version (input -> input//2 -> encoding_dim).
+2. NeuralNetwork: Supports a `correlation_mode` passthrough for prepare_node_features.
+"""
 
 class AutoEncoder(nn.Module):
     """Compresses high-dimensional node embeddings into a lower-dimensional latent space.
 
     Args:
 
-        input_dim (int): Input feature dimension.
-        encoding_dim (int): Output latent dimension.
+        input_dim: Input feature dimension (gnn_hidden_dim).
+        encoding_dim: Output latent dimension.
+        architecture: original or dynamic. "original" (input -> 8 -> 4 encoding_dim). "dynamic" (input -> input//2 -> encoding_dim).
 
     """
-    def __init__(self, input_dim: int, encoding_dim: int):
-        super(AutoEncoder, self).__init__()
 
-        # the intermediate layer is roughly half input
-        hidden_dim = max(input_dim // 2, encoding_dim * 2)
+    def __init__(self, input_dim: int, encoding_dim: int, architecture: str = "original"):
+        super().__init__()
 
-        self.encoder = nn.Sequential(
-            nn.Linear(input_dim, hidden_dim),
-            nn.ReLU(),
-            nn.Linear(hidden_dim, encoding_dim),
-        )
+        if architecture == "original":
+            self.encoder = nn.Sequential(
+                nn.Linear(input_dim, 8),
+                nn.ReLU(),
+                nn.Linear(8, 4),
+                nn.ReLU(),
+                nn.Linear(4, encoding_dim),
+            )
+        elif architecture == "dynamic":
+            hidden_dim = max(input_dim // 2, encoding_dim * 2)
+            self.encoder = nn.Sequential(
+                nn.Linear(input_dim, hidden_dim),
+                nn.ReLU(),
+                nn.Linear(hidden_dim, encoding_dim),
+            )
+        else:
+            raise ValueError(f"Unknown architecture: {architecture}. Use 'original' or 'dynamic'.")
 
     def forward(self, x):
         return self.encoder(x)
 
-
 class ScalarProjection(nn.Module):
-    """Linear projection mapping encoded features to scalar importance weights.
-
-    Args:
-
-        encoding_dim (int): Dimension of the input encoded features.
-
-    """
     def __init__(self, encoding_dim):
-        super(ScalarProjection, self).__init__()
+        super().__init__()
         self.proj = nn.Linear(encoding_dim, 1)
 
     def forward(self, x):
@@ -1161,38 +1326,22 @@ class ScalarProjection(nn.Module):
 
 
 class MLPProjection(nn.Module):
-    """Non-linear projection mapping encoded features to scalar importance weights using an MLP.
-
-    Args:
-
-        encoding_dim (int): Dimension of the input encoded features.
-        hidden_dim (int): Hidden layer size for the projection MLP.
-
-    """
     def __init__(self, encoding_dim, hidden_dim=8):
-        super(MLPProjection, self).__init__()
+        super().__init__()
         self.mlp = nn.Sequential(
             nn.Linear(encoding_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_dim, 1)
+            nn.Linear(hidden_dim, 1),
         )
+
     def forward(self, x):
         return self.mlp(x)
 
-
 class DownstreamTaskNN(nn.Module):
-    """Multilayer Perceptron for the final downstream prediction task.
+    """MLP for final prediction - outputs raw logits."""
 
-    Args:
-
-        input_size (int): Number of input features (omics features).
-        hidden_dim1 (int): Size of the first hidden layer.
-        hidden_dim2 (int): Size of the second hidden layer.
-        output_dim (int): Size of the output layer (num_classes or 1 for regression).
-
-    """
     def __init__(self, input_size, hidden_dim1, hidden_dim2, output_dim):
-        super(DownstreamTaskNN, self).__init__()
+        super().__init__()
         self.fc1 = nn.Linear(input_size, hidden_dim1)
         self.bn1 = nn.BatchNorm1d(hidden_dim1)
         self.relu1 = nn.ReLU()
