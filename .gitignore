@@ -29,7 +29,23 @@ testsOLD
 network_construction_run.ipynb
 datasets_run.ipynb
 jupyter_execute
+external_tools_before/
+external_tools/
+SACKUP_SMCCNETFOLD copy
+SACKUP_SMCCNETFOLD
+external_tools_before
+external_tools_tmp
+bioneuralnet/pysmccnet
+bioneuralnet/network
+bioneuralnet/clustering/old_clustering
+smccnet_r_test
+SMCCNET*
+smccnet_best_network.pkl
+scaling_factors.md
+Server_runs.ipynb
 # Other example data and tests not needed in the repo.
+extra.md
+auto_pysmccnet_test
 
 Output**
 All_Recent_Testing/

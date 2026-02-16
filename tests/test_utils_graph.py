@@ -2,13 +2,13 @@ import unittest
 import pandas as pd
 import numpy as np
 
-from bioneuralnet.utils.graph import gen_similarity_graph
-from bioneuralnet.utils.graph import gen_correlation_graph
-from bioneuralnet.utils.graph import gen_threshold_graph
-from bioneuralnet.utils.graph import gen_gaussian_knn_graph
-from bioneuralnet.utils.graph import gen_lasso_graph
-from bioneuralnet.utils.graph import gen_mst_graph
-from bioneuralnet.utils.graph import gen_snn_graph
+from bioneuralnet.network.generate import gen_similarity_graph
+from bioneuralnet.network.generate import gen_correlation_graph
+from bioneuralnet.network.generate import gen_threshold_graph
+from bioneuralnet.network.generate import gen_gaussian_knn_graph
+from bioneuralnet.network.generate import gen_lasso_graph
+from bioneuralnet.network.generate import gen_mst_graph
+from bioneuralnet.network.generate import gen_snn_graph
 from bioneuralnet.datasets import DatasetLoader
 
 
