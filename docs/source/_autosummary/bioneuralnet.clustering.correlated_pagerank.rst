@@ -17,7 +17,6 @@ bioneuralnet.clustering.correlated\_pagerank
    .. autosummary::
    
       ASHAScheduler
-      Any
       CLIReporter
       CorrelatedPageRank
       PCA

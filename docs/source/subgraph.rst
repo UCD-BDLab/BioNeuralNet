@@ -4,7 +4,7 @@ Subgraph Detection & Biomarkers
 BioNeuralNet supports **phenotype-aware subgraph detection**, enabling users to extract small, interpretable modules of omics features that are tightly linked to clinical labels. These methods go beyond purely structural clustering by explicitly incorporating feature-phenotype correlations, making them well-suited for biomarker discovery.
 
 For a step-by-step example on the TCGA-KIPAN cohort, see
-:doc:`TCGA-KIPAN <notebooks/TCGA-KIPAN>`.
+:doc:`TCGA-Biomarkers <notebooks/TCGA-Biomarkers>`.
 
 Method Overview
 ---------------

@@ -15,7 +15,6 @@ bioneuralnet.external\_tools.smccnet
 
    .. autosummary::
    
-      Any
       Path
       SmCCNet
    
