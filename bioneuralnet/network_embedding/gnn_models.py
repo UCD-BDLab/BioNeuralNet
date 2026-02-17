@@ -57,7 +57,7 @@ def get_activation(activation_choice):
 
 class GCN(nn.Module):
     """
-    Graph Convolutional Network - matches original DPMON layer_num convention.
+    Graph Convolutional Network
 
     layer_num=2 -> 1 conv layer (first only, 0 hidden)
     layer_num=4 -> 3 conv layers (first + 2 hidden)
@@ -149,8 +149,7 @@ class GAT(nn.Module):
     """
     Graph Attention Network - uses edge_dim=1 to incorporate edge weights.
 
-    The original DPMON paper uses edge_dim=1 in GATConv so the attention
-    mechanism can leverage the network's structural information.
+    In DPMON edge_dim=1 in GATConv so the attention mechanism can leverage the network's structural information.
 
     Args:
 
@@ -245,8 +244,7 @@ class SAGE(nn.Module):
     """
     GraphSAGE - aligned layer_num convention.
 
-    Note: SAGEConv does not natively support edge weights in this implementation,
-    matching the baseline comparison models in the original paper.
+    Note: SAGEConv does not natively support edge weights.
 
     Args:
 
@@ -329,8 +327,7 @@ class GIN(nn.Module):
     """
     Graph Isomorphism Network - uses GINEConv for edge-weight awareness.
 
-    The original DPMON paper utilizes GINEConv with edge_dim=1 to 
-    incorporate edge weights into the MLP-based message passing.
+    DPMON utilizes GINEConv with edge_dim=1 to incorporate edge weights into the MLP-based message passing.
 
     Args:
 

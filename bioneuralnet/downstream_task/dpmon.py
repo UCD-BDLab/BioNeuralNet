@@ -515,6 +515,12 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
         best_model_state = None
         best_predictions_df = None
 
+        f1_macros = []
+        f1_weighteds = []
+        recalls = []
+        aucs = []
+        auprs = []
+
         X = omics_dataset.drop([phenotype_col], axis=1)
         Y = omics_dataset[phenotype_col]
         X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.3, random_state=seed, stratify=Y)
@@ -525,6 +531,16 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
             clinical_data_full = clinical_data.reindex(X.index)
 
         clinical_train = clinical_data_full.loc[X_train.index]
+        if dpmon_params['tune']:
+            clinical_train_tune = clinical_data_full.loc[X_train.index]
+            best_config = run_hyperparameter_tuning(
+                X_train, y_train,
+                adjacency_matrix,
+                clinical_train_tune,
+                dpmon_params
+            )
+            dpmon_params.update(best_config)
+            logger.info(f"Best config: {best_config}")
 
         logger.info("Building 'clean' graph features for standard run using train split")
         omics_train_fold_list = [X_train.join(y_train.rename(phenotype_col))]
@@ -576,32 +592,75 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
             )
 
             model.eval()
-
             with torch.no_grad():
                 predictions, _, _ = model(X_test_tensor, omics_network_tg)
                 _, predicted = torch.max(predictions, 1)
+                probs = torch.softmax(predictions, dim=1)
+
+                y_test_np = y_test_tensor.cpu().numpy()
+                predicted_np = predicted.cpu().numpy()
+                probs_np = probs.cpu().numpy()
 
                 accuracy = (predicted == y_test_tensor).sum().item() / len(y_test_tensor)
+                f1_ma = f1_score(y_test_np, predicted_np, average='macro', zero_division=0)
+                f1_wt = f1_score(y_test_np, predicted_np, average='weighted', zero_division=0)
+                recall = recall_score(y_test_np, predicted_np, average='macro', zero_division=0)
+
+                try:
+                    n_classes = probs_np.shape[1]
+                    if n_classes == 2:
+                        auc_score = roc_auc_score(y_test_np, probs_np[:, 1])
+                        aupr = average_precision_score(y_test_np, probs_np[:, 1])
+                    else:
+                        auc_score = roc_auc_score(y_test_np, probs_np, multi_class='ovr', average='macro')
+                        aupr = 0.0
+                except:
+                    auc_score, aupr = 0.0, 0.0
+
+                logger.info(f"Iteration {i+1} Results:")
+                logger.info(f" Accuracy: {accuracy:.4f}")
+                logger.info(f" F1 Macro: {f1_ma:.4f}")
+                logger.info(f" F1 Weighted: {f1_wt:.4f}")
+                logger.info(f" Recall: {recall:.4f}")
+                logger.info(f" AUC: {auc_score:.4f}")
+                logger.info(f" AUPR: {aupr:.4f}\n")
+
                 test_accuracies.append(accuracy)
-                logger.info(f"Iteration {i+1} Test Accuracy: {accuracy:.4f}")
+                f1_macros.append(f1_ma)
+                f1_weighteds.append(f1_wt)
+                recalls.append(recall)
+                aucs.append(auc_score)
+                auprs.append(aupr)
 
-                if accuracy > best_accuracy:
-                        best_accuracy = accuracy
-                        best_model_state = model.state_dict()
+        if test_accuracies:
+            def get_stats(data_list):
+                avg = statistics.mean(data_list) if data_list else 0.0
+                std = statistics.stdev(data_list) if len(data_list) > 1 else 0.0
+                return avg, std
 
-                        best_predictions_df = pd.DataFrame({
-                            "Actual": y_test_tensor.cpu().numpy(),
-                            "Predicted": predicted.cpu().numpy(),
-                            "Iteration": i + 1
-                        })
+            metrics_to_report = {
+                'Accuracy': test_accuracies,
+                'F1 Macro': f1_macros,
+                'F1 Weighted': f1_weighteds,
+                'Recall': recalls,
+                'AUC': aucs,
+                'AUPR': auprs
+            }
 
-                all_predictions_list.append(
-                    pd.DataFrame({
-                        "Actual": y_test_tensor.cpu().numpy(),
-                        "Predicted": predicted.cpu().numpy(),
-                        "Iteration": i + 1
-                    })
-                )
+            summary_rows = []
+            for name, values in metrics_to_report.items():
+                avg, std = get_stats(values)
+                summary_rows.append({'Metric': name, 'Average': avg, 'StdDev': std})
+
+            metrics_df = pd.DataFrame(summary_rows)
+
+            logger.info("--- Standard Run Final Summary (avg across repeats) ---")
+            for _, row in metrics_df.iterrows():
+                logger.info(f"Avg {row['Metric']}: {row['Average']:.4f} +/- {row['StdDev']:.4f}")
+            logger.info("------------------------------------------------------\n")
+
+        else:
+            metrics_df = pd.DataFrame()
 
         if output_dir and best_model_state is not None:
             model_save_path = os.path.join(output_dir, "best_model_standard_run.pt")
@@ -612,7 +671,7 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
             except Exception as e:
                 logger.error(f"Failed to save best model: {e}")
 
-        return best_predictions_df, all_predictions_list, None
+        return best_predictions_df, all_predictions_list, metrics_df
 
     else:
         n_folds = dpmon_params["n_folds"]
@@ -629,6 +688,8 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
         fold_auprs = []
         fold_aucs = []
         fold_recalls = []
+        fold_best_configs = []
+        all_fold_results = []
 
         X = omics_dataset.drop([phenotype_col], axis=1)
         Y = omics_dataset[phenotype_col]
@@ -675,6 +736,11 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
                 )
                 dpmon_params.update(best_config)
                 logger.info(f"Fold {fold+1} best config: {best_config}")
+
+                #save params
+                fold_record = best_config.copy()
+                fold_record['Fold'] = fold + 1
+                fold_best_configs.append(fold_record)
 
             clinical_train = clinical_data_full.iloc[train_index]
             logger.info(f"Building graph features for Fold {fold+1} using train split only")
@@ -789,6 +855,7 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
                     fold_auprs.append(fold_predictions['aupr'])
                     fold_aucs.append(fold_predictions['auc'])
                     fold_recalls.append(fold_predictions['recall'])
+                    all_fold_results.append(fold_predictions)
 
                 logger.info(f"Fold {fold+1} results:")
                 logger.info(f"Accuracy: {accuracy:.4f}")
@@ -838,6 +905,17 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
                 logger.info(f"Successfully saved global best CV model state to: {emb_save_path}")
             except Exception as e:
                 logger.error(f"Failed to save best CV model: {e}")
+
+        if output_dir and fold_best_configs:
+            try:
+                results_df = pd.DataFrame(all_fold_results)
+                config_save_path = os.path.join(output_dir, "cv_tuning_results.csv")
+                config_df = pd.DataFrame(fold_best_configs)
+                combined =  pd.concat([results_df,config_df], axis=1)     
+                config_df.to_csv(combined)
+                logger.info(f"Successfully saved CV tuning parameters to: {config_save_path}")
+            except Exception as e:
+                logger.warning(f"Failed to save CV tuning parameters: {e}")
 
         logger.info("Cross-Validation Results:\n")
         logger.info(f"Avg Accuracy: {avg_acc:.4f} +/- {std_acc:.4f}")
@@ -1054,7 +1132,7 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
 
     cpu_per_trial = 2
     #gpu_per_trial = (0.25 * n_inner_folds) if use_gpu else 0.0
-    gpu_per_trial = 0.5 if use_gpu else 0.0
+    gpu_per_trial = 0.25 if use_gpu else 0.0
 
     for attempt in range(max_retries):
         try:

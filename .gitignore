@@ -43,6 +43,10 @@ SMCCNET*
 smccnet_best_network.pkl
 scaling_factors.md
 Server_runs.ipynb
+smccnet_replication_final_387
+smccnet_replication_final
+smccnet_*
+REVISION2
 # Other example data and tests not needed in the repo.
 extra.md
 auto_pysmccnet_test
