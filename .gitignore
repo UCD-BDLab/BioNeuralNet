@@ -35,8 +35,6 @@ SACKUP_SMCCNETFOLD copy
 SACKUP_SMCCNETFOLD
 external_tools_before
 external_tools_tmp
-bioneuralnet/pysmccnet
-bioneuralnet/network
 bioneuralnet/clustering/old_clustering
 smccnet_r_test
 SMCCNET*
