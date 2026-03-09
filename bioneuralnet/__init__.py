@@ -11,15 +11,6 @@ Key Features:
 * **Data Handling**: Streamline data ingestion, feature selection (ANOVA, Random Forest), and preprocessing.
 * **Reproducibility**: Built-in logging, configuration, and seeding utilities to ensure reproducible research.
 
-Modules:
-
-* `network_embedding`: Generates network embeddings via GNN architectures.
-* `subject_representation`: Fuses network embeddings with omics data for subject profiling.
-* `downstream_task`: Contains pipelines for disease prediction (DPMON) and representation learning.
-* `clustering`: Implements correlated and hybrid clustering algorithms for module detection.
-* `metrics`: Provides tools for correlation analysis, performance evaluation, and plotting.
-* `datasets`: Access to synthetic and real-world (TCGA) multi-omics datasets.
-* `utils`: Utilities for logging, reproducibility, graph generation, and data processing.
 """
 
 __version__ = "1.2.2"
@@ -32,6 +23,7 @@ from . import datasets
 from . import clustering
 from . import network_embedding
 from . import downstream_task
+from . import external_tools
 
 from .network_embedding import GNNEmbedding
 from .network import auto_pysmccnet
@@ -49,8 +41,7 @@ from .datasets import (
     load_monet,
     load_brca,
     load_lgg,
-    load_kipan,
-    load_paad,
+    load_kipan
 )
 
 from .utils import (
@@ -85,7 +76,6 @@ __all__ = [
     "load_brca",
     "load_lgg",
     "load_kipan",
-    "load_paad",
 
     "set_seed",
     "get_logger",

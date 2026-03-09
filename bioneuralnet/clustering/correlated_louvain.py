@@ -1,4 +1,4 @@
-"""
+r"""
 Correlated Louvain Community Detection.
 
 This module extends the standard Louvain algorithm by incorporating an 
@@ -42,7 +42,6 @@ Algorithm:
         \Delta \\rho = [|\\rho(D \setminus \{v\})| + |\\rho(C \cup \{v\})|] - [|\\rho(D)| + |\\rho(C)|]
 """
 
-import logging
 from typing import Any, Dict, FrozenSet, List, Optional, Set, Tuple, Union
 
 import numpy as np
@@ -50,8 +49,9 @@ import pandas as pd
 import networkx as nx
 
 from .louvain import Louvain
+from ..utils import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 class CorrelatedLouvain(Louvain):
     """

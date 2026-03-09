@@ -1,4 +1,4 @@
-"""
+r"""
 Standard Louvain Method for Community Detection - NumPy Implementation.
 
 References: 

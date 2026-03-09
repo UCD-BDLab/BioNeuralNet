@@ -1,4 +1,4 @@
-"""
+r"""
 Correlated PageRank Clustering.
 
 This module implements a personalized PageRank algorithm combined with a 
@@ -49,7 +49,6 @@ Notes:
     Values where :math:`\\rho_i < 0` are clamped to 0.
 """
 
-import logging
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import networkx as nx
@@ -59,7 +58,9 @@ from scipy.stats import pearsonr
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
-logger = logging.getLogger(__name__)
+from ..utils import get_logger
+
+logger = get_logger(__name__)
 
 class CorrelatedPageRank:
     """

@@ -1,8 +1,14 @@
-from .tools import (
-    GPUNetworkAnalyzer,
-    describe_network,
-    network_search
+"""Network Construction and Analysis.
 
+This module provides tools for generating, searching, and analyzing multi-omics 
+networks. It includes methods for building networks from raw tabular data using 
+similarity, correlation, thresholding, and Gaussian KNN, as well as 
+phenotype-driven strategies like PySmCCNet.
+"""
+
+from .tools import (
+    NetworkAnalyzer,
+    network_search
 )
 
 from .generate import (
@@ -12,18 +18,15 @@ from .generate import (
     gaussian_knn_network,
 )
 from .pysmccnet import (
-    auto_pysmccnet,
-    load_r_export_folds,
+    auto_pysmccnet
 )
 
 __all__ = [
-    "GPUNetworkAnalyzer",
-    "describe_network",
+    "NetworkAnalyzer",
     "network_search",
     "similarity_network",
     "correlation_network",
     "threshold_network",
     "gaussian_knn_network",
     "auto_pysmccnet",
-    "load_r_export_folds",
 ]

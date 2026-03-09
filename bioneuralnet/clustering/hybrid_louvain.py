@@ -1,4 +1,4 @@
-"""
+r"""
 Hybrid Louvain-PageRank - Significant Subgraph Detection.
 
 This module implements an iterative refinement algorithm that alternates 
@@ -53,16 +53,15 @@ Notes:
     Where :math:`\rho_i = \rho(S) - \rho(S \setminus \{i\})`.
 """
 
-
-import logging
 from typing import Any, Dict, List, Optional, Tuple, Union
 import networkx as nx
-import numpy as np
 import pandas as pd
+
 from .correlated_louvain import CorrelatedLouvain
 from .correlated_pagerank import CorrelatedPageRank
+from ..utils import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 class HybridLouvain:
     """
@@ -96,9 +95,9 @@ class HybridLouvain:
         G: Union[nx.Graph, pd.DataFrame],
         B: pd.DataFrame,
         Y: Union[pd.DataFrame, pd.Series],
-        k_L: float = 0.2,
-        teleport_prob: float = 0.10,
-        k_P: float = 0.5,
+        k_L: float = 0.8,
+        teleport_prob: float = 0.05,
+        k_P: float = 0.7,
         max_iter: int = 10,
         min_nodes: int = 3,
         weight: str = "weight",
@@ -147,96 +146,72 @@ class HybridLouvain:
             f"max_iter={max_iter}"
         )
 
-    def _compute_correlation(self, nodes: List[Any]) -> float:
-        """
-        Compute |Pearson(PC1(omics[:, nodes]), Y)|.
-
-        Args:
-
-            nodes (List[Any]): List of node identifiers to compute correlation for.
-
-        Returns:
-
-            float: The absolute Pearson correlation coefficient.
-        """
-        from sklearn.preprocessing import StandardScaler
-        from sklearn.decomposition import PCA
-        from scipy.stats import pearsonr
-
-        cols = [n for n in nodes if n in self.B.columns or str(n) in self.B.columns]
-        resolved = [c if c in self.B.columns else str(c) for c in cols]
-
-        if len(resolved) < 2:
-            return 0.0
-
-        sub = self.B[resolved]
-        
-        try:
-            scaled = StandardScaler().fit_transform(sub)
-            pc1 = PCA(n_components=1).fit_transform(scaled).flatten()
-            y_vals = self.Y.values[:len(pc1)]
-            pc1 = pc1[:len(y_vals)]
-            corr, _ = pearsonr(pc1, y_vals)
-            
-            return abs(corr) if np.isfinite(corr) else 0.0
-        except Exception:
-            return 0.0
-
-    def run(self) -> Dict[str, Any]:
+    def run(self, as_dfs: bool = False) -> Union[Dict[str, Any], List[pd.DataFrame]]:
         """
         Execute the Hybrid Louvain-PageRank algorithm.
 
         Returns:
 
-            Dict: Contains best_nodes, best_correlation, best_iteration, and full iteration history.
+            Dict:
+
+                - best_nodes: nodes of the highest |rho| subgraph
+                - best_correlation: float
+                - best_iteration: int
+                - iterations: full per-iteration metadata
+                - all_subgraphs: {iteration_index: [nodes]}
+
         """
         self._iterations.clear()
         self._best_idx = None
 
-        G_current = self.G_original.copy()
-        prev_size = G_current.number_of_nodes()
-        best_rho = 0.0
+        G_remaining = self.G_original.copy()
+        prev_size = G_remaining.number_of_nodes()
 
         for it in range(self.max_iter):
-            n_nodes = G_current.number_of_nodes()
-            n_edges = G_current.number_of_edges()
+            n_nodes = G_remaining.number_of_nodes()
+            n_edges = G_remaining.number_of_edges()
 
-            logger.info(f"\n--- Iteration {it + 1}/{self.max_iter}: {n_nodes} nodes, {n_edges} edges ---")
+            logger.info(f"\n--- Iteration {it + 1}: {n_nodes} nodes remaining ---")
 
             if n_nodes < self.min_nodes:
-                logger.info(f"Graph has {n_nodes} < {self.min_nodes} nodes; stopping.")
+                logger.info(f"Remaining graph has {n_nodes} < {self.min_nodes} nodes. Done.")
                 break
 
+            # part 1: running Correlated Louvain on remaining graph
             try:
                 louvain = CorrelatedLouvain(
-                    G=G_current,
+                    G=G_remaining,
                     B=self.B,
                     Y=self.Y,
                     k_L=self.k_L,
                     weight=self.weight,
                     seed=self.seed,
                 )
-                partition = louvain.run()
+                partition_local = louvain.run()
             except Exception as e:
                 logger.error(f"Louvain failed at iteration {it + 1}: {e}")
                 break
 
             top = louvain.get_top_communities(n=1)
-            
+
             if not top:
-                logger.info("No non-singleton communities found; stopping.")
+                logger.info("No non-singleton communities found. Done.")
                 break
 
             top_cid, top_rho, seed_nodes = top[0]
-            logger.info(f"Top Louvain community: id={top_cid}, |rho|={top_rho:.4f}, size={len(seed_nodes)}")
 
             if len(seed_nodes) < 2:
-                logger.info("Top community has < 2 nodes; stopping.")
+                logger.info("Top community is a singleton. Done.")
                 break
 
+            logger.info(
+                f"Top community: |rho|={top_rho:.4f}, size={len(seed_nodes)}"
+            )
+
+            # part 2: Correlated PageRank refines
             try:
                 pagerank = CorrelatedPageRank(
-                    graph=G_current,
+                    graph=G_remaining,
                     omics_data=self.B,
                     phenotype_data=self.Y,
                     teleport_prob=self.teleport_prob,
@@ -252,50 +227,63 @@ class HybridLouvain:
             refined_nodes = pr_results.get("cluster_nodes", [])
             new_size = len(refined_nodes)
 
-            if new_size < 2:
-                logger.info("PageRank produced < 2 nodes; stopping.")
+            if len(refined_nodes) < 2:
+                logger.info("PageRank produced < 2 nodes. Done.")
                 break
 
-            subgraph_rho = self._compute_correlation(refined_nodes)
+            refined_rho = abs(pagerank.phen_omics_corr(refined_nodes)[0])
+            if self._best_idx is None or refined_rho > self._iterations[self._best_idx]["refined_rho"]:
+                self._best_idx = it
 
+            # save this communit
             iter_result = {
                 "iteration": it,
                 "graph_nodes": n_nodes,
                 "graph_edges": n_edges,
-                "louvain_communities": len(set(partition.values())),
+                "louvain_communities": len(set(partition_local.values())),
                 "louvain_quality": louvain.get_combined_quality(),
                 "seed_size": len(seed_nodes),
                 "seed_rho": top_rho,
-                "refined_size": new_size,
-                "refined_rho": subgraph_rho,
-                "conductance": pr_results.get("conductance", None),
-                "composite_score": pr_results.get("composite_score", None),
+                "refined_size": len(refined_nodes),
+                "refined_rho": refined_rho,
+                "conductance": pr_results.get("conductance"),
+                "composite_score": pr_results.get("composite_score"),
                 "refined_nodes": list(refined_nodes),
             }
             self._iterations.append(iter_result)
 
-            logger.info(f"Refined subgraph: size={new_size}, |rho|={subgraph_rho:.4f}, conductance={pr_results.get('conductance', 'N/A')}")
+            logger.info(
+                f"  Iteration {it}: {len(refined_nodes)} nodes, "
+                f"|rho|={refined_rho:.4f}"
+            )
 
-            if subgraph_rho > best_rho:
-                best_rho = subgraph_rho
-                self._best_idx = it
-                logger.info(f"  *** New best: |rho|={best_rho:.4f} at iteration {it + 1}")
-
+            # zoom-in: next iteration operates on the refined subgraph
             if new_size == prev_size:
                 logger.info("Subgraph size unchanged; stopping.")
                 break
-
-            if new_size <= 1:
-                logger.info("Singleton produced; stopping.")
-                break
-
             prev_size = new_size
-            G_current = G_current.subgraph(refined_nodes).copy()
-
-        n_iters = len(self._iterations)
-        logger.info(f"\nHybrid completed: {n_iters} iterations, best |rho|={best_rho:.4f}")
+            G_remaining = G_remaining.subgraph(refined_nodes).copy()
 
         best_nodes = self._iterations[self._best_idx]["refined_nodes"] if self._best_idx is not None else []
+        best_rho = self._iterations[self._best_idx]["refined_rho"] if self._best_idx is not None else 0.0
+
+        logger.info(f"\nHybrid Louvain completed: {len(self._iterations)} iterations, best |rho|={best_rho:.4f} at iteration {self._best_idx}")
+        logger.info("All iterations:")
+        for it_r in self._iterations:
+            logger.info(
+                f"  iter {it_r['iteration']}: size={it_r['refined_size']}, "
+                f"|rho|={it_r['refined_rho']:.4f}, conductance={it_r['conductance']:.4f}"
+            )
+        logger.info(f"  Best subgraph: {len(best_nodes)} nodes, |rho|={best_rho:.4f} (iter {self._best_idx})")
+
+        if as_dfs:
+            result = []
+            for it_r in self._iterations:
+                nodes = it_r["refined_nodes"]
+                sub_G = self.G_original.subgraph(nodes)
+                adj = nx.to_pandas_adjacency(sub_G, weight=self.weight)
+                result.append(adj)
+            return result
 
         return {
             "best_nodes": best_nodes,

@@ -32,15 +32,6 @@ def load_brca() -> dict:
     """
     return DatasetLoader("brca").data
 
-def load_lgg() -> dict:
-    """Load the Brain Lower Grade Glioma (LGG) dataset.
-
-    Returns:
-
-        dict: Keys include 'mirna', 'target', 'clinical', 'rna', 'meth'.
-    """
-    return DatasetLoader("lgg").data
-
 def load_kipan() -> dict:
     """Load the Pan-kidney Cohort (KIPAN) dataset.
 
@@ -66,5 +57,4 @@ __all__ = [
     "load_brca",
     "load_lgg",
     "load_kipan",
-    "load_paad",
 ]

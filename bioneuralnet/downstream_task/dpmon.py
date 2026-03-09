@@ -1,4 +1,4 @@
-"""
+r"""
 DPMON: Optimized Network Embedding and Fusion for Disease Prediction.
 
 This module implements an end-to-end Graph Neural Network (GNN) pipeline 
@@ -34,20 +34,20 @@ Notes:
     amplifying features that are topologically central.
 """
 
-
 from __future__ import annotations
 
 import os
 import re
+import logging
 import statistics
 import tempfile
 import shutil
 import pandas as pd
 import numpy as np
 import networkx as nx
-
 from pathlib import Path
 from typing import Optional, List, Tuple,Dict, Any
+
 try:
     import torch
     import torch.nn as nn
@@ -60,22 +60,38 @@ except ModuleNotFoundError:
         "https://bioneuralnet.readthedocs.io/en/latest/installation.html"
     )
 
-import ray
-from ray import tune
-from ray.tune import CLIReporter
-from ray.tune import Checkpoint
-from ray.tune.error import TuneError
-from ray.tune.stopper import TrialPlateauStopper
-from ray.tune.schedulers import ASHAScheduler
-from ray.tune.search.basic_variant import BasicVariantGenerator
+try:
+    import ray
+    from ray import tune
+    from ray.tune import CLIReporter
+    from ray.tune import Checkpoint
+    from ray.tune.error import TuneError
+    from ray.tune.stopper import TrialPlateauStopper
+    from ray.tune.schedulers import ASHAScheduler
+    from ray.tune.search.basic_variant import BasicVariantGenerator
+
+    os.environ["TUNE_DISABLE_IPY_WIDGETS"] = "1"
+    os.environ["TUNE_WARN_EXCESSIVE_EXPERIMENT_CHECKPOINT_SYNC_THRESHOLD_S"] = "0"
+    os.environ["RAY_DEDUP_LOGS"] = "0"
+    
+    for logger_name in ("ray", "raylet", "ray.train.session", "ray.tune", "torch_geometric"):
+        logging.getLogger(logger_name).setLevel(logging.WARNING)
+
+except ModuleNotFoundError:
+    raise ImportError(
+        "DPMON (Disease Prediction using Multi-Omics Networks) requires Ray Tune"
+        "Please install it by following the instructions at: "
+        "https://bioneuralnet.readthedocs.io/en/latest/installation.html"
+    )
+
 from sklearn.model_selection import train_test_split,StratifiedKFold,RepeatedStratifiedKFold
 from sklearn.preprocessing import label_binarize
 from scipy.stats import pointbiserialr
-from sklearn.metrics import f1_score, roc_auc_score, recall_score,average_precision_score, matthews_corrcoef
+from sklearn.metrics import f1_score, roc_auc_score, recall_score,precision_score,average_precision_score, matthews_corrcoef
 
-from bioneuralnet.utils import get_logger
 from bioneuralnet.utils import set_seed
 from bioneuralnet.network_embedding import GCN, GAT, SAGE, GIN
+from ..utils import get_logger
 
 logger= get_logger(__name__)
 
@@ -310,12 +326,12 @@ def setup_device(gpu, cuda):
         os.environ["CUDA_VISIBLE_DEVICES"] = str(cuda)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         if torch.cuda.is_available():
-            logger.info(f"Using GPU {cuda}")
+            logger.debug(f"Using GPU {cuda}")
         else:
             logger.warning(f"GPU {cuda} requested but not available, using CPU")
     else:
         device = torch.device("cpu")
-        logger.info("Using CPU")
+        logger.debug("Using CPU")
     return device
 
 def slice_omics_datasets(omics_dataset: pd.DataFrame, adjacency_matrix: pd.DataFrame, phenotype_col: str = "phenotype") -> List[pd.DataFrame]:
@@ -632,6 +648,10 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
                 aucs.append(auc_score)
                 auprs.append(aupr)
 
+                if accuracy > best_accuracy:
+                    best_accuracy = accuracy
+                    best_model_state = model.state_dict()
+
         if test_accuracies:
             def get_stats(data_list):
                 avg = statistics.mean(data_list) if data_list else 0.0
@@ -679,6 +699,7 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
 
         # these are to track the best model across folds and then save it
         best_global_fold_accuracy = 0.0
+        best_global_fold_f1 = 0.0
         best_global_model_state = None
         best_global_embeddings = None
 
@@ -688,6 +709,7 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
         fold_auprs = []
         fold_aucs = []
         fold_recalls = []
+        fold_precisions = []
         fold_best_configs = []
         all_fold_results = []
 
@@ -743,6 +765,7 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
                 fold_best_configs.append(fold_record)
 
             clinical_train = clinical_data_full.iloc[train_index]
+            clinical_test = clinical_data_full.iloc[test_index]
             logger.info(f"Building graph features for Fold {fold+1} using train split only")
 
             omics_train_fold_list = [X_train.join(y_train.rename(phenotype_col))]
@@ -801,6 +824,7 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
                 f1_ma = f1_score(y_test_np, predicted_np, average='macro', zero_division=0)
                 f1_wt = f1_score(y_test_np, predicted_np, average='weighted', zero_division=0)
                 recall = recall_score(y_test_np, predicted_np, average='macro', zero_division=0)
+                precision = precision_score(y_test_np, predicted_np, average='macro', zero_division=0)
 
                 try:
                     n_classes = probs_np.shape[1]
@@ -839,7 +863,8 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
                     'f1_wt': f1_wt,
                     'aupr': aupr,
                     'auc': auc_score,
-                    'recall': recall
+                    'recall': recall,
+                    'precision': precision
                 }
 
                 if accuracy > best_global_fold_accuracy:
@@ -847,6 +872,11 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
                     best_global_model_state = model.state_dict()
                     best_global_embeddings = node_emb.detach().cpu()
 
+                # Should be a parameter that way we can decide which model to optemize/save
+                # if f1_ma > best_global_fold_f1:
+                #     best_global_fold_f1 = f1_ma
+                #     best_global_model_state = model.state_dict()
+                #     best_global_embeddings = node_emb.detach().cpu()
 
                 if fold_predictions:
                     fold_accuracies.append(fold_predictions['accuracy'])
@@ -855,15 +885,17 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
                     fold_auprs.append(fold_predictions['aupr'])
                     fold_aucs.append(fold_predictions['auc'])
                     fold_recalls.append(fold_predictions['recall'])
+                    fold_precisions.append(fold_predictions["precision"])
                     all_fold_results.append(fold_predictions)
 
                 logger.info(f"Fold {fold+1} results:")
-                logger.info(f"Accuracy: {accuracy:.4f}")
-                logger.info(f"F1 Macro: {f1_ma:.4f}")
-                logger.info(f"F1 Weighted: {f1_wt:.4f}")
-                logger.info(f"Recall: {recall:.4f}")
-                logger.info(f"AUC: {auc_score:.4f}")
-                logger.info(f"AUPR: {aupr:.4f}\n")
+                logger.info(f" Accuracy: {accuracy:.4f}")
+                logger.info(f" F1 Macro: {f1_ma:.4f}")
+                logger.info(f" F1 Weighted: {f1_wt:.4f}")
+                logger.info(f" Recall: {recall:.4f}")
+                logger.info(f" Precision: {precision:.4f}")
+                logger.info(f" AUC: {auc_score:.4f}")
+                logger.info(f" AUPR: {aupr:.4f}\n")
 
                 if dpmon_params['gpu']:
                     torch.cuda.empty_cache()
@@ -882,11 +914,13 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
         std_auc = statistics.stdev(fold_aucs) if len(fold_aucs) > 1 else 0.0
         avg_recall = statistics.mean(fold_recalls) if fold_recalls else 0.0
         std_recall = statistics.stdev(fold_recalls) if len(fold_recalls) > 1 else 0.0
+        avg_precision = statistics.mean(fold_precisions) if fold_precisions else 0.0
+        std_precision = statistics.stdev(fold_precisions) if len(fold_precisions) > 1 else 0.0
 
         metrics_df = pd.DataFrame({
-            'Metric': ['Accuracy', 'F1 Macro', 'F1 Weighted', 'Recall', 'AUC', 'AUPR'],
-            'Average': [avg_acc, avg_f1_ma, avg_f1_wt, avg_recall, avg_auc, avg_aupr],
-            'StdDev': [std_acc, std_f1_ma, std_f1_wt, std_recall, std_auc, std_aupr]
+            'Metric': ['Accuracy', 'F1 Macro', 'F1 Weighted', 'Recall', 'Precision', 'AUC', 'AUPR'],
+            'Average': [avg_acc, avg_f1_ma, avg_f1_wt, avg_recall, avg_precision, avg_auc, avg_aupr],
+            'StdDev': [std_acc, std_f1_ma, std_f1_wt, std_recall, std_precision, std_auc, std_aupr]
         })
 
         #final_cv_predictions_df = pd.concat(cv_predictions_list, ignore_index=True)
@@ -911,19 +945,20 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
                 results_df = pd.DataFrame(all_fold_results)
                 config_save_path = os.path.join(output_dir, "cv_tuning_results.csv")
                 config_df = pd.DataFrame(fold_best_configs)
-                combined =  pd.concat([results_df,config_df], axis=1)     
-                config_df.to_csv(combined)
+                combined = pd.concat([results_df,config_df], axis=1)     
+                combined.to_csv(config_save_path)
                 logger.info(f"Successfully saved CV tuning parameters to: {config_save_path}")
             except Exception as e:
                 logger.warning(f"Failed to save CV tuning parameters: {e}")
 
         logger.info("Cross-Validation Results:\n")
-        logger.info(f"Avg Accuracy: {avg_acc:.4f} +/- {std_acc:.4f}")
-        logger.info(f"Avg F1 Macro: {avg_f1_ma:.4f} +/- {std_f1_ma:.4f}")
-        logger.info(f"Avg F1 Weighted: {avg_f1_wt:.4f} +/- {std_f1_wt:.4f}")
-        logger.info(f"Avg Recall: {avg_recall:.4f} +/- {std_recall:.4f}")
-        logger.info(f"Avg AUC: {avg_auc:.4f} +/- {std_auc:.4f}")
-        logger.info(f"Avg AUPR: {avg_aupr:.4f} +/- {std_aupr:.4f}")
+        logger.info(f" Avg Accuracy: {avg_acc:.4f} +/- {std_acc:.4f}")
+        logger.info(f" Avg F1 Macro: {avg_f1_ma:.4f} +/- {std_f1_ma:.4f}")
+        logger.info(f" Avg F1 Weighted: {avg_f1_wt:.4f} +/- {std_f1_wt:.4f}")
+        logger.info(f" Avg Recall: {avg_recall:.4f} +/- {std_recall:.4f}")
+        logger.info(f" Avg Precision: {avg_precision:.4f} +/- {std_precision:.4f}")
+        logger.info(f" Avg AUC: {avg_auc:.4f} +/- {std_auc:.4f}")
+        logger.info(f" Avg AUPR: {avg_aupr:.4f} +/- {std_aupr:.4f}")
 
         return pd.DataFrame(), metrics_df, best_global_embeddings
 
@@ -967,19 +1002,19 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
     )[0].to(device)
 
     pipeline_configs = {
-        "gnn_layer_num": tune.choice([2, 3, 4, 5]),
-        "gnn_hidden_dim": tune.choice([16, 32, 64, 128]),
-        "lr": tune.loguniform(1e-5, 3e-3),
-        "weight_decay": tune.loguniform(1e-5, 1e-2),
-        "nn_hidden_dim1": tune.choice([64, 128, 256]),
-        "nn_hidden_dim2":  tune.choice([16, 32, 64]),
-        "ae_encoding_dim": tune.choice([4, 8, 16]),
+        "gnn_layer_num": tune.choice([2, 3, 4]),
+        "gnn_hidden_dim": tune.choice([32, 64]),
+        "lr": tune.loguniform(1e-4, 8e-4),
+        "weight_decay": tune.loguniform(1e-5, 5e-3),
+        "nn_hidden_dim1": tune.choice([128, 256]),
+        "nn_hidden_dim2": tune.choice([64]),
+        "ae_encoding_dim": tune.choice([4, 8]),
         "ae_architecture": tune.choice(["original", "dynamic"]),
-        "num_epochs": tune.choice([128, 256, 512]),
+        "num_epochs": tune.choice([128, 256]),
         "gnn_dropout": tune.choice([0.4, 0.5, 0.6]),
         "gnn_activation": tune.choice(["relu", "elu"]),
         "dim_reduction": tune.choice(["ae", "linear", "mlp"]),
-        "gat_heads": tune.choice([1,2,3,4]),
+        "gat_heads": tune.choice([1, 2]),
     }
 
     # prepare inner k-fold splits and push to ray object store
@@ -987,32 +1022,28 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
     X = omics_data.drop([phenotype_col], axis=1)
     Y = omics_data[phenotype_col]
 
-    n_inner_folds = dpmon_params.get("tune_inner_folds", 3)
+    n_inner_folds = dpmon_params.get("tune_inner_folds", 5)
     inner_cv = StratifiedKFold(
         n_splits=n_inner_folds, shuffle=True, random_state=dpmon_params["seed"]
     )
 
-    # pre-tensorise every inner fold and store in ray object store
-    # so trials fetch data zero-copy instead of re-splitting.
+    # pre-tensor on every inner fold and store in ray object store, this is so trials fetch data zero-copy instead of re-splitting.
     fold_data_refs = []
     for tr_idx, val_idx in inner_cv.split(X, Y):
+        y_tr = Y.iloc[tr_idx].values
         fold_tensors = {
             "X_train": torch.FloatTensor(X.iloc[tr_idx].values),
-            "y_train": torch.LongTensor(Y.iloc[tr_idx].values),
+            "y_train": torch.LongTensor(y_tr),
             "X_val": torch.FloatTensor(X.iloc[val_idx].values),
             "y_val": torch.LongTensor(Y.iloc[val_idx].values),
         }
+ 
         fold_data_refs.append(ray.put(fold_tensors))
 
     omics_network_ref = ray.put(omics_network_tg.cpu())
+    logger.info(f"Inner CV: {n_inner_folds} folds  |  X shape: {X.shape}  |  Graph nodes: {omics_network_tg.x.shape}")
 
-    logger.info(
-        f"Inner CV: {n_inner_folds} folds  |  "
-        f"X shape: {X.shape}  |  "
-        f"Graph nodes: {omics_network_tg.x.shape}"
-    )
-
-    # pre-compute dims (plain ints captured by closure)
+    # pre-compute dims
     gnn_input_dim = omics_network_tg.x.shape[1]
     nn_input_dim = X.shape[1]
     nn_output_dim = Y.nunique()
@@ -1027,16 +1058,18 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
         folds = []
         for ref in fold_data_refs:
             fd = ray.get(ref)
-            folds.append({
+            fold_dict = {
                 "X_train": fd["X_train"].to(device_inner),
                 "y_train": fd["y_train"].to(device_inner),
                 "X_val": fd["X_val"].to(device_inner),
                 "y_val": fd["y_val"].to(device_inner),
-            })
-
+                "criterion": nn.CrossEntropyLoss()
+            }
+            folds.append(fold_dict)
+        
         # one model + optimizer per inner fold
         models, optimizers = [], []
-        for _ in folds:
+        for _ in range(len(folds)):
             m = NeuralNetwork(
                 model_type=model_type,
                 gnn_input_dim=gnn_input_dim,
@@ -1061,20 +1094,20 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
             models.append(m)
             optimizers.append(o)
 
-        criterion = nn.CrossEntropyLoss()
-
         # epoch-sync training across all inner folds
         for epoch in range(config["num_epochs"]):
             epoch_val_losses = []
             epoch_val_accs   = []
             epoch_train_losses = []
+            epoch_val_f1s = []
+            epoch_val_auprs = []
 
             for fi, fold in enumerate(folds):
                 # train step 
                 models[fi].train()
                 optimizers[fi].zero_grad()
                 out, _, _ = models[fi](fold["X_train"], omics_net)
-                loss = criterion(out, fold["y_train"])
+                loss = fold["criterion"](out, fold["y_train"])
                 loss.backward()
                 optimizers[fi].step()
                 epoch_train_losses.append(loss.item())
@@ -1083,29 +1116,57 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
                 models[fi].eval()
                 with torch.no_grad():
                     val_out, _, _ = models[fi](fold["X_val"], omics_net)
-                    vl = criterion(val_out, fold["y_val"]).item()
+                    vl = fold["criterion"](val_out, fold["y_val"]).item() 
                     _, preds = torch.max(val_out, 1)
+                    probs = torch.softmax(val_out, dim=1)
+
+                    y_true_np = fold["y_val"].cpu().numpy()
+                    predicted_np = preds.cpu().numpy()
+                    probs_np = probs.cpu().numpy()
+
                     va = (preds == fold["y_val"]).sum().item() / fold["y_val"].size(0)
+                    f1_mac = f1_score(y_true_np, predicted_np, average='macro', zero_division=0)
+                    
+                    try:
+                        n_classes = probs_np.shape[1]
+                        if n_classes == 2:
+                            aupr = average_precision_score(y_true_np, probs_np[:, 1])
+                        else:
+                            y_bin = label_binarize(y_true_np, classes=range(n_classes))
+                            aupr_scores = []
+                            for i in range(n_classes):
+                                if np.sum(y_bin[:, i]) > 0:
+                                    aupr_scores.append(average_precision_score(y_bin[:, i], probs_np[:, i]))
+                            aupr = np.mean(aupr_scores) if aupr_scores else 0.0
+                    except:
+                        aupr = 0.0
 
                 epoch_val_losses.append(vl)
                 epoch_val_accs.append(va)
+                epoch_val_f1s.append(f1_mac)
+                epoch_val_auprs.append(aupr)
 
-            # report mean metrics (what ASHA sees)
+            composite = 0.5 * float(np.mean(epoch_val_accs)) + 0.5 * float(np.mean(epoch_val_f1s))
+            # report mean metrics
             metrics = {
                 "val_loss": float(np.mean(epoch_val_losses)),
                 "val_accuracy": float(np.mean(epoch_val_accs)),
+                "val_f1_macro": float(np.mean(epoch_val_f1s)),
+                "val_aupr": float(np.mean(epoch_val_auprs)),
                 "train_loss": float(np.mean(epoch_train_losses)),
             }
 
-            with tempfile.TemporaryDirectory() as tmpdir:
-                torch.save(
-                    {"epoch": epoch, "model_state": models[0].state_dict()},
-                    os.path.join(tmpdir, "checkpoint.pt"),
-                )
-                tune.report(
-                    metrics=metrics,
-                    checkpoint=Checkpoint.from_directory(tmpdir),
-                )
+            ckpt_dir = "trial_checkpoint"
+            os.makedirs(ckpt_dir, exist_ok=True)
+            
+            torch.save(
+                {"epoch": epoch, "model_state": models[0].state_dict()},
+                os.path.join(ckpt_dir, "checkpoint.pt"),
+            )
+            tune.report(
+                metrics=metrics,
+                checkpoint=Checkpoint.from_directory(ckpt_dir),
+            )
 
     # launch Ray Tune
     num_samples = dpmon_params.get("tune_trials", 20)
@@ -1117,22 +1178,29 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
     else:
         logger.debug("seed_trials=False: random hyperparameter sampling")
 
-    scheduler = ASHAScheduler(grace_period=30, reduction_factor=2)
+    scheduler = ASHAScheduler(grace_period=50, reduction_factor=2)
     stopper = TrialPlateauStopper(
-        metric="val_loss", mode="min",
-        num_results=20, metric_threshold=0.002, grace_period=30,
+        metric="val_f1_macro", mode="max",
+        num_results=20, metric_threshold=0.01, grace_period=50,
     )
 
     def short_dirname_creator(trial):
         return f"T{trial.trial_id}"
+    
+    #dummy reporter that fixes Ray-rune screen-clearing for jupyter notebooks
+    class SilentReporter(CLIReporter):
+        def should_report(self, trials, done=False):
+            return False
+        
+        def report(self, trials, done, *sys_info):
+            pass
 
     use_gpu = bool(dpmon_params.get("gpu", False)) and torch.cuda.is_available()
     if dpmon_params.get("gpu", False) and not torch.cuda.is_available():
         logger.warning("gpu=True but CUDA not available; running on CPU.")
 
     cpu_per_trial = 2
-    #gpu_per_trial = (0.25 * n_inner_folds) if use_gpu else 0.0
-    gpu_per_trial = 0.25 if use_gpu else 0.0
+    gpu_per_trial = 0.2 if use_gpu else 0.0
 
     for attempt in range(max_retries):
         try:
@@ -1149,8 +1217,8 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
                 ),
                 param_space=pipeline_configs,
                 tune_config=tune.TuneConfig(
-                    metric="val_loss",
-                    mode="min",
+                    metric="val_f1_macro",
+                    mode="max",
                     num_samples=num_samples,
                     scheduler=scheduler,
                     search_alg=search_alg,
@@ -1162,16 +1230,12 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
                     log_to_file=True,
                     stop=stopper,
                     storage_path=os.path.expanduser("~/ray_results"),
+                    sync_config=tune.SyncConfig(sync_artifacts=False),
                     checkpoint_config=tune.CheckpointConfig(
                         num_to_keep=1,
-                        checkpoint_score_attribute="val_loss",
-                        checkpoint_score_order="min",
-                    ),
-                    progress_reporter=CLIReporter(
-                    max_progress_rows=0, 
-                    print_intermediate_tables=False
-                    ),
-                    
+                        checkpoint_score_attribute="val_f1_macro",
+                        checkpoint_score_order="max",
+                    ),progress_reporter=SilentReporter(),
                 ),
             )
 
@@ -1183,23 +1247,35 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
             if "Trials did not complete" not in msg and "OutOfMemoryError" not in msg:
                 raise
             new_num_samples = max(1, num_samples // 2)
-            if new_num_samples == num_samples:
+
+            if use_gpu:
+                new_gpu_per_trial = min(1.0, gpu_per_trial + 0.2)
+            else:
+                new_gpu_per_trial = 0.0
+
+            if new_num_samples == num_samples and new_gpu_per_trial == gpu_per_trial:
+                logger.error("Cannot reduce num_samples or increase gpu_per_trial any further. Aborting.")
                 raise
+            
             logger.warning(
                 f"Ray Tune failed (attempt {attempt + 1}). "
-                f"Reducing num_samples {num_samples} -> {new_num_samples}."
+                f"Adjusting resources -> num_samples: {num_samples} to {new_num_samples}, "
+                f"gpu_per_trial: {gpu_per_trial:.2f} to {new_gpu_per_trial:.2f}."
             )
             num_samples = new_num_samples
+            gpu_per_trial= new_gpu_per_trial
     else:
         raise RuntimeError("Hyperparameter tuning failed after max retries.")
 
     # extract best config
-    best_result = results.get_best_result(metric="val_loss", mode="min")
+    best_result = results.get_best_result(metric="val_f1_macro", mode="max")
     best_config = best_result.config
 
     logger.info(f"Best trial config: {best_config}")
-    logger.info(f"Best trial val_loss: {best_result.metrics.get('val_loss'):.4f}")
     logger.info(f"Best trial val_accuracy: {best_result.metrics.get('val_accuracy'):.4f}")
+    logger.info(f"Best trial val_loss: {best_result.metrics.get('val_loss'):.4f}")
+    logger.info(f"Best trial val_f1_macro: {best_result.metrics.get('val_f1_macro'):.4f}")
+    logger.info(f"Best trial val_aupr: {best_result.metrics.get('val_aupr'):.4f}")
 
     # cleanup
     try:
@@ -1216,6 +1292,7 @@ def train_model(model, criterion, optimizer, train_features, train_labels, epoch
     network = train_labels["omics_network"]
     labels = train_labels["labels"]
 
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epoch_num, eta_min=1e-6)
     model.train()
     for epoch in range(epoch_num):
         optimizer.zero_grad()
@@ -1224,6 +1301,7 @@ def train_model(model, criterion, optimizer, train_features, train_labels, epoch
 
         loss.backward()
         optimizer.step()
+        scheduler.step() 
 
         if (epoch + 1) % 100 == 0 or epoch == 0:
             logger.debug(f"Epoch [{epoch+1}/{epoch_num}], Loss: {loss.item():.4f}")
@@ -1232,8 +1310,7 @@ def train_model(model, criterion, optimizer, train_features, train_labels, epoch
 
 class NeuralNetwork(nn.Module):
     """Core DPMON model combining GNN feature weighting and sample-level prediction.
-
-    Handles the GAT multi-head output dimension correctly: when using GAT with heads > 1, the GNN output is hidden_dim * heads, and the autoencoder input_dim must match.
+        When using GAT with heads > 1, the GNN output is hidden_dim * heads.
     """
 
     def __init__(
@@ -1331,7 +1408,7 @@ class NeuralNetwork(nn.Module):
             nn_input_dim, nn_hidden_dim1, nn_hidden_dim2, nn_output_dim
         )
 
-    def forward(self, omics_dataset, omics_network_tg):
+    def forward(self, omics_dataset, omics_network_tg, clinical_tensor=None):
         # GNN embeddings
         omics_network_nodes_embedding = self.gnn.get_embeddings(omics_network_tg)
 
@@ -1347,16 +1424,21 @@ class NeuralNetwork(nn.Module):
             feature_weights.expand(omics_dataset.shape[1], omics_dataset.shape[0]).t(),
         )
 
-        # predict
-        predictions = self.predictor(omics_dataset_with_embeddings)
+        # leaving clinical_tensor parameter as pontential addition after dicussion with colleagues.
+        # this way we would be making the final prediction on the scaled omics dataset + the clinical data.
+        if clinical_tensor is not None and clinical_tensor.shape[1] > 0:
+            predictor_input = torch.cat([omics_dataset_with_embeddings, clinical_tensor], dim=1)
+        else:
+            predictor_input = omics_dataset_with_embeddings
 
+        # predict
+        predictions = self.predictor(predictor_input)
         return predictions, omics_dataset_with_embeddings, omics_network_nodes_embedding
 
 """
-DPMON AutoEncoder & NeuralNetwork
-1. AutoEncoder: support both a hardcoded 3-layer encoder (input -> 8 -> 4 encoding_dim). 
-    and a 2-layer version (input -> input//2 -> encoding_dim).
-2. NeuralNetwork: Supports a `correlation_mode` passthrough for prepare_node_features.
+DPMON AutoEncoder & NeuralNetwork:
+    1. AutoEncoder: support both a hardcoded 3-layer encoder (input -> 8 -> 4 encoding_dim) and a 2-layer version (input -> input//2 -> encoding_dim).
+    2. NeuralNetwork: Supports a `correlation_mode` passthrough for prepare_node_features.
 """
 
 class AutoEncoder(nn.Module):
@@ -1374,22 +1456,53 @@ class AutoEncoder(nn.Module):
         super().__init__()
 
         if architecture == "original":
-            self.encoder = nn.Sequential(
-                nn.Linear(input_dim, 8),
-                nn.ReLU(),
-                nn.Linear(8, 4),
-                nn.ReLU(),
-                nn.Linear(4, encoding_dim),
-            )
+            if encoding_dim == 1:
+                # fixed bottleneck
+                self.encoder = nn.Sequential(
+                    nn.Linear(input_dim, 8),
+                    nn.ReLU(),
+                    nn.Linear(8, 4),
+                    nn.ReLU(),
+                    nn.Linear(4, 1),
+                )
+            else:
+                # EX1 if Tune picks 4: Flow is Input -> 8 -> 4. EX2: Tune picks 8: Flow is Input -> 16 -> 8
+                intermediate_dim = encoding_dim * 2
+                if intermediate_dim > input_dim:
+                    intermediate_dim = input_dim
+
+                self.encoder = nn.Sequential(
+                    nn.Linear(input_dim, intermediate_dim),
+                    nn.ReLU(),
+                    nn.Linear(intermediate_dim, encoding_dim),
+                )
+
         elif architecture == "dynamic":
-            hidden_dim = max(input_dim // 2, encoding_dim * 2)
-            self.encoder = nn.Sequential(
-                nn.Linear(input_dim, hidden_dim),
-                nn.ReLU(),
-                nn.Linear(hidden_dim, encoding_dim),
-            )
+            if encoding_dim == 1:
+                # 3-step funnel
+                h1 = max(input_dim // 2, 8)
+                h2 = max(input_dim // 4, 4)
+                
+                self.encoder = nn.Sequential(
+                    nn.Linear(input_dim, h1),
+                    nn.ReLU(),
+                    nn.Linear(h1, h2),
+                    nn.ReLU(),
+                    nn.Linear(h2, 1),
+                )
+            else:
+                # 2 step funnel for linear projections
+                hidden_dim = max(input_dim // 2, encoding_dim * 2)
+                if hidden_dim > input_dim:
+                    hidden_dim = input_dim
+                    
+                self.encoder = nn.Sequential(
+                    nn.Linear(input_dim, hidden_dim),
+                    nn.ReLU(),
+                    nn.Linear(hidden_dim, encoding_dim),
+                )
         else:
-            raise ValueError(f"Unknown architecture: {architecture}. Use 'original' or 'dynamic'.")
+            raise ValueError(f"Unknown architecture: {architecture}")
 
     def forward(self, x):
         return self.encoder(x)
@@ -1401,7 +1514,6 @@ class ScalarProjection(nn.Module):
 
     def forward(self, x):
         return self.proj(x)
-
 
 class MLPProjection(nn.Module):
     def __init__(self, encoding_dim, hidden_dim=8):

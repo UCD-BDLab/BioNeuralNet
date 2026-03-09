@@ -2,12 +2,13 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 from typing import Union, Optional, cast
-from bioneuralnet.utils import get_logger
-from .correlation import cluster_correlation
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from sklearn.manifold import TSNE
+
+from .correlation import cluster_correlation
+from ..utils import get_logger
 
 logger = get_logger(__name__)
 

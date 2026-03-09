@@ -44,13 +44,6 @@ class DatasetLoader:
     - rna: (511, 2127)
     - meth: (511, 1823)
 
-    **paad**
-    - cnv: (177, 1035)
-    - target: (177, 1)
-    - clinical: (177, 19)
-    - rna: (177, 1910)
-    - meth: (177, 1152)
-
     **kipan**
     - mirna: (658, 472)
     - target: (658, 1)
