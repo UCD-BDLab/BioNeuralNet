@@ -28,27 +28,28 @@ def load_brca() -> dict:
 
     Returns:
 
-        dict: Keys include 'mirna', 'target', 'clinical', 'rna', 'meth'.
+        dict: Keys include 'mirna', 'target', 'clinical', 'rna', 'methylation'.
     """
     return DatasetLoader("brca").data
 
-def load_kipan() -> dict:
-    """Load the Pan-kidney Cohort (KIPAN) dataset.
+
+def load_lgg() -> dict:
+    """Load the Brain Lower Grade Glioma dataset.
 
     Returns:
 
-        dict: Keys include 'mirna', 'target', 'clinical', 'rna', 'meth'.
+        dict: Keys include 'mirna', 'target', 'clinical', 'rna', 'methylation'.
     """
     return DatasetLoader("kipan").data
 
-def load_paad() -> dict:
-    """Load the Pancreatic Adenocarcinoma (PAAD) dataset.
+def load_kipan() -> dict:
+    """Load the Pan-kidney (KIPAN) dataset.
 
     Returns:
 
-        dict: Keys include 'cnv', 'target', 'clinical', 'rna', 'meth'.
+        dict: Keys include 'mirna', 'target', 'clinical', 'rna', 'methylation'.
     """
-    return DatasetLoader("paad").data
+    return DatasetLoader("kipan").data
 
 __all__ = [
     "DatasetLoader",

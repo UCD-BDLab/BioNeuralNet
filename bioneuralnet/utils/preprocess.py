@@ -226,74 +226,59 @@ def clean_internal(df: pd.DataFrame, nan_threshold: float = 0.5) -> pd.DataFrame
 
     return df_clean
 
-def preprocess_clinical(X: pd.DataFrame, top_k: Optional[int] = 10, scale: bool = False, ignore_columns: Optional[list] = None, nan_threshold: float = 0.5) -> pd.DataFrame:
-    """Preprocess clinical data by cleaning, encoding, scaling, and selecting features by variance.
-
-    Numeric columns are cleaned via clean_internal, optionally scaled with RobustScaler, and categorical columns are one-hot encoded. Zero-variance features are removed, missing values are filled, and if top_k is set the top-variance features are selected.
-
-    Args:
-
-        X (pd.DataFrame): Clinical feature matrix with samples as rows and features as columns.
-        top_k (int | None): Number of highest-variance features to keep after preprocessing; if None, all features are retained.
-        scale (bool): If True, apply RobustScaler to cleaned numeric features before combining with encoded categorical features.
-        ignore_columns (list | None): Column names to drop from X before preprocessing; useful for IDs or label columns.
-        nan_threshold (float): Maximum allowed fraction of NaNs per numeric column before it is dropped in clean_internal.
-
-    Returns:
-
-        pd.DataFrame: Fully cleaned, numeric feature matrix with optional scaling and variance-based feature selection applied.
-
+def preprocess_clinical(X: pd.DataFrame, scale: bool = False, drop_columns: Optional[list] = None, ordinal_mappings: Optional[dict] = None, continuous_columns: Optional[list] = None) -> pd.DataFrame:
     """
-    ignore_columns = ignore_columns or []
-    missing = set(ignore_columns) - set(X.columns)
-    if missing:
-        raise KeyError(f"Ignored columns not in X: {missing}")
+    Preprocess clinical data by cleaning, mapping ordinals, encoding nominals, and scaling.
+    """
+    drop_columns = drop_columns or []
 
-    logger.info(f"Ignoring {len(ignore_columns)} columns.")
-    X = X.drop(columns=ignore_columns, errors='ignore')
+    logger.info(f"Ignoring {len(drop_columns)} columns.")
+    X = X.copy()
+    X = X.drop(columns=drop_columns, errors='ignore')
 
-    df_numeric = X.select_dtypes(include="number")
-    df_categorical = X.select_dtypes(include=["object", "category", "bool"])
+    if ordinal_mappings:
+        for col, mapping in ordinal_mappings.items():
+            if col in X.columns:
+                X[col] = X[col].astype(str).str.lower().str.strip()
+                X[col] = X[col].map(mapping)
+                X[col] = X[col].fillna(X[col].median())
+
+    if continuous_columns:
+        for col in continuous_columns:
+            if col in X.columns:
+                X[col] = pd.to_numeric(X[col], errors='coerce')
+
+    df_numeric = X.select_dtypes(include="number").copy()
+    df_categorical = X.select_dtypes(exclude="number").copy()
 
     if not df_numeric.empty:
-        df_numeric_clean = clean_internal(df_numeric, nan_threshold=nan_threshold)
+        for col in df_numeric.columns:
+            df_numeric[col] = df_numeric[col].fillna(df_numeric[col].median())
+        
         if scale:
             scaler = RobustScaler()
-            scaled_array = scaler.fit_transform(df_numeric_clean)
-            df_numeric_scaled = pd.DataFrame(scaled_array, columns=df_numeric_clean.columns, index=df_numeric_clean.index)
+            scaled_array = scaler.fit_transform(df_numeric)
+            df_numeric_scaled = pd.DataFrame(scaled_array, columns=df_numeric.columns, index=df_numeric.index)
         else:
-            df_numeric_scaled = df_numeric_clean.copy()
+            df_numeric_scaled = df_numeric.copy()
     else:
         logger.warning("No numeric data found to process.")
         df_numeric_scaled = pd.DataFrame(index=X.index)
 
     if not df_categorical.empty:
-        df_cat_filled = df_categorical.fillna("Missing").astype(str)
-        df_cat_encoded = pd.get_dummies(df_cat_filled, drop_first=True, dtype=int)
+        for col in df_categorical.columns:
+            df_categorical[col] = df_categorical[col].astype(str).str.lower().str.strip()
+            df_categorical[col] = df_categorical[col].replace('nan', np.nan)
+            
+        df_cat_encoded = pd.get_dummies(df_categorical, dummy_na=True, drop_first=True, dtype=int)
     else:
         logger.info("No categorical data found to encode.")
         df_cat_encoded = pd.DataFrame(index=X.index)
 
     df_combined = pd.concat([df_numeric_scaled, df_cat_encoded], axis=1, join="outer")
-    df_features = df_combined.loc[:, df_combined.std(axis=0, ddof=0) > 0]
-    df_features = df_features.fillna(0)
-
-    if top_k is not None:
-        if top_k > len(df_features.columns):
-            logger.warning(
-                f"top_k ({top_k}) is larger than available features ({len(df_features.columns)}). "
-                "Using all features."
-            )
-            return df_features
-
-        logger.info(f"Selecting top {top_k} features by variance.")
-        variances = df_features.var(axis=0)
-        selected_columns = variances.nlargest(top_k).index
-        df_final = df_features[selected_columns]
-
-    else:
-        logger.info("Skipping variance-based feature selection, using all features.")
-        df_final = df_features
+    df_final = df_combined.loc[:, df_combined.std(axis=0, ddof=0) > 0]
+    
+    df_final = df_final.astype(np.float32)
 
     logger.info(f"Clinical data cleaning complete. Final shape: {df_final.shape}")
     return df_final

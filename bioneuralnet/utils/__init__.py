@@ -9,10 +9,12 @@ from .reproducibility import set_seed
 
 from .data import (
     variance_summary,
-    zero_fraction_summary,
+    zero_summary,
     expression_summary,
     correlation_summary,
-    explore_data_stats,
+    nan_summary,
+    sparse_filter,
+    data_stats,
 )
 
 from .feature_selection import (
@@ -44,10 +46,12 @@ __all__ = [
     "set_seed",
     
     "variance_summary",
-    "zero_fraction_summary",
+    "zero_summary",
     "expression_summary",
     "correlation_summary",
-    "explore_data_stats",
+    "nan_summary",
+    "sparse_filter"
+    "data_stats",
     
     "variance_threshold",
     "mad_filter",
