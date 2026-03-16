@@ -45,6 +45,8 @@ smccnet_replication_final_387
 smccnet_replication_final
 smccnet_*
 REVISION2
+old_external_tools
+TCGA-Notebooks_copy
 # Other example data and tests not needed in the repo.
 extra.md
 auto_pysmccnet_test
@@ -63,7 +65,7 @@ WGCNA_old.R
 TCGA_BRCA/
 CNN/
 TCGA_BRCA_DATA/
-
+LGG/
 # Blocking sensitive file types globally
 *.csv
 *.RData
@@ -150,17 +152,11 @@ lib/
 cancer_output_1/GlobalNetwork.csv
 Parkinson
 KIPAN
-dpmon_cv_results
-dpmon_cv_results_GCN_FINAL
-dpmon_cv_results_SAGE_FINAL
 dpmon_tuning
 GBMLGG
 PAAN
-dpmon_cv_results_GAT_FINAL
 docs_notebooks
-dpmon_results
-dpmon_results_GAT_FINAL
-dpmon_results_GCN_FINAL
-dpmon_results_SAGE_FINAL
-dpmon_results_GIN_FINAL
+dpmon_cv_*
+dpmon_results_*
+old_clustering
 TCGA-Notebooks-data
