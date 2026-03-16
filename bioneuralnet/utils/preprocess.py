@@ -226,9 +226,24 @@ def clean_internal(df: pd.DataFrame, nan_threshold: float = 0.5) -> pd.DataFrame
 
     return df_clean
 
-def preprocess_clinical(X: pd.DataFrame, scale: bool = False, drop_columns: Optional[list] = None, ordinal_mappings: Optional[dict] = None, continuous_columns: Optional[list] = None) -> pd.DataFrame:
-    """
-    Preprocess clinical data by cleaning, mapping ordinals, encoding nominals, and scaling.
+def preprocess_clinical(X: pd.DataFrame, scale: bool = False, drop_columns: Optional[list] = None, ordinal_mappings: Optional[dict] = None, continuous_columns: Optional[list] = None, impute:float = False) -> pd.DataFrame:
+    """Preprocess clinical data by cleaning, mapping ordinals, encoding nominals, and scaling.
+
+    This function provides a generalized pipeline for standardizing clinical datasets. It removes specified non-informative columns, maps ordinal variables to numeric ranks, safely coerces continuous variables, and applies one-hot encoding to nominal categories while tracking missing records. Optionally, it handles median imputation and scaling.
+
+    Args:
+
+    X (pd.DataFrame): The raw clinical feature matrix with patients as rows and variables as columns.
+    scale (bool): If True, applies RobustScaler to the numeric columns.
+    drop_columns (list | None): List of column names to drop prior to processing.
+    ordinal_mappings (dict | None): Nested dictionary mapping string categories to numeric ranks.
+    continuous_columns (list | None): List of strictly continuous column names to coerce to numeric.
+    impute (bool): If True, applies median imputation to missing numeric and ordinal values.
+
+    Returns:
+
+    pd.DataFrame: Processed clinical feature matrix containing valid numeric types with zero-variance columns removed.
+
     """
     drop_columns = drop_columns or []
 
@@ -241,7 +256,8 @@ def preprocess_clinical(X: pd.DataFrame, scale: bool = False, drop_columns: Opti
             if col in X.columns:
                 X[col] = X[col].astype(str).str.lower().str.strip()
                 X[col] = X[col].map(mapping)
-                X[col] = X[col].fillna(X[col].median())
+                if impute:
+                    X[col] = X[col].fillna(X[col].median())
 
     if continuous_columns:
         for col in continuous_columns:
@@ -252,8 +268,9 @@ def preprocess_clinical(X: pd.DataFrame, scale: bool = False, drop_columns: Opti
     df_categorical = X.select_dtypes(exclude="number").copy()
 
     if not df_numeric.empty:
-        for col in df_numeric.columns:
-            df_numeric[col] = df_numeric[col].fillna(df_numeric[col].median())
+        if impute:
+            for col in df_numeric.columns:
+                df_numeric[col] = df_numeric[col].fillna(df_numeric[col].median())
         
         if scale:
             scaler = RobustScaler()

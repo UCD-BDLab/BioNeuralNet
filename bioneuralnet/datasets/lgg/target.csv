@@ -1,4 +1,4 @@
-Patient_ID,vital_status
+Patient_ID,target
 TCGA-CS-4938,0
 TCGA-CS-4941,1
 TCGA-CS-4942,1

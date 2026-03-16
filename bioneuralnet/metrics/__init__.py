@@ -6,7 +6,7 @@ This module provides functions for calculating correlations between omics data a
 from .correlation import (
     omics_correlation,
     cluster_correlation,
-    louvain_to_adjacency,
+    cluster_pca_correlation,
 )
 
 from .plot import (
@@ -23,7 +23,7 @@ from .plot import (
 __all__ = [
     "omics_correlation",
     "cluster_correlation",
-    "louvain_to_adjacency",
+    "cluster_pca_correlation",
     "plot_variance_distribution",
     "plot_variance_by_feature",
     "plot_performance_three",

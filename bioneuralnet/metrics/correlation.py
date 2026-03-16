@@ -44,7 +44,7 @@ def omics_correlation(omics: pd.DataFrame, pheno: pd.DataFrame) -> Tuple[float, 
     return corr, pvalue
 
 
-def cluster_correlation(cluster_df: pd.DataFrame, pheno: pd.DataFrame) -> tuple:
+def cluster_pca_correlation(cluster_df: pd.DataFrame, pheno: pd.DataFrame) -> tuple:
     """Computes the Pearson correlation coefficient between PC1 of a cluster and phenotype.
 
     Args:
@@ -88,12 +88,15 @@ def cluster_correlation(cluster_df: pd.DataFrame, pheno: pd.DataFrame) -> tuple:
 
     return (cluster_size, corr)
 
-def louvain_to_adjacency(louvain_cluster: pd.DataFrame) -> pd.DataFrame:
-    """Converts a Louvain cluster to an adjacency matrix.
+def cluster_correlation(louvain_cluster: pd.DataFrame) -> pd.DataFrame:
+    """Builds a new correlation network from an extracted cluster/subnetwork.
+    
+    This function is often used as an intermediate step between HybridLouvain and plotting. 
+    It allows the subnetwork to reveal its internal topological structure by computing the Pearson correlation of node connectivity profiles.
 
     Args:
 
-        louvain_cluster (pd.DataFrame): Represents an induced subnetwork (from Louvain).
+        louvain_cluster (pd.DataFrame): Represents an induced subnetwork.
 
     Returns:
 

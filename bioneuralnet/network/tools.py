@@ -35,20 +35,32 @@ class NetworkAnalyzer:
     Args:
 
         adjacency_matrix (pd.DataFrame): The input weighted adjacency matrix representing network connections.
+        source_omics (list): Optional list of original DataFrames used to build the network to dynamically assign omics types.
         device (str): The target computing device, defaulting to 'cuda' if available.
     """
-
-    def __init__(self, adjacency_matrix: pd.DataFrame, device: str = 'cuda'):
+    def __init__(self, adjacency_matrix: pd.DataFrame, source_omics: list = None, device: str = 'cuda'):
         self.device = device if torch.cuda.is_available() else 'cpu'
         self.feature_names = adjacency_matrix.index.tolist()
         self.n_nodes = len(self.feature_names)
         
         self.omics_types = {}
-        for feat in self.feature_names:
-            omics = feat.split('_')[0]
-            if omics not in self.omics_types:
-                self.omics_types[omics] = []
-            self.omics_types[omics].append(feat)
+        self.feature_to_omic = {}
+        
+        if source_omics is not None:
+            for i, df in enumerate(source_omics):
+                omic_name = f"omic_{i+1}"
+                self.omics_types[omic_name] = []
+                for col in df.columns:
+                    if col in self.feature_names:
+                        self.omics_types[omic_name].append(col)
+                        self.feature_to_omic[col] = omic_name
+        else:
+            for feat in self.feature_names:
+                omics = feat.split('_')[0]
+                if omics not in self.omics_types:
+                    self.omics_types[omics] = []
+                self.omics_types[omics].append(feat)
+                self.feature_to_omic[feat] = omics
         
         self.A = torch.tensor(
             adjacency_matrix.values, 
@@ -178,8 +190,8 @@ class NetworkAnalyzer:
         results = []
         for i, (idx, deg) in enumerate(zip(top_indices.cpu().numpy(), top_values.cpu().numpy())):
             feat_name = self.feature_names[idx]
-            omics_type = feat_name.split('_')[0]
-            actual_name = '_'.join(feat_name.split('_')[1:])
+            omics_type = self.feature_to_omic.get(feat_name, 'unknown')
+            actual_name = feat_name
             
             results.append({
                 'rank': i + 1,
@@ -424,8 +436,8 @@ class NetworkAnalyzer:
                 'rank': i + 1,
                 'feature1': feat1,
                 'feature2': feat2,
-                'omics1': feat1.split('_')[0],
-                'omics2': feat2.split('_')[0],
+                'omics1': self.feature_to_omic.get(feat1, 'unknown'),
+                'omics2': self.feature_to_omic.get(feat2, 'unknown'),
                 'weight': weight
             })
             
