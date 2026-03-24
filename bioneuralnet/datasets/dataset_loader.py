@@ -4,71 +4,20 @@ import pandas as pd
 class DatasetLoader:
     """Load a pre-packaged multi-omics dataset from the package.
 
+    Options for 'dataset_name':
+
+        "example": Synthetic example.
+        "monet": Synthetic example.
+        "brca": Breast invasive carcinoma.
+        "lgg": Brain Lower Grade Glioma.
+        "kipan": Pan-kidney carcinoma.
+
     Args:
-
-        dataset_name (str): Name of the dataset to load (case-insensitive).
-            Valid options:
-            - "example": Synthetic example.
-            - "monet": Synthetic example.
-            - "brca": Breast invasive carcinoma.
-            - "lgg": Brain Lower Grade Glioma.
-            - "kipan": Pan-kidney cohort (KICH+KIRC+KIRP).
-            - "paad": Pancreatic adenocarcinoma.
-
-    Dataset Details:
-
-    **example**
-    - X1: (358, 500)
-    - X2: (358, 100)
-    - Y: (358, 1)
-    - clinical: (358, 6)
-
-    **monet**
-    - gene: (107, 5039)
-    - mirna: (107, 789)
-    - phenotype: (106, 1)
-    - rppa: (107, 175)
-    - clinical: (107, 5)
-
-    **brca**
-    - mirna: (769, 503)
-    - target: (769, 1)
-    - clinical: (769, 103)
-    - rna: (769, 2500)
-    - meth: (769, 2203)
-
-    **lgg**
-    - mirna: (511, 548)
-    - target: (511, 1)
-    - clinical: (511, 13)
-    - rna: (511, 2127)
-    - meth: (511, 1823)
-
-    **paad**
-    - cnv: (177, 1035)
-    - target: (177, 1)
-    - clinical: (177, 19)
-    - rna: (177, 1910)
-    - meth: (177, 1152)
-
-    **kipan**
-    - mirna: (658, 472)
-    - target: (658, 1)
-    - clinical: (658, 19)
-    - rna: (658, 2284)
-    - meth: (658, 2102)
-
-    Attributes:
 
         dataset_name (str): Normalized dataset name.
         base_dir (Path): Directory where the dataset folders live.
         data (dict[str, pd.DataFrame]): Mapping from table name to loaded DataFrame.
 
-    Example:
-
-        loader = DatasetLoader("kipan")
-        print(loader.shape)
-        # {'mirna': (658, 472), 'target': (658, 1), ...}
 
     """
     def __init__(self, dataset_name: str):
@@ -109,28 +58,21 @@ class DatasetLoader:
             self.data["target"] = pd.read_csv(folder / "target.csv", index_col=0)
             self.data["clinical"] = pd.read_csv(folder / "clinical.csv", index_col=0)
             self.data["rna"] = pd.read_csv(folder / "rna.csv", index_col=0)
-            self.data["meth"] = pd.read_csv(folder / "meth.csv", index_col=0)
+            self.data["methylation"] = pd.read_csv(folder / "methylation.csv", index_col=0)
 
         elif self.dataset_name == "lgg":
             self.data["mirna"] = pd.read_csv(folder / "mirna.csv", index_col=0)
             self.data["target"] = pd.read_csv(folder / "target.csv", index_col=0)
             self.data["clinical"] = pd.read_csv(folder / "clinical.csv", index_col=0)
             self.data["rna"] = pd.read_csv(folder / "rna.csv", index_col=0)
-            self.data["meth"] = pd.read_csv(folder / "meth.csv", index_col=0)
+            self.data["methylation"] = pd.read_csv(folder / "methylation.csv", index_col=0)
 
         elif self.dataset_name == "kipan":
             self.data["mirna"] = pd.read_csv(folder / "mirna.csv", index_col=0)
             self.data["target"] = pd.read_csv(folder / "target.csv", index_col=0)
             self.data["clinical"] = pd.read_csv(folder / "clinical.csv", index_col=0)
             self.data["rna"] = pd.read_csv(folder / "rna.csv", index_col=0)
-            self.data["meth"] = pd.read_csv(folder / "meth.csv", index_col=0)
-
-        elif self.dataset_name == "paad":
-            self.data["cnv"] = pd.read_csv(folder / "cnv.csv", index_col=0)
-            self.data["target"] = pd.read_csv(folder / "target.csv", index_col=0)
-            self.data["clinical"] = pd.read_csv(folder / "clinical.csv", index_col=0)
-            self.data["rna"] = pd.read_csv(folder / "rna.csv", index_col=0)
-            self.data["meth"] = pd.read_csv(folder / "meth.csv", index_col=0)
+            self.data["methylation"] = pd.read_csv(folder / "methylation.csv", index_col=0)
 
         else:
             raise ValueError(f"Dataset '{self.dataset_name}' is not recognized.")

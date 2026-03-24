@@ -2,12 +2,13 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 from typing import Union, Optional, cast
-from bioneuralnet.utils import get_logger
-from .correlation import cluster_correlation
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from sklearn.manifold import TSNE
+
+from .correlation import cluster_pca_correlation
+from ..utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -457,8 +458,8 @@ def compare_clusters(clusters1: list, clusters2: list, pheno: pd.DataFrame, labe
     results = []
 
     for i, (df1, df2) in enumerate(zip(clusters1, clusters2), start=1):
-        size1, corr1 = cluster_correlation(df1, pheno)
-        size2, corr2 = cluster_correlation(df2, pheno)
+        size1, corr1 = cluster_pca_correlation(df1, pheno)
+        size2, corr2 = cluster_pca_correlation(df2, pheno)
 
         if corr1 is not None and corr2 is not None:
             results.append((f"Cluster_{i}", size1, corr1, size2, corr2))

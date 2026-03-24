@@ -1,512 +1,512 @@
-patient,years_to_birth,days_to_death,days_to_last_followup,tumor_tissue_site,gender,date_of_initial_pathologic_diagnosis,days_to_last_known_alive,radiation_therapy,karnofsky_performance_score,histological_type,race,ethnicity
-TCGA-CS-4938,31.0,,3574.0,central nervous system,female,2005,,no,90.0,astrocytoma,white,not hispanic or latino
-TCGA-CS-4941,67.0,234.0,,central nervous system,male,2005,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-CS-4942,44.0,1335.0,,central nervous system,female,2006,,yes,70.0,astrocytoma,black or african american,
-TCGA-CS-4943,37.0,1106.0,,central nervous system,male,2009,,no,50.0,astrocytoma,white,
-TCGA-CS-4944,50.0,,1828.0,central nervous system,male,2010,,yes,100.0,astrocytoma,white,
-TCGA-CS-5390,47.0,,,central nervous system,female,2005,,yes,100.0,oligodendroglioma,white,
-TCGA-CS-5393,39.0,,1222.0,central nervous system,male,2008,,yes,100.0,astrocytoma,white,
-TCGA-CS-5394,40.0,,8.0,central nervous system,male,2005,,no,,astrocytoma,white,
-TCGA-CS-5395,43.0,639.0,,central nervous system,male,2007,,yes,80.0,oligodendroglioma,black or african american,
-TCGA-CS-5396,53.0,,1631.0,central nervous system,female,2010,,yes,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-CS-5397,54.0,194.0,,central nervous system,female,2010,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-CS-6186,58.0,538.0,,central nervous system,male,2009,,yes,80.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-CS-6188,48.0,814.0,,central nervous system,male,2009,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-CS-6290,31.0,1137.0,,central nervous system,male,2009,,yes,90.0,astrocytoma,,
-TCGA-CS-6665,51.0,,1568.0,central nervous system,female,2010,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-CS-6666,22.0,,1428.0,central nervous system,male,2010,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-CS-6667,39.0,,1469.0,central nervous system,female,2010,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-CS-6668,57.0,,1519.0,central nervous system,female,2011,,no,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-CS-6669,26.0,,1494.0,central nervous system,female,2011,,no,90.0,oligodendroglioma,white,
-TCGA-CS-6670,43.0,,1426.0,central nervous system,male,2011,,,,oligodendroglioma,white,not hispanic or latino
-TCGA-DB-5270,38.0,,3733.0,central nervous system,female,2002,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-DB-5273,33.0,,2493.0,central nervous system,male,2006,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-DB-5274,37.0,,2289.0,central nervous system,female,2006,,yes,80.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DB-5275,36.0,,1458.0,central nervous system,male,2006,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-DB-5276,32.0,,2218.0,central nervous system,male,2007,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-DB-5277,34.0,1547.0,,central nervous system,male,2007,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-DB-5278,17.0,,2772.0,central nervous system,male,2007,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-DB-5279,59.0,,1354.0,central nervous system,male,2007,,no,,oligodendroglioma,,
-TCGA-DB-5280,43.0,,1112.0,central nervous system,male,2007,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-DB-5281,61.0,,2381.0,central nervous system,male,2006,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-DB-A4X9,33.0,,1412.0,central nervous system,female,2010,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-DB-A4XA,30.0,,573.0,central nervous system,male,2012,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-DB-A4XB,38.0,,919.0,central nervous system,male,2011,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-DB-A4XC,26.0,,1421.0,central nervous system,male,2010,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-DB-A4XD,32.0,,1210.0,central nervous system,male,2010,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-DB-A4XE,27.0,,1139.0,central nervous system,female,2011,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DB-A4XF,41.0,,1021.0,central nervous system,female,2011,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-DB-A4XG,34.0,,2219.0,central nervous system,male,2006,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-DB-A4XH,53.0,,962.0,central nervous system,female,2011,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-DB-A64L,67.0,,736.0,central nervous system,female,2012,,no,70.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DB-A64O,59.0,775.0,,central nervous system,male,2011,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-DB-A64P,40.0,,916.0,central nervous system,male,2012,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-DB-A64Q,31.0,,182.0,central nervous system,female,2012,,no,90.0,oligoastrocytoma,,
-TCGA-DB-A64R,24.0,,955.0,central nervous system,female,2012,,no,90.0,oligodendroglioma,,hispanic or latino
-TCGA-DB-A64S,20.0,,835.0,central nervous system,male,2012,,no,100.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DB-A64U,38.0,,846.0,central nervous system,female,2011,,no,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DB-A64V,54.0,,889.0,central nervous system,male,2012,,no,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DB-A64W,65.0,438.0,,central nervous system,female,2012,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DB-A64X,56.0,,563.0,central nervous system,female,2012,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-DB-A75K,55.0,,368.0,central nervous system,female,2013,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-DB-A75L,36.0,,342.0,central nervous system,female,2013,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-DB-A75O,29.0,,935.0,central nervous system,male,2010,,,90.0,astrocytoma,white,not hispanic or latino
-TCGA-DB-A75P,25.0,,492.0,central nervous system,female,2013,,no,,astrocytoma,,
-TCGA-DH-5140,38.0,607.0,,central nervous system,female,2007,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DH-5141,32.0,,968.0,central nervous system,male,2005,,yes,,oligodendroglioma,white,hispanic or latino
-TCGA-DH-5142,29.0,,1943.0,central nervous system,male,2008,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-DH-5143,30.0,,1401.0,central nervous system,male,2009,,yes,80.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DH-5144,56.0,,748.0,central nervous system,female,2009,,yes,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DH-A669,70.0,919.0,,central nervous system,male,2007,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-DH-A66B,52.0,,1279.0,central nervous system,male,2010,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-DH-A66D,43.0,,846.0,central nervous system,female,2012,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-DH-A66F,49.0,,523.0,central nervous system,male,2012,,no,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DH-A66G,49.0,,523.0,central nervous system,female,2013,,yes,80.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DH-A7UR,59.0,,1650.0,central nervous system,female,2008,,yes,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DH-A7US,50.0,,706.0,central nervous system,male,2013,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-DH-A7UT,30.0,531.0,,central nervous system,male,2013,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-DH-A7UU,43.0,,417.0,central nervous system,male,2013,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-DH-A7UV,49.0,,566.0,central nervous system,male,2013,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-DU-5847,34.0,,548.0,central nervous system,female,2009,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-DU-5849,48.0,,443.0,central nervous system,male,2010,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-5851,40.0,,531.0,central nervous system,female,2010,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-5852,61.0,205.0,,central nervous system,female,2010,,no,50.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-5853,29.0,,407.0,central nervous system,male,2010,,yes,100.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-5854,57.0,,257.0,central nervous system,female,2010,,yes,100.0,astrocytoma,white,not hispanic or latino
-TCGA-DU-5855,49.0,,207.0,central nervous system,female,2010,,yes,100.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-5870,34.0,,5546.0,central nervous system,female,1995,,yes,70.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-5871,37.0,,576.0,central nervous system,female,2009,,yes,100.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-5872,43.0,,532.0,central nervous system,female,2009,,yes,,oligoastrocytoma,black or african american,not hispanic or latino
-TCGA-DU-5874,62.0,,461.0,central nervous system,female,2010,,no,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-6392,35.0,,6423.0,central nervous system,female,1993,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-DU-6393,66.0,1585.0,,central nervous system,male,1993,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-6394,53.0,682.0,,central nervous system,male,1994,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-6395,31.0,1491.0,,central nervous system,male,1994,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-6396,31.0,2286.0,,central nervous system,female,1996,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-6397,45.0,1401.0,,central nervous system,male,1997,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-6399,54.0,2000.0,,central nervous system,male,1998,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-6400,66.0,37.0,,central nervous system,female,1998,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-6401,31.0,2660.0,,central nervous system,female,1998,,yes,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-6402,52.0,214.0,,central nervous system,male,1998,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-DU-6403,60.0,354.0,,central nervous system,female,1999,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-6404,24.0,4068.0,,central nervous system,female,2000,,yes,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-6405,51.0,605.0,,central nervous system,female,2000,,yes,60.0,astrocytoma,white,not hispanic or latino
-TCGA-DU-6406,59.0,512.0,,central nervous system,female,2001,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-6407,35.0,2875.0,,central nervous system,female,2001,,yes,80.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-6408,23.0,3470.0,,central nervous system,female,1998,,yes,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-6410,56.0,,242.0,central nervous system,male,2010,,no,50.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-6542,25.0,,73.0,central nervous system,male,2011,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-7006,60.0,349.0,,central nervous system,female,1995,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-DU-7007,33.0,1915.0,,central nervous system,male,1997,,,,astrocytoma,white,not hispanic or latino
-TCGA-DU-7008,41.0,,4752.0,central nervous system,female,1998,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-7009,32.0,4695.0,,central nervous system,female,2000,,yes,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-7010,58.0,456.0,,central nervous system,female,2001,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-DU-7012,74.0,199.0,,central nervous system,female,2001,,yes,,astrocytoma,black or african american,not hispanic or latino
-TCGA-DU-7013,59.0,269.0,,central nervous system,male,2001,,yes,70.0,astrocytoma,white,not hispanic or latino
-TCGA-DU-7014,59.0,3571.0,,central nervous system,male,2001,,yes,50.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-7015,41.0,,2761.0,central nervous system,female,2004,,no,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-7018,57.0,933.0,,central nervous system,female,2006,,no,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-7019,39.0,,800.0,central nervous system,male,2009,,yes,100.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-7290,45.0,315.0,,central nervous system,female,1995,,no,,astrocytoma,white,not hispanic or latino
-TCGA-DU-7292,69.0,242.0,,central nervous system,male,1997,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-DU-7294,53.0,,2869.0,central nervous system,female,2003,,no,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-7298,38.0,576.0,,central nervous system,female,2006,,yes,80.0,astrocytoma,black or african american,not hispanic or latino
-TCGA-DU-7299,33.0,1339.0,,central nervous system,male,2006,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-DU-7300,53.0,1886.0,,central nervous system,female,2006,,no,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-7301,53.0,788.0,,central nervous system,male,2006,,yes,60.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-7302,48.0,,1834.0,central nervous system,female,2006,,no,70.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-7304,43.0,709.0,,central nervous system,male,2008,,yes,80.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-7306,67.0,,1277.0,central nervous system,male,2008,,yes,100.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-7309,41.0,,84.0,central nervous system,female,2011,,yes,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-8158,57.0,155.0,,central nervous system,female,2001,,,80.0,astrocytoma,white,not hispanic or latino
-TCGA-DU-8161,63.0,722.0,,central nervous system,female,2009,,yes,70.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-8162,61.0,444.0,,central nervous system,female,2011,,yes,80.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-8163,29.0,,629.0,central nervous system,male,2011,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-8164,51.0,,651.0,central nervous system,male,2011,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-8165,60.0,,582.0,central nervous system,female,2011,,yes,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-8166,29.0,,516.0,central nervous system,female,2012,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-8167,69.0,,471.0,central nervous system,female,2012,,yes,100.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-8168,55.0,,431.0,central nervous system,female,2012,,yes,70.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-A5TP,33.0,,1012.0,central nervous system,male,2012,,yes,70.0,astrocytoma,white,not hispanic or latino
-TCGA-DU-A5TR,51.0,,908.0,central nervous system,male,2012,,no,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-A5TS,42.0,,964.0,central nervous system,male,2012,,yes,100.0,oligodendroglioma,black or african american,not hispanic or latino
-TCGA-DU-A5TT,70.0,,743.0,central nervous system,male,2013,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-A5TU,62.0,,796.0,central nervous system,female,2013,,yes,50.0,astrocytoma,white,not hispanic or latino
-TCGA-DU-A5TW,33.0,,760.0,central nervous system,female,2012,,no,100.0,astrocytoma,black or african american,not hispanic or latino
-TCGA-DU-A5TY,46.0,1033.0,,central nervous system,female,2012,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-DU-A6S2,37.0,,777.0,central nervous system,female,2013,,no,70.0,oligodendroglioma,black or african american,not hispanic or latino
-TCGA-DU-A6S3,60.0,,656.0,central nervous system,male,2013,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-A6S6,35.0,,2893.0,central nervous system,female,2007,,no,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-A6S7,27.0,,638.0,central nervous system,female,2013,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-DU-A6S8,74.0,,678.0,central nervous system,female,2013,,no,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-A76K,86.0,347.0,,central nervous system,male,1999,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-A76L,54.0,814.0,,central nervous system,male,2000,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-A76O,30.0,,522.0,central nervous system,male,2013,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-DU-A76R,51.0,648.0,,central nervous system,male,2006,,yes,50.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-A7T6,73.0,547.0,,central nervous system,female,2002,,,60.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-A7T8,35.0,4229.0,,central nervous system,male,2003,,yes,100.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-A7TA,32.0,,2565.0,central nervous system,male,2007,,yes,80.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-A7TB,56.0,,1567.0,central nervous system,male,2010,,no,100.0,oligodendroglioma,asian,not hispanic or latino
-TCGA-DU-A7TC,32.0,,1137.0,central nervous system,male,2011,,no,90.0,astrocytoma,white,not hispanic or latino
-TCGA-DU-A7TD,52.0,228.0,,central nervous system,male,2012,,yes,60.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-DU-A7TG,40.0,1351.0,,central nervous system,male,2008,,no,70.0,oligodendroglioma,white,not hispanic or latino
-TCGA-DU-A7TI,32.0,1183.0,,central nervous system,male,1998,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-DU-A7TJ,55.0,,17.0,central nervous system,male,2013,,,,astrocytoma,black or african american,not hispanic or latino
-TCGA-E1-5302,41.0,1525.0,,central nervous system,male,1998,,yes,100.0,astrocytoma,white,not hispanic or latino
-TCGA-E1-5303,38.0,2052.0,,central nervous system,male,1998,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-E1-5304,42.0,1251.0,,central nervous system,male,1999,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-E1-5305,34.0,2433.0,,central nervous system,male,2000,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-E1-5307,62.0,1762.0,,central nervous system,female,2000,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-E1-5311,31.0,4084.0,,central nervous system,male,1994,,yes,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-E1-5318,42.0,2379.0,,central nervous system,female,1997,,yes,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-E1-5319,48.0,2907.0,,central nervous system,female,1998,,no,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-E1-5322,38.0,3978.0,,central nervous system,female,1999,,,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-E1-A7YD,57.0,435.0,,central nervous system,male,1998,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-E1-A7YE,32.0,886.0,,central nervous system,female,2001,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-E1-A7YH,47.0,2835.0,,central nervous system,female,2005,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-E1-A7YI,33.0,111.0,,central nervous system,female,2008,,no,80.0,astrocytoma,white,not hispanic or latino
-TCGA-E1-A7YJ,55.0,592.0,,central nervous system,male,2008,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-E1-A7YK,52.0,378.0,,central nervous system,male,2009,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-E1-A7YL,46.0,492.0,,central nervous system,male,2009,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-E1-A7YM,63.0,648.0,,central nervous system,male,2010,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-E1-A7YN,63.0,727.0,,central nervous system,female,2010,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-E1-A7YO,45.0,2282.0,,central nervous system,male,1995,,no,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-E1-A7YQ,58.0,1578.0,,central nervous system,female,2000,,yes,60.0,oligodendroglioma,black or african american,not hispanic or latino
-TCGA-E1-A7YS,71.0,466.0,,central nervous system,male,2007,,yes,80.0,oligodendroglioma,black or african american,not hispanic or latino
-TCGA-E1-A7YU,42.0,23.0,,central nervous system,male,1996,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-E1-A7YV,26.0,987.0,,central nervous system,female,2010,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-E1-A7YW,28.0,1120.0,,central nervous system,male,2002,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-E1-A7YY,27.0,4445.0,,central nervous system,female,1998,,yes,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-E1-A7Z2,58.0,398.0,,central nervous system,female,2012,,no,80.0,oligodendroglioma,white,not hispanic or latino
-TCGA-E1-A7Z3,31.0,2235.0,,central nervous system,female,1992,,yes,,astrocytoma,black or african american,not hispanic or latino
-TCGA-E1-A7Z4,35.0,4412.0,,central nervous system,male,1999,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-E1-A7Z6,41.0,984.0,,central nervous system,female,2009,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-EZ-7264,47.0,,1201.0,central nervous system,female,2011,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-F6-A8O3,34.0,,7.0,central nervous system,male,2013,,,,oligodendroglioma,asian,not hispanic or latino
-TCGA-F6-A8O4,44.0,,6.0,central nervous system,male,2013,,,,astrocytoma,asian,not hispanic or latino
-TCGA-FG-5962,54.0,,1453.0,central nervous system,male,2009,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-FG-5963,23.0,775.0,,central nervous system,male,2009,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-FG-5964,62.0,,1588.0,central nervous system,male,2010,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-FG-5965,39.0,1120.0,,central nervous system,female,2008,,no,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-FG-6688,59.0,,571.0,central nervous system,female,2010,,yes,50.0,astrocytoma,black or african american,not hispanic or latino
-TCGA-FG-6689,30.0,,454.0,central nervous system,male,2011,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-FG-6690,70.0,,1294.0,central nervous system,male,2011,,yes,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-FG-6691,23.0,,1257.0,central nervous system,female,2011,,no,80.0,astrocytoma,white,not hispanic or latino
-TCGA-FG-6692,63.0,561.0,,central nervous system,male,2011,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-FG-7634,28.0,,467.0,central nervous system,male,2008,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-FG-7636,48.0,,544.0,central nervous system,male,2011,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-FG-7637,49.0,,1219.0,central nervous system,male,2009,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-FG-7638,31.0,,686.0,central nervous system,female,2011,,yes,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-FG-7641,31.0,,627.0,central nervous system,male,2011,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-FG-7643,49.0,,611.0,central nervous system,female,2011,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-FG-8181,23.0,,862.0,central nervous system,male,2012,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-FG-8182,35.0,,416.0,central nervous system,male,2012,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-FG-8185,37.0,,433.0,central nervous system,male,2012,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-FG-8186,42.0,,487.0,central nervous system,female,2011,,yes,70.0,oligoastrocytoma,white,hispanic or latino
-TCGA-FG-8187,31.0,,611.0,central nervous system,male,2011,,no,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-FG-8188,41.0,,455.0,central nervous system,male,2012,,no,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-FG-8189,33.0,,685.0,central nervous system,female,2012,,yes,70.0,oligodendroglioma,white,not hispanic or latino
-TCGA-FG-8191,30.0,,992.0,central nervous system,male,2011,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-FG-A4MT,27.0,,1164.0,central nervous system,female,2010,,no,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-FG-A4MU,58.0,,326.0,central nervous system,male,2012,,,,oligoastrocytoma,white,not hispanic or latino
-TCGA-FG-A4MW,63.0,559.0,,central nervous system,male,2012,,yes,80.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-FG-A4MX,47.0,,569.0,central nervous system,male,2012,,yes,100.0,astrocytoma,white,not hispanic or latino
-TCGA-FG-A4MY,44.0,,721.0,central nervous system,female,2012,,yes,,oligoastrocytoma,white,hispanic or latino
-TCGA-FG-A60J,47.0,,449.0,central nervous system,female,2012,,no,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-FG-A60K,34.0,,542.0,central nervous system,female,2012,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-FG-A60L,34.0,,655.0,central nervous system,female,2012,,no,100.0,astrocytoma,white,not hispanic or latino
-TCGA-FG-A6IZ,60.0,,457.0,central nervous system,male,2013,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-FG-A6J1,44.0,,500.0,central nervous system,female,2013,,yes,70.0,oligodendroglioma,white,not hispanic or latino
-TCGA-FG-A6J3,52.0,,677.0,central nervous system,female,2012,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-FG-A70Y,20.0,,868.0,central nervous system,female,2011,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-FG-A70Z,53.0,,328.0,central nervous system,female,2011,,yes,,oligoastrocytoma,black or african american,not hispanic or latino
-TCGA-FG-A710,50.0,,1115.0,central nervous system,female,2011,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-FG-A711,33.0,1481.0,,central nervous system,female,2010,,no,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-FG-A713,74.0,,622.0,central nervous system,female,2013,,yes,60.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-FG-A87N,37.0,,567.0,central nervous system,female,2013,,yes,,astrocytoma,asian,not hispanic or latino
-TCGA-FG-A87Q,61.0,,174.0,central nervous system,female,2013,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-FN-7833,25.0,,837.0,central nervous system,male,2011,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-7467,54.0,,3.0,central nervous system,male,2011,,,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7468,30.0,,203.0,central nervous system,male,2011,,no,80.0,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7469,30.0,351.0,,central nervous system,male,2011,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7470,37.0,1220.0,,central nervous system,male,2011,,yes,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7471,37.0,,4.0,central nervous system,female,2010,,,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7472,38.0,,1.0,central nervous system,male,2010,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7473,28.0,,503.0,central nervous system,male,2010,,yes,,oligoastrocytoma,white,hispanic or latino
-TCGA-HT-7474,52.0,,114.0,central nervous system,male,2011,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-7475,67.0,,530.0,central nervous system,male,2010,,yes,70.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-7476,26.0,,199.0,central nervous system,male,2011,,yes,,astrocytoma,white,hispanic or latino
-TCGA-HT-7477,62.0,,738.0,central nervous system,male,2011,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-HT-7478,36.0,,194.0,central nervous system,male,2011,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-HT-7479,44.0,,1227.0,central nervous system,male,2011,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-HT-7480,33.0,,2287.0,central nervous system,male,2005,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7481,39.0,,2918.0,central nervous system,male,2006,,yes,80.0,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7482,18.0,,3253.0,central nervous system,female,2005,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-7483,14.0,,5255.0,central nervous system,male,1998,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-7485,42.0,,122.0,central nervous system,male,2006,,no,100.0,astrocytoma,white,not hispanic or latino
-TCGA-HT-7601,30.0,,153.0,central nervous system,female,2008,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-HT-7602,21.0,,908.0,central nervous system,male,2008,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7603,29.0,,705.0,central nervous system,male,2008,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7604,50.0,,3725.0,central nervous system,male,2003,,yes,,astrocytoma,black or african american,not hispanic or latino
-TCGA-HT-7605,38.0,,139.0,central nervous system,male,2008,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7606,30.0,,526.0,central nervous system,female,2008,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-HT-7607,61.0,96.0,,central nervous system,female,2008,,no,70.0,astrocytoma,white,not hispanic or latino
-TCGA-HT-7608,61.0,,671.0,central nervous system,male,2007,,no,,oligoastrocytoma,black or african american,not hispanic or latino
-TCGA-HT-7609,34.0,,1399.0,central nervous system,male,2007,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-7610,25.0,,1706.0,central nervous system,female,2007,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-7611,36.0,,1752.0,central nervous system,male,2007,,no,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-7616,75.0,7.0,,central nervous system,male,2007,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7620,40.0,,434.0,central nervous system,male,2007,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7676,26.0,,5.0,central nervous system,male,2009,,,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7677,53.0,,494.0,central nervous system,male,2009,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7680,32.0,,23.0,central nervous system,female,2010,,no,,astrocytoma,white,hispanic or latino
-TCGA-HT-7681,29.0,,1359.0,central nervous system,female,2009,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-7684,58.0,,184.0,central nervous system,male,2008,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-7686,29.0,,1300.0,central nervous system,female,2008,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-HT-7687,74.0,,3.0,central nervous system,male,2010,,,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7688,59.0,,964.0,central nervous system,male,2009,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7689,58.0,,455.0,central nervous system,female,2009,,yes,70.0,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7690,29.0,,3.0,central nervous system,male,2009,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-7691,31.0,,3.0,central nervous system,female,2008,,no,,astrocytoma,white,not hispanic or latino
-TCGA-HT-7692,43.0,,90.0,central nervous system,male,2009,,yes,100.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-7693,51.0,,533.0,central nervous system,female,2008,,yes,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7694,60.0,,210.0,central nervous system,male,2008,,yes,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7695,29.0,,442.0,central nervous system,female,2009,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7854,62.0,,1201.0,central nervous system,male,2010,,yes,100.0,astrocytoma,white,not hispanic or latino
-TCGA-HT-7855,39.0,,585.0,central nervous system,male,2008,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-HT-7856,35.0,,1189.0,central nervous system,male,2008,,yes,80.0,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7857,24.0,,7.0,central nervous system,female,2006,,no,,astrocytoma,white,not hispanic or latino
-TCGA-HT-7858,28.0,,1540.0,central nervous system,male,2007,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-HT-7860,60.0,,15.0,central nervous system,female,2009,,,,astrocytoma,white,not hispanic or latino
-TCGA-HT-7873,29.0,,718.0,central nervous system,male,2011,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-7874,41.0,,1130.0,central nervous system,female,2008,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7875,56.0,,10.0,central nervous system,male,2008,,yes,80.0,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7877,20.0,,4.0,central nervous system,female,2011,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-7879,31.0,,112.0,central nervous system,male,2011,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-7880,30.0,,162.0,central nervous system,male,2011,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-7881,38.0,,1079.0,central nervous system,male,2011,,yes,,oligodendroglioma,black or african american,not hispanic or latino
-TCGA-HT-7882,66.0,113.0,,central nervous system,male,2010,,no,,oligodendroglioma,white,hispanic or latino
-TCGA-HT-7884,44.0,,343.0,central nervous system,female,2011,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-HT-7902,30.0,,956.0,central nervous system,female,2009,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-8010,64.0,,50.0,central nervous system,female,2011,,no,,oligodendroglioma,white,hispanic or latino
-TCGA-HT-8011,55.0,,494.0,central nervous system,male,2009,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-HT-8012,30.0,,286.0,central nervous system,female,2010,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-8013,37.0,1933.0,,central nervous system,female,2005,,yes,70.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-8015,21.0,,3.0,central nervous system,male,2008,,,,astrocytoma,white,not hispanic or latino
-TCGA-HT-8018,40.0,1152.0,,central nervous system,female,2010,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-8019,34.0,,1004.0,central nervous system,female,2009,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-8104,51.0,,372.0,central nervous system,female,2010,,,,astrocytoma,white,not hispanic or latino
-TCGA-HT-8105,54.0,,190.0,central nervous system,male,2011,,yes,70.0,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-8106,53.0,,3.0,central nervous system,male,2010,,no,,astrocytoma,white,not hispanic or latino
-TCGA-HT-8107,62.0,,14.0,central nervous system,male,2011,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-8108,26.0,,76.0,central nervous system,female,2011,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-8109,64.0,,169.0,central nervous system,male,2011,,yes,,oligodendroglioma,white,hispanic or latino
-TCGA-HT-8110,57.0,,419.0,central nervous system,male,2011,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-HT-8111,32.0,,7.0,central nervous system,male,2011,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-8113,49.0,,900.0,central nervous system,female,2006,,yes,90.0,oligodendroglioma,black or african american,not hispanic or latino
-TCGA-HT-8114,36.0,,1040.0,central nervous system,male,2011,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-8558,29.0,,418.0,central nervous system,female,2011,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-8563,30.0,,860.0,central nervous system,female,2011,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-HT-8564,47.0,,478.0,central nervous system,male,2012,,no,80.0,astrocytoma,white,hispanic or latino
-TCGA-HT-A4DS,55.0,,7.0,central nervous system,female,2012,,,,astrocytoma,white,not hispanic or latino
-TCGA-HT-A4DV,51.0,,792.0,central nervous system,female,2012,,yes,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-A5R5,33.0,,4.0,central nervous system,female,2012,,,,oligodendroglioma,white,hispanic or latino
-TCGA-HT-A5R7,33.0,,615.0,central nervous system,female,2012,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-HT-A5R9,48.0,,2.0,central nervous system,female,2012,,,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-A5RA,65.0,,832.0,central nervous system,female,2012,,yes,70.0,astrocytoma,white,not hispanic or latino
-TCGA-HT-A5RB,24.0,,3.0,central nervous system,male,2011,,,,astrocytoma,white,hispanic or latino
-TCGA-HT-A5RC,70.0,162.0,,central nervous system,female,2012,,yes,40.0,astrocytoma,white,not hispanic or latino
-TCGA-HT-A614,47.0,,82.0,central nervous system,male,2013,,,,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-A615,38.0,,515.0,central nervous system,female,2012,,yes,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-A616,36.0,,55.0,central nervous system,female,2013,,no,,astrocytoma,white,not hispanic or latino
-TCGA-HT-A617,47.0,,491.0,central nervous system,male,2010,,,60.0,oligodendroglioma,american indian or alaska native,
-TCGA-HT-A618,37.0,,512.0,central nervous system,female,2013,,no,80.0,astrocytoma,white,not hispanic or latino
-TCGA-HT-A619,51.0,,651.0,central nervous system,female,2012,,no,,oligodendroglioma,asian,not hispanic or latino
-TCGA-HT-A61A,20.0,,194.0,central nervous system,female,2013,,yes,80.0,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-A61B,22.0,,533.0,central nervous system,male,2012,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-HT-A61C,66.0,537.0,,central nervous system,male,2013,,yes,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-A74H,62.0,,74.0,central nervous system,male,2013,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-HT-A74K,58.0,,467.0,central nervous system,female,2012,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-HT-A74L,22.0,,336.0,central nervous system,female,2013,,,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-HT-A74O,34.0,,3.0,central nervous system,male,2013,,,,astrocytoma,white,not hispanic or latino
-TCGA-HW-7486,37.0,,1721.0,central nervous system,male,2010,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-HW-7487,39.0,,1382.0,central nervous system,male,2010,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-HW-7489,38.0,1262.0,,central nervous system,male,2011,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-HW-7490,41.0,,1387.0,central nervous system,male,2011,,no,,astrocytoma,white,not hispanic or latino
-TCGA-HW-7491,35.0,,2078.0,central nervous system,male,2009,,no,,oligodendroglioma,white,
-TCGA-HW-7493,40.0,,2107.0,central nervous system,female,2009,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-HW-7495,45.0,,1078.0,central nervous system,female,2011,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-HW-8319,34.0,1209.0,,central nervous system,female,2011,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-HW-8320,36.0,,1217.0,central nervous system,male,2011,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-HW-8321,31.0,,1294.0,central nervous system,male,2011,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-HW-8322,39.0,,758.0,central nervous system,male,2012,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-HW-A5KJ,68.0,962.0,,central nervous system,male,2012,,yes,,oligodendroglioma,white,
-TCGA-HW-A5KK,64.0,388.0,,central nervous system,male,2012,,yes,,astrocytoma,white,
-TCGA-HW-A5KL,42.0,,878.0,central nervous system,female,2012,,yes,,astrocytoma,white,
-TCGA-HW-A5KM,35.0,,630.0,central nervous system,male,2012,,no,,astrocytoma,white,
-TCGA-IK-7675,43.0,578.0,,central nervous system,male,2009,,yes,90.0,oligodendroglioma,white,hispanic or latino
-TCGA-IK-8125,62.0,,1301.0,central nervous system,male,2009,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-KT-A74X,26.0,,438.0,central nervous system,male,2013,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-KT-A7W1,45.0,,438.0,central nervous system,female,2013,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-P5-A5ET,27.0,,0.0,central nervous system,male,2012,,,,oligodendroglioma,white,not hispanic or latino
-TCGA-P5-A5EU,35.0,,0.0,central nervous system,male,2012,,no,60.0,astrocytoma,white,not hispanic or latino
-TCGA-P5-A5EV,39.0,,7.0,central nervous system,male,2012,,,60.0,astrocytoma,white,not hispanic or latino
-TCGA-P5-A5EW,20.0,,204.0,central nervous system,female,2012,,,80.0,astrocytoma,white,not hispanic or latino
-TCGA-P5-A5EX,41.0,,243.0,central nervous system,female,2012,,yes,80.0,oligodendroglioma,white,not hispanic or latino
-TCGA-P5-A5EY,21.0,,72.0,central nervous system,male,2012,,,,astrocytoma,white,not hispanic or latino
-TCGA-P5-A5EZ,39.0,,70.0,central nervous system,male,2012,,,,astrocytoma,white,not hispanic or latino
-TCGA-P5-A5F0,33.0,,287.0,central nervous system,male,2012,,yes,80.0,oligodendroglioma,white,not hispanic or latino
-TCGA-P5-A5F1,30.0,,179.0,central nervous system,male,2012,,,,astrocytoma,white,not hispanic or latino
-TCGA-P5-A5F2,36.0,,242.0,central nervous system,female,2012,,no,80.0,astrocytoma,white,not hispanic or latino
-TCGA-P5-A5F4,35.0,,231.0,central nervous system,female,2012,,yes,70.0,oligodendroglioma,white,not hispanic or latino
-TCGA-P5-A5F6,26.0,,39.0,central nervous system,male,2012,,,70.0,oligodendroglioma,white,not hispanic or latino
-TCGA-P5-A72U,71.0,,7.0,central nervous system,female,2013,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-P5-A72W,35.0,,317.0,central nervous system,male,2013,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-P5-A72X,21.0,,403.0,central nervous system,male,2013,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-P5-A72Z,64.0,,354.0,central nervous system,female,2013,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-P5-A730,22.0,,333.0,central nervous system,male,2013,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-P5-A731,59.0,,274.0,central nervous system,female,2013,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-P5-A733,52.0,,414.0,central nervous system,female,2013,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-P5-A735,38.0,,292.0,central nervous system,female,2013,,no,,astrocytoma,white,not hispanic or latino
-TCGA-P5-A736,44.0,,230.0,central nervous system,female,2013,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-P5-A737,47.0,,372.0,central nervous system,male,2012,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-P5-A77W,37.0,,584.0,central nervous system,female,2013,,no,,oligoastrocytoma,white,not hispanic or latino
-TCGA-P5-A77X,55.0,,105.0,central nervous system,female,2013,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-P5-A780,44.0,,72.0,central nervous system,female,2013,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-P5-A781,34.0,,134.0,central nervous system,female,2013,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-QH-A65R,38.0,,461.0,central nervous system,female,2013,,yes,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-QH-A65S,32.0,,77.0,central nervous system,female,2013,,no,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-QH-A65V,43.0,,384.0,central nervous system,female,2013,,no,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-QH-A65X,28.0,,482.0,central nervous system,female,2013,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-QH-A65Z,54.0,,427.0,central nervous system,male,2013,,yes,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-QH-A6CS,41.0,,588.0,central nervous system,male,2013,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-QH-A6CU,52.0,,451.0,central nervous system,female,2013,,yes,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-QH-A6CV,51.0,,442.0,central nervous system,male,2013,,yes,90.0,oligoastrocytoma,asian,not hispanic or latino
-TCGA-QH-A6CX,66.0,372.0,,central nervous system,male,2013,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-QH-A6CY,38.0,,408.0,central nervous system,male,2013,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-QH-A6CZ,38.0,,279.0,central nervous system,male,2013,,no,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-QH-A6X3,27.0,,313.0,central nervous system,male,2013,,no,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-QH-A6X4,47.0,,442.0,central nervous system,male,2013,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-QH-A6X5,58.0,,497.0,central nervous system,female,2013,,no,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-QH-A6X8,56.0,,509.0,central nervous system,female,2013,,yes,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-QH-A6X9,73.0,,58.0,central nervous system,female,2013,,no,40.0,oligodendroglioma,white,not hispanic or latino
-TCGA-QH-A6XA,23.0,,502.0,central nervous system,female,2013,,no,100.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-QH-A6XC,48.0,,508.0,central nervous system,male,2013,,yes,70.0,astrocytoma,white,not hispanic or latino
-TCGA-QH-A86X,33.0,,337.0,central nervous system,male,2013,,no,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-QH-A870,38.0,,395.0,central nervous system,female,2013,,no,80.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-R8-A6MK,40.0,,2702.0,central nervous system,male,2005,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-R8-A6ML,52.0,,2860.0,central nervous system,male,2005,,yes,,oligodendroglioma,white,hispanic or latino
-TCGA-R8-A6MO,53.0,,993.0,central nervous system,female,2009,,no,,oligodendroglioma,asian,not hispanic or latino
-TCGA-R8-A73M,48.0,,1806.0,central nervous system,female,2008,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-RY-A83X,46.0,,939.0,central nervous system,female,2012,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-RY-A83Y,45.0,,166.0,central nervous system,male,2012,,no,80.0,oligodendroglioma,white,not hispanic or latino
-TCGA-RY-A83Z,54.0,,301.0,central nervous system,female,2012,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-RY-A840,47.0,,854.0,central nervous system,male,2012,,no,90.0,oligodendroglioma,,
-TCGA-RY-A843,30.0,,63.0,central nervous system,male,2012,,no,,astrocytoma,white,not hispanic or latino
-TCGA-RY-A845,40.0,,596.0,central nervous system,female,2013,,no,80.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-RY-A847,45.0,,933.0,central nervous system,male,2012,,no,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-S9-A6TS,48.0,1891.0,,central nervous system,female,2006,,yes,100.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A6TU,38.0,,2650.0,central nervous system,male,2007,,no,100.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A6TV,50.0,,571.0,central nervous system,male,2010,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-S9-A6TW,40.0,,1250.0,central nervous system,male,2011,,no,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-S9-A6TX,46.0,,1245.0,central nervous system,male,2011,,no,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-S9-A6TY,50.0,,1076.0,central nervous system,male,2011,,no,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-S9-A6TZ,39.0,,1120.0,central nervous system,female,2011,,no,100.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A6U0,46.0,742.0,,central nervous system,male,2012,,yes,100.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A6U1,22.0,,785.0,central nervous system,female,2012,,no,100.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A6U2,48.0,,908.0,central nervous system,female,2012,,yes,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-S9-A6U5,33.0,,992.0,central nervous system,male,2011,,no,100.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A6U6,28.0,,1069.0,central nervous system,male,2012,,yes,100.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A6U8,24.0,2988.0,,central nervous system,male,2005,,no,100.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A6U9,36.0,,2918.0,central nervous system,male,2006,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-S9-A6UA,66.0,178.0,,central nervous system,male,2008,,no,60.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A6UB,52.0,,3761.0,central nervous system,male,2005,,no,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-S9-A6WD,58.0,,2289.0,central nervous system,male,2008,,no,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-S9-A6WE,34.0,,4113.0,central nervous system,male,2004,,no,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-S9-A6WG,31.0,,2602.0,central nervous system,male,2007,,yes,100.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A6WH,73.0,,1173.0,central nervous system,female,2011,,yes,80.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-S9-A6WI,56.0,,2585.0,central nervous system,female,2006,,yes,100.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-S9-A6WL,52.0,,946.0,central nervous system,male,2012,,no,100.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A6WM,59.0,,604.0,central nervous system,female,2012,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A6WN,38.0,,805.0,central nervous system,female,2013,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A6WO,29.0,,566.0,central nervous system,male,2013,,no,100.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A6WP,42.0,,567.0,central nervous system,male,2013,,no,100.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-S9-A6WQ,57.0,,428.0,central nervous system,female,2013,,no,100.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-S9-A7IQ,45.0,,1099.0,central nervous system,female,2011,,no,100.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-S9-A7IS,33.0,241.0,,central nervous system,female,2004,,yes,60.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A7IX,57.0,819.0,,central nervous system,male,2012,,yes,100.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A7IY,39.0,,715.0,central nervous system,male,2012,,yes,80.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-S9-A7IZ,48.0,,608.0,central nervous system,female,2013,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A7J0,30.0,,609.0,central nervous system,female,2013,,yes,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-S9-A7J1,43.0,,249.0,central nervous system,male,2013,,no,60.0,oligodendroglioma,white,not hispanic or latino
-TCGA-S9-A7J2,25.0,,62.0,central nervous system,male,2013,,no,80.0,oligodendroglioma,white,not hispanic or latino
-TCGA-S9-A7J3,52.0,,629.0,central nervous system,female,2013,,yes,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-S9-A7QW,54.0,,458.0,central nervous system,female,2013,,yes,100.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A7QX,36.0,,564.0,central nervous system,female,2013,,yes,100.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A7QY,35.0,,863.0,central nervous system,female,2012,,no,100.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-S9-A7QZ,41.0,,826.0,central nervous system,male,2012,,no,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-S9-A7R1,35.0,5166.0,,central nervous system,male,1999,,yes,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-S9-A7R2,69.0,316.0,,central nervous system,male,2008,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A7R3,28.0,,3013.0,central nervous system,female,2006,,no,100.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A7R4,46.0,,914.0,central nervous system,male,2012,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A7R7,27.0,,3000.0,central nervous system,male,2006,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A7R8,44.0,961.0,,central nervous system,female,2004,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A89V,70.0,,569.0,central nervous system,male,2012,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-S9-A89Z,40.0,,623.0,central nervous system,male,2013,,yes,70.0,astrocytoma,white,not hispanic or latino
-TCGA-TM-A7C3,43.0,1666.0,,central nervous system,female,2009,,no,90.0,astrocytoma,white,not hispanic or latino
-TCGA-TM-A7C4,39.0,,1470.0,central nervous system,female,2010,,no,90.0,astrocytoma,white,not hispanic or latino
-TCGA-TM-A7C5,30.0,,1500.0,central nervous system,male,2010,,no,100.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-TM-A7CA,44.0,,1058.0,central nervous system,male,2011,,no,100.0,astrocytoma,white,not hispanic or latino
-TCGA-TM-A7CF,41.0,,1989.0,central nervous system,female,2009,,yes,100.0,astrocytoma,white,not hispanic or latino
-TCGA-TM-A84B,40.0,758.0,,central nervous system,male,2012,,no,90.0,astrocytoma,white,not hispanic or latino
-TCGA-TM-A84C,32.0,492.0,,central nervous system,male,2012,,no,80.0,astrocytoma,white,not hispanic or latino
-TCGA-TM-A84F,48.0,,1796.0,central nervous system,male,2009,,yes,100.0,astrocytoma,white,not hispanic or latino
-TCGA-TM-A84G,54.0,,1236.0,central nervous system,female,2010,,yes,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-TM-A84H,44.0,,926.0,central nervous system,female,2012,,yes,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-TM-A84I,30.0,,854.0,central nervous system,male,2012,,yes,90.0,astrocytoma,white,not hispanic or latino
-TCGA-TM-A84J,63.0,,735.0,central nervous system,male,2012,,yes,80.0,oligodendroglioma,white,not hispanic or latino
-TCGA-TM-A84L,31.0,1242.0,,central nervous system,male,2010,,no,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-TM-A84M,40.0,,754.0,central nervous system,male,2012,,yes,100.0,oligodendroglioma,white,not hispanic or latino
-TCGA-TM-A84O,61.0,1011.0,,central nervous system,female,2011,,yes,90.0,oligodendroglioma,white,not hispanic or latino
-TCGA-TM-A84Q,31.0,,772.0,central nervous system,male,2012,,yes,80.0,astrocytoma,white,not hispanic or latino
-TCGA-TM-A84R,46.0,,566.0,central nervous system,male,2012,,no,80.0,oligodendroglioma,white,not hispanic or latino
-TCGA-TM-A84S,36.0,,454.0,central nervous system,male,2013,,no,80.0,oligodendroglioma,white,not hispanic or latino
-TCGA-TM-A84T,19.0,,724.0,central nervous system,male,2012,,no,90.0,oligoastrocytoma,white,not hispanic or latino
-TCGA-TQ-A7RF,27.0,,650.0,central nervous system,female,2012,,yes,,oligodendroglioma,white,not hispanic or latino
-TCGA-TQ-A7RG,36.0,,599.0,central nervous system,male,2012,,no,100.0,oligoastrocytoma,white,hispanic or latino
-TCGA-TQ-A7RH,39.0,,486.0,central nervous system,male,2013,,yes,,oligoastrocytoma,black or african american,hispanic or latino
-TCGA-TQ-A7RI,37.0,,62.0,central nervous system,female,2012,,no,,oligodendroglioma,white,hispanic or latino
-TCGA-TQ-A7RJ,25.0,,1229.0,central nervous system,female,2011,,yes,,oligoastrocytoma,white,hispanic or latino
-TCGA-TQ-A7RK,29.0,,1341.0,central nervous system,male,2010,,no,90.0,oligoastrocytoma,white,hispanic or latino
-TCGA-TQ-A7RM,41.0,,1116.0,central nervous system,female,2011,,yes,90.0,oligoastrocytoma,white,hispanic or latino
-TCGA-TQ-A7RN,32.0,,1026.0,central nervous system,male,2011,,yes,100.0,oligodendroglioma,white,hispanic or latino
-TCGA-TQ-A7RO,29.0,,949.0,central nervous system,male,2011,,no,100.0,oligoastrocytoma,black or african american,hispanic or latino
-TCGA-TQ-A7RP,66.0,,914.0,central nervous system,male,2012,,yes,90.0,oligoastrocytoma,black or african american,hispanic or latino
-TCGA-TQ-A7RQ,38.0,,795.0,central nervous system,female,2012,,no,90.0,oligodendroglioma,white,hispanic or latino
-TCGA-TQ-A7RR,38.0,,787.0,central nervous system,male,2012,,yes,100.0,oligoastrocytoma,white,hispanic or latino
-TCGA-TQ-A7RS,25.0,,-1.0,central nervous system,female,2012,,no,90.0,oligodendroglioma,white,hispanic or latino
-TCGA-TQ-A7RU,51.0,,1032.0,central nervous system,male,2011,,no,80.0,oligodendroglioma,white,hispanic or latino
-TCGA-TQ-A7RV,27.0,,1868.0,central nervous system,male,2009,,no,80.0,astrocytoma,white,hispanic or latino
-TCGA-TQ-A7RW,32.0,821.0,,central nervous system,male,2010,,yes,90.0,oligodendroglioma,white,hispanic or latino
-TCGA-TQ-A8XE,42.0,954.0,,central nervous system,female,2010,,no,70.0,oligodendroglioma,white,hispanic or latino
-TCGA-VM-A8C8,50.0,,1397.0,central nervous system,female,2011,,yes,90.0,oligodendroglioma,white,
-TCGA-VM-A8C9,37.0,,1314.0,central nervous system,female,2011,,no,,astrocytoma,,
-TCGA-VM-A8CA,54.0,,411.0,central nervous system,male,2011,,no,70.0,oligodendroglioma,,
-TCGA-VM-A8CB,33.0,,3.0,central nervous system,male,2011,,,,oligodendroglioma,,
-TCGA-VM-A8CD,58.0,240.0,,central nervous system,male,2012,,yes,100.0,astrocytoma,white,
-TCGA-VM-A8CE,25.0,,1191.0,central nervous system,male,2011,,no,90.0,oligodendroglioma,white,
-TCGA-VM-A8CF,44.0,,609.0,central nervous system,female,2013,,yes,60.0,astrocytoma,white,
-TCGA-VM-A8CH,24.0,,714.0,central nervous system,female,2013,,no,90.0,astrocytoma,white,
-TCGA-VV-A829,44.0,,1127.0,central nervous system,male,2011,,yes,,oligoastrocytoma,white,not hispanic or latino
-TCGA-VV-A86M,36.0,,487.0,central nervous system,female,2013,,yes,,astrocytoma,,hispanic or latino
-TCGA-VW-A7QS,35.0,,706.0,central nervous system,female,2011,,no,,oligodendroglioma,asian,not hispanic or latino
-TCGA-VW-A8FI,66.0,245.0,,central nervous system,male,2013,,yes,,astrocytoma,white,not hispanic or latino
-TCGA-W9-A837,,,1553.0,central nervous system,male,2010,,no,,oligodendroglioma,white,not hispanic or latino
-TCGA-WH-A86K,65.0,,405.0,central nervous system,male,2013,,no,,astrocytoma,white,not hispanic or latino
-TCGA-WY-A858,32.0,,1337.0,central nervous system,female,2010,,yes,100.0,astrocytoma,white,
-TCGA-WY-A859,34.0,,1213.0,central nervous system,female,2010,,yes,100.0,astrocytoma,white,
-TCGA-WY-A85A,20.0,,1320.0,central nervous system,male,2010,,no,,astrocytoma,white,
-TCGA-WY-A85B,24.0,,1393.0,central nervous system,male,2010,,no,,astrocytoma,white,
-TCGA-WY-A85C,36.0,,1426.0,central nervous system,male,2010,,yes,,astrocytoma,white,
-TCGA-WY-A85D,60.0,,1147.0,central nervous system,male,2010,,no,,oligoastrocytoma,white,
-TCGA-WY-A85E,48.0,,633.0,central nervous system,female,2011,,no,,oligoastrocytoma,white,
+Patient_ID,years_to_birth,karnofsky_performance_score,gender_male,radiation_therapy_yes,radiation_therapy_nan,histological_type_oligoastrocytoma,histological_type_oligodendroglioma,race_asian,race_black or african american,race_white,race_nan,ethnicity_not hispanic or latino,ethnicity_nan
+TCGA-CS-4938,-0.47619048,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-CS-4941,1.2380953,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-CS-4942,0.14285715,-20.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0
+TCGA-CS-4943,-0.1904762,-40.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-CS-4944,0.42857143,10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-CS-5390,0.2857143,10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-CS-5393,-0.0952381,10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-CS-5394,-0.04761905,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-CS-5395,0.0952381,-10.0,1.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0
+TCGA-CS-5396,0.5714286,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-CS-5397,0.61904764,-10.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-CS-6186,0.8095238,-10.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-CS-6188,0.33333334,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-CS-6290,-0.47619048,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0
+TCGA-CS-6665,0.47619048,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-CS-6666,-0.9047619,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-CS-6667,-0.0952381,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-CS-6668,0.7619048,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-CS-6669,-0.71428573,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-CS-6670,0.0952381,0.0,1.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-5270,-0.14285715,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-5273,-0.3809524,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-5274,-0.1904762,-10.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-5275,-0.23809524,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-5276,-0.42857143,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-5277,-0.33333334,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-5278,-1.1428572,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-5279,0.85714287,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0
+TCGA-DB-5280,0.0952381,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-5281,0.95238096,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A4X9,-0.3809524,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A4XA,-0.52380955,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A4XB,-0.14285715,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A4XC,-0.71428573,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A4XD,-0.42857143,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A4XE,-0.6666667,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A4XF,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A4XG,-0.33333334,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A4XH,0.5714286,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A64L,1.2380953,-20.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A64O,0.85714287,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A64P,-0.04761905,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A64Q,-0.47619048,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0
+TCGA-DB-A64R,-0.8095238,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0
+TCGA-DB-A64S,-1.0,10.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A64U,-0.14285715,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A64V,0.61904764,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A64W,1.1428572,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A64X,0.71428573,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A75K,0.6666667,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A75L,-0.23809524,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A75O,-0.5714286,0.0,1.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DB-A75P,-0.7619048,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0
+TCGA-DH-5140,-0.14285715,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DH-5141,-0.42857143,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-DH-5142,-0.5714286,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DH-5143,-0.52380955,-10.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DH-5144,0.71428573,10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DH-A669,1.3809524,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DH-A66B,0.52380955,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DH-A66D,0.0952381,-10.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DH-A66F,0.3809524,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DH-A66G,0.3809524,-10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DH-A7UR,0.85714287,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DH-A7US,0.42857143,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DH-A7UT,-0.52380955,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DH-A7UU,0.0952381,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DH-A7UV,0.3809524,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-5847,-0.33333334,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-5849,0.33333334,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-5851,-0.04761905,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-5852,0.95238096,-40.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-5853,-0.5714286,10.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-5854,0.7619048,10.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-5855,0.3809524,10.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-5870,-0.33333334,-20.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-5871,-0.1904762,10.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-5872,0.0952381,0.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0
+TCGA-DU-5874,1.0,10.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6392,-0.2857143,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6393,1.1904762,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6394,0.5714286,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6395,-0.47619048,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6396,-0.47619048,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6397,0.1904762,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6399,0.61904764,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6400,1.1904762,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6401,-0.47619048,10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6402,0.52380955,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6403,0.9047619,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6404,-0.8095238,10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6405,0.47619048,-30.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6406,0.85714287,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6407,-0.2857143,-10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6408,-0.85714287,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6410,0.71428573,-40.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-6542,-0.7619048,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7006,0.9047619,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7007,-0.3809524,0.0,1.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7008,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7009,-0.42857143,10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7010,0.8095238,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7012,1.5714285,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0
+TCGA-DU-7013,0.85714287,-20.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7014,0.85714287,-40.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7015,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7018,0.7619048,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7019,-0.0952381,10.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7290,0.1904762,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7292,1.3333334,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7294,0.5714286,10.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7298,-0.14285715,-10.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0
+TCGA-DU-7299,-0.3809524,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7300,0.5714286,10.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7301,0.5714286,-30.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7302,0.33333334,-20.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7304,0.0952381,-10.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7306,1.2380953,10.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-7309,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-8158,0.7619048,-10.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-8161,1.0476191,-20.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-8162,0.95238096,-10.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-8163,-0.5714286,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-8164,0.47619048,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-8165,0.9047619,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-8166,-0.5714286,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-8167,1.3333334,10.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-8168,0.6666667,-20.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A5TP,-0.3809524,-20.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A5TR,0.47619048,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A5TS,0.04761905,10.0,1.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0
+TCGA-DU-A5TT,1.3809524,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A5TU,1.0,-40.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A5TW,-0.3809524,10.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0
+TCGA-DU-A5TY,0.23809524,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A6S2,-0.1904762,-20.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0
+TCGA-DU-A6S3,0.9047619,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A6S6,-0.2857143,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A6S7,-0.6666667,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A6S8,1.5714285,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A76K,2.142857,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A76L,0.61904764,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A76O,-0.52380955,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A76R,0.47619048,-40.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A7T6,1.5238096,-30.0,0.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A7T8,-0.2857143,10.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A7TA,-0.42857143,-10.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A7TB,0.71428573,10.0,1.0,0.0,0.0,0.0,1.0,1.0,0.0,0.0,0.0,1.0,0.0
+TCGA-DU-A7TC,-0.42857143,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A7TD,0.52380955,-30.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A7TG,-0.04761905,-20.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A7TI,-0.42857143,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-DU-A7TJ,0.6666667,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0
+TCGA-E1-5302,0.0,10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-5303,-0.14285715,-10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-5304,0.04761905,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-5305,-0.33333334,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-5307,1.0,-10.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-5311,-0.47619048,10.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-5318,0.04761905,10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-5319,0.33333334,10.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-5322,-0.14285715,0.0,0.0,0.0,1.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-A7YD,0.7619048,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-A7YE,-0.42857143,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-A7YH,0.2857143,-10.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-A7YI,-0.3809524,-10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-A7YJ,0.6666667,-10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-A7YK,0.52380955,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-A7YL,0.23809524,-10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-A7YM,1.0476191,-10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-A7YN,1.0476191,-10.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-A7YO,0.1904762,10.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-A7YQ,0.8095238,-30.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0
+TCGA-E1-A7YS,1.4285715,-10.0,1.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0
+TCGA-E1-A7YU,0.04761905,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-A7YV,-0.71428573,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-A7YW,-0.61904764,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-A7YY,-0.6666667,10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-A7Z2,0.8095238,-10.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-A7Z3,-0.47619048,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0
+TCGA-E1-A7Z4,-0.2857143,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-E1-A7Z6,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-EZ-7264,0.2857143,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-F6-A8O3,-0.33333334,0.0,1.0,0.0,1.0,0.0,1.0,1.0,0.0,0.0,0.0,1.0,0.0
+TCGA-F6-A8O4,0.14285715,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0
+TCGA-FG-5962,0.61904764,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-5963,-0.85714287,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-5964,1.0,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-5965,-0.0952381,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-6688,0.85714287,-40.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0
+TCGA-FG-6689,-0.52380955,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-6690,1.3809524,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-6691,-0.85714287,-10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-6692,1.0476191,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-7634,-0.61904764,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-7636,0.33333334,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-7637,0.3809524,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-7638,-0.47619048,10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-7641,-0.47619048,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-7643,0.3809524,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-8181,-0.85714287,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-8182,-0.2857143,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-8185,-0.1904762,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-8186,0.04761905,-20.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-FG-8187,-0.47619048,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-8188,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-8189,-0.3809524,-20.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-8191,-0.52380955,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-A4MT,-0.6666667,10.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-A4MU,0.8095238,0.0,1.0,0.0,1.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-A4MW,1.0476191,-10.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-A4MX,0.2857143,10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-A4MY,0.14285715,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-FG-A60J,0.2857143,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-A60K,-0.33333334,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-A60L,-0.33333334,10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-A6IZ,0.9047619,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-A6J1,0.14285715,-20.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-A6J3,0.52380955,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-A70Y,-1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-A70Z,0.5714286,0.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0
+TCGA-FG-A710,0.42857143,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-A711,-0.3809524,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-A713,1.5714285,-30.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FG-A87N,-0.1904762,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0
+TCGA-FG-A87Q,0.95238096,-10.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-FN-7833,-0.7619048,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7467,0.61904764,0.0,1.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7468,-0.52380955,-10.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7469,-0.52380955,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7470,-0.1904762,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7471,-0.1904762,0.0,0.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7472,-0.14285715,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7473,-0.61904764,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-HT-7474,0.52380955,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7475,1.2380953,-20.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7476,-0.71428573,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-HT-7477,1.0,-10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7478,-0.23809524,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7479,0.14285715,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7480,-0.3809524,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7481,-0.0952381,-10.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7482,-1.0952381,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7483,-1.2857143,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7485,0.04761905,10.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7601,-0.52380955,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7602,-0.95238096,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7603,-0.5714286,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7604,0.42857143,0.0,1.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0
+TCGA-HT-7605,-0.14285715,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7606,-0.52380955,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7607,0.95238096,-20.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7608,0.95238096,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0
+TCGA-HT-7609,-0.33333334,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7610,-0.7619048,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7611,-0.23809524,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7616,1.6190476,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7620,-0.04761905,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7676,-0.71428573,0.0,1.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7677,0.5714286,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7680,-0.42857143,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-HT-7681,-0.5714286,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7684,0.8095238,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7686,-0.5714286,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7687,1.5714285,0.0,1.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7688,0.85714287,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7689,0.8095238,-20.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7690,-0.5714286,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7691,-0.47619048,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7692,0.0952381,10.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7693,0.47619048,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7694,0.9047619,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7695,-0.5714286,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7854,1.0,10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7855,-0.0952381,-10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7856,-0.2857143,-10.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7857,-0.8095238,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7858,-0.61904764,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7860,0.9047619,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7873,-0.5714286,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7874,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7875,0.71428573,-10.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7877,-1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7879,-0.47619048,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7880,-0.52380955,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7881,-0.14285715,0.0,1.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0
+TCGA-HT-7882,1.1904762,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-HT-7884,0.14285715,-10.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-7902,-0.52380955,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-8010,1.0952381,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-HT-8011,0.6666667,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-8012,-0.52380955,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-8013,-0.1904762,-20.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-8015,-0.95238096,0.0,1.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-8018,-0.04761905,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-8019,-0.33333334,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-8104,0.47619048,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-8105,0.61904764,-20.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-8106,0.5714286,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-8107,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-8108,-0.71428573,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-8109,1.0952381,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-HT-8110,0.7619048,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-8111,-0.42857143,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-8113,0.3809524,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0
+TCGA-HT-8114,-0.23809524,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-8558,-0.5714286,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-8563,-0.52380955,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-8564,0.2857143,-10.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-HT-A4DS,0.6666667,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-A4DV,0.47619048,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-A5R5,-0.3809524,0.0,0.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-HT-A5R7,-0.3809524,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-A5R9,0.33333334,0.0,0.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-A5RA,1.1428572,-20.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-A5RB,-0.8095238,0.0,1.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-HT-A5RC,1.3809524,-50.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-A614,0.2857143,0.0,1.0,0.0,1.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-A615,-0.14285715,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-A616,-0.23809524,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-A617,0.2857143,-30.0,1.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0
+TCGA-HT-A618,-0.1904762,-10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-A619,0.47619048,0.0,0.0,0.0,0.0,0.0,1.0,1.0,0.0,0.0,0.0,1.0,0.0
+TCGA-HT-A61A,-1.0,-10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-A61B,-0.9047619,-10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-A61C,1.1904762,10.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-A74H,1.0,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-A74K,0.8095238,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-A74L,-0.9047619,0.0,0.0,0.0,1.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HT-A74O,-0.33333334,0.0,1.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HW-7486,-0.1904762,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HW-7487,-0.0952381,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HW-7489,-0.14285715,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HW-7490,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HW-7491,-0.2857143,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-HW-7493,-0.04761905,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HW-7495,0.1904762,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HW-8319,-0.33333334,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HW-8320,-0.23809524,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HW-8321,-0.47619048,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HW-8322,-0.0952381,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-HW-A5KJ,1.2857143,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-HW-A5KK,1.0952381,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-HW-A5KL,0.04761905,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-HW-A5KM,-0.2857143,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-IK-7675,0.0952381,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-IK-8125,1.0,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-KT-A74X,-0.71428573,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-KT-A7W1,0.1904762,-10.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A5ET,-0.6666667,0.0,1.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A5EU,-0.2857143,-30.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A5EV,-0.0952381,-30.0,1.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A5EW,-1.0,-10.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A5EX,0.0,-10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A5EY,-0.95238096,0.0,1.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A5EZ,-0.0952381,0.0,1.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A5F0,-0.3809524,-10.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A5F1,-0.52380955,0.0,1.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A5F2,-0.23809524,-10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A5F4,-0.2857143,-20.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A5F6,-0.71428573,-20.0,1.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A72U,1.4285715,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A72W,-0.2857143,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A72X,-0.95238096,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A72Z,1.0952381,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A730,-0.9047619,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A731,0.85714287,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A733,0.52380955,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A735,-0.14285715,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A736,0.14285715,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A737,0.2857143,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A77W,-0.1904762,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A77X,0.6666667,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A780,0.14285715,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-P5-A781,-0.33333334,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A65R,-0.14285715,10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A65S,-0.42857143,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A65V,0.0952381,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A65X,-0.61904764,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A65Z,0.61904764,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A6CS,0.0,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A6CU,0.52380955,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A6CV,0.47619048,0.0,1.0,1.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0
+TCGA-QH-A6CX,1.1904762,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A6CY,-0.14285715,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A6CZ,-0.14285715,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A6X3,-0.6666667,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A6X4,0.2857143,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A6X5,0.8095238,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A6X8,0.71428573,10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A6X9,1.5238096,-50.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A6XA,-0.85714287,10.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A6XC,0.33333334,-20.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A86X,-0.3809524,10.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-QH-A870,-0.14285715,-10.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-R8-A6MK,-0.04761905,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-R8-A6ML,0.52380955,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-R8-A6MO,0.5714286,0.0,0.0,0.0,0.0,0.0,1.0,1.0,0.0,0.0,0.0,1.0,0.0
+TCGA-R8-A73M,0.33333334,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-RY-A83X,0.23809524,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-RY-A83Y,0.1904762,-10.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-RY-A83Z,0.61904764,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-RY-A840,0.2857143,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0
+TCGA-RY-A843,-0.52380955,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-RY-A845,-0.04761905,-10.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-RY-A847,0.1904762,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6TS,0.33333334,10.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6TU,-0.14285715,10.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6TV,0.42857143,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6TW,-0.04761905,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6TX,0.23809524,10.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6TY,0.42857143,10.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6TZ,-0.0952381,10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6U0,0.23809524,10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6U1,-0.9047619,10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6U2,0.33333334,10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6U5,-0.3809524,10.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6U6,-0.61904764,10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6U8,-0.8095238,10.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6U9,-0.23809524,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6UA,1.1904762,-30.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6UB,0.52380955,10.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6WD,0.8095238,10.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6WE,-0.33333334,10.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6WG,-0.47619048,10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6WH,1.5238096,-10.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6WI,0.71428573,10.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6WL,0.52380955,10.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6WM,0.85714287,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6WN,-0.14285715,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6WO,-0.5714286,10.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6WP,0.04761905,10.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A6WQ,0.7619048,10.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7IQ,0.1904762,10.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7IS,-0.3809524,-30.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7IX,0.7619048,10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7IY,-0.0952381,-10.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7IZ,0.33333334,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7J0,-0.52380955,10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7J1,0.0952381,-30.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7J2,-0.7619048,-10.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7J3,0.52380955,10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7QW,0.61904764,10.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7QX,-0.23809524,10.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7QY,-0.2857143,10.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7QZ,0.0,10.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7R1,-0.2857143,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7R2,1.3333334,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7R3,-0.61904764,10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7R4,0.23809524,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7R7,-0.6666667,-10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A7R8,0.14285715,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A89V,1.3809524,-10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-S9-A89Z,-0.04761905,-20.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A7C3,0.0952381,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A7C4,-0.0952381,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A7C5,-0.52380955,10.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A7CA,0.14285715,10.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A7CF,0.0,10.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A84B,-0.04761905,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A84C,-0.42857143,-10.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A84F,0.33333334,10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A84G,0.61904764,10.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A84H,0.14285715,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A84I,-0.52380955,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A84J,1.0476191,-10.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A84L,-0.47619048,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A84M,-0.04761905,10.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A84O,0.95238096,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A84Q,-0.47619048,-10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A84R,0.23809524,-10.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A84S,-0.23809524,-10.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TM-A84T,-1.0476191,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TQ-A7RF,-0.6666667,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-TQ-A7RG,-0.23809524,10.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-TQ-A7RH,-0.0952381,0.0,1.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0
+TCGA-TQ-A7RI,-0.1904762,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-TQ-A7RJ,-0.7619048,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-TQ-A7RK,-0.5714286,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-TQ-A7RM,0.0,0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-TQ-A7RN,-0.42857143,10.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-TQ-A7RO,-0.5714286,10.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0
+TCGA-TQ-A7RP,1.1904762,0.0,1.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0
+TCGA-TQ-A7RQ,-0.14285715,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-TQ-A7RR,-0.14285715,10.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-TQ-A7RS,-0.7619048,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-TQ-A7RU,0.47619048,-10.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-TQ-A7RV,-0.6666667,-10.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-TQ-A7RW,-0.42857143,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-TQ-A8XE,0.04761905,-20.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0
+TCGA-VM-A8C8,0.42857143,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-VM-A8C9,-0.1904762,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0
+TCGA-VM-A8CA,0.61904764,-20.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0
+TCGA-VM-A8CB,-0.3809524,0.0,1.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0
+TCGA-VM-A8CD,0.8095238,10.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-VM-A8CE,-0.7619048,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-VM-A8CF,0.14285715,-30.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-VM-A8CH,-0.8095238,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-VV-A829,0.14285715,0.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-VV-A86M,-0.23809524,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0
+TCGA-VW-A7QS,-0.2857143,0.0,0.0,0.0,0.0,0.0,1.0,1.0,0.0,0.0,0.0,1.0,0.0
+TCGA-VW-A8FI,1.1904762,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-W9-A837,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-WH-A86K,1.1428572,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0
+TCGA-WY-A858,-0.42857143,10.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-WY-A859,-0.33333334,10.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-WY-A85A,-1.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-WY-A85B,-0.8095238,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-WY-A85C,-0.23809524,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-WY-A85D,0.9047619,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0
+TCGA-WY-A85E,0.33333334,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0

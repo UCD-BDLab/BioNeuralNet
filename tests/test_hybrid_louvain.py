@@ -5,7 +5,7 @@ import pandas as pd
 
 from bioneuralnet.clustering.hybrid_louvain import HybridLouvain
 from bioneuralnet.datasets import DatasetLoader
-from bioneuralnet.utils.graph import gen_correlation_graph
+from bioneuralnet.network.generate import gen_correlation_graph
 
 
 class TestHybridLouvain(unittest.TestCase):

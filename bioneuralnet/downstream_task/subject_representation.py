@@ -26,8 +26,9 @@ from sklearn.metrics import accuracy_score, r2_score, mean_squared_error
 
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
-from bioneuralnet.utils import get_logger
 
+from ..utils import get_logger
+logger = get_logger(__name__)
 class SubjectRepresentation:
     """SubjectRepresentation Class for Integrating Network Embeddings into Omics Data.
 
@@ -67,8 +68,7 @@ class SubjectRepresentation:
             tune (bool | None): Whether to run hyperparameter tuning. Default is False.
             output_dir (str | Path | None): Directory to write results. If None, a temp directory is used.
         """
-        self.logger = get_logger(__name__)
-        self.logger.info("Initializing SubjectRepresentation with provided data inputs.")
+        logger.info("Initializing SubjectRepresentation with provided data inputs.")
 
         if omics_data is None or omics_data.empty:
             raise ValueError("Omics data must be non-empty.")
@@ -95,7 +95,7 @@ class SubjectRepresentation:
                 torch.backends.cudnn.benchmark = False
 
         self.seed = seed
-        self.logger.info(f"Seed set to {self.seed}.")
+        logger.info(f"Seed set to {self.seed}.")
 
         self.omics_data = omics_data.copy(deep=True)
         self.embeddings = embeddings.copy(deep=True)
@@ -120,16 +120,16 @@ class SubjectRepresentation:
                 f"No common features found between the embeddings and omics data.\n"
                 f"Embeddings: {self.embeddings.shape} and Omics: {self.omics_data.shape}"
             )
-        self.logger.info(f"Found {len(common_features)} common features between network and omics data.")
+        logger.info(f"Found {len(common_features)} common features between network and omics data.")
 
         # output directory
         if output_dir is None:
             self.temp_dir_obj = tempfile.TemporaryDirectory()
             self.output_dir = Path(self.temp_dir_obj.name)
-            self.logger.info(f"No output_dir provided; using temporary directory: {self.output_dir}")
+            logger.info(f"No output_dir provided; using temporary directory: {self.output_dir}")
         else:
             self.output_dir = Path(output_dir)
-            self.logger.info(f"Output directory set to: {self.output_dir}")
+            logger.info(f"Output directory set to: {self.output_dir}")
 
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -141,7 +141,7 @@ class SubjectRepresentation:
         Returns:
             pd.DataFrame: Enhanced omics data as a DataFrame.
         """
-        self.logger.info("Starting Subject Representation workflow.")
+        logger.info("Starting Subject Representation workflow.")
 
         if self.embeddings.empty:
             self.logger.warning(
@@ -152,7 +152,7 @@ class SubjectRepresentation:
         try:
             if self.tune:
                 best_config = self._run_tuning()
-                self.logger.info(f"Best tuning config selected: {best_config}")
+                logger.info(f"Best tuning config selected: {best_config}")
                 ae_params = best_config.get("ae_params", {"epochs": 16, "hidden_dim": 8, "lr": 1e-3, "dropout": 0.2, "activation": "relu"})
                 reduced = self._reduce_embeddings(method=best_config["method"], ae_params=ae_params, compressed_dim=best_config["compressed_dim"])
                 enhanced_omics_data = self._integrate_embeddings(reduced=reduced, method=best_config["integration_method"], alpha=best_config["alpha"], beta=best_config["beta"])
@@ -167,7 +167,7 @@ class SubjectRepresentation:
                 self.logger.warning("Enhanced omics data is empty. Returning original omics_data.")
                 return self.omics_data
 
-            self.logger.info(f"Subject Representation completed successfully. Final shape: {enhanced_omics_data.shape}")
+            logger.info(f"Subject Representation completed successfully. Final shape: {enhanced_omics_data.shape}")
             return enhanced_omics_data
 
         except Exception as e:
@@ -188,7 +188,7 @@ class SubjectRepresentation:
             pd.DataFrame: Reduced embeddings with `compressed_dim` columns.
 
         """
-        self.logger.info(f"Reducing embeddings using method='{method}' with compressed_dim={compressed_dim}.")
+        logger.info(f"Reducing embeddings using method='{method}' with compressed_dim={compressed_dim}.")
 
         if self.embeddings.empty:
             raise ValueError("Embeddings DataFrame is empty.")
@@ -202,10 +202,10 @@ class SubjectRepresentation:
                 columns.append(f"PC{i+1}")
 
             reduced_df = pd.DataFrame(pcs, index=self.embeddings.index, columns=columns)
-            self.logger.info(f"PCA reduction completed. Variance explained: {pca.explained_variance_ratio_.sum():.4f}")
+            logger.info(f"PCA reduction completed. Variance explained: {pca.explained_variance_ratio_.sum():.4f}")
 
         elif method in ["ae"]:
-            self.logger.info("Using autoencoder for reduction.")
+            logger.info("Using autoencoder for reduction.")
             ae_params = ae_params or {
                 "epochs": 64,
                 "hidden_dim": 8,
@@ -233,7 +233,7 @@ class SubjectRepresentation:
                 loss.backward()
                 optimizer.step()
                 if (epoch + 1) % max(1, ae_params["epochs"] // 5) == 0:
-                    self.logger.info(f"AE Epoch {epoch+1}/{ae_params['epochs']} - Loss: {loss.item():.4f}")
+                    logger.info(f"AE Epoch {epoch+1}/{ae_params['epochs']} - Loss: {loss.item():.4f}")
 
             model.eval()
             with torch.no_grad():
@@ -247,7 +247,7 @@ class SubjectRepresentation:
                 columns.append(f"AE_{i+1}")
 
             reduced_df = pd.DataFrame(z_np, index=self.embeddings.index, columns=columns)
-            self.logger.info("Autoencoder reduction completed")
+            logger.info("Autoencoder reduction completed")
 
         else:
             raise ValueError(f"Unsupported reduction method:{method}")
@@ -278,7 +278,7 @@ class SubjectRepresentation:
         if method == "multiply":
             # the reduced embeddings to match the omics data columns.
             if not reduced.index.equals(self.omics_data.columns):
-                self.logger.info("Aligning reduced embeddings index with omics_data columns.")
+                logger.info("Aligning reduced embeddings index with omics_data columns.")
                 reduced = reduced.reindex(self.omics_data.columns)
 
             # normalize the embeddings and compute a weight series
@@ -314,7 +314,7 @@ class SubjectRepresentation:
             #Curently only supoort one method but left the parameter in case we supp0ort more in the future.
             raise ValueError(f"Unknown integration method: {method}.")
 
-        self.logger.info(f"Final Enhanced Omics Shape: {enhanced.shape}")
+        logger.info(f"Final Enhanced Omics Shape: {enhanced.shape}")
         return enhanced
 
     def _run_tuning(self) -> Dict[str, Any]:
@@ -323,7 +323,7 @@ class SubjectRepresentation:
         Returns:
             dict: The best configuration found by Ray Tune.
         """
-        self.logger.info("Running tuning for SubjectRepresentation.")
+        logger.info("Running tuning for SubjectRepresentation.")
         return self._run_classification_tuning()
 
     def _run_classification_tuning(self) -> Dict[str, Any]:
@@ -427,7 +427,7 @@ class SubjectRepresentation:
         else:
             self.logger.error("Analysis object is invalid or missing get_best_trial().")
 
-        self.logger.info(f"Best trial final score: {best_score}")
+        logger.info(f"Best trial final score: {best_score}")
 
         if best_trial:
             timestamp = datetime.now().strftime("%m%d_%H_%M_%S")
@@ -435,9 +435,9 @@ class SubjectRepresentation:
 
             with open(best_params_file, "w") as f:
                 json.dump(best_trial.config, f, indent=4)
-            self.logger.info(f"Best Graph Embedding parameters saved to {best_params_file}")
+            logger.info(f"Best Graph Embedding parameters saved to {best_params_file}")
         else:
-            self.logger.info("No valid best trial config found; skipping save.")
+            logger.info("No valid best trial config found; skipping save.")
 
         return best_trial.config if best_trial else {}
 

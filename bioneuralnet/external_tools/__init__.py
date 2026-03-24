@@ -1,17 +1,23 @@
-"""External tools integration for BioNeuralNet.
+"""
+External Tools Module
 
-This module provides wrappers to interface with external bioinformatics packages, streamlining the execution of R or Python-based tools within the BioNeuralNet pipeline.
+This module provides utility functions for interoperability between Python and R.
+It handles the execution of external R scripts to extract, convert, and load 
+RData structures (such as cross-validation folds and network matrices) into 
+standardized Python data structures like pandas DataFrames and NumPy arrays.
 
-Currently supported:
+Available Functions:
 
-* **SmCCNet**: https://CRAN.R-project.org/package=SmCCNet.
-
-**Extensibility**:
-
-This module is designed to be extensible.
-Users are encouraged to implement wrappers for additional external tools (e.g., WGCNA, MOFA) following the pattern established by SmCCNet.
+* `extract_and_load_folds`: Triggers Rscript extraction and loads the folds.
+* `load_r_export_folds`: Directly loads a previously extracted R directory structure.
+* `rdata_to_df`: Converts an arbitrary .RData file object to a pandas DataFrame.
 """
 
-from .smccnet import SmCCNet
+from .extract_CVfold import extract_and_load_folds, load_r_export_folds
+from .rdata_to_df import rdata_to_df
 
-__all__ = ["SmCCNet"]
+__all__ = [
+    "extract_and_load_folds",
+    "load_r_export_folds",
+    "rdata_to_df"
+]

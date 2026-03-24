@@ -5,11 +5,9 @@ def get_logger(name: str) -> logging.Logger:
     """Retrieves a global logger configured to write to 'bioneuralnet.log'.
 
     Args:
-
         name (str): Name of the logger.
 
     Returns:
-
         logging.Logger: Configured logger instance.
     """
     logger = logging.getLogger(name)
@@ -25,11 +23,13 @@ def get_logger(name: str) -> logging.Logger:
         ch = logging.StreamHandler()
         ch.setLevel(logging.INFO)
 
-        formatter = logging.Formatter(
+        file_formatter = logging.Formatter(
             "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         )
-        fh.setFormatter(formatter)
-        ch.setFormatter(formatter)
+        fh.setFormatter(file_formatter)
+
+        console_formatter = logging.Formatter("%(message)s")
+        ch.setFormatter(console_formatter)
 
         logger.addHandler(fh)
         logger.addHandler(ch)

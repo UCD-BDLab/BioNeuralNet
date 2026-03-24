@@ -5,9 +5,9 @@ import numpy as np
 import networkx as nx
 import warnings
 
-from bioneuralnet.utils.graph_tools import graph_analysis
-from bioneuralnet.utils.graph_tools import repair_graph_connectivity
-from bioneuralnet.utils.graph_tools import find_optimal_graph
+from bioneuralnet.network.tools import analyze_network
+from bioneuralnet.network.tools import repair_network
+from bioneuralnet.network.tools import optimize_network
 from bioneuralnet.datasets import DatasetLoader
 
 
