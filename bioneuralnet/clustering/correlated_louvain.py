@@ -339,7 +339,7 @@ class CorrelatedLouvain(Louvain):
 
         Returns:
 
-            float: The score k_L * Q + (1 - k_L) * mean(|rho|).
+            float: The score k_L * Q + (1 - k_L) * mean(rho ).
         """
         Q = self._modularity if self._modularity is not None else 0.0
         corrs = []
@@ -375,7 +375,7 @@ class CorrelatedLouvain(Louvain):
 
         Returns:
 
-            List[Tuple[int, float, List[Any]]]: Community data sorted by |rho|.
+            List[Tuple[int, float, List[Any]]]: Community data sorted by rho .
         """
         ranked = []
         for cid, nds in self.communities.items():

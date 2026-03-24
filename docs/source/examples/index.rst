@@ -1,5 +1,5 @@
-Examples
-========
+More Examples
+=============
 
 These tutorials illustrate how to combine BioNeuralNet components for a cohesive multi-omics analysis.
 

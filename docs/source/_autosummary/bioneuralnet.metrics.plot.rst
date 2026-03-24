@@ -9,7 +9,7 @@ bioneuralnet.metrics.plot
    .. autosummary::
    
       cast
-      cluster_correlation
+      cluster_pca_correlation
       compare_clusters
       find_omics_modality
       get_logger

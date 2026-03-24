@@ -16,36 +16,23 @@ After installation, the most common pattern is:
 
    # Core entry points
    from bioneuralnet import (
-       GNNEmbedding,
-       SubjectRepresentation,
-       DPMON,
-       SmCCNet,
-       DatasetLoader,
-       CorrelatedPageRank,
-       CorrelatedLouvain,
-       HybridLouvain,
-       load_example,
-       load_monet,
-       load_brca,
-       load_lgg,
-       load_kipan,
-       load_paad,
-       set_seed,
-       get_logger,
+      GNNEmbedding,
+      auto_pysmccnet,
+      SubjectRepresentation,
+      DPMON,
+      DatasetLoader,
+      CorrelatedPageRank,
+      CorrelatedLouvain,
+      HybridLouvain,
+      load_example,
+      load_monet,
+      load_brca,
+      load_lgg,
+      load_kipan,
+      set_seed,
+      get_logger,
    )
 
-
-Architecture Overview
----------------------
-
-The figure below summarizes the main BioNeuralNet modules and public objects.
-
-.. figure:: _static/bioneuralnet_api.png
-   :align: center
-   :alt: BioNeuralNet module and API overview
-
-   BioNeuralNet 1.2.0: core modules (utils, network\_embedding, clustering, downstream\_task, datasets, metrics, external\_tools) and their key user-facing functions and classes.
-   `View BioNeuralNet API. <https://bioneuralnet.readthedocs.io/en/latest/_images/bioneuralnet_api.png>`_
 
 Module Reference
 ----------------
@@ -66,7 +53,6 @@ Several classes expose a high-level ``run()`` method to perform end-to-end workf
 - :class:`bioneuralnet.downstream_task.SubjectRepresentation` for integrating embeddings into subject-level representations.
 - :class:`bioneuralnet.clustering.CorrelatedLouvain` and :class:`bioneuralnet.clustering.HybridLouvain` for phenotype-aware clustering and subgraph detection.
 - :class:`bioneuralnet.downstream_task.DPMON` for disease prediction using multi-omics networks.
-- :class:`bioneuralnet.external_tools.SmCCNet` as a wrapper around external network-inference tools.
 
 Usage pattern:
 
@@ -97,13 +83,13 @@ Run Methods
 
 Direct links to the main ``run()`` methods:
 
-.. automethod:: bioneuralnet.external_tools.SmCCNet.run
-   :no-index:
-
 .. automethod:: bioneuralnet.downstream_task.SubjectRepresentation.run
    :no-index:
 
 .. automethod:: bioneuralnet.downstream_task.DPMON.run
+   :no-index:
+
+.. automethod:: bioneuralnet.clustering.CorrelatedPageRank.run
    :no-index:
 
 .. automethod:: bioneuralnet.clustering.CorrelatedLouvain.run

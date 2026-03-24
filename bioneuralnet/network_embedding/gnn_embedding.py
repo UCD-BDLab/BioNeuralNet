@@ -435,19 +435,17 @@ class GNNEmbedding:
 
         edge_attr = getattr(data, "edge_attr", None)
         if edge_attr is not None:
-            data.edge_weight = edge_attr.view(-1)
-            del data.edge_attr
+            data.edge_attr = edge_attr.view(-1)
         else:
-            # no edge_attr
-            data.edge_weight = torch.ones(data.edge_index.size(1))
+            data.edge_attr = torch.ones(data.edge_index.size(1))
 
-        data.edge_index, data.edge_weight = add_self_loops(data.edge_index,data.edge_weight,fill_value=data.edge_weight.mean(),num_nodes=data.num_nodes)
+        data.edge_index, data.edge_attr = add_self_loops(data.edge_index, data.edge_attr, fill_value=data.edge_attr.mean(), num_nodes=data.num_nodes)
         row, col = data.edge_index
-        deg = degree(row, data.num_nodes, dtype=data.edge_weight.dtype)
+        deg = degree(row, data.num_nodes, dtype=data.edge_attr.dtype)
         deg_inv_sqrt = deg.pow(-0.5)
         deg_inv_sqrt[deg_inv_sqrt == float('inf')] = 0
-        norm_w = deg_inv_sqrt[row] * data.edge_weight * deg_inv_sqrt[col]
-        data.edge_weight = norm_w
+        norm_w = deg_inv_sqrt[row] * data.edge_attr * deg_inv_sqrt[col]
+        data.edge_attr = norm_w
 
         data.x = torch.tensor(node_features.loc[nodes].values, dtype=torch.float)
         data.y = torch.tensor(node_labels.loc[nodes].values, dtype=torch.float)
@@ -468,13 +466,13 @@ class GNNEmbedding:
             raise ValueError("Data is not initialized or is missing the 'x' attribute.")
         input_dim = self.data.x.shape[1]
         if self.model_type.upper() == "GCN":
-            return GCN(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout,activation=self.activation, seed = self.seed, self_loop_and_norm=False)
+            return GCN(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout, activation=self.activation, seed=self.seed, self_loop_and_norm=False, final_layer="regression")
         elif self.model_type.upper() == "GAT":
-            return GAT(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout,activation=self.activation, seed = self.seed, self_loop_and_norm=False)
+            return GAT(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout, activation=self.activation, seed=self.seed, self_loop_and_norm=False, final_layer="regression")
         elif self.model_type.upper() == "SAGE":
-            return SAGE(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout,activation=self.activation, seed = self.seed, self_loop_and_norm=False)
+            return SAGE(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout, activation=self.activation, seed=self.seed, self_loop_and_norm=False, final_layer="regression")
         elif self.model_type.upper() == "GIN":
-            return GIN(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout, activation=self.activation, seed = self.seed, self_loop_and_norm=False)
+            return GIN(input_dim=input_dim, hidden_dim=self.hidden_dim, layer_num=self.layer_num, dropout=self.dropout, activation=self.activation, seed=self.seed, self_loop_and_norm=False, final_layer="regression")
         else:
             self.logger.error(f"Unsupported model_type: {self.model_type}")
             raise ValueError(f"Unsupported model_type: {self.model_type}")
@@ -500,7 +498,7 @@ class GNNEmbedding:
             optimizer.zero_grad()
 
             output = model(data)
-            output = output.view(-1)
+            output = output.squeeze(-1)
             target = data.y.to(self.device)
 
             loss = loss_fn(output, target)

@@ -29,7 +29,7 @@ This tutorial illustrates how to:
    - Load omics data, phenotype data, and clinical data using DatasetLoader.
 
 2. **Network Construction (SmCCNet)**:
-   - Call `SmCCNet.run()` to produce an adjacency matrix from multi-omics data.
+   - Call `auto_pysmccnet()` to produce an adjacency matrix from multi-omics data.
 
 3. **Generate GNN Embeddings**:
    - Pass the adjacency, omics data, and (optionally) clinical data to `GNNEmbedding`.
@@ -45,7 +45,7 @@ Below is a **complete** Python implementation:
 
    import pandas as pd
    from bioneuralnet.datasets import DatasetLoader
-   from bioneuralnet.external_tools import SmCCNet
+   from bioneuralnet.network import auto_pysmccnet
    from bioneuralnet.network_embedding import GNNEmbedding
    from bioneuralnet.downstream_task import SubjectRepresentation
 
@@ -57,14 +57,20 @@ Below is a **complete** Python implementation:
    clinical = Example.data["clinical_data"]
 
    # 2) Network Construction
-   smccnet = SmCCNet(
-       phenotype_df=phenotype,
-       omics_dfs=[omics_genes, omics_proteins],
-       data_types=["Genes", "Proteins"],
-       kfold=5,
-       subSampNum=500,
+   result = auto_pysmccnet(
+      X=[omics1, omics2],
+      Y=phenotype,
+      DataType=["genes", "mirna"],
+      subSampNum=1000,
+      seed=SEED,
+      Kfold=3,
+      BetweenShrinkage=5,
+      CutHeight=1 - 0.1**10,
+      summarization="NetSHy",
    )
-   global_network, clusters = smccnet.run()
+
+   global_network = result["AdjacencyMatrix"]
+   subnetworks = result["Subnetworks"]
 
    # 3) Generate embeddings using GNNEmbedding
    merged_omics = pd.concat([omics_genes, omics_proteins], axis=1)

@@ -8,25 +8,18 @@ bioneuralnet.utils.preprocess
 
    .. autosummary::
    
-      beta_to_m
       clean_inf_nan
       clean_internal
-      f_classif
-      f_regression
       get_logger
-      impute_omics
-      impute_omics_knn
-      multipletests
+      impute_knn
+      impute_simple
+      m_transform
       network_remove_high_zero_fraction
       network_remove_low_variance
-      normalize_omics
+      normalize
       preprocess_clinical
       prune_network
       prune_network_by_quantile
-      select_top_k_correlation
-      select_top_k_variance
-      select_top_randomforest
-      top_anova_f_features
    
    .. rubric:: Classes
 
@@ -34,8 +27,6 @@ bioneuralnet.utils.preprocess
    
       KNNImputer
       MinMaxScaler
-      RandomForestClassifier
-      RandomForestRegressor
       RobustScaler
       SimpleImputer
       StandardScaler

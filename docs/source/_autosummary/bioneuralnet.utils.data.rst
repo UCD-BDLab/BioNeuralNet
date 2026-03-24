@@ -9,9 +9,11 @@ bioneuralnet.utils.data
    .. autosummary::
    
       correlation_summary
-      explore_data_stats
+      data_stats
       expression_summary
       get_logger
+      nan_summary
+      sparse_filter
       variance_summary
-      zero_fraction_summary
+      zero_summary
    

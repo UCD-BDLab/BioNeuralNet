@@ -18,7 +18,7 @@ from .wrappers import get_can_weights_multi,get_robust_weights_multi,get_robust_
 from ...utils.logger import get_logger
 logger = get_logger(__name__)
 
-def auto_pysmccnet(X: List[Union[pd.DataFrame, np.ndarray]], Y: Union[pd.DataFrame, np.ndarray], AdjustedCovar: Optional[pd.DataFrame] = None, preprocess: bool = False, Kfold: int = 5, subSampNum: int = 100, DataType: Optional[List[str]] = None, BetweenShrinkage: float = 2.0, ScalingPen: List[float] = [0.1, 0.1], saving_dir: str = os.getcwd(), tuneLength: int = 5, tuneRangeCCA: List[float] = [0.1, 0.5], tuneRangePLS: List[float] = [0.5, 0.9], EvalMethod: str = 'accuracy', ncomp_pls: int = 3, seed: int = 123, CutHeight: float = 1 - 0.1**10, min_size: int = 10, max_size: int = 100, summarization: str = "NetSHy", precomputed_fold_data: Optional[dict] = None, device: Optional[torch.device] = None, dtype: torch.dtype = torch.float64) -> dict:
+def auto_pysmccnet(X: List[Union[pd.DataFrame, np.ndarray]], Y: Union[pd.DataFrame, np.ndarray], AdjustedCovar: Optional[pd.DataFrame] = None, preprocess: bool = False, Kfold: int = 5, subSampNum: int = 100, DataType: Optional[List[str]] = None, BetweenShrinkage: float = 2.0, ScalingPen: List[float] = [0.1, 0.1], saving_dir: str = os.getcwd(), tuneLength: int = 5, tuneRangeCCA: List[float] = [0.1, 0.5], tuneRangePLS: List[float] = [0.5, 0.9], EvalMethod: str = 'accuracy', ncomp_pls: int = 3, seed: int = 123, CutHeight: float = 1 - 0.1**10, min_size: int = 10, max_size: int = 100, summarization: str = "NetSHy", precomputed_fold_data: Optional[dict] = None, device: Optional[torch.device] = "cpu", dtype: torch.dtype = torch.float64) -> dict:
     """Automated SmCCNet workflow with GPU acceleration.
 
     Runs the complete SmCCNet pipeline supporting both CCA (continuous phenotype) and PLS (binary phenotype) modes. The workflow includes optional preprocessing, cross-validation for penalty tuning, subsampling for stability selection, and final network construction.
@@ -46,7 +46,7 @@ def auto_pysmccnet(X: List[Union[pd.DataFrame, np.ndarray]], Y: Union[pd.DataFra
         summarization (str): Network summarization method. Currently only 'NetSHy' is supported.
         seed (int): Random seed for reproducibility.
         precomputed_fold_data (dict | None): Precomputed CV folds to bypass internal fold generation.
-        device (torch.device | None): PyTorch device; if None, automatically selects GPU if available.
+        device (torch.device | cpu): PyTorch device; if None, automatically selects GPU if available.
         dtype (torch.dtype): PyTorch data type for computations.
 
     Returns:

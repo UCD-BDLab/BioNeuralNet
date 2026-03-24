@@ -13,7 +13,6 @@ bioneuralnet.datasets
       load_kipan
       load_lgg
       load_monet
-      load_paad
    
    .. rubric:: Classes
 

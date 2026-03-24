@@ -16,7 +16,7 @@ BioNeuralNet: Graph Neural Networks for Multi-Omics Network Analysis
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.17503083.svg
    :target: https://doi.org/10.5281/zenodo.17503083
 
-.. figure:: _static/LOGO_TB.png
+.. figure:: _static/logo_update.png
    :align: center
    :alt: BioNeuralNet Logo
 
@@ -37,8 +37,7 @@ Quick Start Examples
 
 Get started quickly with these end-to-end examples demonstrating the BioNeuralNet workflow:
 
-- :doc:`Quick_Start`
-- :doc:`quick_start_bio`
+- :doc:`quick_start/index`
 - :doc:`notebooks/index`
 
 **BioNeuralNet Workflow Overview**
@@ -65,14 +64,15 @@ BioNeuralNet is a flexible and modular Python framework tailored for **end-to-en
 
 **Visualizing Multi-Omics Networks**
 
-BioNeuralNet allows you to inspect the topology of your constructed networks. The visualization below, from our **TCGA Kidney Cancer (KIPAN)** analysis, highlights a module of highly interacting genes and proteins.
+BioNeuralNet allows you to inspect the topology of your constructed networks. The visualization below, from our **TCGA Lower Grade Glioma (LGG)** analysis, highlights a survival-associated module of highly correlated omics features identified by HybridLouvain.
 
-.. figure:: _static/kipan_net.png
+.. figure:: _static/net_lgg.png
    :align: center
    :alt: Multi-Omics Network Visualization
    :width: 100%
 
-   *Network visualization of a highly connected gene module identified in the KIPAN dataset.* `See Network Full Size <https://bioneuralnet.readthedocs.io/en/latest/_images/kipan_net.png>`_
+   *Network visualization of a highly connected gene module identified in the TCGA-LGG dataset.*
+   `See Network Full Size <https://bioneuralnet.readthedocs.io/en/latest/_images/net_lgg.png>`_
 
 **Top Identified Biomarkers (Hub Omics)**
 
@@ -87,28 +87,28 @@ The table below lists the top hub features identified in the network above, rank
      - Index
      - Degree
      - Source
-   * - INPP5J_27124
-     - 5
-     - 12
-     - RNA
-   * - SLC26A7_115111
-     - 26
-     - 9
-     - RNA
-   * - HEPACAM2_253012
-     - 12
+   * - HIVEP3
+     - 20
      - 7
      - RNA
-   * - CLNK_116449
-     - 16
+   * - DBH
+     - 19
      - 7
      - RNA
-   * - RHCG_51458
-     - 27
+   * - ERMP1
+     - 8
+     - 7
+     - RNA
+   * - LFNG
+     - 12
      - 6
      - RNA
-   * - CLCNKB_1188
-     - 3
+   * - MIR23A
+     - 21
+     - 6
+     - miRNA
+   * - THADA
+     - 4
      - 6
      - RNA
 
@@ -129,94 +129,55 @@ BioNeuralNet supports several GNN architectures suited to different biological c
 
 By projecting high-dimensional omics networks into latent spaces, BioNeuralNet distills complex, nonlinear molecular relationships into compact vectorized representations. The t-SNE projection below reveals distinct clusters corresponding to different omics modalities (e.g., DNA Methylation, RNA, miRNA).
 
-.. figure:: _static/emb_kipan.png
+.. figure:: _static/emb_lgg.png
    :align: center
    :alt: t-SNE visualization of Network Embeddings
    :width: 100%
 
-   *2D projection of Network Embeddings showing distinct separation between omics modalities.* `See Embeddings Full Size <https://bioneuralnet.readthedocs.io/en/latest/_images/emb_kipan.png>`_
+   *2D projection of Network Embeddings showing distinct separation between omics modalities.*
+   `See Embeddings Full Size <https://bioneuralnet.readthedocs.io/en/latest/_images/emb_lgg.png>`_
 
 For detailed explanations of BioNeuralNet's supported GNN architectures, see :doc:`gnns`.
 
 Key Considerations for Robust Analysis
---------------------------------------
+---------------------------------------
 
-To ensure scientific rigor and optimal performance when using BioNeuralNet, users should consider the following best practices:
+Multi-omics pipelines involve sequential decisions across data alignment, feature selection, network construction, and downstream modeling. Each stage shapes the one that follows. BioNeuralNet provides a structured **Data Decision Framework** to guide these choices with concrete parameter recommendations grounded in empirical results from TCGA and COPD workflows.
 
-* **Network Topology Sensitivity**: Performance is inherently tied to the quality of the constructed network. We recommend comparing multiple network construction strategies (e.g., Correlation vs Similarity) within BioNeuralNet to benchmark different topologies.
-* **Feature Selection Impact**: Results depend heavily on input features. BioNeuralNet supports various preselection strategies (Top-k Variance, ANOVA-F, Random Forest), which often yield complementary biological insights.
-* **Handling Missing Data**: Incomplete multi-omics data is common. BioNeuralNet provides utilities like ``impute_omics`` and ``impute_omics_knn`` to handle missing values within modalities.
-* **Computational Scalability**: While optimized for standard omics datasets, extremely large networks may require aggressive feature reduction or subgraph detection strategies to maintain computational efficiency.
-* **Interpretability Scope**: BioNeuralNet provides network-level interpretability (identifying key modules and hub features). However, full node-level explainability remains an active area of research.
-
-**Feature Selection Examples**
-
-The following feature set were determined by the intersection of features identified via the **ANOVA F-test** and **Random Forest Importance**. This approach offers comprehensive filtering by balancing class-based relevance (ANOVA) with non-linear model importance (Random Forest).
-
-.. list-table:: TCGA-BRCA Feature Selection
-   :widths: 25 20 20 20 15
-   :header-rows: 1
+.. figure:: _static/UpdatedFlowChart.png
    :align: center
+   :alt: BioNeuralNet Data-Driven Decision Flowchart
+   :width: 100%
 
-   * - Omics Data Type
-     - ANOVA-F & Variance
-     - RF & Variance
-     - ANOVA-F & Random Forest (Selected)
-     - All Three Agree
-   * - **Methylation**
-     - 2,092 features
-     - 1,870 features
-     - **2,203 features**
-     - 814 features
-   * - **RNA**
-     - 2,359 features
-     - 2,191 features
-     - **2,500 features**
-     - 1,124 features
+   *Data-driven decision flowchart for navigating the BioNeuralNet pipeline.*
+   `See Flow Chart Full Size <https://bioneuralnet.readthedocs.io/en/latest/_images/UpdatedFlowChart.png>`_
 
-.. list-table:: TCGA-LGG Feature Selection
-   :widths: 25 20 20 20 15
-   :header-rows: 1
-   :align: center
-
-   * - Omics Data Type
-     - ANOVA-F & Variance
-     - RF & Variance
-     - ANOVA-F & Random Forest (Selected)
-     - All Three Agree
-   * - **Methylation**
-     - 2,704 features
-     - 1,768 features
-     - **1,823 features**
-     - 809 features
-   * - **RNA**
-     - 2,183 features
-     - 1,977 features
-     - **2,127 features**
-     - 763 features
-
-For a full list of *BioNeuralNet* preprocessing utilties see: `Preprocessing Utilities <https://bioneuralnet.readthedocs.io/en/latest/utils.html#preprocessing-utilities>`_.
-
-The full analysis and implementation details for the tables above can be found in the :doc:`notebooks/index`.
+For the full stage-by-stage parameter reference, see :doc:`quick_start/data_framework`.
+For preprocessing utilities, see `Preprocessing Utilities <https://bioneuralnet.readthedocs.io/en/latest/utils.html#preprocessing-utilities>`_.
+Per-cohort feature implementation details are available in the :doc:`notebooks/index`.
 
 Explore BioNeuralNet's Documentation
 ------------------------------------
 
 For detailed examples and tutorials, visit:
 
-- :doc:`Quick_Start`: A quick walkthrough demonstrating the BioNeuralNet workflow from start to finish.
-- :doc:`quick_start_bio`: A user-frienfly walkthrough for members of the community without a developer background.
+- :doc:`quick_start/index`: A series of walkthroughs demonstrating the BioNeuralNet workflow from start to finish.
 - :doc:`notebooks/index`: A collection of demonstration notebooks showcasing end-to-end analyses on TCGA datasets.
 
 **Documentation Sections:**
 
+- :doc:`quick_start/index`: End-to-end notebook walkthrough using a synthetic demo dataset, covering network construction, subgraph detection, and disease prediction.
+- :doc:`quick_start/data_framework`: Comprehensive stage-by-stage parameter reference and decision guide grounded in empirical results from TCGA and COPD workflows.
+- :doc:`notebooks/index`: Demonstration notebooks showcasing end-to-end analyses on TCGA-BRCA, TCGA-LGG, TCGA-KIPAN, and ROSMAP datasets.
 - :doc:`gnns`: Overview of supported GNN architectures (GCN, GAT, GraphSAGE, GIN) and embedding generation.
-- :doc:`subgraph`: How to identify biologically relevant functional modules using correlated clustering methods.
-- :doc:`downstream_tasks`: Performing downstream analyses such as subject representation and phenotype prediction (DPMON).
-- :doc:`metrics`: Methods for visualization, quality evaluation, and performance benchmarking.
-- :doc:`utils`: Tools for preprocessing, feature selection, network construction, and data summarization.
-- :doc:`external_tools/index`: Integration of external methods, such as SmCCNet, for advanced network construction.
-- :doc:`user_api`: Detailed API documentation for developers and advanced users.
+- :doc:`subgraph`: Phenotype-aware subgraph detection using CorrelatedLouvain, CorrelatedPageRank, and HybridLouvain, with TCGA-LGG and ROSMAP case studies.
+- :doc:`network`: Tools for network construction, topology analysis, and automated network search.
+- :doc:`downstream_tasks`: Downstream analysis pipelines including DPMON for phenotype prediction and SubjectRepresentation for patient-level profiling.
+- :doc:`metrics`: Visualization, quality evaluation, and performance benchmarking utilities.
+- :doc:`utils`: Data preprocessing, feature selection, imputation, normalization, and network pruning.
+- :doc:`datasets`: Built-in multi-omics benchmark datasets (BRCA, LGG, KIPAN, ROSMAP) with cohort summaries and feature selection details.
+- :doc:`external_tools/index`: Utility functions for interoperability with R-based tools including SmCCNet cross-validation fold export.
+- :doc:`user_api`: Full API reference for developers and advanced users.
 
 Contributing to BioNeuralNet
 ----------------------------
@@ -258,16 +219,15 @@ If you use BioNeuralNet in your research, we kindly ask that you cite our paper:
    :caption: Contents:
 
    installation
-
+   quick_start/index
+   notebooks/index
    gnns
    subgraph
    metrics
    utils
+   network
    downstream_tasks
    datasets
-   Quick_Start.ipynb
-   quick_start_bio
-   notebooks/index
    examples/index
    external_tools/index
    user_api

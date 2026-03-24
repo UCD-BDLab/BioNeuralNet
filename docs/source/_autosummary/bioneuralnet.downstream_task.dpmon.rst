@@ -14,6 +14,7 @@ bioneuralnet.downstream\_task.dpmon
       label_binarize
       matthews_corrcoef
       pointbiserialr
+      precision_score
       prepare_node_features
       recall_score
       roc_auc_score
@@ -30,6 +31,7 @@ bioneuralnet.downstream\_task.dpmon
    .. autosummary::
    
       ASHAScheduler
+      Any
       AutoEncoder
       BasicVariantGenerator
       CLIReporter

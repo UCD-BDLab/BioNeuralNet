@@ -165,4 +165,4 @@ Next Steps
 After installation, explore our step-by-step tutorials:
 
 - :doc:`notebooks/index`
-- :doc:`Quick_Start`
+- :doc:`quick_start/index`
