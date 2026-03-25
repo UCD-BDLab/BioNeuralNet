@@ -1,272 +1,203 @@
 Utils
 =====
 
-The ``utils`` module provides a collection of supporting functions for data preparation, logging, graph construction, and exploratory analysis. These utilities streamline common preprocessing workflows and enable efficient manipulation of omics and clinical datasets.
+The ``utils`` module provides helper functions for data preprocessing, feature selection,
+statistical data exploration, network pruning, and reproducibility.
 
-Limitations and Best Practices
-------------------------------
+.. code-block:: python
 
-To ensure robust results, consider the following guidelines when using BioNeuralNet's utilities:
+   from bioneuralnet.utils import (
+       set_seed, data_stats, sparse_filter,
+       laplacian_score, variance_threshold, mad_filter,
+       pca_loadings, correlation_filter, importance_rf, top_anova_f_features,
+       m_transform, impute_simple, impute_knn, normalize,
+       clean_inf_nan, clean_internal, preprocess_clinical,
+       prune_network, prune_network_by_quantile,
+       network_remove_low_variance, network_remove_high_zero_fraction,
+   )
 
-* **Suitable Use Cases:** These tools are optimized for tabular multi-omics data (rows as samples, columns as features). They work best when samples are consistently labeled across different omics layers.
-* **Feature Selection:** For high-dimensional data (e.g., >20,000 features), we strongly recommend applying feature selection (e.g., ``select_top_k_variance`` or ``select_top_randomforest``) prior to network construction to reduce noise and computational load.
-* **Network Construction:** Different graph construction methods capture different biological signals.
+Reproducibility
+---------------
 
-   * Use **Correlation** (Pearson/Spearman) for capturing linear co-expression patterns (e.g., WGCNA-style analysis).
-   * Use **Similarity** (Cosine/RBF) for capturing broader geometric relationships in the data space.
-   * Use **KNN** (k-Nearest Neighbors) to ensure sparse, connected topologies suitable for GNNs.
+- :func:`bioneuralnet.utils.reproducibility.set_seed`: Sets global random seeds for Python, NumPy, and PyTorch (including all CUDA GPU operations). Configures ``torch.backends.cudnn`` for deterministic algorithms.
 
-* **Sparse Data:** For datasets with high dropout rates (e.g., single-cell data or metabolomics), use ``clean_inf_nan`` and imputation tools (``impute_omics``) before running sensitive metrics like correlation.
+  Parameters: ``seed_value`` (int).
 
-RData Conversion
+  .. code-block:: python
+
+      from bioneuralnet.utils import set_seed
+      set_seed(123)
+
+Data Diagnostics
 ----------------
 
-- :func:`bioneuralnet.utils.rdata_convert.rdata_to_df` converts an RData file to a CSV and loads it into a pandas DataFrame, facilitating interoperability with R-based bioinformatics pipelines.
+- :func:`bioneuralnet.utils.data.data_stats`: Combines variance, zero fraction, expression, and NaN summaries for an omics DataFrame and emits actionable recommendations. Correlation summary is skipped by default.
 
-Logging
--------
-
-- :func:`bioneuralnet.utils.logger.get_logger` configures and returns a standardized logger writing to ``bioneuralnet.log`` at the project root, ensuring reproducible tracking of analysis steps.
-
-Graph Generation
-----------------
-
-This section details utility functions for generating networks from omics data matrices. All methods are based on established literature.
-
-.. rubric:: Methods and Examples
-
-1. **k-NN Cosine/RBF Similarity Graph**
-
-   Computes either cosine similarity:
-
-   .. math::
-      S_{ij} = \frac{x_i^\top x_j}{\|x_i\|\,\|x_j\|}
-
-   or Gaussian RBF kernel:
-
-   .. math::
-      S_{ij} = \exp\bigl(-\|x_i - x_j\|^2 /(2\sigma^2)\bigr)
-
-   Sparsifies by keeping the top-\(k\) neighbors per node (optionally mutual).
-
-   .. code-block:: python
-
-      from bioneuralnet.utils import gen_similarity_graph
-      A = gen_similarity_graph(X, k=15, metric='cosine', mutual=True)
-
-   Reference: Hastie et al., 2009 [Hastie2009_]
-
-2. **Pearson/Spearman Co-expression Graph**
-
-   Computes correlation:
-
-   .. math::
-      C_{ij} = \mathrm{corr}(x_i, x_j)
-
-   Sparsifies by keeping the top-\(k\) correlations or applying a hard threshold.
-
-   .. code-block:: python
-
-      from bioneuralnet.utils import gen_correlation_graph
-      A = gen_correlation_graph(X, k=15, method='pearson')
-
-   Reference: Langfelder & Horvath, 2008 [Langfelder2008_]
-
-3. **Soft-Threshold Graph**
-
-   Applies a power function to absolute correlations, similar to WGCNA, to emphasize strong connections:
-
-   .. math::
-      W_{ij} = |C_{ij}|^\beta
-
-   Followed by optional top-\(k\) selection.
-
-   .. code-block:: python
-
-      from bioneuralnet.utils import gen_threshold_graph
-      A = gen_threshold_graph(X, b=6.0, k=15)
-
-   Reference: Langfelder & Horvath, 2008 [Langfelder2008_]
-
-4. **Gaussian k-NN Graph**
-
-   Constructs a Gaussian kernel graph sparsified by k-nearest neighbors:
-
-   .. math::
-          S_{ij} = \exp\bigl(-\|x_i - x_j\|^2 /(2\sigma^2)\bigr),\quad W = \text{Top}_k(S)
-
-   .. code-block:: python
-
-      from bioneuralnet.utils import gen_gaussian_knn_graph
-      A = gen_gaussian_knn_graph(X, k=15, sigma=None)
-
-   Credit: Adapts common practice from spectral clustering (Ng et al., 2002).
-
-5. **LASSO Graph (Graphical Lasso)**
-
-   Estimates the sparse inverse covariance matrix (precision matrix) to infer conditional independence:
-
-   .. code-block:: python
-
-      from bioneuralnet.utils import gen_lasso_graph
-      A = gen_lasso_graph(X, alpha=0.01)
-
-   Reference: Friedman et al., 2008 [Friedman2008_]
-
-6. **Shared Nearest Neighbor (SNN) Graph**
-
-   Constructs a graph based on the overlap of neighborhoods between nodes, robust to varying densities:
-
-   .. code-block:: python
-
-      from bioneuralnet.utils import gen_snn_graph
-      A = gen_snn_graph(X, k=15)
-
-7. **Minimum Spanning Tree (MST) Graph**
-
-   Constructs a backbone structure of the data using a Minimum Spanning Tree:
-
-   .. code-block:: python
-
-      from bioneuralnet.utils import gen_mst_graph
-      A = gen_mst_graph(X, metric='euclidean')
-
-Preprocessing Utilities
------------------------
-
-A collection of data-cleaning, imputation, and feature-selection functions for clinical and omics datasets.
-
-**Clinical Preprocessing**
-
-- :func:`bioneuralnet.utils.preprocess.preprocess_clinical` splits numeric and categorical features; replaces Inf/NaN; optionally scales numeric data (RobustScaler); encodes categoricals; drops zero-variance columns; and selects top-k features by RandomForest importance.
-
-  **Example**:
+  Parameters: ``df``, ``name`` (str label for logging), ``compute_correlation`` (bool, default ``False``).
 
   .. code-block:: python
 
-      from bioneuralnet.utils import preprocess_clinical
-      df_top = preprocess_clinical(X, y, top_k=10, scale=True)
+      from bioneuralnet.utils import data_stats
+      data_stats(X_mirna, "miRNA")
+      data_stats(X_meth,  "Methylation", compute_correlation=False)
 
-- :func:`bioneuralnet.utils.preprocess.clean_inf_nan` replaces Inf with NaN, imputes missing values (median), drops zero-variance columns, and logs data statistics.
+- :func:`bioneuralnet.utils.data.sparse_filter`: Drops columns (features) whose missing fraction exceeds ``missing_fraction``, then drops rows (samples) whose missing fraction exceeds the same threshold.
 
-  **Example**:
-
-  .. code-block:: python
-
-      from bioneuralnet.utils import clean_inf_nan
-      df_clean = clean_inf_nan(df)
-
-**Imputation & Normalization**
-
-- :func:`bioneuralnet.utils.preprocess.impute_omics`: Simple imputation (mean/median/zero) for tabular data.
-- :func:`bioneuralnet.utils.preprocess.impute_omics_knn`: Advanced KNN-based imputation for estimating missing values based on similar samples.
-- :func:`bioneuralnet.utils.preprocess.normalize_omics`: Standardizes omics data (z-score or min-max scaling).
-- :func:`bioneuralnet.utils.preprocess.beta_to_m`: Converts Beta values (DNA methylation) to M-values for better statistical properties.
-
-**Variance-Based Selection**
-
-- :func:`bioneuralnet.utils.preprocess.select_top_k_variance` cleans data, then retains the top-k numeric features with the highest variance.
-
-  **Example**:
+  Parameters: ``df``, ``missing_fraction`` (float, default ``0.20``).
 
   .. code-block:: python
 
-      from bioneuralnet.utils import select_top_k_variance
-      df_var = select_top_k_variance(df, k=500)
+      from bioneuralnet.utils import sparse_filter
+      X_mirna = sparse_filter(X_mirna, missing_fraction=0.20)
 
-**Correlation-Based Selection**
+- :func:`bioneuralnet.utils.data.nan_summary`: Logs global and per-feature/per-sample NaN rates. Returns the global missing percentage as a float.
 
-- :func:`bioneuralnet.utils.preprocess.select_top_k_correlation`:
-    * **Supervised:** If ``y`` is provided, selects features with the highest absolute Pearson correlation to the target.
-    * **Unsupervised:** If ``y=None``, selects features with the *lowest* average inter-feature correlation (redundancy reduction).
+  Parameters: ``df``, ``name``, ``missing_threshold`` (float, default ``20.0``).
 
-  **Example**:
+- :func:`bioneuralnet.utils.data.variance_summary`: Returns a dict of mean, median, min, max, and std of column variances. Optionally counts features below ``var_threshold``.
+
+  Parameters: ``df``, ``var_threshold`` (Optional[float]).
+
+- :func:`bioneuralnet.utils.data.zero_summary`: Returns a dict of statistics for the fraction of zeros per column. Optionally counts features above ``zero_threshold``.
+
+  Parameters: ``df``, ``zero_threshold`` (Optional[float]).
+
+- :func:`bioneuralnet.utils.data.expression_summary`: Returns a dict of mean, median, min, max, and std of feature means.
+
+  Parameters: ``df``.
+
+- :func:`bioneuralnet.utils.data.correlation_summary`: Returns a dict of statistics for each feature's maximum pairwise absolute correlation. Fills diagonal with 0 before computing max.
+
+  Parameters: ``df``.
+
+.. _feature-selection-utilities:
+
+Feature Selection
+-----------------
+
+- :func:`bioneuralnet.utils.feature_selection.laplacian_score`: Selects the top ``n_keep`` features by Laplacian Score computed on a symmetric k-NN affinity graph built from standardized data. Lower scores indicate higher importance.
+
+  Parameters: ``df``, ``n_keep`` (int), ``k_neighbors`` (int, default ``5``).
 
   .. code-block:: python
 
-      from bioneuralnet.utils import select_top_k_correlation
-      df_sup = select_top_k_correlation(X, y, top_k=100) # supervised
-      df_unsup = select_top_k_correlation(X, top_k=100) # unsupervised
+      from bioneuralnet.utils import laplacian_score
+      X_selected = laplacian_score(X, n_keep=200, k_neighbors=5)
 
-**RandomForest Feature Importance**
+- :func:`bioneuralnet.utils.feature_selection.variance_threshold`: Selects the top-k features by variance after applying ``clean_inf_nan``.
 
-- :func:`bioneuralnet.utils.preprocess.select_top_randomforest` fits a RandomForest model (classification or regression) and returns the top-k features ranked by importance.
-
-  **Example**:
+  Parameters: ``df``, ``k`` (int, default ``1000``), ``ddof`` (int, default ``0``).
 
   .. code-block:: python
 
-      from bioneuralnet.utils import select_top_randomforest
-      df_rf = select_top_randomforest(X, y, top_k=200)
+      from bioneuralnet.utils import variance_threshold
+      X_prefiltered = variance_threshold(X, k=2000)
 
-**ANOVA F-Test Selection**
+- :func:`bioneuralnet.utils.feature_selection.mad_filter`: Selects the top ``n_keep`` features by Median Absolute Deviation computed across samples.
 
-- :func:`bioneuralnet.utils.preprocess.top_anova_f_features` runs an ANOVA F-test, applies FDR correction, selects significant features, and optionally pads the selection to reach ``max_features``.
+  Parameters: ``df``, ``n_keep`` (int).
 
-  **Example**:
+  .. code-block:: python
+
+      from bioneuralnet.utils import mad_filter
+      X_selected = mad_filter(X, n_keep=200)
+
+- :func:`bioneuralnet.utils.feature_selection.pca_loadings`: Selects features with the highest absolute PCA loading magnitudes, weighted by explained variance ratio. Scales data with ``StandardScaler`` before PCA.
+
+  Parameters: ``df``, ``n_keep`` (int), ``n_components`` (int, default ``50``), ``seed`` (int, default ``1883``).
+
+  .. code-block:: python
+
+      from bioneuralnet.utils import pca_loadings
+      X_selected = pca_loadings(X, n_keep=200, n_components=50)
+
+- :func:`bioneuralnet.utils.feature_selection.correlation_filter`: In unsupervised mode (``y=None``), ranks features by mean absolute inter-feature correlation and selects the top ``top_k``. In supervised mode (``y`` provided), ranks by absolute Pearson correlation with the target.
+
+  Parameters: ``X``, ``y`` (pd.Series or None), ``top_k`` (int, default ``1000``).
+
+  .. code-block:: python
+
+      from bioneuralnet.utils import correlation_filter
+      X_selected = correlation_filter(X, top_k=500)
+      X_supervised = correlation_filter(X, y=y, top_k=500)
+
+- :func:`bioneuralnet.utils.feature_selection.importance_rf`: Fits a ``RandomForestClassifier`` (when ``y.nunique() <= 10``) or ``RandomForestRegressor`` and selects the top ``top_k`` features by ``feature_importances_``. Drops zero-variance columns before fitting.
+
+  Parameters: ``X``, ``y`` (pd.Series), ``top_k`` (int, default ``1000``), ``seed`` (int, default ``119``).
+
+  .. code-block:: python
+
+      from bioneuralnet.utils import importance_rf
+      X_selected = importance_rf(X, y, top_k=200)
+
+- :func:`bioneuralnet.utils.feature_selection.top_anova_f_features`: Computes ANOVA F-statistics (``f_classif`` or ``f_regression``) with Benjamini-Hochberg FDR correction. Returns up to ``max_features`` features ordered by F-statistic, significant features first. Pads with the strongest non-significant features if needed.
+
+  Parameters: ``X``, ``y`` (pd.Series), ``max_features`` (int), ``alpha`` (float, default ``0.05``), ``task`` (``"classification"`` or ``"regression"``).
 
   .. code-block:: python
 
       from bioneuralnet.utils import top_anova_f_features
-      df_anova = top_anova_f_features(X, y, max_features=100, alpha=0.05)
+      X_selected = top_anova_f_features(X, y, max_features=200, alpha=0.05, task="classification")
 
-**Network Pruning**
+Preprocessing Utilities
+-----------------------
 
-- :func:`bioneuralnet.utils.preprocess.prune_network` prunes edges below a weight threshold, removes isolated nodes, and logs network statistics.
+- :func:`bioneuralnet.utils.preprocess.m_transform`: Converts Beta values to M-values via ``log2(clip(B, eps, 1-eps) / (1 - clip(B, eps, 1-eps)))``. Non-numeric columns are coerced to numeric before transformation.
 
-  **Example**:
-
-  .. code-block:: python
-
-      from bioneuralnet.utils import prune_network
-      pruned = prune_network(adj_df, weight_threshold=0.1)
-
-- :func:`bioneuralnet.utils.preprocess.prune_network_by_quantile` uses a quantile cutoff on edge weights to prune the network.
-
-  **Example**:
+  Parameters: ``df``, ``eps`` (float, default ``1e-6``).
 
   .. code-block:: python
 
-      from bioneuralnet.utils import prune_network_by_quantile
-      pruned_q = prune_network_by_quantile(adj_df, quantile=0.75)
+      from bioneuralnet.utils import m_transform
+      X_meth = m_transform(X_meth, eps=1e-7)
 
-- :func:`bioneuralnet.utils.preprocess.network_remove_low_variance` drops nodes (rows/cols) from the adjacency matrix whose variance falls below a threshold.
-- :func:`bioneuralnet.utils.preprocess.network_remove_high_zero_fraction` drops nodes where the fraction of zero-weight edges exceeds a threshold (e.g., disconnected nodes).
+- :func:`bioneuralnet.utils.preprocess.impute_simple`: Fills NaN values using ``mean``, ``median``, or ``zero`` strategy via ``DataFrame.fillna``.
 
-
-Graph Analysis Tools
---------------------
-
-Functions for analyzing and repairing graph structures.
-
-- :func:`bioneuralnet.utils.graph_tools.graph_analysis`: Computes comprehensive graph metrics (density, sparsity, connectivity, connected components) and logs a summary.
-- :func:`bioneuralnet.utils.graph_tools.repair_graph_connectivity`: Analyzes graph connectivity and, if fragmented, repairs it by adding minimum spanning tree (MST) edges or connecting components to the giant component.
-- :func:`bioneuralnet.utils.graph_tools.find_optimal_graph`: Iteratively tests different graph construction parameters (e.g., k-NN `k` values) to maximize a target metric like connectivity or community structure.
-
-
-Data Summary Utilities
-----------------------
-
-- :func:`bioneuralnet.utils.data.variance_summary` computes summary statistics for column variances.
-- :func:`bioneuralnet.utils.data.zero_fraction_summary` computes statistics for the fraction of zeros per column (sparsity).
-- :func:`bioneuralnet.utils.data.expression_summary` computes summary of mean expression values across features.
-- :func:`bioneuralnet.utils.data.correlation_summary` computes statistics of each feature's maximum pairwise correlation.
-- :func:`bioneuralnet.utils.data.explore_data_stats` prints a comprehensive summary (variance, sparsity, expression, correlation) to standard output.
-
-  **Example**:
+  Parameters: ``df``, ``method`` (str, default ``"mean"``).
 
   .. code-block:: python
-      
-      from bioneuralnet.utils import explore_data_stats
-      explore_data_stats(df, name="MyOmicsData")
 
-References
-----------
+      from bioneuralnet.utils import impute_simple
+      X_imputed = impute_simple(X, method="mean")
 
-.. [Langfelder2008] Langfelder, P., & Horvath, S. (2008). WGCNA: an R package for weighted correlation network analysis. *BMC Bioinformatics*, 9, 559.
+- :func:`bioneuralnet.utils.preprocess.impute_knn`: KNN imputation via ``sklearn.impute.KNNImputer``. Raises ``ValueError`` on non-numeric columns. Returns ``df`` unchanged if no NaNs are present.
 
-.. [Margolin2006] Margolin, A. A., Nemenman, I., Basso, K., Wiggins, C., Stolovitzky, G., Dalla Favera, R., & Califano, A. (2006). ARACNE: an algorithm for the reconstruction of gene regulatory networks in a mammalian cellular context. *BMC Bioinformatics*, 7(Suppl 1), S7.
+  Parameters: ``df``, ``n_neighbors`` (int, default ``5``).
 
-.. [Hastie2009] Hastie, T., Tibshirani, R., & Friedman, J. (2009). *The Elements of Statistical Learning* (2nd ed.). Springer.
+  .. code-block:: python
 
-.. [Friedman2008] Friedman, J., Hastie, T., & Tibshirani, R. (2008). Sparse inverse covariance estimation with the graphical lasso. *Biostatistics*, 9(3), 432-441.
+      from bioneuralnet.utils import impute_knn
+      X_imputed = impute_knn(X, n_neighbors=5)
+
+- :func:`bioneuralnet.utils.preprocess.normalize`: Scales data using ``StandardScaler`` (``"standard"``), ``MinMaxScaler`` (``"minmax"``), or ``log2(x + 1)`` (``"log2"``).
+
+  Parameters: ``df``, ``method`` (str, default ``"standard"``).
+
+  .. code-block:: python
+
+      from bioneuralnet.utils import normalize
+      X_norm = normalize(X, method="standard")
+
+- :func:`bioneuralnet.utils.preprocess.clean_inf_nan`: Replaces ``inf``/``-inf`` with NaN, imputes NaNs with column median, and drops zero-variance columns.
+
+  Parameters: ``df``.
+
+  .. code-block:: python
+
+      from bioneuralnet.utils import clean_inf_nan
+      X_clean = clean_inf_nan(X)
+
+- :func:`bioneuralnet.utils.preprocess.clean_internal`: Drops columns with NaN fraction above ``nan_threshold``, removes zero-variance columns, and imputes remaining NaNs with column median via ``SimpleImputer``.
+
+  Parameters: ``df``, ``nan_threshold`` (float, default ``0.5``).
+
+  .. code-block:: python
+
+      from bioneuralnet.utils import clean_internal
+      X_clean = clean_internal(X, nan_threshold=0.5)
+
+- :func:`bioneuralnet.utils.preprocess.preprocess_clinical`: Drops specified columns, maps ordinal variables to numeric ranks, coerces continuous columns, one-hot encodes nominal categoricals (with ``dummy_na=True``), optionally scales numeric columns with ``RobustScaler``, and removes zero-variance columns. Returns ``float32`` DataFrame.
+
+  Parameters: ``X``, ``scale`` (bool, default ``False``), ``drop_columns`` (list or None), ``ordinal_mappings`` (dict or None), ``continuous_columns`` (list or None), ``impute`` (bool, default ``False``).
+
+  ..

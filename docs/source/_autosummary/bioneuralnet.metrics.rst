@@ -9,8 +9,8 @@ bioneuralnet.metrics
    .. autosummary::
    
       cluster_correlation
+      cluster_pca_correlation
       compare_clusters
-      louvain_to_adjacency
       omics_correlation
       plot_embeddings
       plot_multiple_metrics

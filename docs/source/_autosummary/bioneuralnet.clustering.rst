@@ -11,6 +11,7 @@ bioneuralnet.clustering
       CorrelatedLouvain
       CorrelatedPageRank
       HybridLouvain
+      Louvain
    
 .. rubric:: Modules
 
@@ -21,3 +22,4 @@ bioneuralnet.clustering
    correlated_louvain
    correlated_pagerank
    hybrid_louvain
+   louvain

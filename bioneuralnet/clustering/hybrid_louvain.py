@@ -72,7 +72,7 @@ class HybridLouvain:
     (a) Correlated Louvain to find the most phenotype-associated community
     (b) Correlated PageRank to refine that community via sweep cut
 
-    The graph shrinks each iteration. The best subgraph by |rho| is
+    The graph shrinks each iteration. The best subgraph by rho  is
     tracked across all iterations and returned.
 
     Args:
@@ -154,7 +154,7 @@ class HybridLouvain:
 
             Dict:
 
-                - best_nodes: nodes of the highest |rho| subgraph
+                - best_nodes: nodes of the highest rho  subgraph
                 - best_correlation: float
                 - best_iteration: int
                 - iterations: full per-iteration metadata
@@ -205,7 +205,7 @@ class HybridLouvain:
                 break
 
             logger.info(
-                f"Top community: |rho|={top_rho:.4f}, size={len(seed_nodes)}"
+                f"Top community: |rho| ={top_rho:.4f}, size={len(seed_nodes)}"
             )
 
             # part 2: Correlated PageRank refines
@@ -254,7 +254,7 @@ class HybridLouvain:
 
             logger.info(
                 f"  Iteration {it}: {len(refined_nodes)} nodes, "
-                f"|rho|={refined_rho:.4f}"
+                f"rho ={refined_rho:.4f}"
             )
 
             # zoom-in: next iteration operates on the refined subgraph
@@ -267,14 +267,14 @@ class HybridLouvain:
         best_nodes = self._iterations[self._best_idx]["refined_nodes"] if self._best_idx is not None else []
         best_rho = self._iterations[self._best_idx]["refined_rho"] if self._best_idx is not None else 0.0
 
-        logger.info(f"\nHybrid Louvain completed: {len(self._iterations)} iterations, best |rho|={best_rho:.4f} at iteration {self._best_idx}")
+        logger.info(f"\nHybrid Louvain completed: {len(self._iterations)} iterations, best rho ={best_rho:.4f} at iteration {self._best_idx}")
         logger.info("All iterations:")
         for it_r in self._iterations:
             logger.info(
                 f"  iter {it_r['iteration']}: size={it_r['refined_size']}, "
-                f"|rho|={it_r['refined_rho']:.4f}, conductance={it_r['conductance']:.4f}"
+                f"|rho| ={it_r['refined_rho']:.4f}, conductance={it_r['conductance']:.4f}"
             )
-        logger.info(f"  Best subgraph: {len(best_nodes)} nodes, |rho|={best_rho:.4f} (iter {self._best_idx})")
+        logger.info(f"  Best subgraph: {len(best_nodes)} nodes, |rho| ={best_rho:.4f} (iter {self._best_idx})")
 
         if as_dfs:
             result = []
@@ -311,7 +311,7 @@ class HybridLouvain:
 
         Returns:
 
-            Tuple[List[Any], float, int]: (nodes, |rho|, iteration_index).
+            Tuple[List[Any], float, int]: (nodes, rho , iteration_index).
         """
         if self._best_idx is None:
             raise ValueError("Call run() first.")

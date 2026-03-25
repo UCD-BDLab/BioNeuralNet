@@ -13,39 +13,35 @@ In BioNeuralNet, **rows** represent subjects/patients and **columns** represent 
 Feature Selection Summary
 -------------------------
 
-Because omics data are typically **high-dimensional**, most built-in datasets use a filtering step based on both:
+To address high dimensionality and isolate the most informative variables, unsupervised feature selection was performed across all cohorts using **Laplacian Score** filtering.
+This methylationod evaluates each feature based on its ability to preserve the local manifold structure of the data, emphasizing features that vary minimally between closely related samples.
+Lower Laplacian Scores indicate higher feature importance.
 
-- **ANOVA F-test**: To capture features with strong class separability under a linear model.
-- **Random Forest importance**: To capture non-linear dependencies and interaction effects.
+The following feature counts were retained per modality across BRCA, LGG, and KIPAN cohorts:
 
-We retain features in the **intersection** of these criteria, providing a compact set that is both discriminative and predictive. For a detailed mathematical description of this procedure, see :ref:`feature-selection-details` below.
-
-Example overlap for selected omics types:
-
-.. list-table:: Feature overlap across selection methods
+.. list-table::
    :header-rows: 1
+   :widths: 40 30 30
 
-   * - Omics Data Type
-     - ANOVA-F & Variance
-     - RF & Variance
-     - ANOVA-F & Random Forest (Selected)
-     - All Three Agree
-   * - Methylation
-     - 2,092 features
-     - 1,870 features
-     - **2,203 features**
-     - 814 features
-   * - RNA
-     - 2,359 features
-     - 2,191 features
-     - **2,500 features**
-     - 1,124 features
+   * - Modality
+     - Features Retained
+     - Cohorts Applied
+   * - DNA methylation
+     - 400
+     - BRCA, LGG, KIPAN
+   * - mRNA
+     - 200
+     - BRCA, LGG, KIPAN
+   * - miRNA
+     - 100
+     - BRCA, LGG, KIPAN
+
+For a full list of available feature selection methylationods, see the `Preprocessing Utilities <https://bioneuralnet.readthedocs.io/en/latest/utils.html#preprocessing-utilities>`_ documentation.
 
 Quick Usage
 -----------
 
-You can use either the convenience loader functions or the lower-level
-:class:`DatasetLoader`:
+You can use either the convenience loader functions or the lower-level :class:`DatasetLoader`:
 
 .. code-block:: python
 
@@ -55,92 +51,57 @@ You can use either the convenience loader functions or the lower-level
        load_brca,
        load_lgg,
        load_kipan,
-       load_paad,
    )
 
    brca = load_brca()
    print(brca.keys())
-   # dict_keys(['mirna', 'target', 'clinical', 'rna', 'meth'])
+   # dict_keys(['mirna', 'target', 'clinical', 'rna', 'methylation'])
 
    from bioneuralnet.datasets import DatasetLoader
 
    loader = DatasetLoader("kipan")
    print(loader.shape)
-   # {'mirna': (658, 472), 'target': (658, 1), 'clinical': (658, 19),
-   #  'rna': (658, 2284), 'meth': (658, 2102)}
 
 API Summary
 -----------
-
-Convenience loaders
-^^^^^^^^^^^^^^^^^^^
-
-The following functions are provided in `bioneuralnet.datasets`:
-
-.. code-block:: python
-
-   from bioneuralnet.datasets import (
-       load_example,
-       load_monet,
-       load_brca,
-       load_lgg,
-       load_kipan,
-       load_paad,
-   )
 
 Each function returns a ``dict[str, pandas.DataFrame]`` mapping table names to loaded DataFrames:
 
 - :func:`load_example` keys: ``"X1"``, ``"X2"``, ``"Y"``, ``"clinical"``
 - :func:`load_monet` keys: ``"gene"``, ``"mirna"``, ``"phenotype"``, ``"rppa"``, ``"clinical"``
-- :func:`load_brca` keys: ``"mirna"``, ``"target"``, ``"clinical"``, ``"rna"``, ``"meth"``
-- :func:`load_lgg` keys: ``"mirna"``, ``"target"``, ``"clinical"``, ``"rna"``, ``"meth"``
-- :func:`load_kipan` keys: ``"mirna"``, ``"target"``, ``"clinical"``, ``"rna"``, ``"meth"``
-- :func:`load_paad` keys: ``"cnv"``, ``"target"``, ``"clinical"``, ``"rna"``, ``"meth"``
+- :func:`load_brca` keys: ``"mirna"``, ``"target"``, ``"clinical"``, ``"rna"``, ``"methylation"``
+- :func:`load_lgg` keys: ``"mirna"``, ``"target"``, ``"clinical"``, ``"rna"``, ``"methylation"``
+- :func:`load_kipan` keys: ``"mirna"``, ``"target"``, ``"clinical"``, ``"rna"``, ``"methylation"``
 
-DatasetLoader
-^^^^^^^^^^^^^
-
-The :class:`DatasetLoader` class provides a unified interface to any of the built-in datasets:
-
-.. code-block:: python
-
-   from bioneuralnet.datasets import DatasetLoader
-
-   loader = DatasetLoader("paad")
-   data = loader.data
-   print(loader.shape)
-   # {'cnv': (177, 1035), 'target': (177, 1), 'clinical': (177, 19),
-   #  'rna': (177, 1910), 'meth': (177, 1152)}
-
-Valid ``dataset_name`` values (case-insensitive):
-
-- ``"example"``
-- ``"monet"``
-- ``"brca"``
-- ``"lgg"``
-- ``"kipan"``
-- ``"paad"``
-
-The `.shape` property returns a mapping from table name to ``(n_rows, n_cols)`` for each loaded table.
+Valid ``dataset_name`` values for :class:`DatasetLoader` (case-insensitive): ``"example"``, ``"monet"``, ``"brca"``, ``"lgg"``, ``"kipan"``.
 
 Built-in Datasets
 -----------------
 
-Below are the built-in datasets exactly as defined in the :class:`bioneuralnet.datasets.DatasetLoader` implementation.
-
 example
 ^^^^^^^
 
-Synthetic example dataset.
+Synthetic dataset for testing and demonstration.
 
-Tables and shapes:
+.. list-table::
+   :header-rows: 1
+   :widths: 20 40 40
 
-- ``X1``: ``(358, 500)``
-- ``X2``: ``(358, 100)``
-- ``Y``: ``(358, 1)``
-- ``clinical``: ``(358, 6)``
-
-Loaded via:
+   * - Table
+     - Shape
+     - Description
+   * - ``X1``
+     - (358, 500)
+     - Gene expression features
+   * - ``X2``
+     - (358, 100)
+     - miRNA features
+   * - ``Y``
+     - (358, 1)
+     - Continuous phenotype
+   * - ``clinical``
+     - (358, 6)
+     - Clinical covariates
 
 .. code-block:: python
 
@@ -150,17 +111,30 @@ Loaded via:
 monet
 ^^^^^
 
-MONET multi-omics dataset included with the package.
+MONET multi-omics dataset.
 
-Tables and shapes:
+.. list-table::
+   :header-rows: 1
+   :widths: 20 40 40
 
-- ``gene``: ``(107, 5039)``
-- ``mirna``: ``(107, 789)``
-- ``phenotype``: ``(106, 1)``
-- ``rppa``: ``(107, 175)``
-- ``clinical``: ``(107, 5)``
-
-Loaded via:
+   * - Table
+     - Shape
+     - Description
+   * - ``gene``
+     - (107, 5039)
+     - Gene expression
+   * - ``mirna``
+     - (107, 789)
+     - miRNA expression
+   * - ``phenotype``
+     - (106, 1)
+     - Phenotype labels
+   * - ``rppa``
+     - (107, 175)
+     - Protein expression
+   * - ``clinical``
+     - (107, 5)
+     - Clinical covariates
 
 .. code-block:: python
 
@@ -170,17 +144,32 @@ Loaded via:
 brca
 ^^^^
 
-Breast Invasive Carcinoma (BRCA) dataset.
+TCGA Breast Invasive Carcinoma (BRCA). Target: PAM50 subtype (5-class): LumA (n=419), LumB (n=140), Basal (n=130), Her2 (n=46), Normal (n=34).
 
-Tables and shapes:
+.. list-table::
+   :header-rows: 1
+   :widths: 20 20 20 20 20
 
-- ``mirna``: ``(769, 503)``
-- ``target``: ``(769, 1)``
-- ``clinical``: ``(769, 103)``
-- ``rna``: ``(769, 2500)``
-- ``meth``: ``(769, 2203)``
-
-Loaded via:
+   * - Stage
+     - methylation
+     - mRNA
+     - miRNA
+     - Clinical
+   * - Raw (features x samples)
+     - 20,107 x 885
+     - 18,321 x 1,212
+     - 503 x 1,189
+     - 1,098 x 18
+   * - Final aligned (samples x features)
+     - 769 x 20,106
+     - 769 x 16,757
+     - 769 x 354
+     - 769 x 17
+   * - After Laplacian Score selection
+     - 769 x 400
+     - 769 x 200
+     - 769 x 100
+     - 769 x 17
 
 .. code-block:: python
 
@@ -190,57 +179,67 @@ Loaded via:
 lgg
 ^^^
 
-Brain Lower Grade Glioma (LGG) dataset.
+TCGA Brain Lower Grade Glioma (LGG). Target: binary vital status, Alive (n=386) vs. Deceased (n=125).
 
-Tables and shapes:
+.. list-table::
+   :header-rows: 1
+   :widths: 20 20 20 20 20
 
-- ``mirna``: ``(511, 548)``
-- ``target``: ``(511, 1)``
-- ``clinical``: ``(511, 13)``
-- ``rna``: ``(511, 2127)``
-- ``meth``: ``(511, 1823)``
-
-Loaded via:
+   * - Stage
+     - methylation
+     - mRNA
+     - miRNA
+     - Clinical
+   * - Raw (features x samples)
+     - 20,115 x 685
+     - 18,328 x 701
+     - 548 x 531
+     - 14 x 1,110
+   * - Final aligned (samples x features)
+     - 511 x 20,114
+     - 511 x 18,328
+     - 511 x 548
+     - 511 x 13
+   * - After Laplacian Score selection
+     - 511 x 400
+     - 511 x 200
+     - 511 x 100
+     - 511 x 13
 
 .. code-block:: python
 
    from bioneuralnet.datasets import load_lgg
    lgg = load_lgg()
 
-paad
-^^^^
-
-Pancreatic Adenocarcinoma (PAAD) dataset.
-
-Tables and shapes:
-
-- ``cnv``: ``(177, 1035)``
-- ``target``: ``(177, 1)``
-- ``clinical``: ``(177, 19)``
-- ``rna``: ``(177, 1910)``
-- ``meth``: ``(177, 1152)``
-
-Loaded via:
-
-.. code-block:: python
-
-   from bioneuralnet.datasets import load_paad
-   paad = load_paad()
-
 kipan
 ^^^^^
 
-Pan-kidney cohort (KIPAN: KICH + KIRC + KIRP).
+TCGA Pan-Kidney cohort (KIPAN: KICH + KIRC + KIRP). Target: binary cancer stage, Early (Stages I/II, n=417) vs. Late (Stages III/IV, n=216).
 
-Tables and shapes:
+.. list-table::
+   :header-rows: 1
+   :widths: 20 20 20 20 20
 
-- ``mirna``: ``(658, 472)``
-- ``target``: ``(658, 1)``
-- ``clinical``: ``(658, 19)``
-- ``rna``: ``(658, 2284)``
-- ``meth``: ``(658, 2102)``
-
-Loaded via:
+   * - Stage
+     - methylation
+     - mRNA
+     - miRNA
+     - Clinical
+   * - Raw (features x samples)
+     - 20,117 x 867
+     - 18,272 x 1,020
+     - 472 x 1,005
+     - 20 x 941
+   * - Final aligned (samples x features)
+     - 658 x 20,116
+     - 658 x 18,272
+     - 658 x 472
+     - 658 x 19
+   * - After Laplacian Score selection
+     - 633 x 400
+     - 633 x 200
+     - 633 x 100
+     - 633 x 19
 
 .. code-block:: python
 
@@ -253,79 +252,18 @@ Loaded via:
 Feature Selection
 -----------------
 
-To reduce the dimensionality of the high-feature omics datasets, we employed two complementary criteria: statistical class separation via ANOVA and model-based predictive utility via Random Forests. The final feature set was obtained from the intersection of these two methods, ensuring that retained variables exhibit both strong discriminative structure and demonstrable predictive value, a more conservative and robust strategy than relying on either criterion alone.
-
-**ANOVA F-test.**
-For each feature :math:`x_j`, class separability was quantified using a one-way ANOVA.
-
-Let :math:`\bar{x}_{k,j}` denote the class means, :math:`\bar{x}_j` the global mean, and :math:`n_k` the class sizes. The between-class and within-class mean squares are
+To reduce the dimensionality of the high-feature omics datasets, unsupervised feature selection was performed using Laplacian Score filtering.
+The Laplacian Score for the :math:`r`-th feature is:
 
 .. math::
 
-   MS_{\text{between},j}
-   \;=\;
-   \frac{1}{K-1}
-   \sum_{k=1}^{K} n_k\bigl(\bar{x}_{k,j}-\bar{x}_j\bigr)^2,
+   L_r = \frac{\sum_{ij} (x_{ri} - x_{rj})^2 W_{ij}}{\text{Var}(x_r)}
 
-.. math::
+Where:
 
-   MS_{\text{within},j}
-   \;=\;
-   \frac{1}{n-K}
-   \sum_{k=1}^{K}
-   \sum_{x_{ij}\in X_{k,j}}
-   \bigl(x_{ij}-\bar{x}_{k,j}\bigr)^2.
+- :math:`L_r` is the Laplacian Score for feature :math:`r`. Lower scores indicate higher importance.
+- :math:`x_{ri}` and :math:`x_{rj}` are the standardized values of feature :math:`r` for samples :math:`i` and :math:`j`. All feature vectors undergo Z-score normalization prior to scoring.
+- :math:`W_{ij}` is the edge weight between samples :math:`i` and :math:`j` in a symmetric k-nearest neighbors affinity graph. If samples :math:`i` and :math:`j` are neighbors, :math:`W_{ij} = 1`; otherwise :math:`W_{ij} = 0`.
+- :math:`\text{Var}(x_r)` is the variance of feature :math:`r`, weighted by the degree matrix. This denominator ensures scale-invariant normalization, reflecting local spatial variance relative to global feature variance.
 
-The ANOVA statistic is then
-
-.. math::
-
-   F_j \;=\; \frac{MS_{\text{between},j}}{MS_{\text{within},j}}.
-
-Features were ranked by :math:`F_j` after Benjamini-Hochberg FDR correction.
-
-**Random Forest Importance.**
-Predictive relevance was quantified using the mean decrease in Gini impurity.
-A node :math:`t` with class proportions :math:`p_k(t)` has impurity
-
-.. math::
-
-   G(t) \;=\; 1 - \sum_{k=1}^K p_k(t)^2.
-
-A split on feature :math:`j` produces an impurity reduction
-
-.. math::
-
-   \Delta G(j,t)
-   \;=\;
-   G(t)
-   -
-   \Bigl(
-   \frac{N_{t_L}}{N_t} G(t_L)
-   +
-   \frac{N_{t_R}}{N_t} G(t_R)
-   \Bigr),
-
-and the forest-level importance is the average of :math:`\Delta G` over all trees:
-
-.. math::
-
-   I(j)
-   \;=\;
-   \frac{1}{B}
-   \sum_{b=1}^{B}
-   \sum_{t:\,\mathrm{feat}(t)=j}
-   \Delta G(j,t).
-
-**Consensus Selection.**
-For methylation and RNA, the top :math:`6{,}000` ANOVA and Random Forest features were extracted, and their intersection was taken:
-
-.. math::
-
-   \mathcal{S}_{\text{final}}
-   \;=\;
-   \mathcal{S}_{\mathrm{ANOVA}}
-   \,\cap\,
-   \mathcal{S}_{\mathrm{RF}}.
-
-This approach retains features that are simultaneously statistically discriminative and useful to a non-linear classifier, yielding a stable and biologically meaningful subset. The lower-dimensional miRNA panel (472 features) was included in full.
+By filtering for the lowest Laplacian Scores, the optimal subsets of features were retained per cohort to maximize computational efficiency while preserving biological signals.

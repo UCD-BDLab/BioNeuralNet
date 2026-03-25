@@ -11,7 +11,7 @@ Each workflow walks through:
 * **Downstream tasks**, including disease prediction with DPMON.
 * **Subgraph detection and biomarker modules** in selected cohorts.
 
-The TCGA notebooks showcase the full end-to-end pipeline on multiple cancers (BRCA, LGG, KIPAN, PAAD). The biomarker notebook focuses on phenotype-associated subgraphs and driver modules derived from these analyses.
+The TCGA notebooks showcase the full end-to-end pipeline on multiple cancers (BRCA, LGG, KIPAN). The TCGA-LGG notebook includes a biomarker discovery section through phenotype-associated subgraphs and driver modules.
 
 The following notebooks are included in this guide:
 
@@ -20,5 +20,5 @@ The following notebooks are included in this guide:
 
    TCGA-BRCA.ipynb
    TCGA-LGG.ipynb
-   TCGA-PAAD.ipynb
-   TCGA-Biomarkers.ipynb
+   TCGA-KIPAN.ipynb
+   ROSMAP.ipynb

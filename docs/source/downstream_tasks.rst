@@ -32,7 +32,7 @@ BioNeuralNet **DPMON module** provides a streamlined, end-to-end framework for d
 .. code-block:: python
 
    import pandas as pd
-   from bioneuralnet.external_tools import SmCCNet
+   from bioneuralnet.network import auto_pysmccnet
    from bioneuralnet.downstream_task import DPMON
    from bioneuralnet.datasets import DatasetLoader
 
@@ -43,15 +43,21 @@ BioNeuralNet **DPMON module** provides a streamlined, end-to-end framework for d
    phenotype = example.data["Y"]
    clinical = example.data["clinical_data"]
 
-   # Step 2: Construct phenotype-aware network
-   smccnet = SmCCNet(
-       phenotype_df=phenotype,
-       omics_dfs=[omics_genes, omics_proteins],
-       data_types=["Genes", "Proteins"],
-       kfold=5,
-       summarization="PCA",
+   # Step 2: Network Construction
+   result = auto_pysmccnet(
+      X=[omics1, omics2],
+      Y=phenotype,
+      DataType=["genes", "mirna"],
+      subSampNum=1000,
+      seed=SEED,
+      Kfold=3,
+      BetweenShrinkage=5,
+      CutHeight=1 - 0.1**10,
+      summarization="NetSHy",
    )
-   global_network, clusters = smccnet.run()
+
+   global_network = result["AdjacencyMatrix"]
+   subnetworks = result["Subnetworks"]
 
    # Step 3: Disease prediction with DPMON
    dpmon = DPMON(
@@ -97,7 +103,7 @@ Getting Started
 
 To explore comprehensive end-to-end analyses and practical tutorials, refer to:
 
-- :doc:`Quick_Start`
+- :doc:`quick_start/index`
 - :doc:`notebooks/index`
 
 References

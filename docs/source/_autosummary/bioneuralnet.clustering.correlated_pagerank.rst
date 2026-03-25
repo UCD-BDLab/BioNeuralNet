@@ -10,14 +10,12 @@ bioneuralnet.clustering.correlated\_pagerank
    
       get_logger
       pearsonr
-      set_seed
    
    .. rubric:: Classes
 
    .. autosummary::
    
-      ASHAScheduler
-      CLIReporter
+      Any
       CorrelatedPageRank
       PCA
       StandardScaler

@@ -321,8 +321,8 @@ class NetworkAnalyzer:
         for i, om1 in enumerate(omics_list):
             for j, om2 in enumerate(omics_list):
                 if i <= j:
-                    idx1 = torch.tensor(omics_indices[om1], device=self.device)
-                    idx2 = torch.tensor(omics_indices[om2], device=self.device)
+                    idx1 = torch.tensor(omics_indices[om1], device=self.device, dtype=torch.long)
+                    idx2 = torch.tensor(omics_indices[om2], device=self.device, dtype=torch.long)
                     
                     submatrix = A_bin[idx1][:, idx2]
                     n_edges = submatrix.sum().item()

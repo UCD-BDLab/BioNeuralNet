@@ -8,13 +8,13 @@
 
    .. autosummary::
    
+      auto_pysmccnet
       get_logger
       load_brca
       load_example
       load_kipan
       load_lgg
       load_monet
-      load_paad
       set_seed
    
    .. rubric:: Classes
@@ -27,7 +27,6 @@
       DatasetLoader
       GNNEmbedding
       HybridLouvain
-      SmCCNet
       SubjectRepresentation
    
 .. rubric:: Modules
@@ -41,5 +40,6 @@
    downstream_task
    external_tools
    metrics
+   network
    network_embedding
    utils

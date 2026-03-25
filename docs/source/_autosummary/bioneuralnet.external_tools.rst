@@ -4,11 +4,13 @@ bioneuralnet.external\_tools
 .. automodule:: bioneuralnet.external_tools
 
    
-   .. rubric:: Classes
+   .. rubric:: Functions
 
    .. autosummary::
    
-      SmCCNet
+      extract_and_load_folds
+      load_r_export_folds
+      rdata_to_df
    
 .. rubric:: Modules
 
@@ -16,4 +18,4 @@ bioneuralnet.external\_tools
    :toctree:
    :recursive:
 
-   smccnet
+   extract_CVfold

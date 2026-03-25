@@ -9,8 +9,8 @@ bioneuralnet.metrics.correlation
    .. autosummary::
    
       cluster_correlation
+      cluster_pca_correlation
       get_logger
-      louvain_to_adjacency
       omics_correlation
       pearsonr
    

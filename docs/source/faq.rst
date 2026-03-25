@@ -86,7 +86,7 @@ Frequently Asked Questions (FAQ)
    - We provide a set of tutorials and example notebooks to help you get started with BioNeuralNet. You can find them in the `tutorials` directory of the repository.  
    - For a quick start, check out the following notebooks:
 
-      - :doc:`Quick_Start`.
+      - :doc:`quick_start/index`.
       - :doc:`notebooks/index`.
 
 **Q7: What license is BioNeuralNet released under?**:
