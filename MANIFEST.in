@@ -16,7 +16,6 @@ recursive-include bioneuralnet/datasets/example *.csv
 recursive-include bioneuralnet/datasets/brca *.csv
 recursive-include bioneuralnet/datasets/lgg *.csv
 recursive-include bioneuralnet/datasets/kipan *.csv
-recursive-include bioneuralnet/datasets/paad *.csv
 
 # Include documentation source files
 prune docs
