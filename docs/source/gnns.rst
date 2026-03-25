@@ -94,25 +94,4 @@ How DPMON Utilizes GNN Embeddings
 
 `View full-size image: Disease Prediction (DPMON) <https://bioneuralnet.readthedocs.io/en/latest/_images/DPMON.png>`_
 
-Example Code: Training a GNN Embedding Model
---------------------------------------------
-Below is a simplified example showing how to train GNN embeddings guided by phenotype correlations:
-
-.. code-block:: python
-
-   from bioneuralnet.network_embedding import GNNEmbedding
-   import pandas as pd
-
-   gnn = GNNEmbedding(
-       adjacency_matrix=adjacency_matrix,
-       omics_data=omics_data,
-       phenotype_data=phenotype_data,
-       clinical_data=clinical_data,
-       phenotype_col='finalgold_visit',
-       model_type='GAT',
-       hidden_dim=64
-   )
-   gnn.fit()
-   node_embeds = gnn.embed()
-
 Return to :doc:`../index`

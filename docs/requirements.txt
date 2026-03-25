@@ -7,3 +7,4 @@ nbsphinx
 myst_nb
 furo
 sphinx-copybutton
+tqdm
