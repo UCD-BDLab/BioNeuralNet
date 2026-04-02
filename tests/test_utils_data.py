@@ -78,7 +78,9 @@ class TestDataUtils(unittest.TestCase):
     def test_correlation_summary(self):
         stats = correlation_summary(self.df_corr)
         corr_abs = self.df_corr.corr().abs()
-        np.fill_diagonal(corr_abs.values, 0.0)
+        vals = corr_abs.to_numpy().copy()
+        np.fill_diagonal(vals, 0.0)
+        corr_abs = pd.DataFrame(vals, index=corr_abs.index, columns=corr_abs.columns)
         max_corr = corr_abs.max()
         self.assertAlmostEqual(stats["Max Corr Mean"],   float(max_corr.mean()))
         self.assertAlmostEqual(stats["Max Corr Median"], float(max_corr.median()))
