@@ -660,7 +660,7 @@ def _build_config_grid(methods: list[str],seed: int,trials: Optional[int],) -> l
     return configs
 
 def _topology_quality(adj_df: pd.DataFrame) -> float:
-    A = adj_df.fillna(0.0).values
+    A = adj_df.fillna(0.0).values.copy()
     np.fill_diagonal(A, 0.0)
     n_nodes = max(A.shape[0], 1)
 
@@ -678,7 +678,7 @@ def _topology_quality(adj_df: pd.DataFrame) -> float:
     return 0.5 * connectivity + 0.5 * lcc_ratio
 
 def _feature_proxy(adj_df, X_df, y, cv, mode="laplacian", scoring="f1_macro"):
-    A = adj_df.fillna(0.0).values
+    A = adj_df.fillna(0.0).values.copy()
     np.fill_diagonal(A, 0.0)
 
     if mode == "laplacian":

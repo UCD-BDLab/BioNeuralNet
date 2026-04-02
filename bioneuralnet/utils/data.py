@@ -90,8 +90,9 @@ def correlation_summary(df: pd.DataFrame) -> dict:
         dict: A dictionary containing the mean, median, min, max, and std of the max absolute correlations.
     """
     corr_matrix = df.corr().abs()
-    corr_matrix = corr_matrix.copy()
-    np.fill_diagonal(corr_matrix.values, 0)
+    vals = corr_matrix.to_numpy().copy()
+    np.fill_diagonal(vals, 0)
+    corr_matrix = pd.DataFrame(vals, index=corr_matrix.index, columns=corr_matrix.columns)
     max_corr = corr_matrix.max()
 
     summary = {
