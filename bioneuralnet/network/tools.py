@@ -698,6 +698,6 @@ def _feature_proxy(adj_df, X_df, y, cv, mode="laplacian", scoring="f1_macro"):
 
     scores = cross_val_score(
         RidgeClassifier(class_weight="balanced"),
-        X_smooth, y, cv=cv, scoring=scoring, n_jobs=-1,
+        X_smooth, y, cv=cv, scoring=scoring
     )
     return float(scores.mean())

@@ -102,6 +102,7 @@ def cluster_correlation(louvain_cluster: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: Adjacency matrix.
     """
     adjacency_matrix = louvain_cluster.corr(method="pearson")
+    adjacency_matrix = adjacency_matrix.copy()
     np.fill_diagonal(adjacency_matrix.values, 0)
     adjacency_matrix = adjacency_matrix.fillna(0)
 

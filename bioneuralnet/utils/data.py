@@ -90,6 +90,7 @@ def correlation_summary(df: pd.DataFrame) -> dict:
         dict: A dictionary containing the mean, median, min, max, and std of the max absolute correlations.
     """
     corr_matrix = df.corr().abs()
+    corr_matrix = corr_matrix.copy()
     np.fill_diagonal(corr_matrix.values, 0)
     max_corr = corr_matrix.max()
 
@@ -175,7 +176,6 @@ def data_stats(df: pd.DataFrame, name: str = "Data", compute_correlation: bool =
     """
     logger.info(f"=== {name} Statistics Overview ===")
 
-    # --- Variance Summary ---
     var_stats = variance_summary(df, var_threshold=1e-4)
     logger.info("--- Variance Summary ---")
     for key, value in var_stats.items():
@@ -183,7 +183,6 @@ def data_stats(df: pd.DataFrame, name: str = "Data", compute_correlation: bool =
         logger.info(f"{key:<32}: {clean_val}")
     logger.info("")
 
-    # --- Zero Summary ---
     zero_stats = zero_summary(df, zero_threshold=0.50)
     logger.info("--- Zero Summary ---")
     for key, value in zero_stats.items():
@@ -191,7 +190,6 @@ def data_stats(df: pd.DataFrame, name: str = "Data", compute_correlation: bool =
         logger.info(f"{key:<32}: {clean_val}")
     logger.info("")
 
-    # --- Expression Summary ---
     expr_stats = expression_summary(df)
     logger.info("--- Expression Summary ---")
     for key, value in expr_stats.items():
@@ -199,7 +197,6 @@ def data_stats(df: pd.DataFrame, name: str = "Data", compute_correlation: bool =
         logger.info(f"{key:<32}: {clean_val}")
     logger.info("")
 
-    # --- Correlation Summary ---
     if compute_correlation:
         try:
             corr_stats = correlation_summary(df)
@@ -209,15 +206,14 @@ def data_stats(df: pd.DataFrame, name: str = "Data", compute_correlation: bool =
                 logger.info(f"{key:<32}: {clean_val}")
             logger.info("")
         except Exception as e:
-            logger.warning(f"--- Correlation Summary ---\nCould not compute due to: {e}\n")
+            logger.info("--- Correlation Summary ---")
+            logger.info(f"Could not compute due to: {e}\n")
     else:
         logger.info("--- Correlation Summary ---")
         logger.info(f"{'Skipped':<32}: (compute_correlation=False)\n")
 
-    # --- NaN / Missingness Summary ---
     pct_missing = nan_summary(df, name=name)
 
-    # --- SMART RECOMMENDATIONS ENGINE ---
     logger.info(f"--- {name} Recommendations ---")
 
     # 1. Missingness Check
