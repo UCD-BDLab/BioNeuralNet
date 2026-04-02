@@ -1,18 +1,18 @@
 r"""
 Correlated Louvain Community Detection.
 
-This module extends the standard Louvain algorithm by incorporating an 
-absolute phenotype-correlation objective into the modularity maximization 
+This module extends the standard Louvain algorithm by incorporating an
+absolute phenotype-correlation objective into the modularity maximization
 process.
 
 References:
-    Abdel-Hafiz et al. (2022), "Significant Subgraph Detection in 
-    Multi-omics Networks for Disease Pathway Identification," 
+    Abdel-Hafiz et al. (2022), "Significant Subgraph Detection in
+    Multi-omics Networks for Disease Pathway Identification,"
     Frontiers in Big Data.
 
 Notes:
     **Hybrid Modularity Objective**
-    The algorithm optimizes connectivity and phenotype correlation 
+    The algorithm optimizes connectivity and phenotype correlation
     simultaneously using the following weighted objective function:
 
     .. math::
@@ -20,22 +20,22 @@ Notes:
 
     Where:
         * :math:`Q`: Standard modularity (internal connectivity).
-        * :math:`\\rho`: Absolute Pearson correlation of the community's 
+        * :math:`\\rho`: Absolute Pearson correlation of the community's
           first principal component (PC1) with phenotype :math:`Y`.
         * :math:`k_L`: User-defined weight on modularity (Suggested: 0.2).
 
 Algorithm:
-    The hierarchical loop and Phase 2 (network aggregation) remain 
-    identical to the standard Louvain method. The modification occurs 
+    The hierarchical loop and Phase 2 (network aggregation) remain
+    identical to the standard Louvain method. The modification occurs
     exclusively in **Phase 1 (Local Optimization)**.
 
-    When evaluating the movement of node :math:`v` from community :math:`D` 
+    When evaluating the movement of node :math:`v` from community :math:`D`
     to community :math:`C`, the gain is calculated as:
 
     .. math::
         \Delta_{hybrid} = k_L \Delta Q + (1 - k_L) \Delta \\rho
 
-    The correlation gain :math:`\Delta \\rho` is defined as the change in 
+    The correlation gain :math:`\Delta \\rho` is defined as the change in
     total correlation across affected communities:
 
     .. math::
@@ -86,10 +86,10 @@ class CorrelatedLouvain(Louvain):
             raise ValueError(f"k_L must be in [0, 1], got {k_L}")
 
         super().__init__(
-            G=G, 
-            weight=weight, 
+            G=G,
+            weight=weight,
             max_passes=max_passes,
-            min_delta=min_delta, 
+            min_delta=min_delta,
             seed=seed,
         )
 
@@ -196,7 +196,7 @@ class CorrelatedLouvain(Louvain):
         s: Set[int] = set()
         for idx in np.where(community == comm_id)[0]:
             s.update(n2o[int(idx)])
-            
+
         return frozenset(s)
 
     def _correlated_phase1(
@@ -227,7 +227,7 @@ class CorrelatedLouvain(Louvain):
             for node in order:
                 cur_comm = int(community[node])
                 nbr_idx = np.nonzero(A[node])[0]
-                
+
                 if len(nbr_idx) == 0:
                     continue
 
@@ -383,6 +383,6 @@ class CorrelatedLouvain(Louvain):
                 continue
             idx_set = frozenset(self.node_to_idx[nd] for nd in nds)
             ranked.append((cid, self._pc1_correlation(idx_set), nds))
-            
+
         ranked.sort(key=lambda x: x[1], reverse=True)
         return ranked[:n]

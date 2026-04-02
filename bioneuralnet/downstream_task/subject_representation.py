@@ -29,6 +29,7 @@ from sklearn.model_selection import train_test_split
 
 from ..utils import get_logger
 logger = get_logger(__name__)
+
 class SubjectRepresentation:
     """SubjectRepresentation Class for Integrating Network Embeddings into Omics Data.
 
@@ -74,14 +75,14 @@ class SubjectRepresentation:
             raise ValueError("Omics data must be non-empty.")
 
         if embeddings is None:
-            self.logger.warning("No embeddings provided, please review documentation to see how to generate embeddings.")
+            logger.warning("No embeddings provided, please review documentation to see how to generate embeddings.")
             raise ValueError("Embeddings must be non-empty.")
 
         if not isinstance(embeddings, pd.DataFrame):
             raise ValueError("Embeddings must be provided as a pandas DataFrame.")
 
         if embeddings.empty:
-            self.logger.warning("No embeddings provided, please review documentation to see how to generate embeddings.")
+            logger.warning("No embeddings provided, please review documentation to see how to generate embeddings.")
             raise ValueError("Embeddings must be non-empty.")
 
         if tune and phenotype_data is None:
@@ -144,7 +145,7 @@ class SubjectRepresentation:
         logger.info("Starting Subject Representation workflow.")
 
         if self.embeddings.empty:
-            self.logger.warning(
+            logger.warning(
                 "No embeddings provided. Please generate embeddings using GNNEmbeddings class.\nReturning original omics_data."
             )
             return self.omics_data
@@ -164,14 +165,14 @@ class SubjectRepresentation:
                 enhanced_omics_data = self._integrate_embeddings(reduced, method="multiply", alpha=1.0, beta=0.8)
 
             if enhanced_omics_data.empty:
-                self.logger.warning("Enhanced omics data is empty. Returning original omics_data.")
+                logger.warning("Enhanced omics data is empty. Returning original omics_data.")
                 return self.omics_data
 
             logger.info(f"Subject Representation completed successfully. Final shape: {enhanced_omics_data.shape}")
             return enhanced_omics_data
 
         except Exception as e:
-            self.logger.error(f"Error in Subject Representation workflow: {e}")
+            logger.error(f"Error in Subject Representation workflow: {e}")
             raise
 
     def _reduce_embeddings(self, method: str, ae_params: Optional[dict[Any, Any]] = None, compressed_dim: int = 2) -> pd.DataFrame:
@@ -273,7 +274,7 @@ class SubjectRepresentation:
 
         missing_features = set(self.omics_data.columns) - set(reduced.index)
         if missing_features:
-            self.logger.warning(f"Missing {len(missing_features)} features in reduced embeddings: {list(missing_features)[:5]}")
+            logger.warning(f"Missing {len(missing_features)} features in reduced embeddings: {list(missing_features)[:5]}")
 
         if method == "multiply":
             # the reduced embeddings to match the omics data columns.
@@ -295,7 +296,7 @@ class SubjectRepresentation:
 
             # look for duplicate feature names.
             if not scaled_ranks.index.is_unique:
-                self.logger.error("Duplicate feature names detected in the reduced embeddings index.")
+                logger.error("Duplicate feature names detected in the reduced embeddings index.")
 
             # re-index to ensure we have a weight per omics_data feature.
             feature_weights = scaled_ranks.reindex(self.omics_data.columns,fill_value=0.0)
@@ -309,7 +310,7 @@ class SubjectRepresentation:
                 if pd.notnull(weight_val):
                     enhanced[feature] = beta * enhanced[feature] + (1 - beta) * (alpha * weight_val * enhanced[feature])
                 else:
-                    self.logger.warning(f"Feature {feature} not found in the reduced weights.")
+                    logger.warning(f"Feature {feature} not found in the reduced weights.")
         else:
             #Curently only supoort one method but left the parameter in case we supp0ort more in the future.
             raise ValueError(f"Unknown integration method: {method}.")
@@ -383,7 +384,7 @@ class SubjectRepresentation:
                 tune.report({"score": score})
 
             except Exception as e:
-                self.logger.error(f"Tuning trial failed: {e}")
+                logger.error(f"Tuning trial failed: {e}")
                 import traceback
                 traceback.print_exc()
                 tune.report({"score": 0.0})
@@ -410,7 +411,7 @@ class SubjectRepresentation:
                 verbose=1,
             )
         except TuneError as e:
-            self.logger.warning(f"Tuning completed with failures: {e}")
+            logger.warning(f"Tuning completed with failures: {e}")
             analysis = None
             if len(e.args) > 1 and hasattr(e.args[1], "get_best_trial"):
                 analysis = e.args[1]
@@ -423,9 +424,9 @@ class SubjectRepresentation:
                 best_trial = analysis.get_best_trial("score", "max", "last")
                 best_score = best_trial.last_result.get("score", 0.0)
             except Exception as e:
-                self.logger.error(f"Could not retrieve best trial details: {e}")
+                logger.error(f"Could not retrieve best trial details: {e}")
         else:
-            self.logger.error("Analysis object is invalid or missing get_best_trial().")
+            logger.error("Analysis object is invalid or missing get_best_trial().")
 
         logger.info(f"Best trial final score: {best_score}")
 

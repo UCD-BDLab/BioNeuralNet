@@ -1,15 +1,18 @@
 import unittest
-from unittest.mock import patch, call
+from unittest.mock import patch
 import pandas as pd
 import numpy as np
-import io
-import logging
 import torch
-from bioneuralnet.utils.data import variance_summary
-from bioneuralnet.utils.data import zero_fraction_summary
-from bioneuralnet.utils.data import expression_summary
-from bioneuralnet.utils.data import correlation_summary
-from bioneuralnet.utils.data import explore_data_stats
+
+from bioneuralnet.utils.data import (
+    variance_summary,
+    zero_summary,
+    expression_summary,
+    correlation_summary,
+    nan_summary,
+    sparse_filter,
+    data_stats,
+)
 from bioneuralnet.utils.reproducibility import set_seed
 
 class TestDataUtils(unittest.TestCase):
@@ -25,8 +28,8 @@ class TestDataUtils(unittest.TestCase):
         })
         self.df_expr = pd.DataFrame({
             "P": [10.0, 20.0, 30.0],
-            "Q": [1.0, 1.0, 1.0],
-            "R": [0.0, 5.0, 0.0],
+            "Q": [1.0,  1.0,  1.0],
+            "R": [0.0,  5.0,  0.0],
         })
         self.df_corr = pd.DataFrame({
             "U": [1.0, 2.0, 3.0],
@@ -34,107 +37,108 @@ class TestDataUtils(unittest.TestCase):
             "W": [1.0, 0.0, 1.0],
         })
 
-        self.mock_logger = logging.getLogger('test_logger')
-        self.mock_logger.setLevel(logging.INFO)
-        self.mock_stream = io.StringIO()
-        self.mock_handler = logging.StreamHandler(self.mock_stream)
-        self.mock_logger.addHandler(self.mock_handler)
-
     def test_variance_summary_no_threshold(self):
-        stats = variance_summary(self.df_var, low_var_threshold=None)
-
-        self.assertAlmostEqual(stats["variance_mean"], 4.0)
-        self.assertAlmostEqual(stats["variance_median"], 4.0)
-        self.assertAlmostEqual(stats["variance_min"], 4.0)
-        self.assertAlmostEqual(stats["variance_max"], 4.0)
-        self.assertAlmostEqual(stats["variance_std"], 0.0)
-        self.assertNotIn("num_low_variance_features", stats)
+        stats = variance_summary(self.df_var, var_threshold=None)
+        self.assertAlmostEqual(stats["Variance Mean"], 4.0)
+        self.assertAlmostEqual(stats["Variance Median"], 4.0)
+        self.assertAlmostEqual(stats["Variance Min"], 4.0)
+        self.assertAlmostEqual(stats["Variance Max"], 4.0)
+        self.assertAlmostEqual(stats["Variance Std"], 0.0)
+        self.assertNotIn("Number Of Low Variance Features", stats)
 
     def test_variance_summary_with_threshold(self):
-        stats = variance_summary(self.df_var, low_var_threshold=5.0)
+        stats = variance_summary(self.df_var, var_threshold=5.0)
+        self.assertIn("Number Of Low Variance Features", stats)
+        self.assertEqual(stats["Number Of Low Variance Features"], 2)
 
-        self.assertIn("num_low_variance_features", stats)
-        self.assertEqual(stats["num_low_variance_features"], 2)
-
-    def test_zero_fraction_summary_no_threshold(self):
-        stats = zero_fraction_summary(self.df_zero, high_zero_threshold=None)
-
-        self.assertAlmostEqual(stats["zero_fraction_mean"], 0.5)
-        self.assertAlmostEqual(stats["zero_fraction_median"], 0.5)
-        self.assertAlmostEqual(stats["zero_fraction_min"], 0.0)
-        self.assertAlmostEqual(stats["zero_fraction_max"], 1.0)
-
+    def test_zero_summary_no_threshold(self):
+        stats = zero_summary(self.df_zero, zero_threshold=None)
+        self.assertAlmostEqual(stats["Zero Mean"], 0.5)
+        self.assertAlmostEqual(stats["Zero Median"], 0.5)
+        self.assertAlmostEqual(stats["Zero Min"], 0.0)
+        self.assertAlmostEqual(stats["Zero Max"], 1.0)
         expected_std = pd.Series([0.5, 0.0, 1.0]).std()
-        self.assertAlmostEqual(stats["zero_fraction_std"], expected_std)
-        self.assertNotIn("num_high_zero_features", stats)
+        self.assertAlmostEqual(stats["Zero Std"], expected_std)
+        self.assertNotIn("Number Of High Zero Features", stats)
 
-    def test_zero_fraction_summary_with_threshold(self):
-        stats = zero_fraction_summary(self.df_zero, high_zero_threshold=0.5)
-
-        self.assertIn("num_high_zero_features", stats)
-        self.assertEqual(stats["num_high_zero_features"], 1)
+    def test_zero_summary_with_threshold(self):
+        stats = zero_summary(self.df_zero, zero_threshold=0.5)
+        self.assertIn("Number Of High Zero Features", stats)
+        self.assertEqual(stats["Number Of High Zero Features"], 1)
 
     def test_expression_summary(self):
         stats = expression_summary(self.df_expr)
-        mean_exprs = pd.Series({"P": 20.0, "Q": 1.0, "R": (0.0 + 5.0 + 0.0) / 3})
-
-        self.assertAlmostEqual(stats["expression_mean"], mean_exprs.mean())
-        self.assertAlmostEqual(stats["expression_median"], mean_exprs.median())
-        self.assertAlmostEqual(stats["expression_min"], mean_exprs.min())
-        self.assertAlmostEqual(stats["expression_max"], mean_exprs.max())
-        self.assertAlmostEqual(stats["expression_std"], mean_exprs.std())
+        mean_expr = self.df_expr.mean()
+        self.assertAlmostEqual(stats["Expression Mean"],   float(mean_expr.mean()))
+        self.assertAlmostEqual(stats["Expression Median"], float(mean_expr.median()))
+        self.assertAlmostEqual(stats["Expression Min"],    float(mean_expr.min()))
+        self.assertAlmostEqual(stats["Expression Max"],    float(mean_expr.max()))
+        self.assertAlmostEqual(stats["Expression Std"],    float(mean_expr.std()))
 
     def test_correlation_summary(self):
         stats = correlation_summary(self.df_corr)
         corr_abs = self.df_corr.corr().abs()
-
         np.fill_diagonal(corr_abs.values, 0.0)
         max_corr = corr_abs.max()
+        self.assertAlmostEqual(stats["Max Corr Mean"],   float(max_corr.mean()))
+        self.assertAlmostEqual(stats["Max Corr Median"], float(max_corr.median()))
+        self.assertAlmostEqual(stats["Max Corr Min"],    float(max_corr.min()))
+        self.assertAlmostEqual(stats["Max Corr Max"],    float(max_corr.max()))
+        self.assertAlmostEqual(stats["Max Corr Std"],    float(max_corr.std()))
 
-        self.assertAlmostEqual(max_corr["U"], 1.0)
-        self.assertAlmostEqual(max_corr["V"], 1.0)
+    def test_nan_summary_no_nans(self):
+        pct = nan_summary(self.df_var, name="clean")
+        self.assertAlmostEqual(pct, 0.0)
 
-        self.assertAlmostEqual(stats["max_corr_mean"], max_corr.mean())
-        self.assertAlmostEqual(stats["max_corr_median"], max_corr.median())
-        self.assertAlmostEqual(stats["max_corr_min"], max_corr.min())
-        self.assertAlmostEqual(stats["max_corr_max"], max_corr.max())
-        self.assertAlmostEqual(stats["max_corr_std"], max_corr.std())
+    def test_nan_summary_with_nans(self):
+        df = pd.DataFrame({"x": [1.0, np.nan], "y": [np.nan, np.nan]})
+        pct = nan_summary(df, name="sparse")
+        self.assertAlmostEqual(pct, 75.0)
 
-    def test_set_seed_reproducibility(self):
-        test_seed = 177
+    def test_sparse_filter_drops_sparse_columns_and_rows(self):
+        df = pd.DataFrame({
+            "dense": [1.0, 2.0, 3.0, 4.0],
+            "sparse": [np.nan, np.nan, np.nan, 1.0],
+        })
+        result = sparse_filter(df, missing_fraction=0.20)
+        self.assertNotIn("sparse", result.columns)
+        self.assertIn("dense", result.columns)
 
-        set_seed(test_seed)
-        result1 = np.random.rand(5)
+    def test_sparse_filter_clean_data_unchanged(self):
+        result = sparse_filter(self.df_var, missing_fraction=0.20)
+        self.assertEqual(result.shape, self.df_var.shape)
 
-        set_seed(test_seed)
-        result2 = np.random.rand(5)
+    @patch("bioneuralnet.utils.data.logger")
+    def test_data_stats_logs_sections(self, mock_logger):
+        data_stats(self.df_corr, name="TestDF", compute_correlation=True)
+        all_args = [c[0][0] for c in mock_logger.info.call_args_list]
+        output = "\n".join(all_args)
+        self.assertIn("TestDF", output)
+        self.assertIn("Variance", output)
+        self.assertIn("Zero", output)
+        self.assertIn("Expression", output)
+        self.assertIn("Correlation", output)
 
-        np.testing.assert_array_equal(result1, result2)
-        set_seed(test_seed + 1)
-        tensor1 = torch.rand(5)
+    @patch("bioneuralnet.utils.data.logger")
+    def test_data_stats_skips_correlation_when_false(self, mock_logger):
+        data_stats(self.df_corr, name="TestDF", compute_correlation=False)
+        all_args = [c[0][0] for c in mock_logger.info.call_args_list]
+        output = "\n".join(all_args)
+        self.assertIn("Skipped", output)
 
-        set_seed(test_seed + 1)
-        tensor2 = torch.rand(5)
+    def test_set_seed_reproducibility_numpy(self):
+        set_seed(42)
+        r1 = np.random.rand(5)
+        set_seed(42)
+        r2 = np.random.rand(5)
+        np.testing.assert_array_equal(r1, r2)
 
-        self.assertTrue(torch.equal(tensor1, tensor2))
-
-    @patch('bioneuralnet.utils.data.logger')
-    def test_explore_data_stats_logs_all_sections(self, mock_logger):
-        mock_logger.addHandler(self.mock_handler)
-        explore_data_stats(self.df_corr, name="TestDF")
-
-        all_call_args = [call[0][0] for call in mock_logger.info.call_args_list]
-        output = "\n".join(all_call_args)
-
-        self.assertIn("Statistics for TestDF:", output)
-        self.assertIn("Variance Summary:", output)
-        self.assertIn("Zero Fraction Summary:", output)
-        self.assertIn("Expression Summary:", output)
-        self.assertIn("Correlation Summary:", output)
-        self.assertIn("variance_mean", output)
-        self.assertIn("zero_fraction_mean", output)
-        self.assertIn("expression_mean", output)
-        self.assertIn("max_corr_mean", output)
+    def test_set_seed_reproducibility_torch(self):
+        set_seed(42)
+        t1 = torch.rand(5)
+        set_seed(42)
+        t2 = torch.rand(5)
+        self.assertTrue(torch.equal(t1, t2))
 
 if __name__ == "__main__":
     unittest.main()

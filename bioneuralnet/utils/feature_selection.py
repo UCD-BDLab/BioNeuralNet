@@ -55,10 +55,10 @@ def mad_filter(df: pd.DataFrame, n_keep: int) -> pd.DataFrame:
     """
     if n_keep >= df.shape[1]:
         return df
-    
+
     mad = (df - df.median(axis=0)).abs().median(axis=0)
     top_features = mad.nlargest(n_keep).index
-    
+
     return df[top_features]
 
 def pca_loadings(df: pd.DataFrame, n_keep: int, n_components: int = 50, seed: int = 1883) -> pd.DataFrame:
@@ -86,22 +86,22 @@ def pca_loadings(df: pd.DataFrame, n_keep: int, n_components: int = 50, seed: in
     scaled_values = scaler.fit_transform(df.values)
 
     pca = PCA(n_components=n_components, random_state=seed)
-    pca.fit(scaled_values) 
+    pca.fit(scaled_values)
 
     weighted_loadings = np.abs(pca.components_).T * pca.explained_variance_ratio_
     feature_importance = weighted_loadings.max(axis=1)
-    
+
     importance_series = pd.Series(feature_importance, index=df.columns)
     top_features = importance_series.nlargest(n_keep).index
-    
+
     return df[top_features]
 
 def laplacian_score(df: pd.DataFrame, n_keep: int, k_neighbors: int = 5) -> pd.DataFrame:
     """Unsupervised feature selection via the Laplacian Score to address dimensionality.
 
-    Evaluates a feature's ability to preserve the local manifold structure of the data. 
-    The score is computed as the sum of squared differences between connected samples 
-    weighted by the global network (W_ij), divided by the feature's variance. 
+    Evaluates a feature's ability to preserve the local manifold structure of the data.
+    The score is computed as the sum of squared differences between connected samples
+    weighted by the global network (W_ij), divided by the feature's variance.
     Lower scores indicate higher importance (smoothness on the graph).
 
     Args:
@@ -111,7 +111,7 @@ def laplacian_score(df: pd.DataFrame, n_keep: int, k_neighbors: int = 5) -> pd.D
         k_neighbors (int): Number of neighbors to use when building the k-NN graph.
 
     Returns:
-    
+
         pd.DataFrame: DataFrame containing only the top n_keep features.
     """
     if n_keep >= df.shape[1]:
@@ -120,23 +120,23 @@ def laplacian_score(df: pd.DataFrame, n_keep: int, k_neighbors: int = 5) -> pd.D
     X = StandardScaler().fit_transform(df.values)
     A = kneighbors_graph(X, n_neighbors=k_neighbors, mode='connectivity', metric='cosine', include_self=False)
     W = A.maximum(A.T)
-    
+
     D = np.array(W.sum(axis=1)).flatten()
     D_sum = D.sum()
-    
+
     mean_f = np.dot(X.T, D) / D_sum
     X_centered = X - mean_f[np.newaxis, :]
-    
+
     den = np.dot(D, X_centered**2)
     W_X = W.dot(X_centered)
     f_W_f = np.sum(X_centered * W_X, axis=0)
     num = den - f_W_f
-    
+
     laplacian_scores = num / (den + 1e-8)
-    
+
     importance_series = pd.Series(laplacian_scores, index=df.columns)
     top_features = importance_series.nsmallest(n_keep).index
-    
+
     return df[top_features]
 
 def correlation_filter(X: pd.DataFrame, y: pd.Series | None = None, top_k: int = 1000) -> pd.DataFrame:

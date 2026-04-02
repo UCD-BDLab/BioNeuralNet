@@ -31,11 +31,11 @@ def get_can_weights_multi(X: List[torch.Tensor], Trait: Optional[torch.Tensor] =
     if Lambda is None:
         raise ValueError("Lambda must be provided.")
     Lambda = np.atleast_1d(np.array(Lambda, dtype=float))
-    
+
     for lam in Lambda:
         if abs(lam - 0.5) > 0.5:
             raise ValueError("Invalid penalty parameter. Lambda1 needs to be between zero and one.")
-    
+
     if np.min(Lambda) == 0:
         raise ValueError("Invalid penalty parameter. Both Lambda1 and Lambda2 has to be greater than 0.")
 
@@ -53,13 +53,13 @@ def get_can_weights_multi(X: List[torch.Tensor], Trait: Optional[torch.Tensor] =
     else:
         if Trait is None:
             raise ValueError("Trait must be provided if no_trait is False.")
-        
+
         scaled_trait = r_scale_torch(Trait)
         current_X.append(scaled_trait)
-        
+
         trait_ncol = scaled_trait.shape[1]
         L.append(np.sqrt(trait_ncol))
-        
+
         out = my_multi_cca(current_X, penalty=L, cc_coef=cc_coef, trace=trace)
 
     # output extraction
@@ -70,7 +70,7 @@ def get_can_weights_multi(X: List[torch.Tensor], Trait: Optional[torch.Tensor] =
             ws = out['ws']
         else:
             ws = out['ws'][:-1]
-            
+
     return ws
 def get_robust_weights_multi(X: List[torch.Tensor], Trait: Optional[torch.Tensor], Lambda: Union[List[float], np.ndarray], s: Optional[Union[List[float], np.ndarray]] = None, no_trait: bool = False, subsampling_num: int = 1000, cc_coef: Optional[np.ndarray] = None, trace: bool = False, trait_weight: bool = False) -> torch.Tensor:
     """PyTorch version of get_robust_weights_multi with subsampling loop.
@@ -95,14 +95,14 @@ def get_robust_weights_multi(X: List[torch.Tensor], Trait: Optional[torch.Tensor
     # device management
     device = X[0].device
     dtype = X[0].dtype
-    
+
     if s is None:
         raise ValueError("s (subsampling proportions) must be provided.")
-    
+
     s = np.atleast_1d(np.array(s, dtype=float))
     if s.size == 1 and len(X) > 1:
         s = np.repeat(s, len(X))
-        
+
     Lambda = np.atleast_1d(np.array(Lambda, dtype=float))
 
     # validation checks
@@ -111,7 +111,7 @@ def get_robust_weights_multi(X: List[torch.Tensor], Trait: Optional[torch.Tensor
     else:
         if np.sum(np.abs(s - 0.5) > 0.5) > 0:
             raise ValueError("Subsampling proportions can not exceed one.")
-            
+
     if (np.sum(np.abs(Lambda - 0.5) > 0.5) > 0) or (np.sum(Lambda == 0) > 0):
         raise ValueError("Invalid penalty parameter. Lambda1 needs to be between zero and one.")
 
@@ -122,7 +122,7 @@ def get_robust_weights_multi(X: List[torch.Tensor], Trait: Optional[torch.Tensor
 
     # subsampling loop
     results = []
-    
+
     iter_range = range(subsampling_num)
     if subsampling_num > 1:
         iter_range = tqdm(range(subsampling_num), desc="Robust Weights")
@@ -154,13 +154,13 @@ def get_robust_weights_multi(X: List[torch.Tensor], Trait: Optional[torch.Tensor
         for h in range(len(p_cum) - 1):
             global_indices = samp[h] + int(p_cum[h])
             idx = torch.tensor(global_indices, device=device, dtype=torch.long)
-            
+
             val = out[h]
             if not isinstance(val, torch.Tensor):
                 val = torch.tensor(np.array(val).flatten(), device=device, dtype=dtype)
             else:
                 val = val.flatten()
-                
+
             w[idx] = val
 
         results.append(w)
@@ -188,33 +188,33 @@ def get_robust_weights_single_binary(X1: np.ndarray, Trait: np.ndarray, Lambda1:
     """
     X1 = np.array(X1, dtype=float)
     Trait = np.array(Trait).flatten()
-    
+
     p1 = X1.shape[1]
     p1_sub = int(np.ceil(s1 * p1))
-    
+
     results = []
-    
+
     iter_range = range(subsampling_num)
     if subsampling_num > 1:
         iter_range = tqdm(range(subsampling_num), desc="Single Binary Weights")
-    
+
     for _ in iter_range:
         # subsample features
         samp1 = np.sort(np.random.choice(p1, p1_sub, replace=False))
-        
+
         # scale subsampled data
         x1_par = r_scale(X1[:, samp1])
-        
+
         # run sparse pls-da
         out = _splsda(x=x1_par, y=Trait, K=K, eta=Lambda1, kappa=0.5, scale_x=False)
-        
+
         u = np.zeros(p1_sub)
         w = np.zeros(p1)
-        
+
         T_scores = out['T']
         W_weights = out['W']
         A_indices = out['A']
-        
+
         # fit logistic regression on latent factors
         try:
             model = sm.GLM(Trait, T_scores, family=sm.families.Binomial())
@@ -223,19 +223,19 @@ def get_robust_weights_single_binary(X1: np.ndarray, Trait: np.ndarray, Lambda1:
         except Exception:
             results.append(np.zeros(p1))
             continue
-        
+
         # compute weights
         u[A_indices] = np.abs(W_weights) @ np.abs(glm_coefs)
-        
+
         # normalize
         norm_val = np.linalg.norm(u[A_indices])
         if norm_val > 0:
             u[A_indices] = u[A_indices] / norm_val
-        
+
         # scatter back to full feature space
         w[samp1] = u
         results.append(w)
-    
+
     beta = np.column_stack(results)
     return beta
 
@@ -264,13 +264,13 @@ def get_robust_weights_multi_binary(X: List[torch.Tensor], Y: Union[np.ndarray, 
     if between_discriminate_ratio is None:
         between_discriminate_ratio = [1, 1]
     between_discriminate_ratio = np.array(between_discriminate_ratio, dtype=float)
-    
+
     if lambda_between is None:
         raise ValueError("lambda_between must be provided.")
     lambda_between = np.array(lambda_between)
-    
+
     eta = lambda_pheno
-    
+
     # ensure Y is numpy
     if isinstance(Y, torch.Tensor):
         Y_np = Y.cpu().numpy().flatten()
@@ -282,32 +282,32 @@ def get_robust_weights_multi_binary(X: List[torch.Tensor], Y: Union[np.ndarray, 
         X, Trait=None, Lambda=lambda_between, s=subsampling_percent,
         no_trait=True, cc_coef=cc_coef, subsampling_num=subsampling_num
     )
-    
+
     # move to cpu for pls-da
     between_omics_weight = between_omics_weight.cpu().numpy()
-    
+
     # column-bind all omics
     X_all = np.hstack([x.cpu().numpy() for x in X])
-    
+
     # feature type index
     type_index = np.concatenate([np.full(X[h].shape[1], h) for h in range(len(X))])
-    
+
     if not eval_classifier:
         # branch a: network construction
         n_subsamples = between_omics_weight.shape[1]
         p_total = between_omics_weight.shape[0]
-        
+
         omics_pheno_weight = np.zeros_like(between_omics_weight)
-        
+
         for iii in tqdm(range(n_subsamples), desc="Omics-Phenotype PLS"):
             selected_mask = between_omics_weight[:, iii] != 0
             selected_indices = np.where(selected_mask)[0]
-            
+
             if len(selected_indices) == 0:
                 continue
-            
+
             X_subset = X_all[:, selected_indices]
-            
+
             try:
                 # cpu: small matrix pls-da
                 Ws_pheno = get_robust_weights_single_binary(
@@ -317,19 +317,19 @@ def get_robust_weights_multi_binary(X: List[torch.Tensor], Y: Union[np.ndarray, 
                 )
             except Exception:
                 continue
-            
+
             omics_pheno_weight[selected_indices, iii] = Ws_pheno.flatten()
-            
+
             # normalize per data type
             for j in range(len(X)):
                 type_mask = type_index == j
                 norm_val = np.linalg.norm(omics_pheno_weight[type_mask, iii])
                 if norm_val > 0:
                     omics_pheno_weight[type_mask, iii] /= norm_val
-        
+
         # zero out between-omics where pheno is zero
         between_omics_weight[omics_pheno_weight == 0] = 0
-        
+
         # remove zero/nan columns
         if subsampling_num > 1:
             zero_cols = []
@@ -337,49 +337,49 @@ def get_robust_weights_multi_binary(X: List[torch.Tensor], Y: Union[np.ndarray, 
                 col = omics_pheno_weight[:, col_idx]
                 if np.all(col == 0) or np.any(np.isnan(col)):
                     zero_cols.append(col_idx)
-            
+
             if len(zero_cols) > 0:
                 keep_cols = np.setdiff1d(np.arange(omics_pheno_weight.shape[1]), zero_cols)
                 between_omics_weight = between_omics_weight[:, keep_cols]
                 omics_pheno_weight = omics_pheno_weight[:, keep_cols]
-        
+
         # aggregate
         ratio_sum = np.sum(between_discriminate_ratio)
         w1 = between_discriminate_ratio[0] / ratio_sum
         w2 = between_discriminate_ratio[1] / ratio_sum
-        
+
         cc_weight = w1 * between_omics_weight + w2 * omics_pheno_weight
-        
+
         return cc_weight
-    
+
     else:
         # branch b: classifier evaluation
         if subsampling_num != 1:
             raise ValueError("Subsampling number must be 1 when evaluating the classifier.")
-        
+
         if test_data is None:
             raise ValueError("test_data must be provided when eval_classifier=True.")
-        
+
         selected_mask = between_omics_weight[:, 0] != 0
         selected_indices = np.where(selected_mask)[0]
-        
+
         X_subset = X_all[:, selected_indices]
-        
+
         try:
             out = _splsda(x=r_scale(X_subset), y=Y_np, K=ncomp_pls, eta=lambda_pheno, kappa=0.5, scale_x=False)
-            
+
             out_data = np.zeros((X_subset.shape[1], ncomp_pls))
             out_data[out['A'], :] = out['W']
-            
+
             # process test data
             X_all_test = np.hstack([t.cpu().numpy() if isinstance(t, torch.Tensor) else np.array(t) for t in test_data])
             X_subset_test = X_all_test[:, selected_indices]
             out_test = X_subset_test @ out_data
-            
+
             out_train = out['T']
-            
+
             return {'out_train': out_train, 'out_test': out_test}
-            
+
         except Exception as e:
             print(f"Caught an error: {e}")
             n_train = X_all.shape[0]

@@ -38,14 +38,14 @@ class NetworkAnalyzer:
         source_omics (list): Optional list of original DataFrames used to build the network to dynamically assign omics types.
         device (str): The target computing device, defaulting to 'cuda' if available.
     """
-    def __init__(self, adjacency_matrix: pd.DataFrame, source_omics: list = None, device: str = 'cuda'):
+    def __init__(self, adjacency_matrix: pd.DataFrame, source_omics: Optional[list] = None, device: str = 'cuda'):
         self.device = device if torch.cuda.is_available() else 'cpu'
         self.feature_names = adjacency_matrix.index.tolist()
         self.n_nodes = len(self.feature_names)
-        
-        self.omics_types = {}
-        self.feature_to_omic = {}
-        
+
+        self.omics_types: Dict[str, List[str]] = {}
+        self.feature_to_omic: Dict[str, str] = {}
+
         if source_omics is not None:
             for i, df in enumerate(source_omics):
                 omic_name = f"omic_{i+1}"
@@ -61,13 +61,13 @@ class NetworkAnalyzer:
                     self.omics_types[omics] = []
                 self.omics_types[omics].append(feat)
                 self.feature_to_omic[feat] = omics
-        
+
         self.A = torch.tensor(
-            adjacency_matrix.values, 
-            dtype=torch.float32, 
+            adjacency_matrix.values,
+            dtype=torch.float32,
             device=self.device
         )
-        
+
         logger.info(f"Initialized on {self.device.upper()}")
         logger.info(f"Nodes: {self.n_nodes:,}")
         logger.info(f"Omics types: {list(self.omics_types.keys())}")
@@ -105,21 +105,21 @@ class NetworkAnalyzer:
         logger.info(f"\n{'='*60}")
         logger.info(f"BASIC NETWORK STATISTICS (threshold > {threshold})")
         logger.info(f"{'='*60}")
-        
+
         A_bin = self.threshold_network(threshold)
-        
+
         num_nodes = self.n_nodes
         num_edges = A_bin.sum().item() / 2
         max_possible_edges = num_nodes * (num_nodes - 1) / 2
         density = num_edges / max_possible_edges
-        
+
         degrees = A_bin.sum(dim=1)
         avg_degree = degrees.mean().item()
         max_degree = degrees.max().item()
         min_degree = degrees.min().item()
-        
+
         isolated = (degrees == 0).sum().item()
-        
+
         logger.info(f"Nodes: {num_nodes:,}")
         logger.info(f"Edges: {int(num_edges):,}")
         logger.info(f"Density: {density:.6f}")
@@ -127,7 +127,7 @@ class NetworkAnalyzer:
         logger.info(f"Max Degree: {int(max_degree)}")
         logger.info(f"Min Degree: {int(min_degree)}")
         logger.info(f"Isolated Nodes: {isolated:,} ({100*isolated/num_nodes:.1f}%)")
-        
+
         return {
             'nodes': num_nodes,
             'edges': int(num_edges),
@@ -154,9 +154,9 @@ class NetworkAnalyzer:
         """
         A_bin = self.threshold_network(threshold)
         degrees = A_bin.sum(dim=1).cpu().numpy().astype(int)
-        
+
         unique, counts = np.unique(degrees, return_counts=True)
-        
+
         return pd.DataFrame({
             'degree': unique,
             'count': counts,
@@ -181,18 +181,18 @@ class NetworkAnalyzer:
         logger.info(f"\n{'='*60}")
         logger.info(f"TOP {top_n} HUB NODES (threshold > {threshold})")
         logger.info(f"{'='*60}")
-        
+
         A_bin = self.threshold_network(threshold)
         degrees = A_bin.sum(dim=1)
-        
+
         top_values, top_indices = torch.topk(degrees, top_n)
-        
+
         results = []
         for i, (idx, deg) in enumerate(zip(top_indices.cpu().numpy(), top_values.cpu().numpy())):
             feat_name = self.feature_names[idx]
             omics_type = self.feature_to_omic.get(feat_name, 'unknown')
             actual_name = feat_name
-            
+
             results.append({
                 'rank': i + 1,
                 'feature': feat_name,
@@ -201,7 +201,7 @@ class NetworkAnalyzer:
                 'degree': int(deg)
             })
             logger.info(f"{i+1:2d}. {feat_name:<40s} | {omics_type:<6s} | degree: {int(deg)}")
-        
+
         return pd.DataFrame(results)
 
     def clustering_coefficient_gpu(self, threshold: float = 0.5, sample_size: Optional[int] = None) -> Dict[str, Union[float, np.ndarray]]:
@@ -222,18 +222,18 @@ class NetworkAnalyzer:
         logger.info(f"\n{'='*60}")
         logger.info(f"CLUSTERING COEFFICIENT ANALYSIS (threshold > {threshold})")
         logger.info(f"{'='*60}")
-        
+
         A_bin = self.threshold_network(threshold)
         degrees = A_bin.sum(dim=1)
-        
+
         if sample_size is None:
             valid_mask = degrees >= 2
             n_valid = valid_mask.sum().item()
-            
+
             if n_valid > 5000:
                 logger.info(f"Large network ({n_valid} valid nodes). Sampling 5000 nodes...")
                 sample_size = 5000
-        
+
         if sample_size:
             valid_indices = torch.where(degrees >= 2)[0]
             if len(valid_indices) > sample_size:
@@ -243,44 +243,44 @@ class NetworkAnalyzer:
                 sample_indices = valid_indices
         else:
             sample_indices = torch.where(degrees >= 2)[0]
-        
+
         logger.info(f"Computing clustering for {len(sample_indices)} nodes...")
-        
+
         clustering_coeffs = torch.zeros(self.n_nodes, device=self.device)
-        
+
         batch_size = 500
         n_batches = (len(sample_indices) + batch_size - 1) // batch_size
-        
+
         for batch_idx in range(n_batches):
             start = batch_idx * batch_size
             end = min((batch_idx + 1) * batch_size, len(sample_indices))
             batch_nodes = sample_indices[start:end]
-            
+
             for node_idx in batch_nodes:
                 node = node_idx.item()
                 neighbors = torch.where(A_bin[node] > 0)[0]
                 k = len(neighbors)
-                
+
                 if k >= 2:
                     neighbor_subgraph = A_bin[neighbors][:, neighbors]
                     triangles = neighbor_subgraph.sum().item() / 2
                     max_triangles = k * (k - 1) / 2
                     clustering_coeffs[node] = triangles / max_triangles
-            
+
             if (batch_idx + 1) % 10 == 0:
                 logger.info(f"  Processed batch {batch_idx + 1}/{n_batches}")
-        
+
         valid_cc = clustering_coeffs[sample_indices]
         avg_cc = valid_cc.mean().item()
         max_cc = valid_cc.max().item()
         min_cc = valid_cc[valid_cc > 0].min().item() if (valid_cc > 0).any() else 0
-        
+
         logger.info(f"\nClustering Coefficient Statistics:")
         logger.info(f" Average: {avg_cc:.4f}")
         logger.info(f" Maximum: {max_cc:.4f}")
         logger.info(f" Minimum (non-zero): {min_cc:.4f}")
         logger.info(f" Nodes with CC > 0: {(valid_cc > 0).sum().item()}")
-        
+
         return {
             'average': avg_cc,
             'max': max_cc,
@@ -305,45 +305,45 @@ class NetworkAnalyzer:
         logger.info(f"\n{'='*60}")
         logger.info(f"CROSS-OMICS CONNECTIVITY (threshold > {threshold})")
         logger.info(f"{'='*60}")
-        
+
         A_bin = self.threshold_network(threshold)
-        
+
         omics_indices = {}
         for omics, features in self.omics_types.items():
             omics_indices[omics] = [self.feature_names.index(f) for f in features]
-        
+
         results = {}
         omics_list = list(self.omics_types.keys())
-        
+
         logger.info(f"\n{'Omics Pair':<20s} | {'Edges':>10s} | {'Max Possible':>12s} | {'Density':>10s}")
         logger.info("-" * 60)
-        
+
         for i, om1 in enumerate(omics_list):
             for j, om2 in enumerate(omics_list):
                 if i <= j:
                     idx1 = torch.tensor(omics_indices[om1], device=self.device, dtype=torch.long)
                     idx2 = torch.tensor(omics_indices[om2], device=self.device, dtype=torch.long)
-                    
+
                     submatrix = A_bin[idx1][:, idx2]
                     n_edges = submatrix.sum().item()
-                    
+
                     if i == j:
                         n_edges = n_edges / 2
                         max_edges = len(idx1) * (len(idx1) - 1) / 2
                     else:
                         max_edges = len(idx1) * len(idx2)
-                    
+
                     density = n_edges / max_edges if max_edges > 0 else 0
-                    
+
                     pair_name = f"{om1}-{om2}" if i != j else f"{om1} (within)"
                     results[(om1, om2)] = {
                         'edges': int(n_edges),
                         'max_edges': int(max_edges),
                         'density': density
                     }
-                    
+
                     logger.info(f"{pair_name:<20s} | {int(n_edges):>10,} | {int(max_edges):>12,} | {density:>10.6f}")
-        
+
         return results
 
     def edge_weight_analysis(self) -> Optional[np.ndarray]:
@@ -363,16 +363,16 @@ class NetworkAnalyzer:
         logger.info(f"\n{'='*60}")
         logger.info(f"EDGE WEIGHT DISTRIBUTION")
         logger.info(f"{'='*60}")
-        
+
         upper_tri = torch.triu(self.A, diagonal=1)
         weights = upper_tri[upper_tri > 0]
-        
+
         if len(weights) == 0:
             logger.info("No edges found!")
             return None
-        
+
         weights_cpu = weights.cpu().numpy()
-        
+
         logger.info(f"Total edges (weight > 0): {len(weights_cpu):,}")
         logger.info(f"Weight statistics:")
         logger.info(f" Mean: {weights_cpu.mean():.6f}")
@@ -380,17 +380,17 @@ class NetworkAnalyzer:
         logger.info(f" Median: {np.median(weights_cpu):.6f}")
         logger.info(f" Min: {weights_cpu.min():.6f}")
         logger.info(f" Max: {weights_cpu.max():.6f}")
-        
+
         logger.info(f"\nPercentiles:")
         for p in [25, 50, 75, 90, 95, 99]:
             val = np.percentile(weights_cpu, p)
             logger.info(f"  {p}th: {val:.6f}")
-    
+
         logger.info(f"\nEdges at different biological thresholds:")
         for thresh in [0.001, 0.1, 0.3, 0.5, 0.7, 0.8, 0.9]:
             n_edges = (weights_cpu > thresh).sum()
             logger.info(f"  > {thresh}: {n_edges:,} edges")
-        
+
         return weights_cpu
 
     def find_strongest_edges(self, top_n: int = 50) -> pd.DataFrame:
@@ -410,28 +410,28 @@ class NetworkAnalyzer:
         logger.info(f"\n{'='*60}")
         logger.info(f"TOP {top_n} STRONGEST EDGES")
         logger.info(f"{'='*60}")
-        
+
         upper_tri = torch.triu(self.A, diagonal=1)
-        
+
         flat = upper_tri.flatten()
         top_values, top_flat_indices = torch.topk(flat, top_n)
-        
+
         n = self.n_nodes
         row_indices = top_flat_indices // n
         col_indices = top_flat_indices % n
-        
+
         results = []
         logger.info(f"{'Rank':<5s} | {'Feature 1':<35s} | {'Feature 2':<35s} | {'Weight':>10s}")
         logger.info("-" * 95)
-        
+
         for i in range(top_n):
             row = row_indices[i].item()
             col = col_indices[i].item()
             weight = top_values[i].item()
-            
+
             feat1 = self.feature_names[row]
             feat2 = self.feature_names[col]
-            
+
             results.append({
                 'rank': i + 1,
                 'feature1': feat1,
@@ -440,9 +440,9 @@ class NetworkAnalyzer:
                 'omics2': self.feature_to_omic.get(feat2, 'unknown'),
                 'weight': weight
             })
-            
+
             logger.info(f"{i+1:<5d} | {feat1:<35s} | {feat2:<35s} | {weight:>10.6f}")
-        
+
         return pd.DataFrame(results)
 
     def connected_components(self, threshold: float = 0.5) -> Dict[str, Union[int, np.ndarray, List[int]]]:
@@ -462,27 +462,27 @@ class NetworkAnalyzer:
         logger.info(f"\n{'='*60}")
         logger.info(f"CONNECTED COMPONENTS (threshold > {threshold})")
         logger.info(f"{'='*60}")
-        
+
         A_bin = self.threshold_network(threshold)
-        
+
         A_cpu = A_bin.cpu().numpy()
-            
+
         A_sparse = csr_matrix(A_cpu)
         n_components, labels = connected_components(A_sparse, directed=False)
-        
+
         unique, counts = np.unique(labels, return_counts=True)
         component_sizes = sorted(counts, reverse=True)
-        
+
         logger.info(f"Number of components: {n_components}")
         logger.info(f"Largest component: {component_sizes[0]} nodes ({100*component_sizes[0]/self.n_nodes:.1f}%)")
-        
+
         if n_components > 1:
             logger.info(f"Second largest: {component_sizes[1]} nodes")
             logger.info(f"\nTop 10 component sizes: {component_sizes[:10]}")
-        
+
         isolated = (counts == 1).sum()
         logger.info(f"Isolated nodes: {isolated}")
-        
+
         return {
             'n_components': n_components,
             'labels': labels,
@@ -553,12 +553,12 @@ def network_search(
 
     for idx, (method_name, gen_params) in enumerate(all_configs, start=1):
         builder = dispatch.get(method_name)
-        if builder is None:
+        if builder is None or not callable(builder):
             continue
         try:
             G = builder(omics_data, **{**gen_params, "self_loops": False})
 
-            f1_score = _feature_proxy(G, X_scaled, y_vec, cv, mode=centrality_mode, scoring=scoring)           
+            f1_score = _feature_proxy(G, X_scaled, y_vec, cv, mode=centrality_mode, scoring=scoring)
             topo_score = _topology_quality(G)
             topo_norm = np.clip(topo_score, 0, 1)
             combined = ((1.0 - topology_weight) * f1_score+ topology_weight * topo_norm)
@@ -664,17 +664,17 @@ def _topology_quality(adj_df: pd.DataFrame) -> float:
     np.fill_diagonal(A, 0.0)
     n_nodes = max(A.shape[0], 1)
 
-    degrees = np.count_nonzero(A, axis=1) 
+    degrees = np.count_nonzero(A, axis=1)
     connectivity = np.sum(degrees > 0) / n_nodes
-    
+
     G = nx.from_numpy_array(A)
-    
+
     if n_nodes > 0:
         largest_cc_size = len(max(nx.connected_components(G), key=len))
         lcc_ratio = largest_cc_size / n_nodes
     else:
         lcc_ratio = 0.0
-        
+
     return 0.5 * connectivity + 0.5 * lcc_ratio
 
 def _feature_proxy(adj_df, X_df, y, cv, mode="laplacian", scoring="f1_macro"):
@@ -692,7 +692,7 @@ def _feature_proxy(adj_df, X_df, y, cv, mode="laplacian", scoring="f1_macro"):
             weights = nx.eigenvector_centrality_numpy(G_nx, weight="weight")
         except Exception:
             weights = dict(G_nx.degree(weight=None))
-        w_vec = np.log1p(np.maximum(0.0, 
+        w_vec = np.log1p(np.maximum(0.0,
                     np.array([weights.get(c, 0.0) for c in X_df.columns])))
         X_smooth = X_df.values * w_vec[None, :]
 

@@ -11,7 +11,7 @@ rm(list = setdiff(ls(), c("orig_input", "orig_csv", "target_obj")))
 
 success <- tryCatch({
   load(orig_input)
-  
+
   loaded_objs <- setdiff(ls(), c("orig_input", "orig_csv", "target_obj"))
   message("Loaded objects: ", paste(loaded_objs, collapse = ", "))
 

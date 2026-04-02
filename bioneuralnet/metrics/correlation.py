@@ -43,7 +43,6 @@ def omics_correlation(omics: pd.DataFrame, pheno: pd.DataFrame) -> Tuple[float, 
 
     return corr, pvalue
 
-
 def cluster_pca_correlation(cluster_df: pd.DataFrame, pheno: pd.DataFrame) -> tuple:
     """Computes the Pearson correlation coefficient between PC1 of a cluster and phenotype.
 
@@ -90,8 +89,8 @@ def cluster_pca_correlation(cluster_df: pd.DataFrame, pheno: pd.DataFrame) -> tu
 
 def cluster_correlation(louvain_cluster: pd.DataFrame) -> pd.DataFrame:
     """Builds a new correlation network from an extracted cluster/subnetwork.
-    
-    This function is often used as an intermediate step between HybridLouvain and plotting. 
+
+    This function is often used as an intermediate step between HybridLouvain and plotting.
     It allows the subnetwork to reveal its internal topological structure by computing the Pearson correlation of node connectivity profiles.
 
     Args:

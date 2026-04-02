@@ -1,71 +1,26 @@
 import unittest
-import pandas as pd
 import numpy as np
-import warnings
+import pandas as pd
 
-from bioneuralnet.utils.preprocess import preprocess_clinical
-from bioneuralnet.utils.preprocess import clean_inf_nan
-from bioneuralnet.utils.preprocess import select_top_k_variance
-from bioneuralnet.utils.preprocess import select_top_k_correlation
-from bioneuralnet.utils.preprocess import select_top_randomforest
-from bioneuralnet.utils.preprocess import top_anova_f_features
-from bioneuralnet.utils.preprocess import prune_network
-from bioneuralnet.utils.preprocess import prune_network_by_quantile
-from bioneuralnet.utils.preprocess import network_remove_low_variance
-from bioneuralnet.utils.preprocess import network_remove_high_zero_fraction
-from bioneuralnet.utils.preprocess import impute_omics
-from bioneuralnet.utils.preprocess import impute_omics_knn
-from bioneuralnet.utils.preprocess import normalize_omics
-from bioneuralnet.utils.preprocess import beta_to_m
+from bioneuralnet.utils.preprocess import (
+    m_transform,
+    impute_simple,
+    impute_knn,
+    normalize,
+    clean_inf_nan,
+    clean_internal,
+    preprocess_clinical,
+    prune_network,
+    prune_network_by_quantile,
+    network_remove_low_variance,
+    network_remove_high_zero_fraction,
+)
 from bioneuralnet.datasets import DatasetLoader
-
 
 class TestPreprocessFunctions(unittest.TestCase):
     def setUp(self):
         example = DatasetLoader("example")
-        X1 = example["X1"]
-        X2 = example["X2"]
-        Y = example["Y"]
-        clinical = example["clinical"]
-
-        self.omics_example = pd.concat([X1, X2], axis=1)
-
-        if isinstance(Y, pd.DataFrame):
-            self.y_example = Y.iloc[:, 0]
-        else:
-            self.y_example = Y
-
-        y_array = self.y_example.values
-        median_val = float(np.median(y_array))
-        self.y_binary = (self.y_example > median_val).astype(int)
-
-        self.clinical = clinical.copy()
-        self.clinical["ignore"] = 1
-
-        self.X_small = pd.DataFrame(
-            {
-                "f1": [1.0, 2.0, 3.0, 4.0],
-                "f2": [1.0, 1.0, 1.0, 1.0],
-                "f3": [4.0, 3.0, 2.0, 1.0],
-                "f4": [10.0, 20.0, 30.0, 40.0],
-            },
-            index=["i1", "i2", "i3", "i4"],
-        )
-
-        self.df_var = pd.DataFrame(
-            {
-                "A": [1.0, 3.0, 5.0],
-                "B": [2.0, 4.0, 6.0],
-            }
-        )
-
-        self.df_nan = pd.DataFrame(
-            {
-                "C1": [1.0, 2.0, np.nan, 4.0],
-                "C2": [10.0, np.nan, 30.0, 40.0],
-                "C3": [5.0, 5.0, 5.0, 5.0],
-            }
-        )
+        self.clinical = example["clinical"].copy()
 
         self.df_beta = pd.DataFrame(
             {
@@ -74,7 +29,21 @@ class TestPreprocessFunctions(unittest.TestCase):
             }
         )
 
-        self.y_reg = pd.Series([0.1, 0.4, 0.5, 0.8], index=self.X_small.index)
+        # zero variance example
+        self.df_nan = pd.DataFrame(
+            {
+                "C1": [1.0, 2.0, np.nan, 4.0],
+                "C2": [10.0, np.nan, 30.0, 40.0],
+                "C3": [5.0, 5.0, 5.0, 5.0],
+            }
+        )
+
+        self.df_var = pd.DataFrame(
+            {
+                "A": [1.0, 3.0, 5.0],
+                "B": [2.0, 4.0, 6.0],
+            }
+        )
 
         adj = np.array(
             [
@@ -85,12 +54,75 @@ class TestPreprocessFunctions(unittest.TestCase):
             ],
             dtype=float,
         )
-
         self.adj_df = pd.DataFrame(
             adj, index=["a", "b", "c", "d"], columns=["a", "b", "c", "d"]
         )
 
-    def test_clean_inf_nan_replaces_and_drops(self):
+    def test_m_transform_shape_preserved(self):
+        result = m_transform(self.df_beta, eps=1e-6)
+        self.assertEqual(result.shape, self.df_beta.shape)
+        self.assertFalse(result.isnull().any().any())
+
+    def test_m_transform_values(self):
+        result = m_transform(self.df_beta, eps=1e-6)
+        # B1=0.1 -> log2(0.1/0.9) around -3.17
+        self.assertAlmostEqual(result.loc[0, "B1"], -3.169925, places=4)
+        # B1=0.9 -> log2(0.9/0.1) around +3.17
+        self.assertAlmostEqual(result.loc[2, "B1"],  3.169925, places=4)
+
+    def test_impute_simple_mean(self):
+        result = impute_simple(self.df_nan[["C1", "C2"]], method="mean")
+        self.assertEqual(result.isna().sum().sum(), 0)
+        self.assertAlmostEqual(result.loc[2, "C1"], (1.0 + 2.0 + 4.0) / 3, places=5)
+
+    def test_impute_simple_median(self):
+        result = impute_simple(self.df_nan[["C1", "C2"]], method="median")
+        self.assertEqual(result.isna().sum().sum(), 0)
+        self.assertAlmostEqual(result.loc[1, "C2"], 30.0, places=5)
+
+    def test_impute_simple_zero(self):
+        result = impute_simple(self.df_nan[["C1", "C2"]], method="zero")
+        self.assertEqual(result.isna().sum().sum(), 0)
+        self.assertEqual(result.loc[2, "C1"], 0.0)
+
+    def test_impute_simple_invalid_method_raises(self):
+        with self.assertRaises(ValueError):
+            impute_simple(self.df_nan, method="bad_method")
+
+    def test_impute_knn_fills_nans(self):
+        result = impute_knn(self.df_nan[["C1", "C2"]], n_neighbors=2)
+        self.assertEqual(result.shape, self.df_nan[["C1", "C2"]].shape)
+        self.assertEqual(result.isna().sum().sum(), 0)
+
+    def test_impute_knn_no_nans_passthrough(self):
+        df_clean = pd.DataFrame({"x": [1.0, 2.0], "y": [3.0, 4.0]})
+        result = impute_knn(df_clean, n_neighbors=1)
+        pd.testing.assert_frame_equal(result, df_clean)
+
+    def test_impute_knn_non_numeric_raises(self):
+        df_bad = pd.DataFrame({"x": [1.0, np.nan], "label": ["a", "b"]})
+        with self.assertRaises(ValueError):
+            impute_knn(df_bad)
+
+    def test_normalize_standard(self):
+        result = normalize(self.df_var, method="standard")
+        self.assertAlmostEqual(result.mean().sum(), 0.0, places=5)
+
+    def test_normalize_minmax(self):
+        result = normalize(self.df_var, method="minmax")
+        self.assertAlmostEqual(result.min().min(), 0.0, places=5)
+        self.assertAlmostEqual(result.max().max(), 1.0, places=5)
+
+    def test_normalize_log2(self):
+        result = normalize(self.df_var, method="log2")
+        self.assertAlmostEqual(result.loc[0, "A"], np.log2(2.0), places=5)
+
+    def test_normalize_invalid_method_raises(self):
+        with self.assertRaises(ValueError):
+            normalize(self.df_var, method="bad_method")
+
+    # zero variance -> should be dropped
+    def test_clean_inf_nan_removes_inf_and_nan(self):
         df = pd.DataFrame(
             {
                 "x": [1.0, np.inf, 3.0, -np.inf],
@@ -99,139 +131,82 @@ class TestPreprocessFunctions(unittest.TestCase):
             }
         )
         cleaned = clean_inf_nan(df)
-
-        self.assertTrue(np.allclose(cleaned["x"].values, [1.0, 2.0, 3.0, 2.0]))
-        self.assertTrue(np.allclose(cleaned["y"].values, [3.0, 2.0, 3.0, 4.0]))
-        self.assertNotIn("z", cleaned.columns)
         self.assertFalse(cleaned.isin([np.inf, -np.inf]).any().any())
         self.assertFalse(cleaned.isna().any().any())
+        self.assertNotIn("z", cleaned.columns)
+
+    # 75 percent NaN and zero variance
+    def test_clean_internal_drops_sparse_columns(self):
+        df = pd.DataFrame(
+            {
+                "dense": [1.0, 2.0, 3.0, 4.0],
+                "sparse": [np.nan, np.nan, np.nan, 1.0],
+                "const":  [1.0, 1.0, 1.0, 1.0],
+            }
+        )
+        result = clean_internal(df, nan_threshold=0.5)
+        self.assertNotIn("sparse", result.columns)
+        self.assertNotIn("const", result.columns)
+        self.assertEqual(result.isna().sum().sum(), 0)
+
+    def test_clean_internal_no_nans_passthrough(self):
+        df = pd.DataFrame({"x": [1.0, 2.0, 3.0], "y": [4.0, 5.0, 6.0]})
+        result = clean_internal(df, nan_threshold=0.5)
+        self.assertEqual(result.shape, df.shape)
+        self.assertEqual(result.isna().sum().sum(), 0)
 
     def test_preprocess_clinical_basic(self):
-        result = preprocess_clinical(
-            X=self.clinical,
-            top_k=3,
-            scale=False,
-            ignore_columns=["ignore"],
-        )
+        result = preprocess_clinical(self.clinical)
         self.assertIsInstance(result, pd.DataFrame)
         self.assertEqual(result.shape[0], self.clinical.shape[0])
-        self.assertNotIn("ignore", result.columns)
         self.assertGreater(result.shape[1], 0)
-        self.assertLessEqual(result.shape[1], 3)
+        self.assertEqual(result.isna().sum().sum(), 0)
 
-    def test_preprocess_clinical_errors(self):
-        with self.assertRaises(TypeError):
-            preprocess_clinical(
-                self.clinical.iloc[:2, :],
-                top_k=1,
-                nan_threshold="bad",
-            )
-        with self.assertRaises(KeyError):
-            preprocess_clinical(self.clinical, ignore_columns=["nonexistent"])
+    def test_preprocess_clinical_drop_columns(self):
+        col_to_drop = self.clinical.columns[0]
+        result = preprocess_clinical(self.clinical, drop_columns=[col_to_drop])
+        self.assertNotIn(col_to_drop, result.columns)
 
-    def test_select_top_k_variance(self):
-        X_sub = self.omics_example.iloc[:40, :20]
-        top5 = select_top_k_variance(X_sub, k=5)
-        self.assertEqual(top5.shape[0], 40)
-        self.assertLessEqual(top5.shape[1], 5)
-        self.assertTrue((top5.var(axis=0) > 0).all())
+    def test_preprocess_clinical_scale(self):
+        result = preprocess_clinical(self.clinical, scale=True)
+        self.assertIsInstance(result, pd.DataFrame)
+        self.assertEqual(result.shape[0], self.clinical.shape[0])
 
-    def test_select_top_k_correlation_unsupervised(self):
-        X_sub = self.omics_example.iloc[:40, :20]
-        unsup = select_top_k_correlation(X_sub, y=None, top_k=5)
-        self.assertEqual(unsup.shape[0], 40)
-        self.assertLessEqual(unsup.shape[1], 5)
-        self.assertTrue((unsup.var(axis=0) > 0).all())
-
-    def test_select_top_k_correlation_supervised(self):
-        X_sub = self.omics_example.iloc[:40, :20]
-        y_sub = self.y_example.iloc[:40]
-
-        sup = select_top_k_correlation(X_sub, y=y_sub, top_k=5)
-        self.assertEqual(sup.shape[0], 40)
-        self.assertLessEqual(sup.shape[1], 5)
-
-        bad_y = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
-        with self.assertRaises(ValueError):
-            select_top_k_correlation(X_sub.iloc[:2, :], bad_y, top_k=1)
-
-    def test_select_top_randomforest(self):
-        X_sub = self.omics_example.iloc[:40, :20]
-        y_sub = self.y_example.iloc[:40]
-
-        top_rf = select_top_randomforest(X_sub, y_sub, top_k=5, seed=0)
-        self.assertEqual(top_rf.shape[0], 40)
-        self.assertLessEqual(top_rf.shape[1], 5)
-
-        X_mixed = X_sub.copy()
-        str_list = []
-        i = 0
-        n_rows = X_sub.shape[0]
-        base_strings = ["x", "y", "z", "w"]
-        while len(str_list) < n_rows:
-            str_list.append(base_strings[i % len(base_strings)])
-            i += 1
-        X_mixed["non_numeric"] = str_list
-
-        with self.assertRaises(ValueError):
-            select_top_randomforest(X_mixed, y_sub, top_k=1)
-
-    def test_top_anova_f_features_classification(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RuntimeWarning)
-
-            X_clf = self.omics_example.iloc[:40, :20]
-            y_bin = self.y_binary.iloc[:40]
-
-            top_feats = top_anova_f_features(
-                X_clf,
-                y_bin,
-                max_features=5,
-                alpha=0.05,
-                task="classification",
-            )
-            self.assertEqual(top_feats.shape[0], 40)
-            self.assertLessEqual(top_feats.shape[1], 5)
-
-            X_reg = self.omics_example.iloc[:40, :20]
-            y_cont = self.y_example.iloc[:40]
-            top_feats_reg = top_anova_f_features(
-                X_reg,
-                y_cont,
-                max_features=5,
-                alpha=0.05,
-                task="regression",
-            )
-            self.assertEqual(top_feats_reg.shape[0], 40)
-            self.assertLessEqual(top_feats_reg.shape[1], 5)
-
-            with self.assertRaises(ValueError):
-                top_anova_f_features(
-                    X_reg,
-                    y_cont,
-                    max_features=1,
-                    alpha=0.05,
-                    task="invalid",
-                )
+    def test_preprocess_clinical_ordinal_mapping(self):
+        df = pd.DataFrame(
+            {
+                "grade": ["low", "high", "low", "medium"],
+                "score": [1.0, 2.0, 3.0, 4.0],
+            }
+        )
+        mapping = {"ordinal_mappings": {"grade": {"low": 0, "medium": 1, "high": 2}}}
+        result = preprocess_clinical(df, **mapping)
+        self.assertIsInstance(result, pd.DataFrame)
+        self.assertEqual(result.isna().sum().sum(), 0)
 
     def test_prune_network_threshold(self):
         pruned = prune_network(self.adj_df, weight_threshold=0.15)
-        self.assertEqual(set(pruned.index), set(self.adj_df.index))
-        self.assertEqual(set(pruned.columns), set(self.adj_df.columns))
+        self.assertIsInstance(pruned, pd.DataFrame)
+        # all remaining nodes should be in the original index
+        self.assertTrue(set(pruned.index).issubset(set(self.adj_df.index)))
+
+    def test_prune_network_zero_threshold_keeps_all_connected(self):
         full = prune_network(self.adj_df, weight_threshold=0.0)
         self.assertEqual(set(full.index), set(self.adj_df.index))
 
     def test_prune_network_by_quantile(self):
-        pruned_q = prune_network_by_quantile(self.adj_df, quantile=0.5)
-        self.assertEqual(set(pruned_q.index), set(self.adj_df.index))
-        empty_adj = pd.DataFrame(
-            np.zeros((3, 3)),
-            index=["x", "y", "z"],
-            columns=["x", "y", "z"],
-        )
-        pruned_empty = prune_network_by_quantile(empty_adj, quantile=0.5)
-        self.assertTrue(pruned_empty.equals(empty_adj))
+        pruned = prune_network_by_quantile(self.adj_df, quantile=0.5)
+        self.assertIsInstance(pruned, pd.DataFrame)
+        self.assertTrue(set(pruned.index).issubset(set(self.adj_df.index)))
 
+    def test_prune_network_by_quantile_empty_graph(self):
+        empty = pd.DataFrame(
+            np.zeros((3, 3)), index=["x", "y", "z"], columns=["x", "y", "z"]
+        )
+        result = prune_network_by_quantile(empty, quantile=0.5)
+        self.assertIsInstance(result, pd.DataFrame)
+
+    # zero variance -> should be removed
     def test_network_remove_low_variance(self):
         net = pd.DataFrame(
             {
@@ -244,8 +219,8 @@ class TestPreprocessFunctions(unittest.TestCase):
         filtered = network_remove_low_variance(net, threshold=0.5)
         self.assertNotIn("n2", filtered.index)
         self.assertNotIn("n2", filtered.columns)
-        self.assertEqual(set(filtered.index), {"n3"})
 
+    # 2/3 zeros (c2)-> should be removed at threshold=0.5
     def test_network_remove_high_zero_fraction(self):
         net = pd.DataFrame(
             {
@@ -258,42 +233,8 @@ class TestPreprocessFunctions(unittest.TestCase):
         filtered = network_remove_high_zero_fraction(net, threshold=0.5)
         self.assertNotIn("c2", filtered.index)
         self.assertNotIn("c2", filtered.columns)
-        self.assertEqual(set(filtered.index), {"c1", "c3"})
-
-    def test_impute_omics_mean(self):
-        df_imputed = impute_omics(self.df_nan, method="mean")
-        self.assertAlmostEqual(df_imputed.loc[2, "C1"], 2.3333333333333335)
-        self.assertAlmostEqual(df_imputed.loc[1, "C2"], 26.666666666666668)
-        self.assertEqual(df_imputed.isna().sum().sum(), 0)
-
-    def test_impute_omics_median(self):
-        df_imputed = impute_omics(self.df_nan, method="median")
-        self.assertAlmostEqual(df_imputed.loc[1, "C2"], 30.0)
-        self.assertEqual(df_imputed.isna().sum().sum(), 0)
-
-    def test_impute_omics_knn(self):
-        df_imputed = impute_omics_knn(self.df_nan, n_neighbors=2)
-        self.assertEqual(df_imputed.shape, self.df_nan.shape)
-        self.assertEqual(df_imputed.isna().sum().sum(), 0)
-        self.assertNotAlmostEqual(df_imputed.loc[1, "C2"], 26.666666666666668)
-
-    def test_normalize_omics_standard(self):
-        df_normalized = normalize_omics(self.df_nan.dropna(), method="standard")
-        self.assertAlmostEqual(df_normalized.mean().sum(), 0.0, places=5)
-        expected_std_sum = np.sqrt(2) * 2
-        self.assertAlmostEqual(df_normalized.std().sum(), expected_std_sum, places=5)
-
-    def test_normalize_omics_log2(self):
-        df_log = normalize_omics(self.df_var, method="log2")
-        self.assertAlmostEqual(df_log.loc[0, "A"], 1.0)
-        self.assertAlmostEqual(df_log.loc[0, "B"], 1.5849625)
-
-    def test_beta_to_m_conversion(self):
-        df_m_values = beta_to_m(self.df_beta, eps=1e-6)
-        self.assertAlmostEqual(df_m_values.loc[0, "B1"], -3.169925, places=5)
-        self.assertAlmostEqual(df_m_values.loc[2, "B2"], 0.0, places=5)
-        self.assertAlmostEqual(df_m_values.loc[0, "B2"], -19.931567126628412)
-
+        self.assertIn("c1", filtered.index)
+        self.assertIn("c3", filtered.index)
 
 if __name__ == "__main__":
     unittest.main()

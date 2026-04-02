@@ -74,8 +74,8 @@ def impute_simple(df: pd.DataFrame, method: str = "mean") -> pd.DataFrame:
 def impute_knn(df: pd.DataFrame, n_neighbors: int = 5) -> pd.DataFrame:
     """Imputes missing values (NaNs) using the K-Nearest Neighbors (KNN) approach.
 
-    KNN imputation replaces missing values with the average value from the 
-    'n_neighbors' most similar samples. 
+    KNN imputation replaces missing values with the average value from the
+    'n_neighbors' most similar samples.
     NOTE: Input data should be scaled/normalized prior to imputation.
 
     Args:
@@ -93,7 +93,7 @@ def impute_knn(df: pd.DataFrame, n_neighbors: int = 5) -> pd.DataFrame:
         raise ValueError(err_msg)
 
     n_missing_before = df.isna().sum().sum()
-    
+
     if n_missing_before == 0:
         logger.info(f"No NaNs found in DataFrame of shape {df.shape}. Skipping imputation.")
         return df
@@ -105,7 +105,7 @@ def impute_knn(df: pd.DataFrame, n_neighbors: int = 5) -> pd.DataFrame:
 
     imputer = KNNImputer(n_neighbors=n_neighbors)
     imputed_data = imputer.fit_transform(df.values)
-    
+
     imputed_df = pd.DataFrame(imputed_data, index=df.index, columns=df.columns)
 
     n_missing_after = imputed_df.isna().sum().sum()
@@ -271,7 +271,7 @@ def preprocess_clinical(X: pd.DataFrame, scale: bool = False, drop_columns: Opti
         if impute:
             for col in df_numeric.columns:
                 df_numeric[col] = df_numeric[col].fillna(df_numeric[col].median())
-        
+
         if scale:
             scaler = RobustScaler()
             scaled_array = scaler.fit_transform(df_numeric)
@@ -286,7 +286,7 @@ def preprocess_clinical(X: pd.DataFrame, scale: bool = False, drop_columns: Opti
         for col in df_categorical.columns:
             df_categorical[col] = df_categorical[col].astype(str).str.lower().str.strip()
             df_categorical[col] = df_categorical[col].replace('nan', np.nan)
-            
+
         df_cat_encoded = pd.get_dummies(df_categorical, dummy_na=True, drop_first=True, dtype=int)
     else:
         logger.info("No categorical data found to encode.")
@@ -294,7 +294,7 @@ def preprocess_clinical(X: pd.DataFrame, scale: bool = False, drop_columns: Opti
 
     df_combined = pd.concat([df_numeric_scaled, df_cat_encoded], axis=1, join="outer")
     df_final = df_combined.loc[:, df_combined.std(axis=0, ddof=0) > 0]
-    
+
     df_final = df_final.astype(np.float32)
 
     logger.info(f"Clinical data cleaning complete. Final shape: {df_final.shape}")

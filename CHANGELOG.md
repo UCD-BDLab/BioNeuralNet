@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.0] - 2026-04-01
+
+### Network Module (`bioneuralnet.network`)
+- **New dedicated module**: Network construction and analysis moved from `bioneuralnet.utils` to `bioneuralnet.network`.
+- **Renamed construction functions**: `gen_similarity_graph` -> `similarity_network`, `gen_correlation_graph` -> `correlation_network`, `gen_threshold_graph` -> `threshold_network`, `gen_gaussian_knn_graph` -> `gaussian_knn_network`.
+- **`NetworkAnalyzer`**: Moved to `bioneuralnet.network`; GPU-accelerated via PyTorch; added `hub_analysis`, `cross_omics_analysis`, `edge_weight_analysis`, `find_strongest_edges`, `degree_distribution`, `clustering_coefficient_gpu`, `connected_components`.
+- **`auto_pysmccnet`**: Phenotype-driven network construction via SmCCNet 2.0; supports CCA and PLS modes, now fully implemented in native Python, simplifying user experience and removing the R dependency.
+
+### Utils Module
+- **`impute_omics` / `impute_omics_knn` renamed**: Now `impute_simple` and `impute_knn`.
+- **`normalize_omics` renamed**: Now `normalize`; supports `"standard"`, `"minmax"`, `"log2"`.
+- **`beta_to_m` renamed**: Now `m_transform`.
+- **New `feature_selection` submodule**: `laplacian_score`, `mad_filter`, `pca_loadings`, `correlation_filter`, `importance_rf`, `variance_threshold`, `top_anova_f_features`.
+- **New `data` functions**: `data_stats`, `sparse_filter`, `nan_summary`, `zero_summary`.
+- **`clean_internal`**: New cleaning function with configurable NaN threshold.
+
+### DPMON Enhancements
+- **`tune_trials`**: Already introduced in 1.2.2; now fully documented.
+- **`ae_architecture`**: New parameter; supports `"original"` and `"dynamic"` autoencoder architectures.
+- **`correlation_mode`**: New parameter; supports `"abs_pearson"` (default) and `"adaptive"` node feature computation.
+- **Inner CV tuning**: Ray Tune now performs epoch-synchronized inner k-fold cross-validation across all trials.
+
+### Datasets
+- **PAAD removed** from built-in datasets.
+- **Dataset size reduction**: BRCA, LGG, and KIPAN datasets significantly reduced from ~4,000 omics features per dataset to 700 (400 methylation, 200 mRNA, 100 miRNA) using Laplacian Score filtering, replacing the previous ANOVA-F & Random Forest intersection strategy. This standardization was necessary to stay within the PyPI 100 MB package size limit (v1.2.2 reached 97.9 MB) and results in substantially faster installs and downloads for users.
+
+### Documentation
+- **Data Decision Framework**: New comprehensive stage-by-stage parameter reference (`quick_start/data_framework.rst`).
+- **Quick Start notebooks**: New home for end-to-end `Quick_Start.ipynb` and `quick_start_bio.rst`.
+- **Subgraph page**: Updated case studies from KIPAN to TCGA-LGG and ROSMAP with full algorithm documentation.
+- **`network.rst`**: New dedicated page for the network module.
+- **`utils.rst`**, **`datasets.rst`**, **`index.rst`**, **`subgraph.rst`**: Major updates throughout.
+- **README**: GitHub readme updated to reflect all API changes, new images, and corrected function names.
+
+### Removed
+- `gen_similarity_graph`, `gen_correlation_graph`, `gen_threshold_graph`, `gen_gaussian_knn_graph` from `bioneuralnet.utils`.
+- `graph_analysis`, `repair_graph_connectivity`, `find_optimal_graph` from `bioneuralnet.utils` (superseded by `NetworkAnalyzer` and `network_search`).
+- `impute_omics`, `impute_omics_knn`, `normalize_omics`, `beta_to_m` (renamed, see above).
+
+### Testing
+- Test suite updated to align with new `network` module and renamed utils functions.
+
 ## [1.2.2] - 2025-12-29
 
 ### Documentation

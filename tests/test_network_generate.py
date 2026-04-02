@@ -6,9 +6,7 @@ from bioneuralnet.network.generate import similarity_network
 from bioneuralnet.network.generate import correlation_network
 from bioneuralnet.network.generate import threshold_network
 from bioneuralnet.network.generate import gaussian_knn_network
-
 from bioneuralnet.datasets import DatasetLoader
-
 
 class TestUtilsGraph(unittest.TestCase):
     def setUp(self):

@@ -13,7 +13,7 @@ Key Features:
 
 """
 
-__version__ = "1.2.2"
+__version__ = "1.3.0"
 
 # submodules to enable direct imports such as `from bioneuralnet import utils`
 from . import utils
@@ -51,7 +51,7 @@ from .utils import (
 
 __all__ = [
     "__version__",
-    
+
     "utils",
     "metrics",
     "datasets",
@@ -59,16 +59,17 @@ __all__ = [
     "network_embedding",
     "downstream_task",
     "network",
+    "external_tools",
 
     "GNNEmbedding",
     "SubjectRepresentation",
     "auto_pysmccnet",
     "DPMON",
-    
+
     "DatasetLoader",
     "CorrelatedPageRank",
     "CorrelatedLouvain",
-    
+
     "HybridLouvain",
 
     "load_example",

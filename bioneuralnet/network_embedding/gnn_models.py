@@ -47,12 +47,12 @@ def get_activation(activation_choice):
         "elu": nn.ELU(),
         "leaky_relu": nn.LeakyReLU(negative_slope=0.01),
     }
-    
+
     act = activations.get(activation_choice.lower())
-    
+
     if act is None:
         raise ValueError(f"Unsupported activation function: {activation_choice}")
-        
+
     return act
 
 class GCN(nn.Module):
@@ -88,7 +88,7 @@ class GCN(nn.Module):
     ):
         if seed is not None:
             set_seed(seed)
-            
+
         super().__init__()
 
         self.dropout = process_dropout(dropout)
@@ -119,7 +119,7 @@ class GCN(nn.Module):
 
         x = self.conv_first(x, edge_index, edge_weight=edge_weight)
         x = self.activation(x)
-        
+
         if self.dropout > 0.0:
             x = F.dropout(x, p=self.dropout, training=self.training)
 
@@ -128,7 +128,7 @@ class GCN(nn.Module):
             x = self.activation(x)
             if self.dropout > 0.0:
                 x = F.dropout(x, p=self.dropout, training=self.training)
-                
+
         return x
 
     def forward(self, data):
@@ -136,7 +136,7 @@ class GCN(nn.Module):
         Full forward pass including the task-specific head.
         """
         x = self._message_pass(data)
-        
+
         return self.regressor(x)
 
     def get_embeddings(self, data):
@@ -177,7 +177,7 @@ class GAT(nn.Module):
     ):
         if seed is not None:
             set_seed(seed)
-            
+
         super().__init__()
 
         self.dropout = process_dropout(dropout)
@@ -208,13 +208,13 @@ class GAT(nn.Module):
         """
         x, edge_index = data.x, data.edge_index
         edge_attr = getattr(data, "edge_attr", None)
-        
+
         if edge_attr is not None and edge_attr.dim() == 1:
             edge_attr = edge_attr.unsqueeze(1)
 
         x = self.conv_first(x, edge_index, edge_attr=edge_attr)
         x = self.activation(x)
-        
+
         if self.dropout > 0.0:
             x = F.dropout(x, p=self.dropout, training=self.training)
 
@@ -223,7 +223,7 @@ class GAT(nn.Module):
             x = self.activation(x)
             if self.dropout > 0.0:
                 x = F.dropout(x, p=self.dropout, training=self.training)
-                
+
         return x
 
     def forward(self, data):
@@ -231,7 +231,7 @@ class GAT(nn.Module):
         Full forward pass.
         """
         x = self._message_pass(data)
-        
+
         return self.regressor(x)
 
     def get_embeddings(self, data):
@@ -267,7 +267,7 @@ class SAGE(nn.Module):
     ):
         if seed is not None:
             set_seed(seed)
-            
+
         super().__init__()
 
         self.dropout = process_dropout(dropout)
@@ -297,7 +297,7 @@ class SAGE(nn.Module):
 
         x = self.conv_first(x, edge_index)
         x = self.activation(x)
-        
+
         if self.dropout > 0.0:
             x = F.dropout(x, p=self.dropout, training=self.training)
 
@@ -306,7 +306,7 @@ class SAGE(nn.Module):
             x = self.activation(x)
             if self.dropout > 0.0:
                 x = F.dropout(x, p=self.dropout, training=self.training)
-                
+
         return x
 
     def forward(self, data):
@@ -314,7 +314,7 @@ class SAGE(nn.Module):
         Full forward pass.
         """
         x = self._message_pass(data)
-        
+
         return self.regressor(x)
 
     def get_embeddings(self, data):
@@ -351,7 +351,7 @@ class GIN(nn.Module):
     ):
         if seed is not None:
             set_seed(seed)
-            
+
         super().__init__()
 
         self.dropout = process_dropout(dropout)
@@ -383,13 +383,13 @@ class GIN(nn.Module):
         """
         x, edge_index = data.x, data.edge_index
         edge_attr = getattr(data, "edge_attr", None)
-        
+
         if edge_attr is not None and edge_attr.dim() == 1:
             edge_attr = edge_attr.unsqueeze(1)
 
         x = self.conv_first(x, edge_index, edge_attr=edge_attr)
         x = self.activation(x)
-        
+
         if self.dropout > 0.0:
             x = F.dropout(x, p=self.dropout, training=self.training)
 
@@ -398,7 +398,7 @@ class GIN(nn.Module):
             x = self.activation(x)
             if self.dropout > 0.0:
                 x = F.dropout(x, p=self.dropout, training=self.training)
-                
+
         return x
 
     def forward(self, data):
@@ -406,7 +406,7 @@ class GIN(nn.Module):
         Full forward pass.
         """
         x = self._message_pass(data)
-        
+
         return self.regressor(x)
 
     def get_embeddings(self, data):

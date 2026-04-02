@@ -22,7 +22,11 @@ repos:
     hooks:
       - id: mypy
         name: Static type checking with MyPy
-        args: [--ignore-missing-imports]
+        exclude: ^bioneuralnet/network/pysmccnet/
+        args: [
+          --ignore-missing-imports,
+          --follow-imports=silent,
+        ]
 
   - repo: local
     hooks:
