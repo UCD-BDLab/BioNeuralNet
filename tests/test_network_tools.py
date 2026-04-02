@@ -93,7 +93,7 @@ class TestNetworkSearch(unittest.TestCase):
             self.omics_data,
             self.y,
             methods=["correlation", "threshold"],
-            trials=2,
+            trials=10,
             verbose=False,
         )
         self.assertIsInstance(results, pd.DataFrame)
@@ -105,7 +105,7 @@ class TestNetworkSearch(unittest.TestCase):
             self.omics_data,
             self.y,
             methods=["correlation"],
-            trials=2,
+            trials=10,
             verbose=False,
         )
         for col in ("method", "score", "f1", "topology"):
@@ -116,7 +116,7 @@ class TestNetworkSearch(unittest.TestCase):
             self.omics_data,
             self.y,
             methods=["threshold"],
-            trials=2,
+            trials=10,
             verbose=False,
         )
         n_features = self.omics_data.shape[1]
