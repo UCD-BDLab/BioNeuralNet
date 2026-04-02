@@ -5,9 +5,8 @@ import numpy as np
 import networkx as nx
 import warnings
 
-from bioneuralnet.network.tools import analyze_network
-from bioneuralnet.network.tools import repair_network
-from bioneuralnet.network.tools import optimize_network
+from bioneuralnet.network.tools import NetworkAnalyzer
+from bioneuralnet.network.tools import network_search
 from bioneuralnet.datasets import DatasetLoader
 
 

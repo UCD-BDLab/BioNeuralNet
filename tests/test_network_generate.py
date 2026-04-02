@@ -2,13 +2,11 @@ import unittest
 import pandas as pd
 import numpy as np
 
-from bioneuralnet.network.generate import gen_similarity_graph
-from bioneuralnet.network.generate import gen_correlation_graph
-from bioneuralnet.network.generate import gen_threshold_graph
-from bioneuralnet.network.generate import gen_gaussian_knn_graph
-from bioneuralnet.network.generate import gen_lasso_graph
-from bioneuralnet.network.generate import gen_mst_graph
-from bioneuralnet.network.generate import gen_snn_graph
+from bioneuralnet.network.generate import similarity_network
+from bioneuralnet.network.generate import correlation_network
+from bioneuralnet.network.generate import threshold_network
+from bioneuralnet.network.generate import gaussian_knn_network
+
 from bioneuralnet.datasets import DatasetLoader
 
 
@@ -49,15 +47,15 @@ class TestUtilsGraph(unittest.TestCase):
         self.assertTrue(is_normalized.all())
 
     def test_gen_similarity_graph_default(self):
-        G = gen_similarity_graph(self.X, k=3)
+        G = similarity_network(self.X, k=3)
         self._basic_checks(G)
 
     def test_gen_similarity_graph_type_error(self):
         with self.assertRaises(TypeError):
-            gen_similarity_graph(np.array([[1, 2], [3, 4]]))
+            similarity_network(np.array([[1, 2], [3, 4]]))
 
     def test_gen_correlation_graph_default(self):
-        G = gen_correlation_graph(
+        G = correlation_network(
             self.X,
             k=3,
             method="pearson",
@@ -72,10 +70,10 @@ class TestUtilsGraph(unittest.TestCase):
 
     def test_gen_correlation_graph_type_error(self):
         with self.assertRaises(TypeError):
-            gen_correlation_graph("not a df")
+            correlation_network("not a df")
 
     def test_gen_threshold_graph_default(self):
-        G = gen_threshold_graph(
+        G = threshold_network(
             self.X,
             b=4.0,
             k=3,
@@ -87,10 +85,10 @@ class TestUtilsGraph(unittest.TestCase):
 
     def test_gen_threshold_graph_type_error(self):
         with self.assertRaises(TypeError):
-            gen_threshold_graph(None)
+            threshold_network(None)
 
     def test_gen_gaussian_knn_graph_default(self):
-        G = gen_gaussian_knn_graph(
+        G = gaussian_knn_network(
             self.X,
             k=3,
             mutual=False,
@@ -101,31 +99,7 @@ class TestUtilsGraph(unittest.TestCase):
 
     def test_gen_gaussian_knn_graph_type_error(self):
         with self.assertRaises(TypeError):
-            gen_gaussian_knn_graph(123)
-
-    def test_gen_lasso_graph_default(self):
-        G = gen_lasso_graph(self.X, alpha=0.1)
-        self._basic_checks(G)
-
-    def test_gen_lasso_graph_type_error(self):
-        with self.assertRaises(TypeError):
-            gen_lasso_graph([1, 2, 3])
-
-    def test_gen_mst_graph_default(self):
-        G = gen_mst_graph(self.X)
-        self._basic_checks(G)
-
-    def test_gen_mst_graph_type_error(self):
-        with self.assertRaises(TypeError):
-            gen_mst_graph(5.0)
-
-    def test_gen_snn_graph_default(self):
-        G = gen_snn_graph(self.X, k=3)
-        self._basic_checks(G)
-
-    def test_gen_snn_graph_type_error(self):
-        with self.assertRaises(TypeError):
-            gen_snn_graph("oops, not a df")
+            gaussian_knn_network(123)
 
 
 if __name__ == "__main__":
