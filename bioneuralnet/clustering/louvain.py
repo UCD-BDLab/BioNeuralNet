@@ -1,7 +1,7 @@
 r"""
 Standard Louvain Method for Community Detection - NumPy Implementation.
 
-References: 
+References:
     Blondel et al. (2008), "Fast unfolding of communities in large networks."
 """
 

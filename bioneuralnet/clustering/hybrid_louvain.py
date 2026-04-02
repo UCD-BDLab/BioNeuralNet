@@ -1,23 +1,23 @@
 r"""
 Hybrid Louvain-PageRank - Significant Subgraph Detection.
 
-This module implements an iterative refinement algorithm that alternates 
-between community detection (Louvain) and local ranking (PageRank) to 
+This module implements an iterative refinement algorithm that alternates
+between community detection (Louvain) and local ranking (PageRank) to
 identify phenotype-correlated subgraphs.
 
 References:
-    Abdel-Hafiz et al. (2022), "Significant Subgraph Detection in 
-    Multi-omics Networks for Disease Pathway Identification," 
+    Abdel-Hafiz et al. (2022), "Significant Subgraph Detection in
+    Multi-omics Networks for Disease Pathway Identification,"
     Frontiers in Big Data.
 
 Algorithm:
-    The process alternates between global community detection and local 
+    The process alternates between global community detection and local
     refinement until convergence:
 
     Iteration 1 (Global Scope):
         1. Run Correlated Louvain on the full graph to optimize Hybrid Modularity.
         2. Select the community with the highest phenotype correlation :math:`|\rho|`.
-        3. Assign seed weights to these nodes based on their marginal 
+        3. Assign seed weights to these nodes based on their marginal
            contribution to :math:`\rho`.
         4. Execute Correlated PageRank on the full graph.
         5. Use a sweep cut to produce the initial refined subgraph.
@@ -33,23 +33,23 @@ Algorithm:
 Notes:
     **Hybrid Modularity (Correlated Louvain)**
     Balances internal topological connectivity with phenotype correlation:
-    
+
     .. math::
         Q_{hybrid} = k_L Q + (1 - k_L) \rho
-    
+
     **Hybrid Conductance (Correlated PageRank)**
     Balances the external cut/internal volume ratio with correlation:
-    
+
     .. math::
         \Phi_{hybrid} = k_P \Phi + (1 - k_P) \rho
 
     **Seed Weighting**
-    Teleportation probabilities :math:`\alpha_i` are weighted by a node's 
+    Teleportation probabilities :math:`\alpha_i` are weighted by a node's
     marginal contribution:
-    
+
     .. math::
         \alpha_i = \frac{\rho_i}{\max(\rho_{seeds})} \cdot \alpha_{max}
-    
+
     Where :math:`\rho_i = \rho(S) - \rho(S \setminus \{i\})`.
 """
 
@@ -106,7 +106,7 @@ class HybridLouvain:
         if isinstance(G, pd.DataFrame):
             logger.info("Converting adjacency DataFrame to NetworkX graph.")
             G = nx.from_pandas_adjacency(G)
-        
+
         if not isinstance(G, nx.Graph):
             raise TypeError("G must be a networkx.Graph or adjacency DataFrame.")
 
@@ -116,10 +116,10 @@ class HybridLouvain:
         graph_nodes = set(str(n) for n in G.nodes())
         keep = [c for c in B.columns if str(c) in graph_nodes]
         dropped = len(B.columns) - len(keep)
-        
+
         if dropped > 0:
             logger.info(f"Dropped {dropped} omics columns not in graph.")
-        
+
         self.B = B.loc[:, keep].copy()
 
         if isinstance(Y, pd.DataFrame):
@@ -315,7 +315,7 @@ class HybridLouvain:
         """
         if self._best_idx is None:
             raise ValueError("Call run() first.")
-        
+
         best = self._iterations[self._best_idx]
-        
+
         return best["refined_nodes"], best["refined_rho"], best["iteration"]

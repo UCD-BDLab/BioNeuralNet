@@ -1,8 +1,8 @@
 """Network Construction and Analysis.
 
-This module provides tools for generating, searching, and analyzing multi-omics 
-networks. It includes methods for building networks from raw tabular data using 
-similarity, correlation, thresholding, and Gaussian KNN, as well as 
+This module provides tools for generating, searching, and analyzing multi-omics
+networks. It includes methods for building networks from raw tabular data using
+similarity, correlation, thresholding, and Gaussian KNN, as well as
 phenotype-driven strategies like PySmCCNet.
 """
 

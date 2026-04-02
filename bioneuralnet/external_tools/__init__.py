@@ -2,8 +2,8 @@
 External Tools Module
 
 This module provides utility functions for interoperability between Python and R.
-It handles the execution of external R scripts to extract, convert, and load 
-RData structures (such as cross-validation folds and network matrices) into 
+It handles the execution of external R scripts to extract, convert, and load
+RData structures (such as cross-validation folds and network matrices) into
 standardized Python data structures like pandas DataFrames and NumPy arrays.
 
 Available Functions:

@@ -1,12 +1,12 @@
 r"""
 DPMON: Optimized Network Embedding and Fusion for Disease Prediction.
 
-This module implements an end-to-end Graph Neural Network (GNN) pipeline 
+This module implements an end-to-end Graph Neural Network (GNN) pipeline
 integrating network topology with subject-level omics data.
 
 References:
-    Hussein, S. et al. (2024), "Learning from Multi-Omics Networks to 
-    Enhance Disease Prediction: An Optimized Network Embedding and 
+    Hussein, S. et al. (2024), "Learning from Multi-Omics Networks to
+    Enhance Disease Prediction: An Optimized Network Embedding and
     Fusion Approach" IEEE BIBM.
 
 Algorithm:
@@ -16,21 +16,21 @@ Algorithm:
         1. Construct a multi-omics network.
         2. Initialize node features using clinical correlation vectors.
         3. Pass graph through a GNN (GAT/GCN/GIN).
-    
+
     Phase 2: Dimensionality Reduction
         Compress embeddings into scalar weights via AutoEncoder/MLP.
 
     Phase 3: Fusion and Prediction
-        Fuse embeddings with subject-level data via element-wise 
+        Fuse embeddings with subject-level data via element-wise
         multiplication (Feature Reweighting).
 
 Notes:
     The embedding space is optimized dynamically using the loss function:
-    
+
     .. math::
         L_{total} = L_{classification} + \lambda L_{regularization}
 
-    The fusion acts as a **Network-Guided Attention Mechanism**, 
+    The fusion acts as a **Network-Guided Attention Mechanism**,
     amplifying features that are topologically central.
 """
 
@@ -73,7 +73,7 @@ try:
     os.environ["TUNE_DISABLE_IPY_WIDGETS"] = "1"
     os.environ["TUNE_WARN_EXCESSIVE_EXPERIMENT_CHECKPOINT_SYNC_THRESHOLD_S"] = "0"
     os.environ["RAY_DEDUP_LOGS"] = "0"
-    
+
     for logger_name in ("ray", "raylet", "ray.train.session", "ray.tune", "torch_geometric"):
         logging.getLogger(logger_name).setLevel(logging.WARNING)
 
@@ -945,7 +945,7 @@ def run_standard_training(dpmon_params, adjacency_matrix, combined_omics, clinic
                 results_df = pd.DataFrame(all_fold_results)
                 config_save_path = os.path.join(output_dir, "cv_tuning_results.csv")
                 config_df = pd.DataFrame(fold_best_configs)
-                combined = pd.concat([results_df,config_df], axis=1)     
+                combined = pd.concat([results_df,config_df], axis=1)
                 combined.to_csv(config_save_path)
                 logger.info(f"Successfully saved CV tuning parameters to: {config_save_path}")
             except Exception as e:
@@ -1037,7 +1037,7 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
             "X_val": torch.FloatTensor(X.iloc[val_idx].values),
             "y_val": torch.LongTensor(Y.iloc[val_idx].values),
         }
- 
+
         fold_data_refs.append(ray.put(fold_tensors))
 
     omics_network_ref = ray.put(omics_network_tg.cpu())
@@ -1066,7 +1066,7 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
                 "criterion": nn.CrossEntropyLoss()
             }
             folds.append(fold_dict)
-        
+
         # one model + optimizer per inner fold
         models, optimizers = [], []
         for _ in range(len(folds)):
@@ -1103,7 +1103,7 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
             epoch_val_auprs = []
 
             for fi, fold in enumerate(folds):
-                # train step 
+                # train step
                 models[fi].train()
                 optimizers[fi].zero_grad()
                 out, _, _ = models[fi](fold["X_train"], omics_net)
@@ -1116,7 +1116,7 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
                 models[fi].eval()
                 with torch.no_grad():
                     val_out, _, _ = models[fi](fold["X_val"], omics_net)
-                    vl = fold["criterion"](val_out, fold["y_val"]).item() 
+                    vl = fold["criterion"](val_out, fold["y_val"]).item()
                     _, preds = torch.max(val_out, 1)
                     probs = torch.softmax(val_out, dim=1)
 
@@ -1126,7 +1126,7 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
 
                     va = (preds == fold["y_val"]).sum().item() / fold["y_val"].size(0)
                     f1_mac = f1_score(y_true_np, predicted_np, average='macro', zero_division=0)
-                    
+
                     try:
                         n_classes = probs_np.shape[1]
                         if n_classes == 2:
@@ -1158,7 +1158,7 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
 
             ckpt_dir = "trial_checkpoint"
             os.makedirs(ckpt_dir, exist_ok=True)
-            
+
             torch.save(
                 {"epoch": epoch, "model_state": models[0].state_dict()},
                 os.path.join(ckpt_dir, "checkpoint.pt"),
@@ -1186,12 +1186,12 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
 
     def short_dirname_creator(trial):
         return f"T{trial.trial_id}"
-    
+
     #dummy reporter that fixes Ray-rune screen-clearing for jupyter notebooks
     class SilentReporter(CLIReporter):
         def should_report(self, trials, done=False):
             return False
-        
+
         def report(self, trials, done, *sys_info):
             pass
 
@@ -1256,7 +1256,7 @@ def run_hyperparameter_tuning(X_train, y_train, adjacency_matrix, clinical_data,
             if new_num_samples == num_samples and new_gpu_per_trial == gpu_per_trial:
                 logger.error("Cannot reduce num_samples or increase gpu_per_trial any further. Aborting.")
                 raise
-            
+
             logger.warning(
                 f"Ray Tune failed (attempt {attempt + 1}). "
                 f"Adjusting resources -> num_samples: {num_samples} to {new_num_samples}, "
@@ -1301,7 +1301,7 @@ def train_model(model, criterion, optimizer, train_features, train_labels, epoch
 
         loss.backward()
         optimizer.step()
-        scheduler.step() 
+        scheduler.step()
 
         if (epoch + 1) % 100 == 0 or epoch == 0:
             logger.debug(f"Epoch [{epoch+1}/{epoch_num}], Loss: {loss.item():.4f}")
@@ -1482,7 +1482,7 @@ class AutoEncoder(nn.Module):
                 # 3-step funnel
                 h1 = max(input_dim // 2, 8)
                 h2 = max(input_dim // 4, 4)
-                
+
                 self.encoder = nn.Sequential(
                     nn.Linear(input_dim, h1),
                     nn.ReLU(),
@@ -1495,7 +1495,7 @@ class AutoEncoder(nn.Module):
                 hidden_dim = max(input_dim // 2, encoding_dim * 2)
                 if hidden_dim > input_dim:
                     hidden_dim = input_dim
-                    
+
                 self.encoder = nn.Sequential(
                     nn.Linear(input_dim, hidden_dim),
                     nn.ReLU(),

@@ -36,25 +36,25 @@ def data_preprocess(X: Union[pd.DataFrame, np.ndarray], covariates: Optional[Uni
     """
     if not isinstance(X, pd.DataFrame):
         X = pd.DataFrame(X)
-        
+
     data = X.copy()
-    
+
     # cv filtering
     if is_cv:
         if device is None:
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        
+
         data_tensor = torch.tensor(data.values, dtype=dtype, device=device)
         N = data_tensor.shape[0]
         col_mean = data_tensor.mean(dim=0)
         col_std = torch.sqrt(torch.sum((data_tensor - col_mean.unsqueeze(0)) ** 2, dim=0) / (N - 1))
-        
+
         safe_mean = torch.where(col_mean == 0, torch.ones_like(col_mean), col_mean)
         cv_values = torch.abs(col_std / safe_mean).cpu().numpy()
-        
+
         if cv_quantile is None:
             raise ValueError("cv filtering quantile must be provided!")
-            
+
         thresh = np.quantile(cv_values, cv_quantile)
         keep_mask = cv_values > thresh
         data = data.loc[:, keep_mask]
@@ -62,7 +62,7 @@ def data_preprocess(X: Union[pd.DataFrame, np.ndarray], covariates: Optional[Uni
     # center and scale
     if center:
         data = data - data.mean(axis=0)
-        
+
     if scale:
         std_devs = data.std(axis=0, ddof=1)
         std_devs[std_devs == 0] = 1
@@ -72,10 +72,10 @@ def data_preprocess(X: Union[pd.DataFrame, np.ndarray], covariates: Optional[Uni
     if covariates is not None:
         if not isinstance(covariates, pd.DataFrame):
             covariates = pd.DataFrame(covariates)
-            
+
         if covariates.shape[1] == 0:
             raise ValueError('Covariate dataframe must have at least 1 column!')
-            
+
         if not data.index.equals(covariates.index):
             common_idx = data.index.intersection(covariates.index)
             data = data.loc[common_idx]
@@ -83,18 +83,18 @@ def data_preprocess(X: Union[pd.DataFrame, np.ndarray], covariates: Optional[Uni
 
         if device is None:
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        
+
         data_tensor = torch.tensor(data.values, dtype=dtype, device=device)
         cov_tensor = torch.tensor(covariates.values, dtype=dtype, device=device)
-        
+
         ones_col = torch.ones((cov_tensor.shape[0], 1), device=device, dtype=dtype)
         X_cov = torch.cat([ones_col, cov_tensor], dim=1)
-        
+
         result = torch.linalg.lstsq(X_cov, data_tensor)
         beta = result.solution
-        
+
         residuals = data_tensor - torch.matmul(X_cov, beta)
-        
+
         data = pd.DataFrame(residuals.cpu().numpy(), index=data.index, columns=data.columns)
 
     return data
@@ -116,77 +116,77 @@ def get_can_cor_multi(X: List[torch.Tensor], cc_coef: Union[np.ndarray, torch.Te
     """
     device = X[0].device
     dtype = X[0].dtype
-    
+
     if not isinstance(Y, torch.Tensor):
         Y = torch.tensor(np.array(Y), device=device, dtype=dtype)
-    
+
     if not isinstance(cc_coef, torch.Tensor):
         cc_coef = torch.tensor(np.array(cc_coef), device=device, dtype=dtype)
-    
+
     num_datasets = len(X)
-    
+
     # projections
     projections = []
     for i in range(num_datasets):
         w = cc_weight[i] if isinstance(cc_weight[i], torch.Tensor) else torch.tensor(np.array(cc_weight[i]), device=device, dtype=dtype)
-        
+
         if w.ndim == 1:
             w = w.view(-1, 1)
-            
+
         proj = torch.matmul(X[i], w)
         projections.append(proj.reshape(-1, 1))
-    
+
     omics_projection = torch.cat(projections, dim=1)
-    
+
     # correlation matrix
     k = omics_projection.shape[1]
     centered = omics_projection - omics_projection.mean(dim=0, keepdim=True)
-    
+
     N = omics_projection.shape[0]
     cov_mat = torch.matmul(centered.t(), centered) / (N - 1)
     std_vec = torch.sqrt(torch.diag(cov_mat))
-    
+
     std_outer = std_vec.unsqueeze(1) * std_vec.unsqueeze(0)
     std_outer = torch.where(std_outer == 0, torch.ones_like(std_outer), std_outer)
-    
+
     omics_cor_mat = cov_mat / std_outer
-    
+
     # between-omics correlations
     if k > 1:
         row_idx, col_idx = torch.triu_indices(k, k, offset=1)
         omics_cor_vec = omics_cor_mat[row_idx, col_idx]
     else:
         omics_cor_vec = torch.tensor([], device=device, dtype=dtype)
-    
+
     cc_coef_between = cc_coef[:num_datasets]
     cc_between = r_vec_mult_sum(cc_coef_between, omics_cor_vec)
-    
+
     # omics-phenotype correlations
     y_flat = Y.flatten()
     y_centered = y_flat - torch.mean(y_flat)
     y_norm = torch.sqrt(torch.sum(y_centered ** 2))
-    
+
     pheno_cor_list = []
     for i in range(k):
         col = omics_projection[:, i]
         col_centered = col - torch.mean(col)
         col_norm = torch.sqrt(torch.sum(col_centered ** 2))
-        
+
         denom = col_norm * y_norm
         if denom == 0:
             corr = torch.tensor(0.0, device=device, dtype=dtype)
         else:
             corr = torch.sum(col_centered * y_centered) / denom
-            
+
         if torch.isnan(corr):
             corr = torch.tensor(0.0, device=device, dtype=dtype)
-            
+
         pheno_cor_list.append(corr)
-    
+
     pheno_cor_vec = torch.stack(pheno_cor_list)
     cc_coef_pheno = cc_coef[num_datasets:]
     pheno_cor_val = r_vec_mult_sum(pheno_cor_vec, cc_coef_pheno)
-    
+
     return cc_between + pheno_cor_val
 
 
@@ -208,32 +208,32 @@ def get_abar(ws: Union[pd.DataFrame, np.ndarray, torch.Tensor, List[float]], fea
         ws = torch.tensor(ws.values, dtype=torch.float32)
     elif not isinstance(ws, torch.Tensor):
         ws = torch.tensor(ws, dtype=torch.float32)
-        
+
     w_abs = torch.abs(ws)
-    
+
     # compute similarity matrix
     if w_abs.ndim == 1:
         abar = torch.outer(w_abs, w_abs)
     else:
         abar = torch.matmul(w_abs, w_abs.T)
-        
+
     # zero diagonal
     abar.fill_diagonal_(0)
-    
+
     # normalize
     max_val = torch.max(abar)
     if max_val > 0:
         abar = abar / max_val
-        
+
     # format output
     if feature_label is None:
         raise ValueError("Need to provide FeatureLabel.")
-        
+
     if len(feature_label) != abar.shape[0]:
         raise ValueError(f"FeatureLabel length ({len(feature_label)}) does not match matrix rows ({abar.shape[0]}).")
 
     abar_cpu = abar.detach().cpu().numpy()
-    
+
     return pd.DataFrame(abar_cpu, index=feature_label, columns=feature_label)
 
 def get_omics_modules(Abar: pd.DataFrame, cut_height: float = 1 - 0.1**10) -> List[List[int]]:
@@ -265,7 +265,7 @@ def get_omics_modules(Abar: pd.DataFrame, cut_height: float = 1 - 0.1**10) -> Li
 
     labels = fcluster(Z, t=cut_height, criterion='distance')
 
-    # Logic here only keep leaf nodes from merges below cut_height 
+    # Logic here only keep leaf nodes from merges below cut_height
     merged_below = Z[:, 2] < cut_height
 
     n = abar_mat.shape[0]

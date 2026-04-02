@@ -1,6 +1,6 @@
 """Utility Module
 
-This module provides a collection of helper functions for data preprocessing, 
+This module provides a collection of helper functions for data preprocessing,
 feature selection, statistical data exploration, graph network pruning, and reproducibility.
 """
 
@@ -44,7 +44,7 @@ from .preprocess import (
 __all__ = [
     "get_logger",
     "set_seed",
-    
+
     "variance_summary",
     "zero_summary",
     "expression_summary",
@@ -52,7 +52,7 @@ __all__ = [
     "nan_summary",
     "sparse_filter"
     "data_stats",
-    
+
     "variance_threshold",
     "mad_filter",
     "pca_loadings",
@@ -60,7 +60,7 @@ __all__ = [
     "correlation_filter",
     "importance_rf",
     "top_anova_f_features",
-    
+
     "m_transform",
     "impute_simple",
     "impute_knn",
@@ -68,7 +68,7 @@ __all__ = [
     "clean_inf_nan",
     "clean_internal",
     "preprocess_clinical",
-    
+
     "prune_network",
     "prune_network_by_quantile",
     "network_remove_low_variance",

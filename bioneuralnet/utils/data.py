@@ -15,7 +15,7 @@ def variance_summary(df: pd.DataFrame, var_threshold: Optional[float] = None) ->
         var_threshold (Optional[float]): A threshold used to count features falling below this variance level.
 
     Returns:
-        dict: A dictionary containing the mean, median, min, max, and standard deviation of the column variances. 
+        dict: A dictionary containing the mean, median, min, max, and standard deviation of the column variances.
               If a threshold is provided, it also includes 'Number Of Low Variance Features'.
     """
     variances = df.var()
@@ -41,7 +41,7 @@ def zero_summary(df: pd.DataFrame, zero_threshold: Optional[float] = None) -> di
         zero_threshold (Optional[float]): A threshold used to count features whose zero-fraction exceeds this value.
 
     Returns:
-        dict: A dictionary containing the mean, median, min, max, and standard deviation of the zero fractions. 
+        dict: A dictionary containing the mean, median, min, max, and standard deviation of the zero fractions.
               If a threshold is provided, it includes 'Number Of High Zero Features'.
     """
     zero_fraction = (df == 0).sum(axis=0) / df.shape[0]
@@ -90,7 +90,9 @@ def correlation_summary(df: pd.DataFrame) -> dict:
         dict: A dictionary containing the mean, median, min, max, and std of the max absolute correlations.
     """
     corr_matrix = df.corr().abs()
-    np.fill_diagonal(corr_matrix.values, 0)
+    vals = corr_matrix.to_numpy().copy()
+    np.fill_diagonal(vals, 0)
+    corr_matrix = pd.DataFrame(vals, index=corr_matrix.index, columns=corr_matrix.columns)
     max_corr = corr_matrix.max()
 
     summary = {
@@ -109,36 +111,36 @@ def nan_summary(df: pd.DataFrame, name: str = "Dataset", missing_threshold: floa
         df (pd.DataFrame): The input omics DataFrame.
         name (str): A descriptive name for the dataset for clear output labeling.
         missing_threshold (float): Percentage threshold (0-100) to trigger a warning for highly missing data.
-        
+
     Returns:
         float: The global percentage of missing values (NaNs) in the DataFrame.
     """
     total_elements = df.size
     total_nans = df.isna().sum().sum()
     pct_missing = (total_nans / total_elements) * 100
-    
+
     logger.info(f"=== {name} NaN Report ===")
     logger.info(f"Shape: {df.shape} (Samples: {df.shape[0]}, Features: {df.shape[1]})")
     logger.info(f"Global NaN: {pct_missing:.2f}%\n")
-    
+
     if total_nans > 0:
         feature_nan_pct = (df.isna().sum(axis=0) / df.shape[0]) * 100
         sample_nan_pct = (df.isna().sum(axis=1) / df.shape[1]) * 100
-        
+
         logger.info("Top 5 FEATURES with most missing data:")
         logger.info("\n" + feature_nan_pct.sort_values(ascending=False).head(5).to_string(float_format="{:.2f}%".format))
-        
+
         logger.info("\nTop 5 SAMPLES with most missing data:")
         logger.info("\n" + sample_nan_pct.sort_values(ascending=False).head(5).to_string(float_format="{:.2f}%".format))
-        
+
         high_missing_features = (feature_nan_pct > missing_threshold).sum()
         high_missing_samples = (sample_nan_pct > missing_threshold).sum()
-        
+
         if high_missing_features > 0:
             logger.warning(f"{high_missing_features} features are missing in >{missing_threshold}% of samples.")
         if high_missing_samples > 0:
             logger.warning(f"{high_missing_samples} samples are missing >{missing_threshold}% of their features.")
-            
+
     logger.info("-" * 50)
     return pct_missing
 
@@ -155,14 +157,14 @@ def sparse_filter(df: pd.DataFrame, missing_fraction: float = 0.20) -> pd.DataFr
     """
     min_valid_samples = int(df.shape[0] * (1 - missing_fraction))
     df_filtered = df.dropna(axis=1, thresh=min_valid_samples)
-    
+
     min_valid_features = int(df_filtered.shape[1] * (1 - missing_fraction))
     return df_filtered.dropna(axis=0, thresh=min_valid_features)
 
 def data_stats(df: pd.DataFrame, name: str = "Data", compute_correlation: bool = False) -> None:
     """Prints a comprehensive set of key statistics for an omics DataFrame.
 
-    Combines variance, zero fraction, expression, correlation, and missingness summaries 
+    Combines variance, zero fraction, expression, correlation, and missingness summaries
     for rapid data quality assessment. Recommends data cleaning steps if high missingness is found.
 
     Args:
@@ -174,8 +176,7 @@ def data_stats(df: pd.DataFrame, name: str = "Data", compute_correlation: bool =
         None: Logs the statistics directly to the console.
     """
     logger.info(f"=== {name} Statistics Overview ===")
-    
-    # --- Variance Summary ---
+
     var_stats = variance_summary(df, var_threshold=1e-4)
     logger.info("--- Variance Summary ---")
     for key, value in var_stats.items():
@@ -183,7 +184,6 @@ def data_stats(df: pd.DataFrame, name: str = "Data", compute_correlation: bool =
         logger.info(f"{key:<32}: {clean_val}")
     logger.info("")
 
-    # --- Zero Summary ---
     zero_stats = zero_summary(df, zero_threshold=0.50)
     logger.info("--- Zero Summary ---")
     for key, value in zero_stats.items():
@@ -191,7 +191,6 @@ def data_stats(df: pd.DataFrame, name: str = "Data", compute_correlation: bool =
         logger.info(f"{key:<32}: {clean_val}")
     logger.info("")
 
-    # --- Expression Summary ---
     expr_stats = expression_summary(df)
     logger.info("--- Expression Summary ---")
     for key, value in expr_stats.items():
@@ -199,7 +198,6 @@ def data_stats(df: pd.DataFrame, name: str = "Data", compute_correlation: bool =
         logger.info(f"{key:<32}: {clean_val}")
     logger.info("")
 
-    # --- Correlation Summary ---
     if compute_correlation:
         try:
             corr_stats = correlation_summary(df)
@@ -209,28 +207,27 @@ def data_stats(df: pd.DataFrame, name: str = "Data", compute_correlation: bool =
                 logger.info(f"{key:<32}: {clean_val}")
             logger.info("")
         except Exception as e:
-            logger.warning(f"--- Correlation Summary ---\nCould not compute due to: {e}\n")
+            logger.info("--- Correlation Summary ---")
+            logger.info(f"Could not compute due to: {e}\n")
     else:
         logger.info("--- Correlation Summary ---")
         logger.info(f"{'Skipped':<32}: (compute_correlation=False)\n")
 
-    # --- NaN / Missingness Summary ---
     pct_missing = nan_summary(df, name=name)
-    
-    # --- SMART RECOMMENDATIONS ENGINE ---
+
     logger.info(f"--- {name} Recommendations ---")
-    
+
     # 1. Missingness Check
     if pct_missing > 30.0:
         logger.warning(
             f"SPARSITY: {pct_missing:.2f}% missing data. "
             f"Consider running `df = sparse_filter(df, missing_fraction=0.30)`."
         )
-        
+
     # 2. Beta Value Check (Bounded between 0 and 1)
     expr_min = expr_stats["Expression Min"]
     expr_max = expr_stats["Expression Max"]
-    
+
     if expr_min >= 0.0 and expr_max <= 1.0:
         logger.warning(
             "NORMALIZATION: Values are strictly bounded between 0 and 1. "
@@ -246,5 +243,5 @@ def data_stats(df: pd.DataFrame, name: str = "Data", compute_correlation: bool =
     else:
         logger.info("NORMALIZATION: Data distribution looks unbounded with low exact zeros. "
                     "Appears properly transformed.")
-        
+
     logger.info("=" * 50 + "\n")

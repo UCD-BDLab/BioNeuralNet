@@ -1,17 +1,17 @@
 r"""
 Correlated PageRank Clustering.
 
-This module implements a personalized PageRank algorithm combined with a 
+This module implements a personalized PageRank algorithm combined with a
 phenotype-aware sweep cut to detect significant subgraphs.
 
 References:
-    Abdel-Hafiz et al. (2022), "Significant Subgraph Detection in 
-    Multi-omics Networks for Disease Pathway Identification," 
+    Abdel-Hafiz et al. (2022), "Significant Subgraph Detection in
+    Multi-omics Networks for Disease Pathway Identification,"
     Frontiers in Big Data.
 
 Algorithm:
     The PageRank vector is computed as the stationary distribution of:
-    
+
     .. math::
         pr_{\\alpha}(s) = \\alpha s + (1 - \\alpha) pr_{\\alpha}(s) W
 
@@ -21,13 +21,13 @@ Algorithm:
         * :math:`W`: Transition matrix.
 
     .. important::
-        The `networkx.pagerank` implementation uses a `alpha` parameter 
-        representing the **damping factor** (link-following probability). 
+        The `networkx.pagerank` implementation uses a `alpha` parameter
+        representing the **damping factor** (link-following probability).
         Therefore, :math:`\\text{nx_alpha} = 1 - \\alpha_{theoretical}`.
 
 Notes:
     **Sweep Cut Optimization**
-    Nodes are sorted by PageRank-per-degree in descending order. For each 
+    Nodes are sorted by PageRank-per-degree in descending order. For each
     prefix set :math:`S_i`, the algorithm minimizes the **Hybrid Conductance**:
 
     .. math::
@@ -39,13 +39,13 @@ Notes:
         * :math:`k_P`: Trade-off weight (Default: ~0.5).
 
     **Personalization Vector (Seed Weighting)**
-    Teleportation probabilities for seeds are weighted by their marginal 
+    Teleportation probabilities for seeds are weighted by their marginal
     contribution to correlation:
 
     .. math::
         \\alpha_i = \\frac{\\rho_i}{\\max(\\rho_{seeds})} \\cdot \\alpha_{max}
 
-    Where :math:`\\rho_i = |\\rho(S)| - |\\rho(S \setminus \{i\})|`. 
+    Where :math:`\\rho_i = |\\rho(S)| - |\\rho(S \setminus \{i\})|`.
     Values where :math:`\\rho_i < 0` are clamped to 0.
 """
 
@@ -103,13 +103,13 @@ class CorrelatedPageRank:
 
         if not 0.0 <= teleport_prob <= 1.0:
             raise ValueError(f"teleport_prob must be in [0, 1], got {teleport_prob}")
-            
+
         self.teleport_prob = teleport_prob
         self._nx_alpha = 1.0 - teleport_prob
 
         if not 0.0 <= k_P <= 1.0:
             raise ValueError(f"k_P must be in [0, 1], got {k_P}")
-            
+
         self.k_P = k_P
         self.max_iter = max_iter
         self.tol = tol
@@ -135,14 +135,14 @@ class CorrelatedPageRank:
         """
         if not isinstance(self.G, nx.Graph):
             raise TypeError("graph must be a networkx.Graph")
-            
+
         if not isinstance(self.B, pd.DataFrame):
             raise TypeError("omics_data must be a pandas DataFrame")
-            
+
         graph_nodes = set(str(n) for n in self.G.nodes())
         omics_cols = set(str(c) for c in self.B.columns)
         missing = graph_nodes - omics_cols
-        
+
         if missing:
             logger.warning(
                 f"{len(missing)} graph nodes missing from omics columns "
@@ -174,7 +174,7 @@ class CorrelatedPageRank:
             return 0.0, 1.0
 
         B_sub = self.B[valid_cols]
-        
+
         if B_sub.shape[0] < 2:
             return 0.0, 1.0
 
@@ -199,7 +199,7 @@ class CorrelatedPageRank:
                 pc1, y_vals = pc1[:n_limit], y_vals[:n_limit]
 
             corr, pvalue = pearsonr(pc1, y_vals)
-            
+
             return (float(corr), float(pvalue)) if np.isfinite(corr) else (0.0, 1.0)
 
         except Exception as e:
@@ -255,7 +255,7 @@ class CorrelatedPageRank:
 
             vol_S = sum(d for _, d in self.G.degree(current_cluster, weight="weight"))
             vol_T = sum(d for _, d in self.G.degree(complement, weight="weight"))
-            
+
             if min(vol_S, vol_T) == 0:
                 continue
 
@@ -310,7 +310,7 @@ class CorrelatedPageRank:
             if not nodes_excl:
                 contributions.append(0.0)
                 continue
-                
+
             corr_excl, _ = self.phen_omics_corr(nodes_excl)
             rho_i = abs_total - abs(corr_excl)
             contributions.append(rho_i)
@@ -347,12 +347,12 @@ class CorrelatedPageRank:
 
         graph_nodes = set(self.G.nodes())
         missing = set(seed_nodes) - graph_nodes
-        
+
         if missing:
             raise ValueError(f"Seed nodes not in graph: {missing}")
 
         personalization = self.generate_weighted_personalization(seed_nodes)
-        
+
         logger.info(
             f"Personalization: {len(personalization)} nodes, "
             f"max_weight={max(personalization.values()):.4f}, "

@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.abspath("../../"))
 try:
     release = metadata.version("bioneuralnet")
 except metadata.PackageNotFoundError:
-    release = "1.2.2"
+    release = "1.3.0"
 
 project = "BioNeuralNet"
 version = release
@@ -54,7 +54,7 @@ html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 html_theme = "furo"
 #html_title = ""
-html_logo = "_static/LOGO_TB.svg"
+html_logo = "_static/logo_update.png"
 #html_theme = "sphinx_rtd_theme"
 
 intersphinx_mapping = {
