@@ -13,7 +13,7 @@ Key Features:
 
 """
 
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 
 # submodules to enable direct imports such as `from bioneuralnet import utils`
 from . import utils
