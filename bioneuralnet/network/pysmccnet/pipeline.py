@@ -18,7 +18,7 @@ from .wrappers import get_can_weights_multi,get_robust_weights_multi,get_robust_
 from ...utils.logger import get_logger
 logger = get_logger(__name__)
 
-def auto_pysmccnet(X: List[Union[pd.DataFrame, np.ndarray]], Y: Union[pd.DataFrame, np.ndarray], AdjustedCovar: Optional[pd.DataFrame] = None, preprocess: bool = False, Kfold: int = 5, subSampNum: int = 100, DataType: Optional[List[str]] = None, BetweenShrinkage: float = 2.0, ScalingPen: List[float] = [0.1, 0.1], saving_dir: str = os.getcwd(), tuneLength: int = 5, tuneRangeCCA: List[float] = [0.1, 0.5], tuneRangePLS: List[float] = [0.5, 0.9], EvalMethod: str = 'accuracy', ncomp_pls: int = 3, seed: int = 123, CutHeight: float = 1 - 0.1**10, min_size: int = 10, max_size: int = 100, summarization: str = "NetSHy", precomputed_fold_data: Optional[dict] = None, device: Optional[torch.device] = "cpu", dtype: torch.dtype = torch.float64) -> dict:
+def auto_pysmccnet(X: List[Union[pd.DataFrame, np.ndarray]], Y: Union[pd.DataFrame, np.ndarray], AdjustedCovar: Optional[pd.DataFrame] = None, preprocess: bool = False, Kfold: int = 5, subSampNum: int = 100, DataType: Optional[List[str]] = None, BetweenShrinkage: float = 2.0, ScalingPen: List[float] = [0.1, 0.1], saving_dir: str = os.getcwd(), tuneLength: int = 5, tuneRangeCCA: List[float] = [0.1, 0.5], tuneRangePLS: List[float] = [0.5, 0.9], EvalMethod: str = 'accuracy', ncomp_pls: int = 3, seed: int = 123, CutHeight: float = 1 - 0.1**10, min_size: int = 10, max_size: int = 100, summarization: str = "NetSHy", precomputed_fold_data: Optional[dict] = None, device: Optional[torch.device] = "cpu", dtype: torch.dtype = torch.float64, rename: bool = True) -> dict:
     """Automated SmCCNet workflow with GPU acceleration.
 
     Runs the complete SmCCNet pipeline supporting both CCA (continuous phenotype) and PLS (binary phenotype) modes. The workflow includes optional preprocessing, cross-validation for penalty tuning, subsampling for stability selection, and final network construction.
@@ -48,6 +48,7 @@ def auto_pysmccnet(X: List[Union[pd.DataFrame, np.ndarray]], Y: Union[pd.DataFra
         precomputed_fold_data (dict | None): Precomputed CV folds to bypass internal fold generation.
         device (torch.device | cpu): PyTorch device; if None, automatically selects GPU if available.
         dtype (torch.dtype): PyTorch data type for computations.
+        rename (bool): If True, prefix datatype to column names; if False, use original column names.
 
     Returns:
 
@@ -73,19 +74,37 @@ def auto_pysmccnet(X: List[Union[pd.DataFrame, np.ndarray]], Y: Union[pd.DataFra
     if DataType is None:
         DataType = [f"Omics{i+1}" for i in range(len(X))]
 
+    rename_mapping = {}
+
+    # validating uniqueness if rename is False
+    if not rename:
+        all_original_columns = []
+        for data_obj in X:
+            if hasattr(data_obj, 'columns'):
+                all_original_columns.extend(list(data_obj.columns))
+            else:
+                all_original_columns.extend([f"Feat{j+1}" for j in range(data_obj.shape[1])])
+
+        if len(all_original_columns) != len(set(all_original_columns)):
+            raise ValueError("Overlapping column names detected across omics. Set 'rename=True' or rename your columns manually.")
+
     feature_labels = []
 
     for i, data_obj in enumerate(X):
         prefix = DataType[i]
 
         if hasattr(data_obj, 'columns'):
-            # DataFrame: use real column names with DataType prefix
-            labels = [f"{prefix}_{col}" for col in data_obj.columns]
+            og_cols = data_obj.columns
+            labels = [f"{prefix}_{col}" for col in og_cols]
         else:
-            # Numpy array: fallback to generic
-            labels = [f"{prefix}_Feat{j+1}" for j in range(data_obj.shape[1])]
+            og_cols = [f"Feat{j+1}" for j in range(data_obj.shape[1])]
+            labels = [f"{prefix}_{col}" for col in og_cols]
 
         feature_labels.extend(labels)
+
+        if not rename:
+            for prefixed_col, og_col in zip(labels, og_cols):
+                rename_mapping[prefixed_col] = og_col
 
     # preprocessing
     if preprocess:
@@ -465,8 +484,10 @@ def auto_pysmccnet(X: List[Union[pd.DataFrame, np.ndarray]], Y: Union[pd.DataFra
         for i in range(len(X)):
             feature_labels.extend([f"{DataType[i]}_Feat{j+1}" for j in range(X[i].shape[1])])
 
-    Abar = get_abar(Ws_final, feature_label=feature_labels)
+    if rename_mapping:
+        feature_labels = [rename_mapping.get(label, label) for label in feature_labels]
 
+    Abar = get_abar(Ws_final, feature_label=feature_labels)
 
     if not os.path.exists(saving_dir):
         os.makedirs(saving_dir)

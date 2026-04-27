@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.1] - 2026-04-27
+
+### New `auto_pysmccnet` param: `rename`
+- Added a `rename` boolean flag to the pysmccnet pipeline.
+    - When set to `False`, the pipeline preserves the original dataset column names instead of automatically appending datatype prefixes (column names must be strictly unique across omics)
+
+### Datasets Module:
+- Fixed a user-reported error ahead of the Multi Omics NETwork Analysis Workshop (MONET) workshop at the University of Colorado Anschutz Medical Campus.
+
 ## [1.3.0] - 2026-04-01
 
 ### Network Module (`bioneuralnet.network`)
