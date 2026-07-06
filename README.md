@@ -21,9 +21,9 @@
 
 If you use BioNeuralNet in your research, we kindly ask that you cite our paper:
 
-> Ramos, V., Hussein, S., et al. (2025).
-> [**BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool**](https://arxiv.org/abs/2507.20440).
-> *arXiv preprint arXiv:2507.20440* | [**DOI: 10.48550/arXiv.2507.20440**](https://doi.org/10.48550/arXiv.2507.20440).
+> Ramos, V., et al. (2026).
+> [**BioNeuralNet: a graph neural network based Multi-Omics network data analysis tool**](https://academic.oup.com/bioinformatics/article/42/6/btag365/8705525).
+> *Bioinformatics*, Volume 42, Issue 6, btag365 | [**DOI: 10.1093/bioinformatics/btag365**](https://doi.org/10.1093/bioinformatics/btag365).
 
 
 For your convenience, you can use the following BibTeX entry:
@@ -32,14 +32,17 @@ For your convenience, you can use the following BibTeX entry:
   <summary>BibTeX Citation</summary>
 
 ```bibtex
-@misc{ramos2025bioneuralnetgraphneuralnetwork,
-      title={BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool},
-      author={Vicente Ramos and Sundous Hussein and Mohamed Abdel-Hafiz and Arunangshu Sarkar and Weixuan Liu and Katerina J. Kechris and Russell P. Bowler and Leslie Lange and Farnoush Banaei-Kashani},
-      year={2025},
-      eprint={2507.20440},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2507.20440},
+@article{ramos2026bioneuralnet,
+      title={BioNeuralNet: a graph neural network based Multi-Omics network data analysis tool},
+      author={Ramos, Vicente and Hussein, Sundous and Abdel-Hafiz, Mohamed and Sarkar, Arunangshu and Liu, Weixuan and Kechris, Katerina J. and Bowler, Russell P. and Lange, Leslie and Banaei-Kashani, Farnoush},
+      journal={Bioinformatics},
+      volume={42},
+      number={6},
+      pages={btag365},
+      year={2026},
+      month={June},
+      doi={10.1093/bioinformatics/btag365},
+      url={https://doi.org/10.1093/bioinformatics/btag365}
 }
 ```
 </details>
@@ -63,7 +66,6 @@ For complete documentation, tutorials, and examples, please visit our Read the D
 - [8. License](#9-License)
 - [9. Contact](#10-Contact)
 - [10. References](#11-References)
-- [11. Citation](#11-Citation)
 
 ## 1. Installation
 
@@ -355,35 +357,8 @@ See the [LICENSE](LICENSE) file for details.
 
 ## 10. References
 
-<a id="1">[1]</a> Abdel-Hafiz, M., Najafi, M., et al. "Significant Subgraph Detection in Multi-omics Networks for Disease Pathway Identification." *Frontiers in Big Data*, 5 (2022). [DOI: 10.3389/fdata.2022.894632](https://doi.org/10.3389/fdata.2022.894632)
+<a id="1">[1]</a> Abdel-Hafiz, M., et al. (2022). "Significant Subgraph Detection in Multi-omics Networks for Disease Pathway Identification." *Frontiers in Big Data*, 5. [DOI: 10.3389/fdata.2022.894632](https://doi.org/10.3389/fdata.2022.894632)
 
-<a id="2">[2]</a> Hussein, S., Ramos, V., et al. "Learning from Multi-Omics Networks to Enhance Disease Prediction: An Optimized Network Embedding and Fusion Approach." In *2024 IEEE International Conference on Bioinformatics and Biomedicine (BIBM)*, Lisbon, Portugal, 2024, pp. 4371-4378. [DOI: 10.1109/BIBM62325.2024.10822233](https://doi.org/10.1109/BIBM62325.2024.10822233)
+<a id="2">[2]</a> Hussein, S., et al. (2024). "Learning from Multi-Omics Networks to Enhance Disease Prediction: An Optimized Network Embedding and Fusion Approach." In *2024 IEEE International Conference on Bioinformatics and Biomedicine (BIBM)*, Lisbon, Portugal, pp. 4371-4378. [DOI: 10.1109/BIBM62325.2024.10822233](https://doi.org/10.1109/BIBM62325.2024.10822233)
 
-<a id="3">[3]</a> Liu, W., Vu, T., Konigsberg, I. R., Pratte, K. A., Zhuang, Y., & Kechris, K. J. (2023). "Network-Based Integration of Multi-Omics Data for Biomarker Discovery and Phenotype Prediction." *Bioinformatics*, 39(5), btat204. [DOI: 10.1093/bioinformatics/btat204](https://doi.org/10.1093/bioinformatics/btat204)
-
-
-## 11. Citation
-
-If you use BioNeuralNet in your research, we kindly ask that you cite our paper:
-
-> Vicente Ramos, et al. (2025).
-> [**BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool**](https://arxiv.org/abs/2507.20440).
-> *arXiv preprint arXiv:2507.20440*.
-
-For your convenience, you can use the following BibTeX entry:
-
-<details>
-  <summary>BibTeX Citation</summary>
-
-```bibtex
-@misc{ramos2025bioneuralnetgraphneuralnetwork,
-      title={BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool},
-      author={Vicente Ramos and Sundous Hussein and Mohamed Abdel-Hafiz and Arunangshu Sarkar and Weixuan Liu and Katerina J. Kechris and Russell P. Bowler and Leslie Lange and Farnoush Banaei-Kashani},
-      year={2025},
-      eprint={2507.20440},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2507.20440},
-}
-```
-</details>
+<a id="3">[3]</a> Liu, W., et al. (2024). "Smccnet 2.0: a comprehensive tool for multi-omics network inference with shiny visualization." *BMC Bioinformatics*, 25(1), 276. [DOI: 10.1186/s12859-024-05900-9](https://doi.org/10.1186/s12859-024-05900-9)
