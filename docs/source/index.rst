@@ -210,9 +210,9 @@ Citation
 
 If you use BioNeuralNet in your research, we kindly ask that you cite our paper:
 
-   Ramos, V., Hussein, S., et al. (2025).
-   `BioNeuralNet: A Graph Neural Network based Multi-Omics Network Data Analysis Tool <https://arxiv.org/abs/2507.20440>`_.
-   *arXiv preprint arXiv:2507.20440* | `DOI: 10.48550/arXiv.2507.20440 <https://doi.org/10.48550/arXiv.2507.20440>`_.
+   Ramos, V., et al. (2026).
+   `BioNeuralNet: a graph neural network based Multi-Omics network data analysis tool <https://academic.oup.com/bioinformatics/article/42/6/btag365/8705525>`_.
+   *Bioinformatics*, Volume 42, Issue 6, btag365 | `DOI: 10.1093/bioinformatics/btag365 <https://doi.org/10.1093/bioinformatics/btag365>`_.
 
 .. toctree::
    :maxdepth: 2
@@ -240,5 +240,5 @@ Indices and References
 * :ref:`modindex`
 * :ref:`search`
 
-.. [1] Liu, W., Vu, T., Konigsberg, I. R., Pratte, K. A., Zhuang, Y., & Kechris, K. J. (2023). "Network-Based Integration of Multi-Omics Data for Biomarker Discovery and Phenotype Prediction." *Bioinformatics*, 39(5), btat204. DOI: `10.1093/bioinformatics/btat204 <https://doi.org/10.1093/bioinformatics/btat204>`_.
-.. [2] Hussein, S., Ramos, V., et al. "Learning from Multi-Omics Networks to Enhance Disease Prediction: An Optimized Network Embedding and Fusion Approach." In *2024 IEEE International Conference on Bioinformatics and Biomedicine (BIBM)*, Lisbon, Portugal, 2024, pp. 4371-4378. DOI: `10.1109/BIBM62325.2024.10822233 <https://doi.org/10.1109/BIBM62325.2024.10822233>`_.
+.. [1] Liu, W., et al. (2024). "Smccnet 2.0: a comprehensive tool for multi-omics network inference with shiny visualization." *BMC Bioinformatics*, 25(1), 276. DOI: `10.1186/s12859-024-05900-9 <https://doi.org/10.1186/s12859-024-05900-9>`_.
+.. [2] Hussein, S., et al. (2024). "Learning from Multi-Omics Networks to Enhance Disease Prediction: An Optimized Network Embedding and Fusion Approach." In *2024 IEEE International Conference on Bioinformatics and Biomedicine (BIBM)*, Lisbon, Portugal, pp. 4371-4378. DOI: `10.1109/BIBM62325.2024.10822233 <https://doi.org/10.1109/BIBM62325.2024.10822233>`_.
